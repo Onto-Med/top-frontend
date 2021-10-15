@@ -1,18 +1,24 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <phenotype-editor v-model="phenotype" />
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component'
-import HelloWorld from '@/components/HelloWorld.vue' // @ is an alias to /src
+import PhenotypeEditor from '@/components/PhenotypeEditor.vue'
 
 @Options({
   components: {
-    HelloWorld
+    PhenotypeEditor
   }
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  phenotype!: {
+    title: {
+      de: 'Größe',
+      en: 'Height'
+    }
+  }
+}
 </script>
