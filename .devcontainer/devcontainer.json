@@ -24,7 +24,8 @@
 		"eamodio.gitlens",
 		"gamunu.vscode-yarn",
 		"hollowtree.vue-snippets",
-		"dariofuzinato.vue-peek"
+		"dariofuzinato.vue-peek",
+		"mhutchie.git-graph"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
