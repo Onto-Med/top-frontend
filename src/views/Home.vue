@@ -1,24 +1,24 @@
 <template>
   <div class="home">
-    <phenotype-editor v-model="phenotype" />
+    <localized-text v-model="phenotype.titles" :supportedLangs="['de', 'en']" :uniqueLangs="true" />
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component'
-import PhenotypeEditor from '@/components/PhenotypeEditor.vue'
+import LocalizedText from '@/components/LocalizedText.vue'
 
 @Options({
   components: {
-    PhenotypeEditor
+    LocalizedText
   }
 })
 export default class Home extends Vue {
   phenotype = {
-    titles: {
-      de: 'Größe',
-      en: 'Height'
-    }
-  }
+    titles: [
+      { lang: 'de', text: 'Größe' },
+      { lang: 'en', text: 'Height' }
+    ]
+  };
 }
 </script>
