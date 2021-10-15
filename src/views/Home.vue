@@ -1,6 +1,13 @@
 <template>
   <div class="home">
-    <localized-text v-model="phenotype.titles" :supportedLangs="['de', 'en']" :uniqueLangs="true" />
+    <localized-text unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" />
+    <div>
+      Describing metadata
+      <localized-text v-model="phenotype.synonyms" :supported-langs="['de', 'en']" />
+      <localized-text text-area rows="3" v-model="phenotype.descriptions" :supported-langs="['de', 'en']" />
+    </div>
+
+    <pre>{{ phenotype }}</pre>
   </div>
 </template>
 
@@ -18,6 +25,11 @@ export default class Home extends Vue {
     titles: [
       { lang: 'de', text: 'Größe' },
       { lang: 'en', text: 'Height' }
+    ],
+    synonyms: [],
+    descriptions: [
+      { lang: 'de', text: 'Beispielbeschreibung' },
+      { lang: 'en', text: 'Example description' }
     ]
   };
 }
