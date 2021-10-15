@@ -14,8 +14,8 @@ import PhenotypeEditor from '@/components/PhenotypeEditor.vue'
   }
 })
 export default class Home extends Vue {
-  phenotype!: {
-    title: {
+  phenotype = {
+    titles: {
       de: 'Größe',
       en: 'Height'
     }
