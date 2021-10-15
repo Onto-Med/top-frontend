@@ -1,13 +1,14 @@
 <template>
   <div>
-    <pre>{{ modelValue }}</pre>
     <div v-for="(entry, index) in modelValue" :key="index">
       <select v-model="entry.lang">
         <option :value="lang" v-for="lang in supportedLangs" :key="lang">{{ lang }}</option>
       </select>
       <input type="text" :value="entry.text" />
+      <button @click="removeEntryByIndex(index)">Remove</button>
     </div>
-    <div v-show="uniqueLangs & duplicatedLangs > 0">There can only be one title per language!</div>
+    <button @click="addEntry()">Add new {{ name }}</button>
+    <div v-show="uniqueLangs && duplicatedLangs > 0">There can only be one {{ name }} per language!</div>
   </div>
 </template>
 
@@ -17,6 +18,10 @@ import { Options, Vue } from 'vue-class-component'
 @Options({
   props: {
     modelValue: Array,
+    name: {
+      type: String,
+      default: 'entry'
+    },
     supportedLangs: {
       type: Array,
       default () {
@@ -34,6 +39,17 @@ import { Options, Vue } from 'vue-class-component'
         .map((x: Record<string, string>) => x.lang)
         .filter((l: string, i: number, a: Array<string>) => a.indexOf(l) !== i)
         .length
+    },
+    unusedSupportedLangs () {
+      return this.supportedLangs
+    }
+  },
+  methods: {
+    removeEntryByIndex (index: number) {
+      this.modelValue.splice(index, 1)
+    },
+    addEntry () {
+      this.modelValue.push({ lang: this.unusedSupportedLangs[0] })
     }
   }
 })
