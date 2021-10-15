@@ -6,9 +6,9 @@
       </select>
       <textarea v-if="textArea" :rows="rows" :cols="cols" v-model="entry.text" />
       <input v-else type="text" v-model="entry.text" />
-      <button @click="removeEntryByIndex(index)">Remove</button>
+      <button class="remove-localized-text-btn" @click="removeEntryByIndex(index)">Remove</button>
     </div>
-    <button @click="addEntry()">Add new {{ name }}</button>
+    <button class="add-localized-text-btn" @click="addEntry()">Add new {{ name }}</button>
     <div v-show="uniqueLangs && duplicatedLangs > 0">There can only be one {{ name }} per language!</div>
   </div>
 </template>
