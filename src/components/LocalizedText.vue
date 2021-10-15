@@ -4,7 +4,8 @@
       <select v-model="entry.lang">
         <option :value="lang" v-for="lang in supportedLangs" :key="lang">{{ lang }}</option>
       </select>
-      <input type="text" :value="entry.text" />
+      <textarea v-if="textArea" :rows="rows" :cols="cols" v-model="entry.text" />
+      <input v-else type="text" v-model="entry.text" />
       <button @click="removeEntryByIndex(index)">Remove</button>
     </div>
     <button @click="addEntry()">Add new {{ name }}</button>
@@ -17,20 +18,21 @@ import { Options, Vue } from 'vue-class-component'
 
 @Options({
   props: {
-    modelValue: Array,
+    modelValue: {
+      type: Array,
+      required: true
+    },
+    uniqueLangs: Boolean,
+    textArea: Boolean,
+    rows: [Number, String],
+    cols: [Number, String],
     name: {
       type: String,
       default: 'entry'
     },
     supportedLangs: {
       type: Array,
-      default () {
-        return ['en']
-      }
-    },
-    uniqueLangs: {
-      type: Boolean,
-      default: false
+      default: () => ['en']
     }
   },
   computed: {
