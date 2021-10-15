@@ -22,7 +22,9 @@
 		"dbaeumer.vscode-eslint",
 		"octref.vetur",
 		"eamodio.gitlens",
-		"gamunu.vscode-yarn"
+		"gamunu.vscode-yarn",
+		"hollowtree.vue-snippets",
+		"dariofuzinato.vue-peek"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
