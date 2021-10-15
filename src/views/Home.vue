@@ -22,3 +22,9 @@ export default class Home extends Vue {
   };
 }
 </script>
+
+<style lang="scss">
+.home {
+  text-align: left;
+}
+</style>
