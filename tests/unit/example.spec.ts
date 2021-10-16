@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils'
-import LocalizedText from '@/components/LocalizedText.vue'
+import LocalizedTextInput from '@/components/LocalizedTextInput.vue'
 
-describe('LocalizedText.vue', () => {
+describe('LocalizedTextInput.vue', () => {
   it('adds empty localized string', () => {
     const titles: Record<string, unknown>[] = []
-    const wrapper = shallowMount(LocalizedText, {
+    const wrapper = shallowMount(LocalizedTextInput, {
       props: { modelValue: titles }
     })
     expect(wrapper.find('button.remove-localized-text-btn').exists()).toBeFalsy()
@@ -19,7 +19,7 @@ describe('LocalizedText.vue', () => {
       { lang: 'de', text: 'Beispiel' },
       { lang: 'en', text: 'Example' }
     ]
-    const wrapper = shallowMount(LocalizedText, {
+    const wrapper = shallowMount(LocalizedTextInput, {
       props: { modelValue: titles }
     })
     const btns = wrapper.findAll('button.remove-localized-text-btn')

@@ -55,6 +55,6 @@ import { Options, Vue } from 'vue-class-component'
     }
   }
 })
-export default class LocalizedText extends Vue {
+export default class LocalizedTextInput extends Vue {
 }
 </script>

@@ -3,8 +3,8 @@
     <localized-text unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" />
     <div>
       Describing metadata
-      <localized-text v-model="phenotype.synonyms" :supported-langs="['de', 'en']" />
-      <localized-text text-area rows="3" v-model="phenotype.descriptions" :supported-langs="['de', 'en']" />
+      <localized-text-input v-model="phenotype.synonyms" :supported-langs="['de', 'en']" />
+      <localized-text-input text-area rows="3" v-model="phenotype.descriptions" :supported-langs="['de', 'en']" />
     </div>
 
     <pre>{{ phenotype }}</pre>
@@ -13,11 +13,11 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component'
-import LocalizedText from '@/components/LocalizedText.vue'
+import LocalizedTextInput from '@/components/LocalizedTextInput.vue'
 
 @Options({
   components: {
-    LocalizedText
+    LocalizedTextInput
   }
 })
 export default class Home extends Vue {
