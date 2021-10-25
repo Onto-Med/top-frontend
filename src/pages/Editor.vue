@@ -13,29 +13,33 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component'
-import LocalizedTextInput from '@/components/LocalizedTextInput.vue'
-import DatatypeSelect from '@/components/DatatypeSelect.vue'
+import { defineComponent } from 'vue'
+import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
+import DatatypeSelect from 'src/components/DatatypeSelect.vue'
 
-@Options({
+export default defineComponent({
+  name: 'Editor',
   components: {
     LocalizedTextInput,
     DatatypeSelect
+  },
+  data () {
+    return {
+      phenotype: {
+        titles: [
+          { lang: 'de', text: 'Größe' },
+          { lang: 'en', text: 'Height' }
+        ],
+        datatype: 'numeric',
+        synonyms: [],
+        descriptions: [
+          { lang: 'de', text: 'Beispielbeschreibung' },
+          { lang: 'en', text: 'Example description' }
+        ]
+      }
+    }
   }
 })
-export default class Home extends Vue {
-  phenotype = {
-    titles: [
-      { lang: 'de', text: 'Größe' },
-      { lang: 'en', text: 'Height' }
-    ],
-    synonyms: [],
-    descriptions: [
-      { lang: 'de', text: 'Beispielbeschreibung' },
-      { lang: 'en', text: 'Example description' }
-    ]
-  };
-}
 </script>
 
 <style lang="scss">

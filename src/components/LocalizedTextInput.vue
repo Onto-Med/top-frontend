@@ -11,17 +11,17 @@
       </q-input>
     </div>
     <q-btn color="primary" icon="add" class="add-localized-text-btn" @click="addEntry()" :label="`Add new ${name}`" />
-    <div v-show="uniqueLangs && duplicatedLangs > 0">There can only be one {{ name }} per language!</div>
+    <div v-show="uniqueLangs && duplicatedLangs.length > 0">There can only be one {{ name }} per language!</div>
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component'
+import { defineComponent } from 'vue'
 
-@Options({
+export default defineComponent({
   props: {
     modelValue: {
-      type: Array,
+      type: Array as () => Array<Record<string, string>>,
       required: true
     },
     uniqueLangs: Boolean,
@@ -33,30 +33,31 @@ import { Options, Vue } from 'vue-class-component'
       default: 'entry'
     },
     supportedLangs: {
-      type: Array,
+      type: Array as () => string[],
       default: () => ['en']
     }
   },
   computed: {
-    duplicatedLangs () {
+    duplicatedLangs (): string[] {
       return this.modelValue
-        .map((x: Record<string, string>) => x.lang)
+        .map(x => x.lang)
         .filter((l: string, i: number, a: Array<string>) => a.indexOf(l) !== i)
-        .length
     },
-    unusedSupportedLangs () {
-      return this.supportedLangs
+    unusedSupportedLangs (): string[] {
+      return this.supportedLangs.filter(l => !this.duplicatedLangs.includes(l))
     }
   },
   methods: {
     removeEntryByIndex (index: number) {
-      this.modelValue.splice(index, 1)
+      let newModelValue = this.modelValue.slice()
+      newModelValue.splice(index, 1)
+      this.$emit('update:modelValue', newModelValue)
     },
     addEntry () {
-      this.modelValue.push({ lang: this.unusedSupportedLangs[0] })
+      let newModelValue = this.modelValue.slice()
+      newModelValue.push({ lang: this.unusedSupportedLangs[0] })
+      this.$emit('update:modelValue', newModelValue)
     }
   }
 })
-export default class LocalizedTextInput extends Vue {
-}
 </script>

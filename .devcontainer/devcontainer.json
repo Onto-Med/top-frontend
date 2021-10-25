@@ -14,7 +14,11 @@
 	},
 
 	// Set *default* container specific settings.json values on container create.
-	"settings": {},
+	"settings": {
+		"vetur.validation.template": false,
+		"vetur.validation.script": false,
+		"vetur.validation.style": false
+	},
 
 
 	// Add the IDs of extensions you want installed when the container is created.
