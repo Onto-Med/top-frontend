@@ -9,7 +9,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   props: {
     modelValue: {
       type: String,
@@ -36,5 +38,5 @@ export default {
       set (value: string): void { this.$emit('update:modelValue', value) }
     }
   }
-}
+})
 </script>

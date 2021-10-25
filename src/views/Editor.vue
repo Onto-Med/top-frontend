@@ -1,6 +1,7 @@
 <template>
   <div class="home">
     <localized-text-input unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" />
+    <datatype-select v-model="phenotype.datatype" />
     <div>
       Describing metadata
       <localized-text-input v-model="phenotype.synonyms" :supported-langs="['de', 'en']" />
@@ -14,10 +15,12 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component'
 import LocalizedTextInput from '@/components/LocalizedTextInput.vue'
+import DatatypeSelect from '@/components/DatatypeSelect.vue'
 
 @Options({
   components: {
-    LocalizedTextInput
+    LocalizedTextInput,
+    DatatypeSelect
   }
 })
 export default class Home extends Vue {
