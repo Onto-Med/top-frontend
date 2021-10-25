@@ -4,6 +4,7 @@
     :label="label"
     stack-label
     emit-value
+    map-options
     :options="options"
   />
 </template>
