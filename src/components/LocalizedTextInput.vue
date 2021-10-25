@@ -1,14 +1,16 @@
 <template>
-  <div>
-    <div v-for="(entry, index) in modelValue" :key="index">
-      <select v-model="entry.lang">
-        <option :value="lang" v-for="lang in supportedLangs" :key="lang">{{ lang }}</option>
-      </select>
-      <textarea v-if="textArea" :rows="rows" :cols="cols" v-model="entry.text" />
-      <input v-else type="text" v-model="entry.text" />
-      <button class="remove-localized-text-btn" @click="removeEntryByIndex(index)">Remove</button>
+  <div class="q-pa-md">
+    <div class="row" v-for="(entry, index) in modelValue" :key="index">
+      <q-input outlined :type="textArea ? 'textarea' : 'text'" :rows="rows" :cols="cols" v-model="entry.text">
+        <template v-slot:before>
+          <q-select outlined v-model="entry.lang" :options="supportedLangs" />
+        </template>
+        <template v-slot:after>
+          <q-btn color="red" icon="remove" class="remove-localized-text-btn" @click="removeEntryByIndex(index)" />
+        </template>
+      </q-input>
     </div>
-    <button class="add-localized-text-btn" @click="addEntry()">Add new {{ name }}</button>
+    <q-btn color="primary" icon="add" class="add-localized-text-btn" @click="addEntry()" :label="`Add new ${name}`" />
     <div v-show="uniqueLangs && duplicatedLangs > 0">There can only be one {{ name }} per language!</div>
   </div>
 </template>
