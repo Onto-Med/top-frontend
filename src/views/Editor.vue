@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <localized-text unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" />
+    <localized-text-input unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" />
     <div>
       Describing metadata
       <localized-text-input v-model="phenotype.synonyms" :supported-langs="['de', 'en']" />
