@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-jest';
 import { mount } from '@vue/test-utils';
-import LocalizedTextInput from '@/components/LocalizedTextInput.vue'
+import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 
 // Specify here Quasar config you'll need to test your component
 installQuasarPlugin();
@@ -12,6 +12,7 @@ describe('LocalizedTextInput.vue', () => {
     const wrapper = mount(LocalizedTextInput, {
       props: { modelValue: titles }
     })
+    expect(wrapper).toBeTruthy()
     expect(wrapper.find('button.remove-localized-text-btn').exists()).toBeFalsy()
     const btn = wrapper.find('button.add-localized-text-btn')
     expect(btn.exists()).toBeTruthy()
@@ -27,6 +28,7 @@ describe('LocalizedTextInput.vue', () => {
     const wrapper = mount(LocalizedTextInput, {
       props: { modelValue: titles }
     })
+    expect(wrapper).toBeTruthy()
     const btns = wrapper.findAll('button.remove-localized-text-btn')
     expect(btns.length).toBe(2)
     expect(btns[1].exists()).toBeTruthy()
