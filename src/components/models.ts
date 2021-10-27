@@ -8,14 +8,14 @@ export interface IPhenotype {
   descriptions: Array<Record<string, string>>;
 }
 
-enum EntityType {
-  category = 'category',
-  missing_value_phenotype = 'missing_value_phenotype',
-  group_phenotype = 'group_phenotype',
-  unrestricted_single_phenotype = 'unrestricted_single_phenotype',
-  restricted_single_phenotype = 'restricted_single_phenotype',
-  unrestricted_combined_phenotype = 'unrestricted_combined_phenotype',
-  restricted_combined_phenotype = 'restricted_combined_phenotype',
-  unrestricted_derived_phenotype = 'unrestricted_derived_phenotype',
-  restricted_derived_phenotype = 'restricted_derived_phenotype'
+export enum EntityType {
+  Category                      = 'category',
+  MissingValuePhenotype         = 'missing_value_phenotype',
+  GroupPhenotype                = 'group_phenotype',
+  UnrestrictedSinglePhenotype   = 'unrestricted_single_phenotype',
+  UnrestrictedCombinedPhenotype = 'unrestricted_combined_phenotype',
+  UnrestrictedDerivedPhenotype  = 'unrestricted_derived_phenotype',
+  RestrictedSinglePhenotype     = 'restricted_single_phenotype',
+  RestrictedCombinedPhenotype   = 'restricted_combined_phenotype',
+  RestrictedDerivedPhenotype    = 'restricted_derived_phenotype'
 }

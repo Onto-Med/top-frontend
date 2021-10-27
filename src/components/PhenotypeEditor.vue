@@ -12,7 +12,9 @@
 
     <div class="q-gutter-md q-pa-md">
       <localized-text-input unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" />
+
       <datatype-select v-model="phenotype.datatype" />
+
       <q-expansion-item expand-separator icon="description" label="Describing metadata">
         <div class="q-gutter-md">
           <localized-text-input v-model="phenotype.synonyms" :supported-langs="['de', 'en']" label="Synonyms" />
@@ -45,7 +47,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { IPhenotype, EntityType } from './models';
+import { IPhenotype, EntityType } from 'src/components/models';
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 import DatatypeSelect from 'src/components/DatatypeSelect.vue'
 

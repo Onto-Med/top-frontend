@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { EntityType } from 'src/components/models';
 import PhenotypeEditor from 'src/components/PhenotypeEditor.vue'
 
 export default defineComponent({
@@ -14,7 +15,7 @@ export default defineComponent({
   data () {
     return {
       showJson: false,
-      entityType: 'unrestricted_single_phenotype'
+      entityType: EntityType.UnrestrictedSinglePhenotype
     }
   }
 })
