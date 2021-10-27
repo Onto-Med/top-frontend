@@ -11,7 +11,7 @@
     </q-toolbar>
 
     <div class="q-gutter-md q-pa-md">
-      <localized-text-input unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" />
+      <localized-text-input unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" label="Titles" />
 
       <datatype-select v-model="phenotype.datatype" />
 
