@@ -21,7 +21,12 @@
     </template>
     <template #after>
       <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2">
-        <q-tab :name="tab.id" :label="tab.label" v-for="tab in tabs" :key="tab.id" />
+        <q-tab :name="tab.id" v-for="tab in tabs" :key="tab.id">
+          <span class="no-wrap">
+            {{ tab.label }}
+            <q-btn flat dense rounded icon="close" size="xs" @click.prevent="closeTab(tab)" />
+          </span>
+        </q-tab>
       </q-tabs>
       <q-tab-panels keep-alive animated v-model="selected">
         <q-tab-panel :name="tab.id" v-for="tab in tabs" :key="tab.id">
@@ -61,6 +66,12 @@ export default defineComponent({
         let tree = this.$refs.tree as QTree
         this.tabs.push(tree.getNodeByKey(key) as IPhenotypeTreeNode)
       }
+    }
+  },
+  methods: {
+    closeTab (tab: IPhenotypeTreeNode): void {
+      this.tabs.splice(this.tabs.indexOf(tab.id), 1)
+      if (this.selected === tab.id) this.selected = ''
     }
   },
   mounted () {
