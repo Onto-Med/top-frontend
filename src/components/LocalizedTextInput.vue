@@ -16,8 +16,8 @@
             <q-btn color="red" icon="remove" class="remove-localized-text-btn" @click="removeEntryByIndex(index)" />
           </template>
         </q-input>
-        <div v-show="uniqueLangs && duplicatedLangs.length > 0">There can only be one {{ name }} per language!</div>
       </div>
+      <div v-show="uniqueLangs && duplicatedLangs.length > 0">There can only be one {{ name }} per language!</div>
     </q-card-section>
 
     <q-separator />
