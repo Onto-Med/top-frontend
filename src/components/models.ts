@@ -2,10 +2,17 @@ export interface IPhenotype {
   id: string;
   title: string;
   entityType: EntityType;
-  titles: Array<Record<string, string>>;
+  titles: Record<string, string>[];
   datatype: string;
-  synonyms: Array<Record<string, string>>;
-  descriptions: Array<Record<string, string>>;
+  synonyms: Record<string, string>[];
+  descriptions: Record<string, string>[];
+}
+
+export interface IPhenotypeTreeNode {
+  id: string;
+  label: string;
+  icon: string;
+  children: IPhenotypeTreeNode[];
 }
 
 export enum EntityType {
