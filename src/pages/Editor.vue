@@ -16,7 +16,7 @@
       <q-tabs v-model="tabModel" dense align="left" class="bg-primary text-white shadow-2">
         <q-tab :name="tab.id" :label="tab.label" v-for="tab in tabs" :key="tab.id" />
       </q-tabs>
-      <q-tab-panels v-model="tabModel">
+      <q-tab-panels keep-alive v-model="tabModel">
         <q-tab-panel :name="tab.id" v-for="tab in tabs" :key="tab.id">
           <phenotype-editor :entityType="entityType" :entityId="tab.id" />
         </q-tab-panel>
