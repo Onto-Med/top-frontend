@@ -1,5 +1,12 @@
 <template>
-  <phenotype-editor :entityType="entityType" />
+  <q-splitter v-model="splitterModel">
+    <template #before>
+      tree
+    </template>
+    <template #after>
+      <phenotype-editor :entityType="entityType" />
+    </template>
+  </q-splitter>
 </template>
 
 <script lang="ts">
@@ -15,6 +22,7 @@ export default defineComponent({
   data () {
     return {
       showJson: false,
+      splitterModel: 25,
       entityType: EntityType.UnrestrictedSinglePhenotype
     }
   }
