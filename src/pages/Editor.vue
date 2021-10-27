@@ -11,6 +11,13 @@
           v-model:selected="selected"
         />
       </div>
+      <q-menu context-menu ref="treeContextMenu">
+        <q-list dense>
+          <q-item clickable v-close-popup>
+            <q-item-section>Example Entry</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
     </template>
     <template #after>
       <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2">
