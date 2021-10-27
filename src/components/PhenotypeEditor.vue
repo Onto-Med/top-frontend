@@ -59,8 +59,10 @@ export default defineComponent({
   },
   props: {
     entityType: {
-      type: String as () => EntityType,
-      required: true
+      type: String as () => EntityType
+    },
+    entityId: {
+      type: [String, Number]
     }
   },
   data () {
