@@ -8,15 +8,15 @@
           node-key="id"
           selected-color="primary"
           v-model:expanded="treeExpansion"
-          v-model:selected="selectedNode"
+          v-model:selected="selected"
         />
       </div>
     </template>
     <template #after>
-      <q-tabs v-model="tabModel" dense align="left" class="bg-primary text-white shadow-2">
+      <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2">
         <q-tab :name="tab.id" :label="tab.label" v-for="tab in tabs" :key="tab.id" />
       </q-tabs>
-      <q-tab-panels keep-alive animated v-model="tabModel">
+      <q-tab-panels keep-alive animated v-model="selected">
         <q-tab-panel :name="tab.id" v-for="tab in tabs" :key="tab.id">
           <phenotype-editor :entityType="entityType" :entityId="tab.id" />
         </q-tab-panel>
@@ -43,17 +43,16 @@ export default defineComponent({
       entityType: EntityType.UnrestrictedSinglePhenotype,
       phenotypeNodes: [] as IPhenotypeTreeNode[],
       treeExpansion: [],
-      selectedNode: String,
-      tabModel: '',
+      selected: '' as string,
       tabs: [] as IPhenotypeTreeNode[]
     }
   },
   watch: {
-    selectedNode (key: string) {
-      if (key && !this.tabs.map((t: IPhenotypeTreeNode) => t.id).includes(key)) {
+    selected (key: string) {
+      if (!key) return
+      if (!this.tabs.map((t: IPhenotypeTreeNode) => t.id).includes(key)) {
         let tree = this.$refs.tree as QTree
         this.tabs.push(tree.getNodeByKey(key) as IPhenotypeTreeNode)
-        this.tabModel = key
       }
     }
   },
