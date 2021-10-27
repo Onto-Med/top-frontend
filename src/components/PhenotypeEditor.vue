@@ -68,7 +68,13 @@ export default defineComponent({
   data () {
     return {
       showJson: false,
-      phenotype: null as IPhenotype
+      phenotype: null as IPhenotype,
+      initialState: null as IPhenotype
+    }
+  },
+  computed: {
+    hasUnsavedChanges (): boolean {
+      return JSON.stringify(this.phenotype) !== JSON.stringify(this.initialState)
     }
   },
   created () {
@@ -86,6 +92,8 @@ export default defineComponent({
         { lang: 'en', text: 'Example description' }
       ]
     }
+    // TODO: reset state after save
+    this.initialState = JSON.parse(JSON.stringify(this.phenotype)) as IPhenotype
   }
 })
 </script>
