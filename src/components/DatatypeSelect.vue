@@ -11,6 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { DataType } from 'src/components/models'
 
 export default defineComponent({
   name: 'DataTypeSelect',
@@ -26,10 +27,10 @@ export default defineComponent({
     options: {
       type: Array,
       default: (): Array<unknown> => [
-        { label: 'Numeric', value: 'numeric' },
-        { label: 'Boolean', value: 'boolean' },
-        { label: 'Date and Time', value: 'datetime' },
-        { label: 'Text', value: 'string' }
+        { label: 'Numeric', value: DataType.Number },
+        { label: 'Boolean', value: DataType.Boolean },
+        { label: 'Date and Time', value: DataType.DateTime },
+        { label: 'Text', value: DataType.String }
       ]
     }
   },

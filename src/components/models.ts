@@ -3,7 +3,7 @@ export interface IPhenotype {
   title: string;
   entityType: EntityType;
   titles: Record<string, string>[];
-  dataType: string;
+  dataType: DataType;
   synonyms: Record<string, string>[];
   descriptions: Record<string, string>[];
 }
@@ -25,4 +25,11 @@ export enum EntityType {
   RestrictedSinglePhenotype     = 'restricted_single_phenotype',
   RestrictedCombinedPhenotype   = 'restricted_combined_phenotype',
   RestrictedDerivedPhenotype    = 'restricted_derived_phenotype'
+}
+
+export enum DataType {
+  String   = 'string',
+  Number   = 'number',
+  Boolean  = 'boolean',
+  DateTime = 'dateTime'
 }

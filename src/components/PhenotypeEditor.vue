@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { IPhenotype, EntityType } from 'src/components/models';
+import { IPhenotype, EntityType, DataType } from 'src/components/models';
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/DataTypeSelect.vue'
 
@@ -85,7 +85,7 @@ export default defineComponent({
         { lang: 'de', text: 'Größe' },
         { lang: 'en', text: 'Height' }
       ],
-      dataType: 'numeric',
+      dataType: DataType.Number,
       synonyms: [],
       descriptions: [
         { lang: 'de', text: 'Beispielbeschreibung' },
