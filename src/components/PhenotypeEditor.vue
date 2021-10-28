@@ -85,6 +85,7 @@ export default defineComponent({
         { lang: 'de', text: 'Größe' },
         { lang: 'en', text: 'Height' }
       ],
+      entityType: EntityType.SinglePhenotype,
       dataType: DataType.Number,
       synonyms: [],
       descriptions: [
