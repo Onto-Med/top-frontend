@@ -4,16 +4,16 @@
       <div class="q-pa-md">
         <q-tree
           ref="tree"
+          v-model:expanded="treeExpansion"
+          v-model:selected="selected"
           :nodes="phenotypeNodes"
           node-key="id"
           selected-color="primary"
-          v-model:expanded="treeExpansion"
-          v-model:selected="selected"
         />
       </div>
-      <q-menu context-menu ref="treeContextMenu">
+      <q-menu ref="treeContextMenu" context-menu>
         <q-list dense>
-          <q-item clickable v-close-popup>
+          <q-item v-close-popup clickable>
             <q-item-section>Example Entry</q-item-section>
           </q-item>
         </q-list>
@@ -21,16 +21,23 @@
     </template>
     <template #after>
       <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2">
-        <q-tab :name="tab.id" v-for="tab in tabs" :key="tab.id">
+        <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
           <span class="no-wrap">
             {{ tab.label }}
-            <q-btn flat dense rounded icon="close" size="xs" @click.prevent="closeTab(tab)" />
+            <q-btn
+              flat
+              dense
+              rounded
+              icon="close"
+              size="xs"
+              @click.prevent="closeTab(tab)"
+            />
           </span>
         </q-tab>
       </q-tabs>
-      <q-tab-panels keep-alive animated v-model="selected">
-        <q-tab-panel :name="tab.id" v-for="tab in tabs" :key="tab.id">
-          <phenotype-editor :entityType="entityType" :entityId="tab.id" />
+      <q-tab-panels v-model="selected" keep-alive animated>
+        <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id">
+          <phenotype-editor :entity-type="entityType" :entity-id="tab.id" />
         </q-tab-panel>
       </q-tab-panels>
     </template>
@@ -68,12 +75,6 @@ export default defineComponent({
       }
     }
   },
-  methods: {
-    closeTab (tab: IPhenotypeTreeNode): void {
-      this.tabs.splice(this.tabs.map(t => t.id).indexOf(tab.id), 1)
-      if (this.selected === tab.id) this.selected = ''
-    }
-  },
   mounted () {
     // TODO: load phenotype nodes
     this.phenotypeNodes = [
@@ -96,6 +97,12 @@ export default defineComponent({
       },
       { id: 2, label: 'Laboratory values' }
     ]
+  },
+  methods: {
+    closeTab (tab: IPhenotypeTreeNode): void {
+      this.tabs.splice(this.tabs.map(t => t.id).indexOf(tab.id), 1)
+      if (this.selected === tab.id) this.selected = ''
+    }
   }
 })
 </script>

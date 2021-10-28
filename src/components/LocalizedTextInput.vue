@@ -1,19 +1,33 @@
 <template>
   <q-card flat bordered class="q-pa-md bg-grey-1">
     <q-card-section v-if="label">
-      <div class="text-h6">{{ label }}</div>
+      <div class="text-h6">
+        {{ label }}
+      </div>
     </q-card-section>
 
     <q-separator v-if="label" />
 
     <q-card-section>
-      <div class="row" v-for="(entry, index) in modelValue" :key="index">
-        <q-input outlined :type="textArea ? 'textarea' : 'text'" :rows="rows" :cols="cols" v-model="entry.text">
-          <template v-slot:before>
-            <q-select outlined v-model="entry.lang" :options="supportedLangs" />
+      <div v-for="(entry, index) in modelValue" :key="index" class="row">
+        <q-input
+          v-model="entry.text"
+          outlined
+          :type="textArea ? 'textarea' : 'text'"
+          :rows="rows"
+          :cols="cols"
+        >
+          <template #before>
+            <q-select v-model="entry.lang" outlined :options="supportedLangs" />
           </template>
-          <template v-slot:after>
-            <q-btn color="red" icon="remove" class="remove-localized-text-btn" @click="removeEntryByIndex(index)" :title="$t('remove')" />
+          <template #after>
+            <q-btn
+              color="red"
+              icon="remove"
+              class="remove-localized-text-btn"
+              :title="$t('remove')"
+              @click="removeEntryByIndex(index)"
+            />
           </template>
         </q-input>
       </div>
@@ -25,7 +39,13 @@
     <q-separator />
 
     <q-card-actions>
-      <q-btn color="primary" icon="add" class="add-localized-text-btn" @click="addEntry()" :label="$t('addThing', { thing: name || defaultName })" />
+      <q-btn
+        color="primary"
+        icon="add"
+        class="add-localized-text-btn"
+        :label="$t('addThing', { thing: name || defaultName })"
+        @click="addEntry()"
+      />
     </q-card-actions>
   </q-card>
 </template>
@@ -50,6 +70,7 @@ export default defineComponent({
       default: () => ['de', 'en']
     }
   },
+  emits: ['update:modelValue'],
   computed: {
     duplicatedLangs (): string[] {
       return this.modelValue
