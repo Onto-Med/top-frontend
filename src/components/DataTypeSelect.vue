@@ -1,11 +1,11 @@
 <template>
   <q-select
     v-model="dataType"
-    :label="label"
+    :label="label || defaultLabel"
     stack-label
     emit-value
     map-options
-    :options="options"
+    :options="options || defaultOptions"
   />
 </template>
 
@@ -20,25 +20,21 @@ export default defineComponent({
       type: String,
       required: true
     },
-    label: {
-      type: String,
-      default () {
-        return this.$t('dataType')
-      }
-    },
-    options: {
-      type: Array,
-      default (): Array<unknown> {
-        return [ DataType.Number, DataType.Boolean, DataType.DateTime, DataType.String ]
-          .map(d => { return { label: this.$(d), value: d } })
-      }
-    }
+    label: String,
+    options: Array
   },
   emits: ['update:modelValue'],
   computed: {
     dataType: {
       get (): string { return this.modelValue },
       set (value: string): void { this.$emit('update:modelValue', value) }
+    },
+    defaultLabel () {
+      return this.$t('dataType')
+    },
+    defaultOptions () {
+      return [ DataType.Number, DataType.Boolean, DataType.DateTime, DataType.String ]
+          .map(d => { return { label: this.$t(d), value: d } })
     }
   }
 })
