@@ -1,22 +1,22 @@
 export interface IPhenotype {
-  id: string;
+  id?: string;
   title: string;
   entityType: EntityType;
   titles: Record<string, string>[];
-  dataType: DataType;
+  dataType?: DataType;
   synonyms: Record<string, string>[];
   descriptions: Record<string, string>[];
-  codes: ICode[];
-  score: number;
-  units: string[];
-  negated: boolean;
+  codes?: ICode[];
+  score?: number;
+  units?: string[];
+  negated?: boolean;
 }
 
 export interface IPhenotypeTreeNode {
-  id: string;
+  id: string|number;
   label: string;
-  icon: string;
-  children: IPhenotypeTreeNode[];
+  icon?: string;
+  children?: IPhenotypeTreeNode[];
 }
 
 export interface ICodeSystem {
