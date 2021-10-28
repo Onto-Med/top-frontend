@@ -12,7 +12,8 @@ export default {
   entry: 'Eintrag|Einträge',
   addThing: '{thing} hinzufügen',
   oneThingPerThing: 'Es kann nur ein {thing1} pro {thing2} existieren!',
-  language: 'Sprache',
+  language: 'Sprache|Sprachen',
+  remove: 'Entfernen',
   phenotypeEditor: {
     rawBtn: {
       label: 'Zeige Phänotyp Daten als JSON'

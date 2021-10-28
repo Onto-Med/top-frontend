@@ -13,7 +13,7 @@
             <q-select outlined v-model="entry.lang" :options="supportedLangs" />
           </template>
           <template v-slot:after>
-            <q-btn color="red" icon="remove" class="remove-localized-text-btn" @click="removeEntryByIndex(index)" />
+            <q-btn color="red" icon="remove" class="remove-localized-text-btn" @click="removeEntryByIndex(index)" :title="$t('remove')" />
           </template>
         </q-input>
       </div>
