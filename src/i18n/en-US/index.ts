@@ -9,6 +9,10 @@ export default {
   synonym: 'Synonym|Synonyms',
   description: 'Description|Descriptions',
   ok: 'OK',
+  entry: 'Entry|Entries',
+  addThing: 'Add {thing}',
+  oneThingPerThing: 'There can only exist one {thing1} per {thing2}!',
+  language: 'Language',
   phenotypeEditor: {
     rawBtn: {
       label: 'Show phenotype data as JSON'

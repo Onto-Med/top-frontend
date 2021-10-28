@@ -17,13 +17,15 @@
           </template>
         </q-input>
       </div>
-      <div v-show="uniqueLangs && duplicatedLangs.length > 0">There can only be one {{ name }} per language!</div>
+      <div v-show="uniqueLangs && duplicatedLangs.length > 0">
+        {{ $t('oneThingPerThing', { thing1: name || defaultName, thing2: $t('language') }) }}
+      </div>
     </q-card-section>
 
     <q-separator />
 
     <q-card-actions>
-      <q-btn color="primary" icon="add" class="add-localized-text-btn" @click="addEntry()" :label="`Add new ${name}`" />
+      <q-btn color="primary" icon="add" class="add-localized-text-btn" @click="addEntry()" :label="$t('addThing', { thing: name || defaultName })" />
     </q-card-actions>
   </q-card>
 </template>
@@ -41,10 +43,7 @@ export default defineComponent({
     textArea: Boolean,
     rows: [Number, String],
     cols: [Number, String],
-    name: {
-      type: String,
-      default: 'entry'
-    },
+    name: String,
     label: String,
     supportedLangs: {
       type: Array as () => string[],
@@ -59,6 +58,9 @@ export default defineComponent({
     },
     unusedSupportedLangs (): string[] {
       return this.supportedLangs.filter(l => !this.duplicatedLangs.includes(l))
+    },
+    defaultName () {
+      return this.$t('entry')
     }
   },
   methods: {

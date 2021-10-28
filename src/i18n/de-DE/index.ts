@@ -9,6 +9,10 @@ export default {
   synonym: 'Synonym|Synonyme',
   description: 'Beschreibung|Beschreibungen',
   ok: 'OK',
+  entry: 'Eintrag|Einträge',
+  addThing: '{thing} hinzufügen',
+  oneThingPerThing: 'Es kann nur ein {thing1} pro {thing2} existieren!',
+  language: 'Sprache',
   phenotypeEditor: {
     rawBtn: {
       label: 'Zeige Phänotyp Daten als JSON'
