@@ -48,7 +48,7 @@ export default defineComponent({
     label: String,
     supportedLangs: {
       type: Array as () => string[],
-      default: () => ['en']
+      default: () => ['de', 'en']
     }
   },
   computed: {

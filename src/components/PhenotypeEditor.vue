@@ -11,14 +11,14 @@
     </q-toolbar>
 
     <div class="q-gutter-md q-pa-md">
-      <localized-text-input unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" label="Titles" />
+      <localized-text-input unique-langs v-model="phenotype.titles" label="Titles" />
 
       <data-type-select v-model="phenotype.dataType" />
 
       <q-expansion-item expand-separator icon="description" label="Describing metadata">
         <div class="q-gutter-md">
-          <localized-text-input v-model="phenotype.synonyms" :supported-langs="['de', 'en']" label="Synonyms" />
-          <localized-text-input text-area rows="3" v-model="phenotype.descriptions" :supported-langs="['de', 'en']" label="Descriptions" />
+          <localized-text-input v-model="phenotype.synonyms" label="Synonyms" />
+          <localized-text-input text-area rows="3" v-model="phenotype.descriptions" label="Descriptions" />
         </div>
       </q-expansion-item>
     </div>
