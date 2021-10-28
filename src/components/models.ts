@@ -6,6 +6,10 @@ export interface IPhenotype {
   dataType: DataType;
   synonyms: Record<string, string>[];
   descriptions: Record<string, string>[];
+  codes: ICode[];
+  score: number;
+  units: string[];
+  negated: boolean;
 }
 
 export interface IPhenotypeTreeNode {
@@ -13,6 +17,16 @@ export interface IPhenotypeTreeNode {
   label: string;
   icon: string;
   children: IPhenotypeTreeNode[];
+}
+
+export interface ICodeSystem {
+  uri: string;
+  name: string;
+}
+export interface ICode {
+  codeSystem: ICodeSystem;
+  code: string;
+  name: string;
 }
 
 export enum EntityType {
