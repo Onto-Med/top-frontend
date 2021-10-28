@@ -7,18 +7,18 @@
           <q-breadcrumbs-el :label="phenotype.title" />
         </q-breadcrumbs>
       </q-toolbar-title>
-      <q-btn flat round dense icon="raw_on" color="primary" title="Show phenotype data as JSON" @click="showJson = true" />
+      <q-btn flat round dense icon="raw_on" color="primary" :title="$t('phenotypeEditor.rawBtn.label')" @click="showJson = true" />
     </q-toolbar>
 
     <div class="q-gutter-md q-pa-md">
-      <localized-text-input unique-langs v-model="phenotype.titles" label="Titles" />
+      <localized-text-input unique-langs v-model="phenotype.titles" :label="$tc('title', 2)" />
 
       <data-type-select v-model="phenotype.dataType" />
 
-      <q-expansion-item expand-separator icon="description" label="Describing metadata">
+      <q-expansion-item expand-separator icon="description" :label="$t('describingMetadata')">
         <div class="q-gutter-md">
-          <localized-text-input v-model="phenotype.synonyms" label="Synonyms" />
-          <localized-text-input text-area rows="3" v-model="phenotype.descriptions" label="Descriptions" />
+          <localized-text-input v-model="phenotype.synonyms" :label="$tc('synonym', 2)" />
+          <localized-text-input text-area rows="3" v-model="phenotype.descriptions" :label="$tc('description', 2)" />
         </div>
       </q-expansion-item>
     </div>
@@ -26,7 +26,7 @@
     <q-dialog v-model="showJson">
       <q-card>
         <q-card-section>
-          <div class="text-h6">Current state of the phenotype</div>
+          <div class="text-h6" v-t="'phenotypeEditor.rawDialog.content'" />
         </q-card-section>
 
         <q-separator />
@@ -38,7 +38,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn flat label="OK" color="primary" v-close-popup />
+          <q-btn flat :label="$t('ok')" color="primary" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
