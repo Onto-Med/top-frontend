@@ -22,16 +22,16 @@ export default defineComponent({
     },
     label: {
       type: String,
-      default: 'Data Type'
+      default () {
+        return this.$t('dataType')
+      }
     },
     options: {
       type: Array,
-      default: (): Array<unknown> => [
-        { label: 'Numeric', value: DataType.Number },
-        { label: 'Boolean', value: DataType.Boolean },
-        { label: 'Date and Time', value: DataType.DateTime },
-        { label: 'Text', value: DataType.String }
-      ]
+      default (): Array<unknown> {
+        return [ DataType.Number, DataType.Boolean, DataType.DateTime, DataType.String ]
+          .map(d => { return { label: this.$(d), value: d } })
+      }
     }
   },
   emits: ['update:modelValue'],
