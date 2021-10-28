@@ -70,7 +70,7 @@ export default defineComponent({
   },
   methods: {
     closeTab (tab: IPhenotypeTreeNode): void {
-      this.tabs.splice(this.tabs.indexOf(tab.id), 1)
+      this.tabs.splice(this.tabs.map(t => t.id).indexOf(tab.id), 1)
       if (this.selected === tab.id) this.selected = ''
     }
   },
