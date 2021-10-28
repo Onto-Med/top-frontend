@@ -52,7 +52,7 @@ export default defineComponent({
     return {
       showJson: false,
       splitterModel: 25,
-      entityType: EntityType.UnrestrictedSinglePhenotype,
+      entityType: EntityType.SinglePhenotype,
       phenotypeNodes: [] as IPhenotypeTreeNode[],
       treeExpansion: [],
       selected: '' as string,

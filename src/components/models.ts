@@ -30,15 +30,15 @@ export interface ICode {
 }
 
 export enum EntityType {
-  Category                      = 'category',
-  MissingValuePhenotype         = 'missing_value_phenotype',
-  GroupPhenotype                = 'group_phenotype',
-  UnrestrictedSinglePhenotype   = 'unrestricted_single_phenotype',
-  UnrestrictedCombinedPhenotype = 'unrestricted_combined_phenotype',
-  UnrestrictedDerivedPhenotype  = 'unrestricted_derived_phenotype',
-  RestrictedSinglePhenotype     = 'restricted_single_phenotype',
-  RestrictedCombinedPhenotype   = 'restricted_combined_phenotype',
-  RestrictedDerivedPhenotype    = 'restricted_derived_phenotype'
+  Category            = 'category',
+  MissingValue        = 'missing_value',
+  PhenotypeGroup      = 'phenotype_group',
+  SinglePhenotype     = 'single_phenotype',
+  CombinedPhenotype   = 'combined_phenotype',
+  DerivedPhenotype    = 'derived_phenotype',
+  SingleRestriction   = 'single_restriction',
+  CombinedRestriction = 'combined_restriction',
+  DerivedRestriction  = 'derived_restriction'
 }
 
 export enum DataType {
