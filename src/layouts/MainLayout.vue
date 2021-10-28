@@ -47,7 +47,6 @@
 
 <script lang="ts">
 import EssentialLink from 'components/EssentialLink.vue'
-import LanguageSwitch from 'components/LanguageSwitch.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue';
 
 const linksList = [
