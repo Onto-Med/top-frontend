@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          TOP Framework
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <language-switch />
       </q-toolbar>
     </q-header>
 
@@ -47,6 +47,8 @@
 
 <script lang="ts">
 import EssentialLink from 'components/EssentialLink.vue'
+import LanguageSwitch from 'components/LanguageSwitch.vue'
+import LanguageSwitch from 'src/components/LanguageSwitch.vue';
 
 const linksList = [
   {
@@ -99,7 +101,8 @@ export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink
+    EssentialLink,
+    LanguageSwitch
   },
 
   setup () {
