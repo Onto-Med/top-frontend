@@ -3,7 +3,7 @@ export interface IPhenotype {
   title: string;
   entityType: EntityType;
   titles: Record<string, string>[];
-  datatype: string;
+  dataType: string;
   synonyms: Record<string, string>[];
   descriptions: Record<string, string>[];
 }

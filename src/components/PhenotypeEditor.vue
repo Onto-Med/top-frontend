@@ -13,7 +13,7 @@
     <div class="q-gutter-md q-pa-md">
       <localized-text-input unique-langs v-model="phenotype.titles" :supported-langs="['de', 'en']" label="Titles" />
 
-      <datatype-select v-model="phenotype.datatype" />
+      <data-type-select v-model="phenotype.dataType" />
 
       <q-expansion-item expand-separator icon="description" label="Describing metadata">
         <div class="q-gutter-md">
@@ -49,13 +49,13 @@
 import { defineComponent } from 'vue'
 import { IPhenotype, EntityType } from 'src/components/models';
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
-import DatatypeSelect from 'src/components/DatatypeSelect.vue'
+import DataTypeSelect from 'src/components/DataTypeSelect.vue'
 
 export default defineComponent({
   name: 'PhenotypeEditor',
   components: {
     LocalizedTextInput,
-    DatatypeSelect
+    DataTypeSelect
   },
   props: {
     entityType: {
@@ -85,7 +85,7 @@ export default defineComponent({
         { lang: 'de', text: 'Größe' },
         { lang: 'en', text: 'Height' }
       ],
-      datatype: 'numeric',
+      dataType: 'numeric',
       synonyms: [],
       descriptions: [
         { lang: 'de', text: 'Beispielbeschreibung' },

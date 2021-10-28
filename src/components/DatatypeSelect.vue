@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-model="datatype"
+    v-model="dataType"
     :label="label"
     stack-label
     emit-value
@@ -13,6 +13,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
+  name: 'DataTypeSelect',
   props: {
     modelValue: {
       type: String,
@@ -20,7 +21,7 @@ export default defineComponent({
     },
     label: {
       type: String,
-      default: 'Datatype'
+      default: 'Data Type'
     },
     options: {
       type: Array,
@@ -34,7 +35,7 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   computed: {
-    datatype: {
+    dataType: {
       get (): string { return this.modelValue },
       set (value: string): void { this.$emit('update:modelValue', value) }
     }
