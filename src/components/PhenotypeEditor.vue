@@ -68,8 +68,8 @@ export default defineComponent({
   data () {
     return {
       showJson: false,
-      phenotype: null as IPhenotype,
-      initialState: null as IPhenotype
+      phenotype: null as unknown as IPhenotype,
+      initialState: null as unknown as IPhenotype
     }
   },
   computed: {
