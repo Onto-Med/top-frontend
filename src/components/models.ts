@@ -48,3 +48,19 @@ export enum DataType {
   Boolean  = 'boolean',
   DateTime = 'dateTime'
 }
+
+export enum ExpressionType {
+  Class,
+  Restriction,
+  Union,
+  Intersection,
+  Complement
+}
+
+export enum RestrictionOperatorType {
+  LowerThan    = '<',
+  LowerEqual   = '≤',
+  Equal        = '=',
+  GreaterEqual = '≥',
+  GreaterThan  = '>'
+}
