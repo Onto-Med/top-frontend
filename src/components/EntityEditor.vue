@@ -13,20 +13,20 @@
         dense
         icon="raw_on"
         color="primary"
-        :title="$t('entityEditor.rawBtn.label')"
+        :title="t('entityEditor.rawBtn.label')"
         @click="showJson = true"
       />
     </q-toolbar>
 
     <div class="q-gutter-md q-pa-md">
-      <localized-text-input v-model="entity.titles" unique-langs :label="$tc('title', 2)" />
+      <localized-text-input v-model="entity.titles" unique-langs :label="t('title', 2)" />
 
       <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)" v-model="entity.dataType" />
 
-      <q-expansion-item expand-separator icon="description" :label="$t('describingMetadata')">
+      <q-expansion-item expand-separator icon="description" :label="t('describingMetadata')">
         <div class="q-gutter-md">
-          <localized-text-input v-model="entity.synonyms" :label="$tc('synonym', 2)" />
-          <localized-text-input v-model="entity.descriptions" text-area rows="3" :label="$tc('description', 2)" />
+          <localized-text-input v-model="entity.synonyms" :label="t('synonym', 2)" />
+          <localized-text-input v-model="entity.descriptions" text-area rows="3" :label="t('description', 2)" />
         </div>
       </q-expansion-item>
     </div>
@@ -46,7 +46,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn v-close-popup flat :label="$t('ok')" color="primary" />
+          <q-btn v-close-popup flat :label="t('ok')" color="primary" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -55,6 +55,7 @@
 
 <script lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { IEntity, EntityType } from 'src/components/models';
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/DataTypeSelect.vue'
@@ -75,6 +76,8 @@ export default {
     }
   },
   setup (props: Record<string, unknown>) {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t }  = useI18n()
     const entity       = ref({} as IEntity)
     const showJson     = ref(false)
     const initialState = ref({} as IEntity)
@@ -90,7 +93,7 @@ export default {
     getEntity()
 
     return {
-      entity, showJson, initialState, hasUnsavedChanges, EntityType
+      t, entity, showJson, initialState, hasUnsavedChanges, EntityType
     }
   }
 }

@@ -25,14 +25,14 @@
               color="red"
               icon="remove"
               class="remove-localized-text-btn"
-              :title="$t('remove')"
+              :title="t('remove')"
               @click="removeEntryByIndex(index)"
             />
           </template>
         </q-input>
       </div>
       <div v-show="uniqueLangs && duplicatedLangs.length > 0">
-        {{ $t('oneThingPerThing', { thing1: name || defaultName, thing2: $t('language') }) }}
+        {{ t('oneThingPerThing', { thing1: name || defaultName, thing2: t('language') }) }}
       </div>
     </q-card-section>
 
@@ -43,7 +43,7 @@
         color="primary"
         icon="add"
         class="add-localized-text-btn"
-        :label="$t('addThing', { thing: name || defaultName })"
+        :label="t('addThing', { thing: name || defaultName })"
         @click="addEntry()"
       />
     </q-card-actions>
@@ -51,7 +51,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   props: {
@@ -71,6 +72,12 @@ export default defineComponent({
     }
   },
   emits: ['update:modelValue'],
+  setup () {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t } = useI18n()
+    const defaultName = computed(() => t('entry'))
+    return { t, defaultName }
+  },
   computed: {
     duplicatedLangs (): string[] {
       return this.modelValue
@@ -79,9 +86,6 @@ export default defineComponent({
     },
     unusedSupportedLangs (): string[] {
       return this.supportedLangs.filter(l => !this.duplicatedLangs.includes(l))
-    },
-    defaultName () {
-      return this.$t('entry')
     }
   },
   methods: {

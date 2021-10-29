@@ -1,7 +1,7 @@
 <template>
   <q-select
     v-model="dataType"
-    :label="label || defaultLabel"
+    :label="label || t('dataType')"
     stack-label
     emit-value
     map-options
@@ -10,7 +10,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, SetupContext, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { DataType } from 'src/components/models'
 
 export default defineComponent({
@@ -24,18 +25,17 @@ export default defineComponent({
     options: Array
   },
   emits: ['update:modelValue'],
-  computed: {
-    dataType: {
-      get (): string { return this.modelValue },
-      set (value: string): void { this.$emit('update:modelValue', value) }
-    },
-    defaultLabel () {
-      return this.$t('dataType')
-    },
-    defaultOptions () {
-      return [ DataType.Number, DataType.Boolean, DataType.DateTime, DataType.String ]
-          .map(d => { return { label: this.$t(d), value: d } })
-    }
+  setup (props: Record<string, unknown>, { emit }: SetupContext) {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t } = useI18n()
+    const dataType = computed({
+      get (): string { return props.modelValue as string },
+      set (value: string): void { emit('update:modelValue', value) }
+    })
+    const defaultOptions = [ DataType.Number, DataType.Boolean, DataType.DateTime, DataType.String ]
+        .map(d => { return { label: t(d), value: d } })
+
+    return { t, dataType, defaultOptions }
   }
 })
 </script>
