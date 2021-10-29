@@ -32,8 +32,9 @@ export default defineComponent({
       get (): string { return props.modelValue as string },
       set (value: string): void { emit('update:modelValue', value) }
     })
-    const defaultOptions = [ DataType.Number, DataType.Boolean, DataType.DateTime, DataType.String ]
-        .map(d => { return { label: t(d), value: d } })
+    const defaultOptions = computed(() =>
+      Object.values(DataType).map(d => { return { label: t(d), value: d } })
+    )
 
     return { t, dataType, defaultOptions }
   }
