@@ -79,13 +79,13 @@ export default defineComponent({
     // TODO: load entity nodes
     this.entityNodes = [
       {
-        id: 1,
+        id: 'anthropometry',
         label: 'Anthropometry',
         children: [
-          { id: 3, label: 'BMI', icon: 'calculate' },
-          { id: 4, label: 'Height', icon: 'calculate' },
+          { id: 'bmi', label: 'BMI', icon: 'calculate' },
+          { id: 'height', label: 'Height', icon: 'calculate' },
           {
-            id: 5,
+            id: 'weight',
             label: 'Weight',
             icon: 'calculate',
             children: [
@@ -95,7 +95,7 @@ export default defineComponent({
           }
         ]
       },
-      { id: 2, label: 'Laboratory values' }
+      { id: 'laboratory_values', label: 'Laboratory values' }
     ]
   },
   methods: {
