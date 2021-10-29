@@ -5,6 +5,6 @@ module.exports = {
     // See https://github.com/jest-community/eslint-plugin-jest#recommended
     'plugin:jest/recommended',
     // Uncomment following line to apply style rules
-    // 'plugin:jest/style',
+    'plugin:jest/style',
   ],
 };
