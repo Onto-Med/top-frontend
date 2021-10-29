@@ -11,6 +11,17 @@ export interface IEntity {
   units?: string[];
   negated?: boolean;
   superClass?: IEntity;
+  restriction?: IRestriction;
+}
+
+export interface IRestriction {
+  type: DataType,
+  components: IRestrictionComponent[]
+}
+
+export interface IRestrictionComponent {
+  operator?: RestrictionOperator,
+  value: string|number|boolean|Date
 }
 
 export interface IEntityTreeNode {
@@ -57,7 +68,7 @@ export enum ExpressionType {
   Complement
 }
 
-export enum RestrictionOperatorType {
+export enum RestrictionOperator {
   LowerThan    = '<',
   LowerEqual   = '≤',
   Equal        = '=',
