@@ -54,12 +54,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { IEntity, EntityType, DataType } from 'src/components/models';
+import { ref, computed } from 'vue'
+import { IEntity, EntityType } from 'src/components/models';
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/DataTypeSelect.vue'
+import { fetchEntity } from 'src/api/entityRepository'
 
-export default defineComponent({
+export default {
   name: 'EntityEditor',
   components: {
     LocalizedTextInput,
@@ -73,36 +74,24 @@ export default defineComponent({
       type: [String, Number]
     }
   },
-  data () {
+  setup (props: Record<string, unknown>) {
+    const entity       = ref({} as IEntity)
+    const showJson     = ref(false)
+    const initialState = ref({} as IEntity)
+
+    const getEntity = () => {
+      entity.value = fetchEntity(props.entityId as string)
+      initialState.value = JSON.parse(JSON.stringify(entity.value)) as IEntity
+    }
+    const hasUnsavedChanges = computed(() =>
+      JSON.stringify(entity.value) !== JSON.stringify(initialState.value)
+    )
+
+    getEntity()
+
     return {
-      showJson: false,
-      entity: null as unknown as IEntity,
-      initialState: null as unknown as IEntity
+      entity, showJson, initialState, hasUnsavedChanges
     }
-  },
-  computed: {
-    hasUnsavedChanges (): boolean {
-      return JSON.stringify(this.entity) !== JSON.stringify(this.initialState)
-    }
-  },
-  created () {
-    // TODO: load entity from API
-    this.entity = {
-      title: 'Example Entity',
-      titles: [
-        { lang: 'de', text: 'Größe' },
-        { lang: 'en', text: 'Height' }
-      ],
-      entityType: EntityType.SinglePhenotype,
-      dataType: DataType.Number,
-      synonyms: [],
-      descriptions: [
-        { lang: 'de', text: 'Beispielbeschreibung' },
-        { lang: 'en', text: 'Example description' }
-      ]
-    }
-    // TODO: reset state after save
-    this.initialState = JSON.parse(JSON.stringify(this.entity)) as IEntity
   }
-})
+}
 </script>
