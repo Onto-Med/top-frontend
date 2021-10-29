@@ -32,7 +32,7 @@
         </q-input>
       </div>
       <div v-show="uniqueLangs && duplicatedLangs.length > 0">
-        {{ t('oneThingPerThing', { thing1: name || defaultName, thing2: t('language') }) }}
+        {{ t('oneThingPerThing', { thing1: name || t('entry'), thing2: t('language') }) }}
       </div>
     </q-card-section>
 
@@ -43,7 +43,7 @@
         color="primary"
         icon="add"
         class="add-localized-text-btn"
-        :label="t('addThing', { thing: name || defaultName })"
+        :label="t('addThing', { thing: name || t('entry') })"
         @click="addEntry()"
       />
     </q-card-actions>
@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -75,8 +75,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const defaultName = computed(() => t('entry'))
-    return { t, defaultName }
+    return { t }
   },
   computed: {
     duplicatedLangs (): string[] {
