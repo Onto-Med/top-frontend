@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="q-pa-md bg-grey-1">
+  <q-card flat bordered class="bg-grey-1">
     <q-card-section v-if="label">
       <div class="text-h6">
         {{ label }}
@@ -8,7 +8,7 @@
 
     <q-separator v-if="label" />
 
-    <q-card-section>
+    <q-card-section class="q-pa-md">
       <div v-for="(entry, index) in modelValue" :key="index" class="row">
         <q-input
           v-model="entry.text"
