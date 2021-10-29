@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="bg-grey-1">
+  <q-card flat bordered>
     <q-card-section v-if="label">
       <div class="text-h6">
         {{ label }}
