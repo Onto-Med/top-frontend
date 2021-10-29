@@ -1,4 +1,4 @@
-import { DataType, EntityType, IEntity, IEntityTreeNode } from 'src/components/models'
+import { DataType, EntityType, IEntity, IEntityTreeNode, RestrictionOperator } from 'src/components/models'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -70,7 +70,14 @@ const _entites: IEntity[] = [
     synonyms: [],
     descriptions: [],
     codes: [],
-    superClass: weight
+    superClass: weight,
+    restriction: {
+      type: DataType.Number,
+      components: [
+        { operator: RestrictionOperator.GreaterEqual, value: 1500 },
+        { operator: RestrictionOperator.LowerEqual, value: 2500 }
+      ]
+    }
   },
   {
     id: 'weight_gt_80kg',
