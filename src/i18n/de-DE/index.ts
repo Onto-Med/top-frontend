@@ -15,6 +15,8 @@ export default {
   language: 'Sprache|Sprachen',
   remove: 'Entfernen',
   score: 'Ergebnis',
+  component: 'Komponente',
+  restriction: 'Restriktion',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

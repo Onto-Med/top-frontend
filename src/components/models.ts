@@ -11,12 +11,7 @@ export interface IEntity {
   units?: string[];
   negated?: boolean;
   superClass?: IEntity;
-  restriction?: IRestriction;
-}
-
-export interface IRestriction {
-  type: DataType,
-  components: IRestrictionComponent[]
+  restriction?: IRestrictionComponent[];
 }
 
 export interface IRestrictionComponent {

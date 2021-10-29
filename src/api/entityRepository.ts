@@ -1,4 +1,4 @@
-import { DataType, EntityType, IEntity, IEntityTreeNode, RestrictionOperator } from 'src/components/models'
+import { DataType, EntityType, IEntity, IEntityTreeNode, IRestrictionComponent, RestrictionOperator } from 'src/components/models'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -67,17 +67,15 @@ const _entites: IEntity[] = [
     title: '1500-2500g',
     titles: [],
     entityType: EntityType.SingleRestriction,
+    dataType: DataType.Number,
     synonyms: [],
     descriptions: [],
     codes: [],
     superClass: weight,
-    restriction: {
-      type: DataType.Number,
-      components: [
-        { operator: RestrictionOperator.GreaterEqual, value: 1500 },
-        { operator: RestrictionOperator.LowerEqual, value: 2500 }
-      ]
-    }
+    restriction: [
+      { operator: RestrictionOperator.GreaterEqual, value: 1500 },
+      { operator: RestrictionOperator.LowerEqual, value: 2500 }
+    ]
   },
   {
     id: 'weight_gt_80kg',
@@ -106,7 +104,13 @@ const _entites: IEntity[] = [
 // eslint-disable-next-line @typescript-eslint/require-await
 export function fetchEntity(id: string): IEntity {
   const result = _entites.filter(e => e.id === id)
-  return result[0]
+  const entity = result[0]
+
+  if ([EntityType.SingleRestriction, EntityType.DerivedRestriction, EntityType.CombinedRestriction].includes(entity.entityType) && !entity.restriction) {
+    entity.restriction = [] as IRestrictionComponent[]
+  }
+
+  return entity
 }
 
 export function fetchEntityTree(): IEntityTreeNode[] {

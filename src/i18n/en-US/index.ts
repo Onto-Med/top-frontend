@@ -15,6 +15,8 @@ export default {
   language: 'Language|Languages',
   remove: 'Remove',
   score: 'Score',
+  component: 'Component',
+  restriction: 'Restriction',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

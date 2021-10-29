@@ -36,6 +36,11 @@
         type="number"
         :label="t('score')"
       />
+
+      <restriction-input
+        v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction, EntityType.CombinedRestriction].includes(entity.entityType)"
+        v-model="entity.restriction"
+      />
     </div>
 
     <q-dialog v-model="showJson">
@@ -61,18 +66,20 @@
 </template>
 
 <script lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { IEntity, EntityType } from 'src/components/models';
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/DataTypeSelect.vue'
 import { fetchEntity } from 'src/api/entityRepository'
+import RestrictionInput from './RestrictionInput.vue';
 
-export default {
+export default defineComponent({
   name: 'EntityEditor',
   components: {
     LocalizedTextInput,
-    DataTypeSelect
+    DataTypeSelect,
+    RestrictionInput
   },
   props: {
     entityType: {
@@ -103,5 +110,5 @@ export default {
       t, entity, showJson, initialState, hasUnsavedChanges, EntityType
     }
   }
-}
+})
 </script>
