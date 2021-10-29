@@ -21,7 +21,7 @@
     <div class="q-gutter-md q-pa-md">
       <localized-text-input v-model="entity.titles" unique-langs :label="$tc('title', 2)" />
 
-      <data-type-select v-model="entity.dataType" />
+      <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)" v-model="entity.dataType" />
 
       <q-expansion-item expand-separator icon="description" :label="$t('describingMetadata')">
         <div class="q-gutter-md">
@@ -90,7 +90,7 @@ export default {
     getEntity()
 
     return {
-      entity, showJson, initialState, hasUnsavedChanges
+      entity, showJson, initialState, hasUnsavedChanges, EntityType
     }
   }
 }
