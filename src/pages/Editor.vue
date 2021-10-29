@@ -1,47 +1,49 @@
 <template>
-  <q-splitter v-model="splitterModel">
-    <template #before>
-      <div class="q-pa-md">
-        <q-tree
-          ref="tree"
-          v-model:expanded="treeExpansion"
-          v-model:selected="selected"
-          :nodes="entityNodes"
-          node-key="id"
-          selected-color="primary"
-        />
-      </div>
-      <q-menu ref="treeContextMenu" context-menu>
-        <q-list dense>
-          <q-item v-close-popup clickable>
-            <q-item-section>Example Entry</q-item-section>
-          </q-item>
-        </q-list>
-      </q-menu>
-    </template>
-    <template #after>
-      <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2">
-        <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
-          <span class="no-wrap">
-            {{ tab.label }}
-            <q-btn
-              flat
-              dense
-              rounded
-              icon="close"
-              size="xs"
-              @click.prevent="closeTab(tab)"
-            />
-          </span>
-        </q-tab>
-      </q-tabs>
-      <q-tab-panels v-model="selected" keep-alive animated>
-        <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id">
-          <entity-editor :entity-type="entityType" :entity-id="tab.id" />
-        </q-tab-panel>
-      </q-tab-panels>
-    </template>
-  </q-splitter>
+  <q-page>
+    <q-splitter v-model="splitterModel" style="min-height: inherit">
+      <template #before>
+        <div class="q-pa-md">
+          <q-tree
+            ref="tree"
+            v-model:expanded="treeExpansion"
+            v-model:selected="selected"
+            :nodes="entityNodes"
+            node-key="id"
+            selected-color="primary"
+          />
+        </div>
+        <q-menu ref="treeContextMenu" context-menu>
+          <q-list dense>
+            <q-item v-close-popup clickable>
+              <q-item-section>Example Entry</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </template>
+      <template #after>
+        <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2">
+          <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
+            <span class="no-wrap">
+              {{ tab.label }}
+              <q-btn
+                flat
+                dense
+                rounded
+                icon="close"
+                size="xs"
+                @click.prevent="closeTab(tab)"
+              />
+            </span>
+          </q-tab>
+        </q-tabs>
+        <q-tab-panels v-model="selected" keep-alive animated>
+          <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id">
+            <entity-editor :entity-type="entityType" :entity-id="tab.id" />
+          </q-tab-panel>
+        </q-tab-panels>
+      </template>
+    </q-splitter>
+  </q-page>
 </template>
 
 <script lang="ts">
