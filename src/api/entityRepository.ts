@@ -1,4 +1,4 @@
-import { DataType, EntityType, IEntity } from 'src/components/models'
+import { DataType, EntityType, IEntity, IEntityTreeNode } from 'src/components/models'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -100,4 +100,27 @@ const _entites: IEntity[] = [
 export function fetchEntity(id: string): IEntity {
   const result = _entites.filter(e => e.id === id)
   return result[0]
+}
+
+export function fetchEntityTree(): IEntityTreeNode[] {
+  return [
+    {
+      id: 'anthropometry',
+      label: 'Anthropometry',
+      children: [
+        { id: 'bmi', label: 'BMI', icon: 'calculate' },
+        { id: 'height', label: 'Height', icon: 'calculate' },
+        {
+          id: 'weight',
+          label: 'Weight',
+          icon: 'calculate',
+          children: [
+            { id: 'weight_1500_to_2500g', label: '1500-2500g' },
+            { id: 'weight_gt_80kg', label: '>80kg' }
+          ]
+        }
+      ]
+    },
+    { id: 'laboratory_values', label: 'Laboratory values' }
+  ]
 }

@@ -49,6 +49,7 @@ import { defineComponent } from 'vue'
 import { IEntityTreeNode, EntityType } from 'src/components/models'
 import { QTree } from 'quasar'
 import EntityEditor from 'src/components/EntityEditor.vue'
+import { fetchEntityTree } from 'src/api/entityRepository'
 
 export default defineComponent({
   name: 'Editor',
@@ -77,26 +78,7 @@ export default defineComponent({
   },
   mounted () {
     // TODO: load entity nodes
-    this.entityNodes = [
-      {
-        id: 'anthropometry',
-        label: 'Anthropometry',
-        children: [
-          { id: 'bmi', label: 'BMI', icon: 'calculate' },
-          { id: 'height', label: 'Height', icon: 'calculate' },
-          {
-            id: 'weight',
-            label: 'Weight',
-            icon: 'calculate',
-            children: [
-              { id: 'weight_1500_to_2500g', label: '1500-2500g' },
-              { id: 'weight_gt_80kg', label: '>80kg' }
-            ]
-          }
-        ]
-      },
-      { id: 'laboratory_values', label: 'Laboratory values' }
-    ]
+    this.entityNodes = fetchEntityTree()
   },
   methods: {
     closeTab (tab: IEntityTreeNode): void {
