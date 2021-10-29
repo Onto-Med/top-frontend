@@ -30,7 +30,12 @@
         </div>
       </q-expansion-item>
 
-      <q-input v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction].includes(entity.entityType)" v-model="entity.score" type="number" :label="t('score')" />
+      <q-input
+        v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(entity.entityType)"
+        v-model="entity.score"
+        type="number"
+        :label="t('score')"
+      />
     </div>
 
     <q-dialog v-model="showJson">
