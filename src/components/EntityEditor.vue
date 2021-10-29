@@ -4,7 +4,7 @@
       <q-toolbar-title class="text-subtitle1">
         <q-breadcrumbs>
           <!-- TODO: add super classes and super phenotypes -->
-          <q-breadcrumbs-el :label="phenotype.title" />
+          <q-breadcrumbs-el :label="entity.title" />
         </q-breadcrumbs>
       </q-toolbar-title>
       <q-btn
@@ -13,20 +13,20 @@
         dense
         icon="raw_on"
         color="primary"
-        :title="$t('phenotypeEditor.rawBtn.label')"
+        :title="$t('entityEditor.rawBtn.label')"
         @click="showJson = true"
       />
     </q-toolbar>
 
     <div class="q-gutter-md q-pa-md">
-      <localized-text-input v-model="phenotype.titles" unique-langs :label="$tc('title', 2)" />
+      <localized-text-input v-model="entity.titles" unique-langs :label="$tc('title', 2)" />
 
-      <data-type-select v-model="phenotype.dataType" />
+      <data-type-select v-model="entity.dataType" />
 
       <q-expansion-item expand-separator icon="description" :label="$t('describingMetadata')">
         <div class="q-gutter-md">
-          <localized-text-input v-model="phenotype.synonyms" :label="$tc('synonym', 2)" />
-          <localized-text-input v-model="phenotype.descriptions" text-area rows="3" :label="$tc('description', 2)" />
+          <localized-text-input v-model="entity.synonyms" :label="$tc('synonym', 2)" />
+          <localized-text-input v-model="entity.descriptions" text-area rows="3" :label="$tc('description', 2)" />
         </div>
       </q-expansion-item>
     </div>
@@ -34,13 +34,13 @@
     <q-dialog v-model="showJson">
       <q-card>
         <q-card-section>
-          <div v-t="'phenotypeEditor.rawDialog.content'" class="text-h6" />
+          <div v-t="'entityEditor.rawDialog.content'" class="text-h6" />
         </q-card-section>
 
         <q-separator />
 
         <q-card-section class="q-pt-none">
-          <pre>{{ phenotype }}</pre>
+          <pre>{{ entity }}</pre>
         </q-card-section>
 
         <q-separator />
@@ -55,12 +55,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { IPhenotype, EntityType, DataType } from 'src/components/models';
+import { IEntity, EntityType, DataType } from 'src/components/models';
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/DataTypeSelect.vue'
 
 export default defineComponent({
-  name: 'PhenotypeEditor',
+  name: 'EntityEditor',
   components: {
     LocalizedTextInput,
     DataTypeSelect
@@ -76,19 +76,19 @@ export default defineComponent({
   data () {
     return {
       showJson: false,
-      phenotype: null as unknown as IPhenotype,
-      initialState: null as unknown as IPhenotype
+      entity: null as unknown as IEntity,
+      initialState: null as unknown as IEntity
     }
   },
   computed: {
     hasUnsavedChanges (): boolean {
-      return JSON.stringify(this.phenotype) !== JSON.stringify(this.initialState)
+      return JSON.stringify(this.entity) !== JSON.stringify(this.initialState)
     }
   },
   created () {
-    // TODO: load phenotype from API
-    this.phenotype = {
-      title: 'Example Phenotype',
+    // TODO: load entity from API
+    this.entity = {
+      title: 'Example Entity',
       titles: [
         { lang: 'de', text: 'Größe' },
         { lang: 'en', text: 'Height' }
@@ -102,7 +102,7 @@ export default defineComponent({
       ]
     }
     // TODO: reset state after save
-    this.initialState = JSON.parse(JSON.stringify(this.phenotype)) as IPhenotype
+    this.initialState = JSON.parse(JSON.stringify(this.entity)) as IEntity
   }
 })
 </script>

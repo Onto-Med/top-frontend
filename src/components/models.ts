@@ -1,4 +1,4 @@
-export interface IPhenotype {
+export interface IEntity {
   id?: string;
   title: string;
   entityType: EntityType;
@@ -12,11 +12,11 @@ export interface IPhenotype {
   negated?: boolean;
 }
 
-export interface IPhenotypeTreeNode {
+export interface IEntityTreeNode {
   id: string|number;
   label: string;
   icon?: string;
-  children?: IPhenotypeTreeNode[];
+  children?: IEntityTreeNode[];
 }
 
 export interface ICodeSystem {

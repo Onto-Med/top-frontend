@@ -14,12 +14,12 @@ export default {
   oneThingPerThing: 'Es kann nur ein {thing1} pro {thing2} existieren!',
   language: 'Sprache|Sprachen',
   remove: 'Entfernen',
-  phenotypeEditor: {
+  entityEditor: {
     rawBtn: {
-      label: 'Zeige Phänotyp Daten als JSON'
+      label: 'Zeige Entität-Daten als JSON'
     },
     rawDialog: {
-      content: 'Aktueller Zustand des Phänotyps'
+      content: 'Aktueller Zustand der Entität'
     }
   }
 };

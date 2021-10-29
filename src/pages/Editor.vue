@@ -6,7 +6,7 @@
           ref="tree"
           v-model:expanded="treeExpansion"
           v-model:selected="selected"
-          :nodes="phenotypeNodes"
+          :nodes="entityNodes"
           node-key="id"
           selected-color="primary"
         />
@@ -37,7 +37,7 @@
       </q-tabs>
       <q-tab-panels v-model="selected" keep-alive animated>
         <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id">
-          <phenotype-editor :entity-type="entityType" :entity-id="tab.id" />
+          <entity-editor :entity-type="entityType" :entity-id="tab.id" />
         </q-tab-panel>
       </q-tab-panels>
     </template>
@@ -46,38 +46,38 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { IPhenotypeTreeNode, EntityType } from 'src/components/models'
+import { IEntityTreeNode, EntityType } from 'src/components/models'
 import { QTree } from 'quasar'
-import PhenotypeEditor from 'src/components/PhenotypeEditor.vue'
+import EntityEditor from 'src/components/EntityEditor.vue'
 
 export default defineComponent({
   name: 'Editor',
   components: {
-    PhenotypeEditor
+    EntityEditor
   },
   data () {
     return {
       showJson: false,
       splitterModel: 25,
       entityType: EntityType.SinglePhenotype,
-      phenotypeNodes: [] as IPhenotypeTreeNode[],
+      entityNodes: [] as IEntityTreeNode[],
       treeExpansion: [],
       selected: '' as string,
-      tabs: [] as IPhenotypeTreeNode[]
+      tabs: [] as IEntityTreeNode[]
     }
   },
   watch: {
     selected (key: string) {
       if (!key) return
-      if (!this.tabs.map((t: IPhenotypeTreeNode) => t.id).includes(key)) {
+      if (!this.tabs.map((t: IEntityTreeNode) => t.id).includes(key)) {
         let tree = this.$refs.tree as QTree
-        this.tabs.push(tree.getNodeByKey(key) as IPhenotypeTreeNode)
+        this.tabs.push(tree.getNodeByKey(key) as IEntityTreeNode)
       }
     }
   },
   mounted () {
-    // TODO: load phenotype nodes
-    this.phenotypeNodes = [
+    // TODO: load entity nodes
+    this.entityNodes = [
       {
         id: 1,
         label: 'Anthropometry',
@@ -99,7 +99,7 @@ export default defineComponent({
     ]
   },
   methods: {
-    closeTab (tab: IPhenotypeTreeNode): void {
+    closeTab (tab: IEntityTreeNode): void {
       this.tabs.splice(this.tabs.map(t => t.id).indexOf(tab.id), 1)
       if (this.selected === tab.id) this.selected = ''
     }
