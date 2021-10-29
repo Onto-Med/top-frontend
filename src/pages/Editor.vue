@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <q-splitter v-model="splitterModel" style="min-height: inherit">
+    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
         <div class="q-pa-md">
           <q-tree
@@ -21,26 +21,28 @@
         </q-menu>
       </template>
       <template #after>
-        <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2">
-          <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
-            <span class="no-wrap">
-              {{ tab.label }}
-              <q-btn
-                flat
-                dense
-                rounded
-                icon="close"
-                size="xs"
-                @click.prevent="closeTab(tab)"
-              />
-            </span>
-          </q-tab>
-        </q-tabs>
-        <q-tab-panels v-model="selected" keep-alive animated>
-          <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id">
-            <entity-editor :entity-type="entityType" :entity-id="tab.id" />
-          </q-tab-panel>
-        </q-tab-panels>
+        <div class="column fit">
+          <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2 col-auto">
+            <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
+              <span class="no-wrap">
+                {{ tab.label }}
+                <q-btn
+                  flat
+                  dense
+                  rounded
+                  icon="close"
+                  size="xs"
+                  @click.prevent="closeTab(tab)"
+                />
+              </span>
+            </q-tab>
+          </q-tabs>
+          <q-tab-panels v-model="selected" keep-alive animated class="col">
+            <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id">
+              <entity-editor :entity-type="entityType" :entity-id="tab.id" />
+            </q-tab-panel>
+          </q-tab-panels>
+        </div>
       </template>
     </q-splitter>
   </q-page>
