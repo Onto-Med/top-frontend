@@ -14,6 +14,7 @@ export default {
   oneThingPerThing: 'Es kann nur ein {thing1} pro {thing2} existieren!',
   language: 'Sprache|Sprachen',
   remove: 'Entfernen',
+  score: 'Ergebnis',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'
