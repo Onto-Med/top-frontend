@@ -89,8 +89,8 @@ export default defineComponent({
             label: 'Weight',
             icon: 'calculate',
             children: [
-              { id: 6, label: '1500-2500g' },
-              { id: 7, label: '>80kg' }
+              { id: 'weight_1500_to_2500g', label: '1500-2500g' },
+              { id: 'weight_gt_80kg', label: '>80kg' }
             ]
           }
         ]

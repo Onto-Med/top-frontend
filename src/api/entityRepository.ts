@@ -1,17 +1,35 @@
 import { DataType, EntityType, IEntity } from 'src/components/models'
 
+const anthropometry: IEntity = {
+  id: 'anthropometry',
+  title: 'Anthropometry',
+  titles: [
+    { lang: 'de', text: 'Anthropometrie' },
+    { lang: 'en', text: 'Anthropometry' }
+  ],
+  entityType: EntityType.Category,
+  synonyms: [],
+  codes: [],
+  descriptions: []
+}
+
+const weight: IEntity = {
+  id: 'weight',
+  title: 'Weight',
+  titles: [
+    { lang: 'de', text: 'Gewicht' },
+    { lang: 'en', text: 'Weight' }
+  ],
+  entityType: EntityType.SinglePhenotype,
+  dataType: DataType.Number,
+  synonyms: [],
+  descriptions: [],
+  codes: [],
+  superClass: anthropometry
+}
+
 const _entites: IEntity[] = [
-  {
-    id: 'anthropometry',
-    title: 'Anthropometry',
-    titles: [
-      { lang: 'de', text: 'Anthropometrie' },
-      { lang: 'en', text: 'Anthropometry' }
-    ],
-    entityType: EntityType.Category,
-    synonyms: [],
-    descriptions: []
-  },
+  anthropometry,
   {
     id: 'bmi',
     title: 'BMI',
@@ -22,7 +40,9 @@ const _entites: IEntity[] = [
     entityType: EntityType.SinglePhenotype,
     dataType: DataType.Number,
     synonyms: [],
-    descriptions: []
+    descriptions: [],
+    codes: [],
+    superClass: anthropometry
   },
   {
     id: 'height',
@@ -37,19 +57,30 @@ const _entites: IEntity[] = [
     descriptions: [
       { lang: 'de', text: 'Beispielbeschreibung' },
       { lang: 'en', text: 'Example description' }
-    ]
+    ],
+    codes: [],
+    superClass: anthropometry
+  },
+  weight,
+  {
+    id: 'weight_1500_to_2500g',
+    title: '1500-2500g',
+    titles: [],
+    entityType: EntityType.SingleRestriction,
+    synonyms: [],
+    descriptions: [],
+    codes: [],
+    superClass: weight
   },
   {
-    id: 'weight',
-    title: 'Weight',
-    titles: [
-      { lang: 'de', text: 'Gewicht' },
-      { lang: 'en', text: 'Weight' }
-    ],
-    entityType: EntityType.SinglePhenotype,
-    dataType: DataType.Number,
+    id: 'weight_gt_80kg',
+    title: '>80kg',
+    titles: [],
+    entityType: EntityType.SingleRestriction,
     synonyms: [],
-    descriptions: []
+    descriptions: [],
+    codes: [],
+    superClass: weight
   },
   {
     id: 'laboratory_values',
@@ -60,6 +91,7 @@ const _entites: IEntity[] = [
     ],
     entityType: EntityType.Category,
     synonyms: [],
+    codes: [],
     descriptions: []
   },
 ]

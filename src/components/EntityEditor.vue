@@ -3,7 +3,7 @@
     <q-toolbar>
       <q-toolbar-title class="text-subtitle1">
         <q-breadcrumbs>
-          <!-- TODO: add super classes and super phenotypes -->
+          <q-breadcrumbs-el v-if="entity.superClass" :label="entity.superClass.title" />
           <q-breadcrumbs-el :label="entity.title" />
         </q-breadcrumbs>
       </q-toolbar-title>
