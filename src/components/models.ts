@@ -2,11 +2,11 @@ export interface IEntity {
   id?: string;
   entityType: EntityType;
   title?: string
-  titles: Record<string, string>[];
-  synonyms: Record<string, string>[];
-  descriptions: Record<string, string>[];
+  titles?: Record<string, string>[];
+  synonyms?: Record<string, string>[];
+  descriptions?: Record<string, string>[];
   dataType?: DataType;
-  codes: ICode[];
+  codes?: ICode[];
   score?: number;
   units?: string[];
   negated?: boolean;

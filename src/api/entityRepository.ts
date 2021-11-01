@@ -102,18 +102,23 @@ const _entites: IEntity[] = [
 ]
 
 // eslint-disable-next-line @typescript-eslint/require-await
-export function fetchEntity(id: string): IEntity {
+export function fetchEntity (id: string): IEntity {
   const result = _entites.filter(e => e.id === id)
   const entity = result[0]
 
-  if ([EntityType.SingleRestriction, EntityType.DerivedRestriction, EntityType.CombinedRestriction].includes(entity.entityType) && !entity.restriction) {
+  if (!entity.titles) entity.titles = [] as Record<string, string>[]
+  if (!entity.synonyms) entity.synonyms = [] as Record<string, string>[]
+  if (!entity.descriptions) entity.descriptions = [] as Record<string, string>[]
+  if (!entity.codes) entity.codes = [] as ICode[]
+
+  if ([EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType) && !entity.restriction) {
     entity.restriction = [] as IRestrictionComponent[]
   }
 
   return entity
 }
 
-export function fetchEntityTree(): IEntityTreeNode[] {
+export function fetchEntityTree (): IEntityTreeNode[] {
   return [
     {
       id: 'anthropometry',
