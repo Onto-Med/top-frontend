@@ -30,15 +30,24 @@
 
     <q-chip
       v-if="modelValue.id"
-      removable
       clickable
       icon="calculate"
       class="truncate"
       :label="modelValue.id"
       :title="t(modelValue.type) + ': ' + modelValue.id"
-      @click="$emit('entityClicked', modelValue.id)"
-      @remove="$emit('removeClicked')"
-    />
+    >
+      <q-menu>
+        <q-list dense>
+          <q-item v-close-popup clickable @click="$emit('entityClicked', modelValue.id)">
+            <q-item-section v-t="'show'" />
+          </q-item>
+          <q-separator />
+          <q-item v-close-popup clickable @click="$emit('removeClicked')">
+            <q-item-section v-t="'remove'" />
+          </q-item>
+        </q-list>
+      </q-menu>
+    </q-chip>
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">
       <span
@@ -56,6 +65,8 @@
         @update:model-value="handleOperandUpdate(index, $event)"
       />
     </span>
+
+    <span v-show="showAddButton">, +</span>
 
     <span
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
@@ -106,8 +117,12 @@ export default defineComponent({
           return ''
       }
     })
+    const showAddButton = computed((): boolean => {
+      return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
+        || props.modelValue.operands !== undefined && props.modelValue.operands.length === 0
+    })
     
-    return { t, hover, operatorSymbol, ExpressionType }
+    return { t, hover, operatorSymbol, ExpressionType, showAddButton }
   },
   methods: {
     setType (type: ExpressionType) {
