@@ -29,6 +29,7 @@
         :class="{ monospace: monospace }"
         :model-value="modelValue"
         :inline="inline"
+        @update:model-value="$emit('update:modelValue', $event)"
       />
     </q-card-section>
   </q-card>

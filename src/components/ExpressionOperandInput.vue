@@ -7,7 +7,25 @@
       :title="t(modelValue.type)"
       @mouseover="hover = true"
       @mouseleave="hover = false"
-    >{{ operatorSymbol }} (<br v-show="!inline"></span>
+    >
+      {{ operatorSymbol }} (<br v-show="!inline">
+      <q-menu>
+        <q-list dense>
+          <q-item
+            v-for="type in [ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement]"
+            :key="type"
+            v-close-popup
+            clickable
+          >
+            <q-item-section v-t="type" @click="setType(type)" />
+          </q-item>
+          <q-separator />
+          <q-item v-close-popup clickable>
+            <q-item-section v-t="'remove'" />
+          </q-item>
+        </q-list>
+      </q-menu>
+    </span>
 
     <q-chip
       v-if="modelValue.id"
@@ -33,6 +51,7 @@
         :indent="indent"
         :indent-level="indentLevel + 1"
         @entity-clicked="$emit('entityClicked', $event)"
+        @update:model-value="handleOperandUpdate(index, $event)"
       />
     </span>
 
@@ -87,6 +106,18 @@ export default defineComponent({
     })
     
     return { t, hover, operatorSymbol, ExpressionType }
+  },
+  methods: {
+    setType (type: ExpressionType) {
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+      newModelValue.type = type
+      this.$emit('update:modelValue', newModelValue)
+    },
+    handleOperandUpdate (index: number, operand: IExpression) {
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+      if (newModelValue.operands) newModelValue.operands[index] = operand
+      this.$emit('update:modelValue', newModelValue)
+    }
   }
 })
 </script>
