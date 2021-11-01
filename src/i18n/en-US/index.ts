@@ -29,6 +29,7 @@ export default {
   alignLeft: 'Align left',
   clearAll: 'Clear all',
   show: 'Show',
+  filter: 'Filter',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

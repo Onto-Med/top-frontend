@@ -3,11 +3,17 @@
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
         <div class="column fit q-pa-md">
+          <q-input v-model="treeFilter" filled :label="t('filter')">
+            <template #append>
+              <q-icon v-show="treeFilter !== ''" name="clear" class="cursor-pointer" @click="treeFilter = ''" />
+            </template>
+          </q-input>
           <q-tree
             ref="tree"
             v-model:expanded="treeExpansion"
             v-model:selected="selected"
             :nodes="entityNodes"
+            :filter="treeFilter"
             node-key="id"
             selected-color="primary"
           />
@@ -51,6 +57,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { IEntityTreeNode, EntityType } from 'src/components/models'
 import { QTree } from 'quasar'
 import EntityEditor from 'src/components/EntityEditor.vue'
@@ -61,6 +68,12 @@ export default defineComponent({
   components: {
     EntityEditor
   },
+  setup () {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t } = useI18n()
+
+    return { t }
+  },
   data () {
     return {
       showJson: false,
@@ -68,6 +81,7 @@ export default defineComponent({
       entityType: EntityType.SinglePhenotype,
       entityNodes: [] as IEntityTreeNode[],
       treeExpansion: [],
+      treeFilter: '',
       selected: '' as string|number,
       tabs: [] as IEntityTreeNode[]
     }
