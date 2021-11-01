@@ -7,17 +7,17 @@
           flat
           round
           dense
-          icon="clear_all"
-          :title="t('clearAll')"
-          @click="showClearDialog = true"
+          :icon="inline ? 'height' : 'format_align_left'"
+          :title="inline ? t('expand') : t('alignLeft')"
+          @click="inline = !inline"
         />
         <q-btn
           flat
           round
           dense
-          :icon="inline ? 'height' : 'format_align_left'"
-          :title="inline ? t('expand') : t('alignLeft')"
-          @click="inline = !inline"
+          icon="clear"
+          :title="t('clearAll')"
+          @click="showClearDialog = true"
         />
         <q-btn
           flat
