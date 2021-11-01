@@ -12,6 +12,7 @@ export interface IEntity {
   negated?: boolean;
   superClass?: IEntity;
   restriction?: IRestrictionComponent[];
+  expression?: IExpression;
 }
 
 export interface IRestrictionComponent {
@@ -34,6 +35,12 @@ export interface ICode {
   codeSystem: ICodeSystem;
   code: string;
   name: string;
+}
+
+export interface IExpression {
+  type: ExpressionType;
+  id?: string;
+  operands?: IExpression[];
 }
 
 export enum EntityType {

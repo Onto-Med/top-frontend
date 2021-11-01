@@ -1,4 +1,4 @@
-import { DataType, EntityType, IEntity, IEntityTreeNode, IRestrictionComponent, RestrictionOperator } from 'src/components/models'
+import { DataType, EntityType, IEntity, IEntityTreeNode, IRestrictionComponent, RestrictionOperator, ICode, IExpression } from 'src/components/models'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -26,6 +26,26 @@ const weight: IEntity = {
   descriptions: [],
   codes: [],
   superClass: anthropometry
+}
+
+const laboratoryValues: IEntity = {
+  id: 'laboratory_values',
+  title: 'Laboratory Values',
+  titles: [
+    { lang: 'de', text: 'Laborwerte' },
+    { lang: 'en', text: 'Laboratory Values' }
+  ],
+  entityType: EntityType.Category,
+  synonyms: [],
+  codes: [],
+  descriptions: []
+}
+
+const combinedPhenotype: IEntity = {
+  id: 'combined_phenotype',
+  title: 'Combined Phenotype',
+  entityType: EntityType.CombinedPhenotype,
+  superClass: laboratoryValues
 }
 
 const _entites: IEntity[] = [
@@ -87,18 +107,14 @@ const _entites: IEntity[] = [
     codes: [],
     superClass: weight
   },
+  laboratoryValues,
+  combinedPhenotype,
   {
-    id: 'laboratory_values',
-    title: 'Laboratory Values',
-    titles: [
-      { lang: 'de', text: 'Laborwerte' },
-      { lang: 'en', text: 'Laboratory Values' }
-    ],
-    entityType: EntityType.Category,
-    synonyms: [],
-    codes: [],
-    descriptions: []
-  },
+    id: 'combined_restriction',
+    title: 'Combined Restriction',
+    entityType: EntityType.CombinedRestriction,
+    superClass: combinedPhenotype
+  }
 ]
 
 // eslint-disable-next-line @typescript-eslint/require-await
@@ -113,6 +129,9 @@ export function fetchEntity (id: string): IEntity {
 
   if ([EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType) && !entity.restriction) {
     entity.restriction = [] as IRestrictionComponent[]
+  }
+  if (entity.entityType === EntityType.CombinedRestriction && !entity.expression) {
+    entity.expression = {} as IExpression;
   }
 
   return entity
@@ -137,6 +156,19 @@ export function fetchEntityTree (): IEntityTreeNode[] {
         }
       ]
     },
-    { id: 'laboratory_values', label: 'Laboratory values' }
+    {
+      id: 'laboratory_values',
+      label: 'Laboratory values',
+      children: [
+        {
+          id: 'combined_phenotype',
+          label: 'Combined Phenotype',
+          icon: 'merge_type',
+          children: [
+            { id: 'combined_restriction', label: 'Combined Restriction' }
+          ]
+        }
+      ]
+    }
   ]
 }

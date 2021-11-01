@@ -38,7 +38,7 @@
       />
 
       <restriction-input
-        v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction, EntityType.CombinedRestriction].includes(entity.entityType)"
+        v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)"
         v-model="entity.restriction"
       />
     </div>
