@@ -30,6 +30,7 @@
         :model-value="modelValue"
         :inline="inline"
         @update:model-value="$emit('update:modelValue', $event)"
+        @entity-clicked="$emit('entityClicked', $event)"
       />
     </q-card-section>
   </q-card>
