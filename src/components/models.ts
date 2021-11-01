@@ -56,11 +56,11 @@ export enum DataType {
 }
 
 export enum ExpressionType {
-  Class,
-  Restriction,
-  Union,
-  Intersection,
-  Complement
+  Class        = 'class',
+  Restriction  = 'restriction',
+  Union        = 'union',
+  Intersection = 'intersection',
+  Complement   = 'complement'
 }
 
 export enum RestrictionOperator {
