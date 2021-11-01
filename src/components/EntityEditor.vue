@@ -45,7 +45,7 @@
       <expression-input
         v-if="entity.entityType === EntityType.CombinedRestriction"
         v-model="entity.expression"
-        class="monospace"
+        :label="t('expression')"
         @entity-clicked="$emit('entityClicked', $event)"
       />
     </div>
@@ -122,8 +122,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style lang="sass">
-.monospace
-  font-family: monospace, monospace
-</style>
