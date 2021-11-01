@@ -1,12 +1,13 @@
 <template>
   <span>
+    <span v-show="!inline">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
     <span
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
       :title="t(modelValue.type)"
       @mouseover="hover = true"
       @mouseleave="hover = false"
-    >{{ operatorSymbol }} (</span>
+    >{{ operatorSymbol }} (<br v-show="!inline"></span>
 
     <q-chip
       v-if="modelValue.id"
@@ -21,9 +22,16 @@
     />
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">
-      <span v-if="index != 0" :class="{ 'text-weight-bolder text-primary': hover }">, </span>
+      <span
+        v-if="index != 0"
+        :class="{ 'text-weight-bolder text-primary': hover }"
+      >,<span v-show="inline">&nbsp;</span><br v-show="!inline"></span>
+
       <expression-operand-input
         :model-value="operand"
+        :inline="inline"
+        :indent="indent"
+        :indent-level="indentLevel + 1"
         @entity-clicked="$emit('entityClicked', $event)"
       />
     </span>
@@ -31,7 +39,7 @@
     <span
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
-    >)</span>
+    ><br v-show="!inline"><span v-show="!inline">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>)</span>
   </span>
 </template>
 
@@ -46,6 +54,18 @@ export default defineComponent({
     modelValue: {
       type: Object as () => IExpression,
       required: true
+    },
+    inline: {
+      type: Boolean,
+      default: true
+    },
+    indent: {
+      type: Number,
+      default: 2
+    },
+    indentLevel: {
+      type: Number,
+      default: 0
     }
   },
   emits: ['update:modelValue', 'entityClicked', 'removeClicked'],

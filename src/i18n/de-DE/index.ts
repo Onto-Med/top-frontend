@@ -25,6 +25,9 @@ export default {
   and: 'und',
   or: 'oder',
   not: 'nicht',
+  expand: 'Erweitern',
+  alignLeft: 'Zeilenweise anzeigen',
+  clearAll: 'Alles löschen',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

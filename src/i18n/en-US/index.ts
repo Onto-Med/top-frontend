@@ -25,6 +25,9 @@ export default {
   and: 'and',
   or: 'or',
   not: 'not',
+  expand: 'Expand',
+  alignLeft: 'Align left',
+  clearAll: 'Clear all',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

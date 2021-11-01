@@ -1,9 +1,25 @@
 <template>
   <q-card>
     <q-card-section v-if="label">
-      <div class="text-h6">
-        {{ label }}
-      </div>
+      <q-toolbar>
+        <q-toolbar-title>{{ label }}</q-toolbar-title>
+        <q-btn
+          flat
+          round
+          dense
+          :icon="inline ? 'height' : 'format_align_left'"
+          :title="inline ? t('expand') : t('alignLeft')"
+          @click="inline = !inline"
+        />
+        <q-btn
+          flat
+          round
+          dense
+          icon="clear_all"
+          :title="t('clearAll')"
+          @click="$emit('update:modelValue', { type: ExpressionType.Union })"
+        />
+      </q-toolbar>
     </q-card-section>
 
     <q-separator />
@@ -12,6 +28,7 @@
       <expression-operand-input
         :class="{ monospace: monospace }"
         :model-value="modelValue"
+        :inline="inline"
       />
     </q-card-section>
   </q-card>
@@ -20,7 +37,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IExpression } from 'src/components/models'
+import { IExpression, ExpressionType } from 'src/components/models'
 import ExpressionOperandInput from 'src/components/ExpressionOperandInput.vue'
 
 export default defineComponent({
@@ -44,8 +61,9 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const hover = ref(false)
+    const inline = ref(true)
 
-    return { t, hover }
+    return { t, hover, inline, ExpressionType }
   }
 })
 </script>
