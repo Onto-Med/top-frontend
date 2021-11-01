@@ -2,7 +2,7 @@
   <q-page>
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
-        <div class="q-pa-md">
+        <div class="column fit q-pa-md">
           <q-tree
             ref="tree"
             v-model:expanded="treeExpansion"
@@ -11,15 +11,16 @@
             node-key="id"
             selected-color="primary"
           />
+          <q-menu context-menu>
+            <q-list dense>
+              <q-item v-close-popup clickable>
+                <q-item-section>Example Entry</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
         </div>
-        <q-menu ref="treeContextMenu" context-menu>
-          <q-list dense>
-            <q-item v-close-popup clickable>
-              <q-item-section>Example Entry</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
       </template>
+
       <template #after>
         <div class="column fit">
           <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2 col-auto">
