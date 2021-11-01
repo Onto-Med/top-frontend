@@ -16,8 +16,9 @@
             :key="type"
             v-close-popup
             clickable
+            @click="setType(type)"
           >
-            <q-item-section v-t="type" @click="setType(type)" />
+            <q-item-section v-t="type" />
           </q-item>
           <q-separator />
           <q-item v-close-popup clickable>
