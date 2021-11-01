@@ -9,6 +9,7 @@ export default {
   synonym: 'Synonym|Synonyme',
   description: 'Beschreibung|Beschreibungen',
   ok: 'OK',
+  cancel: 'Abbrechen',
   entry: 'Eintrag|Einträge',
   addThing: '{thing} hinzufügen',
   oneThingPerThing: 'Es kann nur ein {thing1} pro {thing2} existieren!',
@@ -31,6 +32,9 @@ export default {
   show: 'Anzeigen',
   filter: 'Filter',
   operand: 'Operand',
+  settings: 'Einstellungen',
+  indentWithSpaces: 'Einrücken mit Leerzeichen',
+  confirmClearExpression: 'Bitte bestätigen Sie, dass Sie den aktuellen Ausdruck löschen möchten.',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'
