@@ -41,6 +41,13 @@
         v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)"
         v-model="entity.restriction"
       />
+
+      <expression-input
+        v-if="entity.entityType === EntityType.CombinedRestriction"
+        v-model="entity.expression"
+        class="monospace"
+        @entity-clicked="$emit('entityClicked', $event)"
+      />
     </div>
 
     <q-dialog v-model="showJson">
@@ -68,18 +75,20 @@
 <script lang="ts">
 import { ref, computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IEntity, EntityType } from 'src/components/models';
+import { IEntity, EntityType } from 'src/components/models'
 import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/DataTypeSelect.vue'
+import ExpressionInput from 'src/components/ExpressionInput.vue'
 import { fetchEntity } from 'src/api/entityRepository'
-import RestrictionInput from './RestrictionInput.vue';
+import RestrictionInput from './RestrictionInput.vue'
 
 export default defineComponent({
   name: 'EntityEditor',
   components: {
     LocalizedTextInput,
     DataTypeSelect,
-    RestrictionInput
+    RestrictionInput,
+    ExpressionInput
   },
   props: {
     entityType: {
@@ -89,6 +98,7 @@ export default defineComponent({
       type: [String, Number]
     }
   },
+  emits: ['entityClicked'],
   setup (props: Record<string, unknown>) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }  = useI18n()
@@ -112,3 +122,8 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="sass">
+.monospace
+  font-family: monospace, monospace
+</style>

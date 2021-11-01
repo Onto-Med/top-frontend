@@ -39,7 +39,7 @@
           </q-tabs>
           <q-tab-panels v-model="selected" keep-alive animated class="col">
             <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id">
-              <entity-editor :entity-type="entityType" :entity-id="tab.id" />
+              <entity-editor :entity-type="entityType" :entity-id="tab.id" @entity-clicked="selected = $event" />
             </q-tab-panel>
           </q-tab-panels>
         </div>

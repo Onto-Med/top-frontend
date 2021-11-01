@@ -17,6 +17,14 @@ export default {
   score: 'Ergebnis',
   component: 'Komponente',
   restriction: 'Restriktion',
+  expression: 'Ausdruck',
+  class: 'Klasse',
+  union: 'Vereinigung',
+  intersection: 'Durchschnitt',
+  complement: 'Komplement',
+  and: 'und',
+  or: 'oder',
+  not: 'nicht',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

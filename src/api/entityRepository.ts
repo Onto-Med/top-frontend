@@ -1,4 +1,4 @@
-import { DataType, EntityType, IEntity, IEntityTreeNode, IRestrictionComponent, RestrictionOperator, ICode, IExpression } from 'src/components/models'
+import { DataType, EntityType, IEntity, IEntityTreeNode, IRestrictionComponent, RestrictionOperator, ICode, IExpression, ExpressionType } from 'src/components/models'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -113,7 +113,19 @@ const _entites: IEntity[] = [
     id: 'combined_restriction',
     title: 'Combined Restriction',
     entityType: EntityType.CombinedRestriction,
-    superClass: combinedPhenotype
+    superClass: combinedPhenotype,
+    expression: {
+      type: ExpressionType.Union,
+      operands: [
+        { type: ExpressionType.Restriction, id: 'weight_1500_to_2500g' },
+        {
+          type: ExpressionType.Complement,
+          operands: [
+            { type: ExpressionType.Class, id: 'height' }
+          ]
+        }
+      ]
+    } as IExpression
   }
 ]
 
