@@ -4,6 +4,7 @@
     <span
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
+      class="cursor-pointer"
       :title="t(modelValue.type)"
       @mouseover="hover = true"
       @mouseleave="hover = false"
@@ -66,12 +67,24 @@
       />
     </span>
 
-    <span v-show="showAddButton">, +</span>
+    <span v-show="showAddButton" :class="{ 'text-weight-bolder text-primary': hover }">
+      <span v-show="(modelValue.operands || []).length > 0">, </span>
+      <span v-show="!inline"><br>{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
+      <span
+        class="cursor-pointer"
+        :title="t('addThing', { thing: t('operand') })"
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+      >+</span>
+    </span>
 
     <span
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
-    ><br v-show="!inline"><span v-show="!inline">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>)</span>
+    >
+      <span v-show="!inline"><br>{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
+      <span @mouseover="hover = true" @mouseleave="hover = false">)</span>
+    </span>
   </span>
 </template>
 

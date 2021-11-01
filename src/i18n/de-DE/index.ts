@@ -30,6 +30,7 @@ export default {
   clearAll: 'Alles löschen',
   show: 'Anzeigen',
   filter: 'Filter',
+  operand: 'Operand',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'
