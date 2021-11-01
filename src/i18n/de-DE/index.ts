@@ -35,6 +35,7 @@ export default {
   settings: 'Einstellungen',
   indentWithSpaces: 'Einrücken mit Leerzeichen',
   confirmClearExpression: 'Bitte bestätigen Sie, dass Sie den aktuellen Ausdruck löschen möchten.',
+  selectThing: '{thing} auswählen',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

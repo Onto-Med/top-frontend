@@ -30,7 +30,7 @@
     </span>
 
     <q-chip
-      v-if="modelValue.id"
+      v-else-if="modelValue.id"
       clickable
       icon="calculate"
       class="truncate"
@@ -49,6 +49,17 @@
         </q-list>
       </q-menu>
     </q-chip>
+
+    <q-input
+      v-else
+      rounded
+      outlined
+      dense
+      type="text"
+      style="width: 200px"
+      class="inline"
+      :label="t('selectThing', { thing: t(modelValue.type) }) + '...'"
+    />
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">
       <span
@@ -75,7 +86,20 @@
         :title="t('addThing', { thing: t('operand') })"
         @mouseover="hover = true"
         @mouseleave="hover = false"
-      >+</span>
+      ><span class="add-btn">+</span><q-menu>
+        <q-list dense>
+          <q-item
+            v-for="type in [ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Class, ExpressionType.Restriction]"
+            :key="type"
+            v-close-popup
+            clickable
+            @click="addOperand(type)"
+          >
+            <q-item-section v-t="type" />
+          </q-item>
+        </q-list>
+      </q-menu>
+      </span>
     </span>
 
     <span
@@ -131,19 +155,26 @@ export default defineComponent({
       }
     })
     const showAddButton = computed((): boolean => {
+      if ([ExpressionType.Class, ExpressionType.Restriction].includes(props.modelValue.type)) return false
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
-        || props.modelValue.operands !== undefined && props.modelValue.operands.length === 0
+        || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
     })
     
     return { t, hover, operatorSymbol, ExpressionType, showAddButton }
   },
   methods: {
-    setType (type: ExpressionType) {
+    setType (type: ExpressionType): void {
       let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
       newModelValue.type = type
       this.$emit('update:modelValue', newModelValue)
     },
-    handleOperandUpdate (index: number, operand: IExpression|null) {
+    addOperand (type: ExpressionType): void {
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+      if (!newModelValue.operands) newModelValue.operands = []
+      newModelValue.operands.push({ type: type })
+      this.$emit('update:modelValue', newModelValue)
+    },
+    handleOperandUpdate (index: number, operand: IExpression|null): void {
       let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
       if (newModelValue.operands) {
         if (operand) newModelValue.operands[index] = operand
