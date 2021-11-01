@@ -67,7 +67,7 @@ export default defineComponent({
       entityType: EntityType.SinglePhenotype,
       entityNodes: [] as IEntityTreeNode[],
       treeExpansion: [],
-      selected: '' as string,
+      selected: '' as string|number,
       tabs: [] as IEntityTreeNode[]
     }
   },
@@ -86,8 +86,12 @@ export default defineComponent({
   },
   methods: {
     closeTab (tab: IEntityTreeNode): void {
-      this.tabs.splice(this.tabs.map(t => t.id).indexOf(tab.id), 1)
-      if (this.selected === tab.id) this.selected = ''
+      const tabIds = this.tabs.map(t => t.id)
+      const index = tabIds.indexOf(tab.id)
+      this.tabs.splice(index, 1)
+      tabIds.splice(index, 1)
+      if (this.selected === tab.id)
+        this.selected = tabIds.pop() || ''
     }
   }
 })
