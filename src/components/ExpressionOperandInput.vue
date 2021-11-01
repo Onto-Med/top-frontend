@@ -21,7 +21,7 @@
             <q-item-section v-t="type" />
           </q-item>
           <q-separator />
-          <q-item v-close-popup clickable>
+          <q-item v-close-popup clickable @click="$emit('removeClicked')">
             <q-item-section v-t="'remove'" />
           </q-item>
         </q-list>
@@ -37,7 +37,7 @@
       :label="modelValue.id"
       :title="t(modelValue.type) + ': ' + modelValue.id"
       @click="$emit('entityClicked', modelValue.id)"
-      @remove="$emit('removeClicked', modelValue.id)"
+      @remove="$emit('removeClicked')"
     />
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">
@@ -52,6 +52,7 @@
         :indent="indent"
         :indent-level="indentLevel + 1"
         @entity-clicked="$emit('entityClicked', $event)"
+        @remove-clicked="handleOperandUpdate(index, null)"
         @update:model-value="handleOperandUpdate(index, $event)"
       />
     </span>
@@ -114,9 +115,12 @@ export default defineComponent({
       newModelValue.type = type
       this.$emit('update:modelValue', newModelValue)
     },
-    handleOperandUpdate (index: number, operand: IExpression) {
+    handleOperandUpdate (index: number, operand: IExpression|null) {
       let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
-      if (newModelValue.operands) newModelValue.operands[index] = operand
+      if (newModelValue.operands) {
+        if (operand) newModelValue.operands[index] = operand
+        else newModelValue.operands.splice(index, 1)
+      }
       this.$emit('update:modelValue', newModelValue)
     }
   }
