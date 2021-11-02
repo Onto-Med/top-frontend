@@ -149,6 +149,10 @@ export function fetchEntity (id: string): IEntity {
   return entity
 }
 
+export function searchEntitiesByTitle(title: string): IEntity[] {
+  return _entites.filter(e => e.title?.toLowerCase().includes(title.toLowerCase()))
+}
+
 export function fetchEntityTree (): IEntityTreeNode[] {
   return [
     {
