@@ -18,8 +18,8 @@
           icon="settings"
           :title="t('setting', 2)"
         >
-          <q-menu>
-            <div class="text-h6 q-mb-md">
+          <q-menu class="q-pa-sm">
+            <div class="text-h6 q-mb-sm">
               {{ t('setting', 2) }}
             </div>
             <q-toggle v-model="expand" :label="t('expand')" />
