@@ -7,7 +7,7 @@
     hide-bottom-space
     use-input
     class="inline entity-search-input-field"
-    :label="label || t('selectThing', { thing: t('entity') })"
+    :placeholder="label || t('selectThing', { thing: t('entity') })"
     :options="options"
     @filter="filterFn"
     @update:model-value="$emit('entitySelected', $event)"
