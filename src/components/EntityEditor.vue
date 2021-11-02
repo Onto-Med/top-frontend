@@ -1,6 +1,6 @@
 <template>
   <div v-cloak class="column fit">
-    <div class="col-auto">
+    <div class="col-auto entity-editor-tab-header">
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           <q-breadcrumbs>
@@ -152,6 +152,8 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
+.entity-editor-tab-header
+  width: 100%
 .entity-editor-tab-content
   overflow-y: scroll
 </style>

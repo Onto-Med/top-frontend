@@ -30,7 +30,7 @@
 
       <template #after>
         <div class="column fit">
-          <q-tabs v-model="selected" dense no-caps align="left" class="bg-primary text-white shadow-2 col-auto">
+          <q-tabs v-model="selected" dense no-caps align="left" class="bg-primary text-white shadow-2 entity-editor-tabs-bar">
             <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
               <span class="no-wrap">
                 {{ tab.label }}
@@ -45,8 +45,8 @@
               </span>
             </q-tab>
           </q-tabs>
-          <q-tab-panels v-model="selected" keep-alive animated class="col">
-            <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id" class="entity-editor-tab q-pa-none">
+          <q-tab-panels v-model="selected" keep-alive animated class="col entity-editor-tab">
+            <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
               <entity-editor :entity-type="entityType" :entity-id="tab.id" @entity-clicked="selected = $event" />
             </q-tab-panel>
           </q-tab-panels>
@@ -114,6 +114,9 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
+.entity-editor-tabs-bar
+  width: 100%
 .entity-editor-tab
   height: 100%
+  width: 100%
 </style>
