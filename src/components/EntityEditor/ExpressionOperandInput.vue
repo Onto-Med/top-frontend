@@ -50,15 +50,10 @@
       </q-menu>
     </q-chip>
 
-    <q-input
+    <entity-search-input
       v-else
-      rounded
-      outlined
-      dense
-      type="text"
-      style="width: 200px"
-      class="inline"
-      :label="t('selectThing', { thing: t(modelValue.type) }) + '...'"
+      :label="t('selectThing', { thing: t(modelValue.type) })"
+      @clear-Clicked="$emit('removeClicked')"
     />
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">
@@ -116,9 +111,13 @@
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { IExpression, ExpressionType } from 'src/components/models'
+import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 
 export default defineComponent({
   name: 'ExpressionOperandInput',
+  components: {
+    EntitySearchInput
+  },
   props: {
     modelValue: {
       type: Object as () => IExpression,
