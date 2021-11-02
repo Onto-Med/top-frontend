@@ -65,21 +65,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="sass">
-.entity-search-input-field
-  width: 200px
-  margin: 4px
-  .q-field__inner, .q-field__control
-    min-height: 2em !important
-    height: 2em !important
-  .q-field__native
-    padding: 0 0 !important
-    min-height: 2em !important
-    height: 2em !important
-  .q-field__append
-    height: 1em
-  .q-btn
-    min-height: 1em !important
-    min-width: 1em !important
-</style>
