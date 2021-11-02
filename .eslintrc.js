@@ -80,7 +80,7 @@ module.exports = {
 
     "vue/max-attributes-per-line": ["warn", {
       "singleline": {
-        "max": 4
+        "max": 5
       },
       "multiline": {
         "max": 1

@@ -29,7 +29,7 @@
 
       <template #after>
         <div class="column fit">
-          <q-tabs v-model="selected" dense align="left" class="bg-primary text-white shadow-2 col-auto">
+          <q-tabs v-model="selected" dense no-caps align="left" class="bg-primary text-white shadow-2 col-auto">
             <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
               <span class="no-wrap">
                 {{ tab.label }}
