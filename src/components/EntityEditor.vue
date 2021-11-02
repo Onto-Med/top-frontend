@@ -76,11 +76,11 @@
 import { ref, computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { IEntity, EntityType } from 'src/components/models'
-import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
-import DataTypeSelect from 'src/components/DataTypeSelect.vue'
-import ExpressionInput from 'src/components/ExpressionInput.vue'
 import { fetchEntity } from 'src/api/entityRepository'
-import RestrictionInput from './RestrictionInput.vue'
+import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
+import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
+import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
+import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
 
 export default defineComponent({
   name: 'EntityEditor',

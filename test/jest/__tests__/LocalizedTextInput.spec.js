@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-jest';
 import { mount } from '@vue/test-utils';
-import LocalizedTextInput from 'src/components/LocalizedTextInput.vue'
+import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 
 // Specify here Quasar config you'll need to test your component
 installQuasarPlugin();
