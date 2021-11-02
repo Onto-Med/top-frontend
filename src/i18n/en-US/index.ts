@@ -35,6 +35,8 @@ export default {
   indentWithSpaces: 'Indent with spaces',
   confirmClearExpression: 'Please confirm that you want to delete the current expression.',
   selectThing: 'Select {thing}',
+  save: 'Save',
+  reset: 'Reset',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

@@ -1,8 +1,8 @@
 <template>
   <div v-cloak class="column fit">
     <div class="col-auto">
-      <q-toolbar>
-        <q-toolbar-title class="text-subtitle1">
+      <q-toolbar class="q-gutter-sm">
+        <q-toolbar-title class="text-subtitle1 ellipsis">
           <q-breadcrumbs>
             <q-breadcrumbs-el
               v-if="entity.superClass"
@@ -13,6 +13,22 @@
             <q-breadcrumbs-el :label="entity.title" />
           </q-breadcrumbs>
         </q-toolbar-title>
+        <q-btn
+          dense
+          no-caps
+          color="primary"
+          :label="t('save')"
+          :disabled="!hasUnsavedChanges"
+        />
+        <q-btn
+          dense
+          no-caps
+          color="grey-7"
+          :label="t('reset')"
+          :disable="!hasUnsavedChanges"
+          @click="reset()"
+        />
+        <q-separator vertical />
         <q-btn
           flat
           round
@@ -119,6 +135,9 @@ export default defineComponent({
       entity.value = fetchEntity(props.entityId as string)
       initialState.value = JSON.parse(JSON.stringify(entity.value)) as IEntity
     }
+    const reset = () => {
+      entity.value = JSON.parse(JSON.stringify(initialState.value)) as IEntity
+    }
     const hasUnsavedChanges = computed(() =>
       JSON.stringify(entity.value) !== JSON.stringify(initialState.value)
     )
@@ -126,7 +145,7 @@ export default defineComponent({
     getEntity()
 
     return {
-      t, entity, showJson, initialState, hasUnsavedChanges, EntityType
+      t, entity, showJson, initialState, reset, hasUnsavedChanges, EntityType
     }
   }
 })
