@@ -1,6 +1,6 @@
 <template>
   <span>
-    <span v-show="!inline">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
+    <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
     <span
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
@@ -9,7 +9,7 @@
       @mouseover="hover = true"
       @mouseleave="hover = false"
     >
-      {{ operatorSymbol }} (<br v-show="!inline">
+      {{ operatorSymbol }} (<br v-show="expand">
       <q-menu>
         <q-list dense>
           <q-item
@@ -60,11 +60,11 @@
       <span
         v-if="index != 0"
         :class="{ 'text-weight-bolder text-primary': hover }"
-      >,<span v-show="inline">&nbsp;</span><br v-show="!inline"></span>
+      >,<span v-show="!expand">&nbsp;</span><br v-show="expand"></span>
 
       <expression-operand-input
         :model-value="operand"
-        :inline="inline"
+        :expand="expand"
         :indent="indent"
         :indent-level="indentLevel + 1"
         @entity-clicked="$emit('entityClicked', $event)"
@@ -75,7 +75,7 @@
 
     <span v-show="showAddButton" :class="{ 'text-weight-bolder text-primary': hover }">
       <span v-show="(modelValue.operands || []).length > 0">, </span>
-      <span v-show="!inline"><br>{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
+      <span v-show="expand"><br>{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
       <span
         class="cursor-pointer"
         :title="t('addThing', { thing: t('operand') })"
@@ -101,7 +101,7 @@
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
     >
-      <span v-show="!inline"><br>{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
+      <span v-show="expand"><br>{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
       <span @mouseover="hover = true" @mouseleave="hover = false">)</span>
     </span>
   </span>
@@ -123,9 +123,9 @@ export default defineComponent({
       type: Object as () => IExpression,
       required: true
     },
-    inline: {
+    expand: {
       type: Boolean,
-      default: true
+      default: false
     },
     indent: {
       type: Number,

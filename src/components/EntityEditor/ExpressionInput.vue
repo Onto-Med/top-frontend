@@ -7,14 +7,6 @@
           flat
           round
           dense
-          :icon="inline ? 'height' : 'format_align_left'"
-          :title="inline ? t('expand') : t('alignLeft')"
-          @click="inline = !inline"
-        />
-        <q-btn
-          flat
-          round
-          dense
           icon="clear"
           :title="t('clearAll')"
           @click="showClearDialog = true"
@@ -24,10 +16,30 @@
           round
           dense
           icon="settings"
-          :title="t('settings')"
-          @click="showSettingsDialog = true"
-        />
+          :title="t('setting', 2)"
+        >
+          <q-menu>
+            <div class="text-h6 q-mb-md">
+              {{ t('setting', 2) }}
+            </div>
+            <q-toggle v-model="expand" :label="t('expand')" />
+            <q-input v-model.number="indent" type="number" :label="t('indentWithSpaces')" />
+          </q-menu>
+        </q-btn>
       </q-toolbar>
+    </q-card-section>
+
+    <q-separator />
+
+    <q-card-section>
+      <expression-operand-input
+        :class="{ monospace: monospace }"
+        :model-value="modelValue"
+        :expand="expand"
+        :indent="indent"
+        @update:model-value="$emit('update:modelValue', $event)"
+        @entity-clicked="$emit('entityClicked', $event)"
+      />
     </q-card-section>
 
     <q-dialog v-model="showClearDialog">
@@ -51,39 +63,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
-    <q-dialog v-model="showSettingsDialog">
-      <q-card>
-        <q-card-section>
-          <div v-t="'settings'" class="text-h6" />
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section>
-          <q-input v-model.number="indent" type="number" :label="t('indentWithSpaces')" />
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup flat :label="t('ok')" color="primary" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
-    <q-separator />
-
-    <q-card-section>
-      <expression-operand-input
-        :class="{ monospace: monospace }"
-        :model-value="modelValue"
-        :inline="inline"
-        :indent="indent"
-        @update:model-value="$emit('update:modelValue', $event)"
-        @entity-clicked="$emit('entityClicked', $event)"
-      />
-    </q-card-section>
   </q-card>
 </template>
 
@@ -114,12 +93,11 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const hover = ref(false)
-    const inline = ref(true)
-    const showSettingsDialog = ref(false)
+    const expand = ref(false)
     const indent = ref(2)
     const showClearDialog = ref(false)
 
-    return { t, hover, inline, showSettingsDialog, showClearDialog, indent, ExpressionType }
+    return { t, hover, expand, showClearDialog, indent, ExpressionType }
   }
 })
 </script>
