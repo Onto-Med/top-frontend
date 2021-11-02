@@ -54,6 +54,7 @@
       v-else
       :label="t('selectThing', { thing: t(modelValue.type) })"
       @clear-Clicked="$emit('removeClicked')"
+      @entity-selected="setId($event)"
     />
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">
@@ -165,6 +166,11 @@ export default defineComponent({
     setType (type: ExpressionType): void {
       let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
       newModelValue.type = type
+      this.$emit('update:modelValue', newModelValue)
+    },
+    setId (id: string|number): void {
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+      newModelValue.id = id
       this.$emit('update:modelValue', newModelValue)
     },
     addOperand (type: ExpressionType): void {

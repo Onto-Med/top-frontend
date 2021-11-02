@@ -39,7 +39,7 @@ export interface ICode {
 
 export interface IExpression {
   type: ExpressionType;
-  id?: string;
+  id?: string|number;
   operands?: IExpression[];
 }
 
