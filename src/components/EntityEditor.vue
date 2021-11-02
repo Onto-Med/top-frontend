@@ -23,6 +23,8 @@
       />
     </q-toolbar>
 
+    <q-separator />
+
     <div class="q-gutter-md q-pa-md">
       <localized-text-input v-model="entity.titles" unique-langs :label="t('title', 2)" />
 
