@@ -3,7 +3,7 @@
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
         <div class="column fit q-pa-md">
-          <q-input v-model="treeFilter" filled :label="t('filter')">
+          <q-input v-model="treeFilter" dense filled :label="t('filter')">
             <template #append>
               <q-icon v-show="treeFilter !== ''" name="clear" class="cursor-pointer" @click="treeFilter = ''" />
             </template>
