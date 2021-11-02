@@ -36,7 +36,7 @@
         :class="{ monospace: monospace }"
         :model-value="modelValue"
         :expand="expand"
-        :indent="indent"
+        :indent="indent || 2"
         @update:model-value="$emit('update:modelValue', $event)"
         @entity-clicked="$emit('entityClicked', $event)"
       />
