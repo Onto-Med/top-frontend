@@ -6,6 +6,7 @@
     dense
     hide-bottom-space
     use-input
+    emit-value
     class="inline entity-search-input-field"
     :placeholder="label || t('selectThing', { thing: t('entity') })"
     :options="options"
@@ -26,8 +27,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { defineComponent, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { searchEntitiesByTitle } from 'src/api/entityRepository'
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -43,8 +45,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
     // TODO: get proper options from API
-    const stringOptions = ['height', 'weight', 'bmi']
-    const options = ref([] as string[])
+    const options = ref([] as Record<string, string|undefined>[])
     const selection = ref(null)
 
     return {
@@ -56,9 +57,8 @@ export default defineComponent({
         }
 
         update(() => {
-          const needle = val.toLowerCase()
-          // TODO: do filtering via API
-          options.value = stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+          options.value = searchEntitiesByTitle(val)
+            .map(e => { return { label: e.title, value: e.id } })
         })
       }
     };
