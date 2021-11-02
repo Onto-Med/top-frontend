@@ -70,7 +70,7 @@
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { IExpression, ExpressionType } from 'src/components/models'
-import ExpressionOperandInput from 'src/components/ExpressionOperandInput.vue'
+import ExpressionOperandInput from 'src/components/EntityEditor/ExpressionOperandInput.vue'
 
 export default defineComponent({
   name: 'ExpressionInput',
