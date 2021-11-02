@@ -3,7 +3,12 @@
     <q-toolbar>
       <q-toolbar-title class="text-subtitle1">
         <q-breadcrumbs>
-          <q-breadcrumbs-el v-if="entity.superClass" :label="entity.superClass.title" />
+          <q-breadcrumbs-el
+            v-if="entity.superClass"
+            class="cursor-pointer"
+            :label="entity.superClass.title"
+            @click="entity.superClass ? $emit('entityClicked', entity.superClass.id) : null"
+          />
           <q-breadcrumbs-el :label="entity.title" />
         </q-breadcrumbs>
       </q-toolbar-title>
