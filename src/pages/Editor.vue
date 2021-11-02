@@ -114,5 +114,5 @@ export default defineComponent({
 
 <style lang="sass" scoped>
 .entity-editor-tab
-  overflow-y: scroll
+  height: 100%
 </style>

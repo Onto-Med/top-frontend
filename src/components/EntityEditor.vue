@@ -1,31 +1,33 @@
 <template>
-  <div v-cloak>
-    <q-toolbar>
-      <q-toolbar-title class="text-subtitle1">
-        <q-breadcrumbs>
-          <q-breadcrumbs-el
-            v-if="entity.superClass"
-            class="cursor-pointer"
-            :label="entity.superClass.title"
-            @click="entity.superClass ? $emit('entityClicked', entity.superClass.id) : null"
-          />
-          <q-breadcrumbs-el :label="entity.title" />
-        </q-breadcrumbs>
-      </q-toolbar-title>
-      <q-btn
-        flat
-        round
-        dense
-        icon="raw_on"
-        color="primary"
-        :title="t('entityEditor.rawBtn.label')"
-        @click="showJson = true"
-      />
-    </q-toolbar>
+  <div v-cloak class="column fit">
+    <div class="col-auto">
+      <q-toolbar>
+        <q-toolbar-title class="text-subtitle1">
+          <q-breadcrumbs>
+            <q-breadcrumbs-el
+              v-if="entity.superClass"
+              class="cursor-pointer"
+              :label="entity.superClass.title"
+              @click="entity.superClass ? $emit('entityClicked', entity.superClass.id) : null"
+            />
+            <q-breadcrumbs-el :label="entity.title" />
+          </q-breadcrumbs>
+        </q-toolbar-title>
+        <q-btn
+          flat
+          round
+          dense
+          icon="raw_on"
+          color="primary"
+          :title="t('entityEditor.rawBtn.label')"
+          @click="showJson = true"
+        />
+      </q-toolbar>
 
-    <q-separator />
+      <q-separator />
+    </div>
 
-    <div class="q-gutter-md q-pa-md">
+    <div class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
       <localized-text-input v-model="entity.titles" unique-langs :label="t('title', 2)" />
 
       <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)" v-model="entity.dataType" />
@@ -129,3 +131,8 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="sass" scoped>
+.entity-editor-tab-content
+  overflow-y: scroll
+</style>
