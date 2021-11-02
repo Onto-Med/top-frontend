@@ -33,6 +33,7 @@
 
     <q-card-section>
       <expression-operand-input
+        class="text-subtitle1"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
         :expand="expand"
