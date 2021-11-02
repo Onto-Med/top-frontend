@@ -200,6 +200,7 @@ export default defineComponent({
 .entity-search-input-field
   width: 200px
   margin: 4px
+  vertical-align: middle
   .q-field__inner, .q-field__control
     min-height: 2em !important
     height: 2em !important
