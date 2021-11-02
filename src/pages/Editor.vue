@@ -12,6 +12,7 @@
             ref="tree"
             v-model:expanded="treeExpansion"
             v-model:selected="selected"
+            class="col"
             :nodes="entityNodes"
             :filter="treeFilter"
             node-key="id"
