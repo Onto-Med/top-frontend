@@ -47,6 +47,7 @@ export default {
     }
   },
   entitySearchInput: {
-    description: 'Geben Sie mindestens {minLength} Zeichen ein um nach passenden {types} zu suchen.'
+    description: 'Geben Sie mindestens {minLength} Zeichen ein um nach passenden {types} zu suchen.',
+    emptyResult: 'Es wurden keine passenden {types} gefunden.'
   }
 };

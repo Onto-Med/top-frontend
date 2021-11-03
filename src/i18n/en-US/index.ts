@@ -47,6 +47,7 @@ export default {
     }
   },
   entitySearchInput: {
-    description: 'Enter at least {minLength} characters to search for matching {types}.'
+    description: 'Enter at least {minLength} characters to search for matching {types}.',
+    emptyResult: 'No matching {types} could be found.'
   }
 };

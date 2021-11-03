@@ -26,6 +26,11 @@
         @click="$emit('clearClicked')"
       />
     </template>
+    <template #no-option>
+      <div class="q-pa-sm">
+        {{ t('entitySearchInput.emptyResult', { types: t('entity', 2) }) }}
+      </div>
+    </template>
   </q-select>
 </template>
 
