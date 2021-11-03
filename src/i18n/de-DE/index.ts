@@ -46,6 +46,9 @@ export default {
       content: 'Aktueller Zustand der Entität'
     }
   },
+  entityTree: {
+    listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und Phenotypen, und der Listenansicht ohne Kategorien.'
+  },
   entitySearchInput: {
     description: 'Geben Sie mindestens {minLength} Zeichen ein um nach passenden {types} zu suchen.',
     emptyResult: 'Es wurden keine passenden {types} gefunden.'

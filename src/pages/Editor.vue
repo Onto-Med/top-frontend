@@ -3,28 +3,34 @@
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
         <div class="column fit q-pa-md">
-          <q-input v-model="treeFilter" dense filled :label="t('filter')">
-            <template #append>
-              <q-icon v-show="treeFilter !== ''" name="clear" class="cursor-pointer" @click="treeFilter = ''" />
-            </template>
-          </q-input>
-          <q-tree
-            ref="tree"
-            v-model:expanded="treeExpansion"
-            v-model:selected="selected"
-            class="col"
-            :nodes="entityNodes"
-            :filter="treeFilter"
-            node-key="id"
-            selected-color="primary"
-          />
-          <q-menu context-menu>
-            <q-list dense>
-              <q-item v-close-popup clickable>
-                <q-item-section>Example Entry</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
+          <q-toolbar>
+            <q-toolbar-title>
+              <q-input v-model="treeFilter" dense filled :label="t('filter')">
+                <template #append>
+                  <q-icon v-show="treeFilter !== ''" name="clear" class="cursor-pointer" @click="treeFilter = ''" />
+                </template>
+              </q-input>
+            </q-toolbar-title>
+            <q-btn :icon="list ? 'account_tree' : 'view_list'" :title="t('entityTree.listDescription')" @click="list = !list" />
+          </q-toolbar>
+          <div class="col">
+            <q-tree
+              ref="tree"
+              v-model:expanded="treeExpansion"
+              v-model:selected="selected"
+              :nodes="visibleEntityNodes"
+              :filter="treeFilter"
+              node-key="id"
+              selected-color="primary"
+            />
+            <q-menu context-menu>
+              <q-list dense>
+                <q-item v-close-popup clickable>
+                  <q-item-section>Example Entry</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </div>
         </div>
       </template>
 
@@ -84,7 +90,14 @@ export default defineComponent({
       treeExpansion: [],
       treeFilter: '',
       selected: '' as string|number,
-      tabs: [] as IEntityTreeNode[]
+      tabs: [] as IEntityTreeNode[],
+      list: false
+    }
+  },
+  computed: {
+    visibleEntityNodes (): IEntityTreeNode[] {
+      if (!this.list) return this.entityNodes
+      return []
     }
   },
   watch: {

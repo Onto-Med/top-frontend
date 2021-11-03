@@ -46,6 +46,9 @@ export default {
       content: 'Current state of the entity'
     }
   },
+  entityTree: {
+    listDescription: 'Switch between the tree view with categories and phenotypes, and the list view without categories.'
+  },
   entitySearchInput: {
     description: 'Enter at least {minLength} characters to search for matching {types}.',
     emptyResult: 'No matching {types} could be found.'
