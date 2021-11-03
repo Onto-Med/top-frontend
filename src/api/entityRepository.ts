@@ -129,11 +129,7 @@ const _entites: IEntity[] = [
   }
 ]
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export function fetchEntity (id: string): IEntity {
-  const result = _entites.filter(e => e.id === id)
-  const entity = result[0]
-
+function prepareEntity (entity: IEntity): IEntity {
   if (!entity.titles) entity.titles = [] as Record<string, string>[]
   if (!entity.synonyms) entity.synonyms = [] as Record<string, string>[]
   if (!entity.descriptions) entity.descriptions = [] as Record<string, string>[]
@@ -149,9 +145,17 @@ export function fetchEntity (id: string): IEntity {
   return entity
 }
 
+// eslint-disable-next-line @typescript-eslint/require-await
+export function fetchEntity (id: string): IEntity {
+  const result = _entites.filter(e => e.id === id)
+  return prepareEntity(result[0])
+}
+
 export async function searchEntitiesByTitle(title: string): Promise<IEntity[]> {
   await new Promise(r => setTimeout(r, 1000))
-  return _entites.filter(e => e.title?.toLowerCase().includes(title.toLowerCase()))
+  return _entites
+    .filter(e => e.title?.toLowerCase().includes(title.toLowerCase()))
+    .map(e => prepareEntity(e))
 }
 
 export function fetchEntityTree (): IEntityTreeNode[] {
