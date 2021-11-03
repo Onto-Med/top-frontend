@@ -46,7 +46,7 @@ export class Entity {
       this.score = obj.score
       this.units = obj.units
       this.negated = obj.negated
-      this.superClass = new Entity(obj.superClass)
+      this.superClass = obj.superClass ? new Entity(obj.superClass) : undefined
       this.restriction = obj.restriction
       this.expression = obj.expression
     }
@@ -74,7 +74,7 @@ export class Entity {
   }
 
   getTitle (): string {
-		// TODO: incorporate current locale
+    // TODO: incorporate current locale
     return this.titles && this.titles.length > 0 ? this.titles[0].text : this.id as string
   }
 
