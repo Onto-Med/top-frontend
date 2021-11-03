@@ -54,7 +54,7 @@
       v-else
       :label="t('selectThing', { thing: t(modelValue.type) })"
       @clear-Clicked="$emit('removeClicked')"
-      @entity-selected="setId($event)"
+      @entity-selected="setId($event.id)"
     />
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">

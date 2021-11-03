@@ -1,6 +1,6 @@
 <template>
   <q-select
-    :model-value="selection"
+    v-model="selection"
     rounded
     outlined
     dense
@@ -9,7 +9,7 @@
     use-input
     emit-value
     class="inline entity-search-input-field"
-    :placeholder="label || t('selectThing', { thing: t('entity') })"
+    :placeholder="selection ? '' : label || t('selectThing', { thing: t('entity') })"
     :options="options"
     :loading="loading"
     :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
@@ -26,10 +26,31 @@
         @click="$emit('clearClicked')"
       />
     </template>
+    <template #selected>
+      <span v-if="selection">
+        <q-icon :name="selection.icon" />
+        {{ selection.title }}
+      </span>
+    </template>
+    <template #option="scope">
+      <q-item v-bind="scope.itemProps">
+        <q-item-section avatar>
+          <q-icon :name="scope.opt.icon" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>{{ scope.opt.title }}</q-item-label>
+          <q-item-label v-for="(description, index) in scope.opt.descriptions" :key="index" caption>
+            <b>{{ description.lang }}:</b> {{ description.text }}
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+    </template>
     <template #no-option>
-      <div class="q-pa-sm">
-        {{ t('entitySearchInput.emptyResult', { types: t('entity', 2) }) }}
-      </div>
+      <q-item>
+        <q-item-section>
+          {{ t('entitySearchInput.emptyResult', { types: t('entity', 2) }) }}
+        </q-item-section>
+      </q-item>
     </template>
   </q-select>
 </template>
@@ -38,6 +59,7 @@
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { searchEntitiesByTitle } from 'src/api/entityRepository'
+import { IEntity } from '../models';
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -52,7 +74,7 @@ export default defineComponent({
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
-    const options = ref([] as Record<string, string|undefined>[])
+    const options = ref([] as IEntity[])
     const selection = ref(null)
     const loading = ref(false)
 
@@ -67,7 +89,6 @@ export default defineComponent({
         options.value = []
         loading.value = true
         let result = await searchEntitiesByTitle(val)
-          .then(r => r.map(e => { return { label: e.title, value: e.id } }))
           .finally(() => loading.value = false)
 
         update(() => options.value = result)
