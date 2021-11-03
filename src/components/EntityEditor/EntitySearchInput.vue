@@ -5,6 +5,7 @@
     outlined
     dense
     hide-bottom-space
+    hide-dropdown-icon
     use-input
     emit-value
     class="inline entity-search-input-field"
@@ -65,9 +66,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="sass">
-.entity-search-input-field
-  .q-field__append.q-anchor--skip:last-of-type
-    display: none
-</style>
