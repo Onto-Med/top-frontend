@@ -1,4 +1,5 @@
 import { EntityType, DataType, ICode, IRestrictionComponent, IExpression } from 'src/components/models'
+import { useI18n } from 'vue-i18n'
 
 export interface IEntity {
   id?: string
@@ -74,8 +75,13 @@ export class Entity {
   }
 
   getTitle (): string {
-    // TODO: incorporate current locale
-    return this.titles && this.titles.length > 0 ? this.titles[0].text : this.id as string
+    const { locale } = useI18n({ useScope: 'global' })
+    const lang = locale.value.split('-')[0]
+    if (this.titles) {
+      const result = this.titles.filter(t => t.lang === lang).shift()
+      if (result) return result.text
+    }
+    return this.id as string
   }
 
   clone (): Entity {
