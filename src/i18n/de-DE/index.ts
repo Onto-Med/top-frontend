@@ -37,6 +37,7 @@ export default {
   selectThing: '{thing} auswählen',
   save: 'Speichern',
   reset: 'Zurücksetzen',
+  entity: 'Entität|Entitäten',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'
@@ -44,5 +45,8 @@ export default {
     rawDialog: {
       content: 'Aktueller Zustand der Entität'
     }
+  },
+  entitySearchInput: {
+    description: 'Geben Sie mindestens {minLength} Zeichen ein um nach passenden {types} zu suchen.'
   }
 };

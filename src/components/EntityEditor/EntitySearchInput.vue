@@ -10,6 +10,7 @@
     class="inline entity-search-input-field"
     :placeholder="label || t('selectThing', { thing: t('entity') })"
     :options="options"
+    :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
     @filter="filterFn"
     @update:model-value="$emit('entitySelected', $event)"
   >
