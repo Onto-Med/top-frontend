@@ -65,3 +65,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="sass">
+.entity-search-input-field
+  .q-field__append.q-anchor--skip:last-of-type
+    display: none
+</style>
