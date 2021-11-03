@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 export interface IEntity {
   id?: string
   entityType: EntityType
-  title?: string
   titles?: Record<string, string>[]
   synonyms?: Record<string, string>[]
   descriptions?: Record<string, string>[]
@@ -21,7 +20,6 @@ export interface IEntity {
 export class Entity {
   id?: string
   entityType: EntityType = EntityType.Category
-  title?: string
   titles?: Record<string, string>[]
   synonyms?: Record<string, string>[]
   descriptions?: Record<string, string>[]
@@ -38,7 +36,6 @@ export class Entity {
     if (obj) {
       this.id = obj.id
       this.entityType = obj.entityType
-      this.title = obj.title
       this.titles = obj.titles
       this.synonyms = obj.synonyms
       this.descriptions = obj.descriptions
@@ -79,7 +76,8 @@ export class Entity {
     const lang = locale.value.split('-')[0]
     if (this.titles) {
       const result = this.titles.filter(t => t.lang === lang).shift()
-      if (result) return result.text
+      if (result && result.text) return result.text
+      if (this.titles[0] && this.titles[0].text) return this.titles[0].text
     }
     return this.id as string
   }

@@ -3,7 +3,6 @@ import { Entity, IEntity } from 'src/models/Entity'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
-  title: 'Anthropometry',
   titles: [
     { lang: 'de', text: 'Anthropometrie' },
     { lang: 'en', text: 'Anthropometry' }
@@ -16,7 +15,6 @@ const anthropometry: IEntity = {
 
 const weight: IEntity = {
   id: 'weight',
-  title: 'Weight',
   titles: [
     { lang: 'de', text: 'Gewicht' },
     { lang: 'en', text: 'Weight' }
@@ -31,7 +29,6 @@ const weight: IEntity = {
 
 const laboratoryValues: IEntity = {
   id: 'laboratory_values',
-  title: 'Laboratory Values',
   titles: [
     { lang: 'de', text: 'Laborwerte' },
     { lang: 'en', text: 'Laboratory Values' }
@@ -44,7 +41,7 @@ const laboratoryValues: IEntity = {
 
 const combinedPhenotype: IEntity = {
   id: 'combined_phenotype',
-  title: 'Combined Phenotype',
+  titles: [ { lang: 'en', text: 'Combined Phenotype' } ],
   entityType: EntityType.CombinedPhenotype,
   superClass: laboratoryValues
 }
@@ -53,7 +50,6 @@ const _entites: IEntity[] = [
   anthropometry,
   {
     id: 'bmi',
-    title: 'BMI',
     titles: [
       { lang: 'de', text: 'BMI' },
       { lang: 'en', text: 'BMI' }
@@ -67,7 +63,6 @@ const _entites: IEntity[] = [
   },
   {
     id: 'height',
-    title: 'Height',
     titles: [
       { lang: 'de', text: 'Größe' },
       { lang: 'en', text: 'Height' }
@@ -85,8 +80,7 @@ const _entites: IEntity[] = [
   weight,
   {
     id: 'weight_1500_to_2500g',
-    title: '1500-2500g',
-    titles: [],
+    titles: [ { lang: 'en', text: '1500-2500g' } ],
     entityType: EntityType.SingleRestriction,
     dataType: DataType.Number,
     synonyms: [],
@@ -100,8 +94,7 @@ const _entites: IEntity[] = [
   },
   {
     id: 'weight_gt_80kg',
-    title: '>80kg',
-    titles: [],
+    titles: [ { lang: 'en', text: '>80kg' } ],
     entityType: EntityType.SingleRestriction,
     synonyms: [],
     descriptions: [],
@@ -112,7 +105,7 @@ const _entites: IEntity[] = [
   combinedPhenotype,
   {
     id: 'combined_restriction',
-    title: 'Combined Restriction',
+    titles: [ { lang: 'en', text: 'Combined Restriction' } ],
     entityType: EntityType.CombinedRestriction,
     superClass: combinedPhenotype,
     expression: {
@@ -138,8 +131,9 @@ export function fetchEntity (id: string): Entity {
 
 export async function searchEntitiesByTitle(title: string): Promise<Entity[]> {
   await new Promise(r => setTimeout(r, 1000))
+  const needle = title.toLowerCase()
   return _entites
-    .filter(e => e.title?.toLowerCase().includes(title.toLowerCase()))
+    .filter(e => e.id?.includes(needle) || e.titles && e.titles.filter(t => t.text.toLowerCase().includes(needle)).length > 0)
     .map(e => new Entity(e))
 }
 
