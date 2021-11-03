@@ -86,7 +86,6 @@ export default defineComponent({
           return
         }
 
-        options.value = []
         loading.value = true
         let result = await searchEntitiesByTitle(val)
           .finally(() => loading.value = false)
