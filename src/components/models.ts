@@ -1,47 +1,29 @@
-export interface IEntity {
-  id?: string;
-  entityType: EntityType;
-  title?: string
-  titles?: Record<string, string>[];
-  synonyms?: Record<string, string>[];
-  descriptions?: Record<string, string>[];
-  dataType?: DataType;
-  codes?: ICode[];
-  score?: number;
-  units?: string[];
-  negated?: boolean;
-  superClass?: IEntity;
-  restriction?: IRestrictionComponent[];
-  expression?: IExpression;
-  icon?: string;
-}
-
 export interface IRestrictionComponent {
-  operator?: RestrictionOperator,
+  operator?: RestrictionOperator
   value: string|number|boolean|Date
 }
 
 export interface IEntityTreeNode {
-  id: string|number;
-  label: string;
-  icon?: string;
-  children?: IEntityTreeNode[];
+  id: string|number
+  label: string
+  icon?: string
+  children?: IEntityTreeNode[]
 }
 
 export interface ICodeSystem {
-  uri: string;
-  name: string;
+  uri: string
+  name: string
 }
 export interface ICode {
-  codeSystem: ICodeSystem;
-  code: string;
-  name: string;
+  codeSystem: ICodeSystem
+  code: string
+  name: string
 }
 
 export interface IExpression {
-  type: ExpressionType;
-  id?: string|number;
-  operands?: IExpression[];
+  type: ExpressionType
+  id?: string|number
+  operands?: IExpression[]
 }
 
 export enum EntityType {

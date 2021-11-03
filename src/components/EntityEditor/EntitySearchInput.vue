@@ -29,16 +29,16 @@
     <template #selected>
       <span v-if="selection">
         <q-icon :name="selection.icon" />
-        {{ selection.title }}
+        {{ selection.getTitle() }}
       </span>
     </template>
     <template #option="scope">
       <q-item v-bind="scope.itemProps">
         <q-item-section avatar>
-          <q-icon :name="scope.opt.icon" />
+          <q-icon :name="scope.opt.getIcon()" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{ scope.opt.title }}</q-item-label>
+          <q-item-label>{{ scope.opt.getTitle() }}</q-item-label>
           <q-item-label v-for="(description, index) in scope.opt.descriptions" :key="index" caption>
             <b>{{ description.lang }}:</b> {{ description.text }}
           </q-item-label>
@@ -59,7 +59,7 @@
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { searchEntitiesByTitle } from 'src/api/entityRepository'
-import { IEntity } from '../models';
+import { Entity } from 'src/models/Entity'
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -74,7 +74,7 @@ export default defineComponent({
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
-    const options = ref([] as IEntity[])
+    const options = ref([] as Entity[])
     const selection = ref(null)
     const loading = ref(false)
 

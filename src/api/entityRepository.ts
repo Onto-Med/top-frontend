@@ -1,4 +1,5 @@
-import { DataType, EntityType, IEntity, IEntityTreeNode, IRestrictionComponent, RestrictionOperator, ICode, IExpression, ExpressionType } from 'src/components/models'
+import { DataType, EntityType, IEntityTreeNode, RestrictionOperator, IExpression, ExpressionType } from 'src/components/models'
+import { Entity, IEntity } from 'src/models/Entity'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -129,54 +130,17 @@ const _entites: IEntity[] = [
   }
 ]
 
-function prepareEntity (entity: IEntity): IEntity {
-  if (!entity.titles) entity.titles = [] as Record<string, string>[]
-  if (!entity.synonyms) entity.synonyms = [] as Record<string, string>[]
-  if (!entity.descriptions) entity.descriptions = [] as Record<string, string>[]
-  if (!entity.codes) entity.codes = [] as ICode[]
-
-  if ([EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType) && !entity.restriction) {
-    entity.restriction = [] as IRestrictionComponent[]
-  }
-  if (entity.entityType === EntityType.CombinedRestriction && !entity.expression) {
-    entity.expression = {} as IExpression;
-  }
-
-  if (entity.entityType === EntityType.CombinedPhenotype) {
-    entity.icon = 'merge_type'
-  } else if (entity.entityType === EntityType.DerivedPhenotype) {
-    entity.icon = 'functions'
-  } else if (entity.entityType === EntityType.SinglePhenotype) {
-    switch (entity.dataType) {
-      case DataType.Number:
-        entity.icon = 'calculate'
-        break
-      case DataType.DateTime:
-        entity.icon = 'today'
-        break
-      case DataType.String:
-        entity.icon = 'notes'
-        break
-      case DataType.Boolean:
-        entity.icon = 'check_box'
-        break
-    }
-  }
-
-  return entity
-}
-
 // eslint-disable-next-line @typescript-eslint/require-await
-export function fetchEntity (id: string): IEntity {
+export function fetchEntity (id: string): Entity {
   const result = _entites.filter(e => e.id === id)
-  return prepareEntity(result[0])
+  return new Entity(result[0])
 }
 
-export async function searchEntitiesByTitle(title: string): Promise<IEntity[]> {
+export async function searchEntitiesByTitle(title: string): Promise<Entity[]> {
   await new Promise(r => setTimeout(r, 1000))
   return _entites
     .filter(e => e.title?.toLowerCase().includes(title.toLowerCase()))
-    .map(e => prepareEntity(e))
+    .map(e => new Entity(e))
 }
 
 export function fetchEntityTree (): IEntityTreeNode[] {

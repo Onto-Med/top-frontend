@@ -7,10 +7,10 @@
             <q-breadcrumbs-el
               v-if="entity.superClass"
               class="cursor-pointer"
-              :label="entity.superClass.title"
+              :label="entity.superClass.getTitle()"
               @click="entity.superClass ? $emit('entityClicked', entity.superClass.id) : null"
             />
-            <q-breadcrumbs-el :label="entity.title" />
+            <q-breadcrumbs-el :label="entity.getTitle()" />
           </q-breadcrumbs>
         </q-toolbar-title>
         <q-btn
@@ -100,7 +100,8 @@
 <script lang="ts">
 import { ref, computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IEntity, EntityType } from 'src/components/models'
+import { EntityType } from 'src/components/models'
+import { Entity } from 'src/models/Entity'
 import { fetchEntity } from 'src/api/entityRepository'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
@@ -127,19 +128,19 @@ export default defineComponent({
   setup (props: Record<string, unknown>) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }  = useI18n()
-    const entity       = ref({} as IEntity)
+    const entity       = ref({} as Entity)
     const showJson     = ref(false)
-    const initialState = ref({} as IEntity)
+    const initialState = ref({} as Entity)
 
     const getEntity = () => {
       entity.value = fetchEntity(props.entityId as string)
-      initialState.value = JSON.parse(JSON.stringify(entity.value)) as IEntity
+      initialState.value = entity.value.clone()
     }
     const reset = () => {
-      entity.value = JSON.parse(JSON.stringify(initialState.value)) as IEntity
+      entity.value = initialState.value.clone()
     }
     const hasUnsavedChanges = computed(() =>
-      JSON.stringify(entity.value) !== JSON.stringify(initialState.value)
+      entity.value.equals(initialState.value)
     )
 
     getEntity()
