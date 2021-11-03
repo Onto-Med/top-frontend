@@ -17,7 +17,13 @@
 	"settings": {
 		"vetur.validation.template": false,
 		"vetur.validation.script": false,
-		"vetur.validation.style": false
+		"vetur.validation.style": false,
+		"vetur.validation.interpolation": false,
+		"vetur.format.defaultFormatter.ts": "prettier-tslint",
+		"vetur.format.enable": false,
+		"eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
+		"typescript.tsdk": "node_modules/typescript/lib",
+		"vetur.experimental.templateInterpolationService": true
 	},
 
 
