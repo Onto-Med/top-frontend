@@ -149,7 +149,8 @@ export function fetchEntity (id: string): IEntity {
   return entity
 }
 
-export function searchEntitiesByTitle(title: string): IEntity[] {
+export async function searchEntitiesByTitle(title: string): Promise<IEntity[]> {
+  await new Promise(r => setTimeout(r, 1000))
   return _entites.filter(e => e.title?.toLowerCase().includes(title.toLowerCase()))
 }
 

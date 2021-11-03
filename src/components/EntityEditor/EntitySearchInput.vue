@@ -11,6 +11,7 @@
     class="inline entity-search-input-field"
     :placeholder="label || t('selectThing', { thing: t('entity') })"
     :options="options"
+    :loading="loading"
     :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
     @filter="filterFn"
     @update:model-value="$emit('entitySelected', $event)"
@@ -48,19 +49,23 @@ export default defineComponent({
     const { t } = useI18n();
     const options = ref([] as Record<string, string|undefined>[])
     const selection = ref(null)
+    const loading = ref(false)
 
     return {
-      t, options, selection,
-      filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
+      t, options, selection, loading,
+      async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
         if (val.length < props.minLength) {
           abort()
           return
         }
 
-        update(() => {
-          options.value = searchEntitiesByTitle(val)
-            .map(e => { return { label: e.title, value: e.id } })
-        })
+        options.value = []
+        loading.value = true
+        let result = await searchEntitiesByTitle(val)
+          .then(r => r.map(e => { return { label: e.title, value: e.id } }))
+          .finally(() => loading.value = false)
+
+        update(() => options.value = result)
       }
     };
   },
