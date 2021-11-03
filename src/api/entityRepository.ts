@@ -142,6 +142,27 @@ function prepareEntity (entity: IEntity): IEntity {
     entity.expression = {} as IExpression;
   }
 
+  if (entity.entityType === EntityType.CombinedPhenotype) {
+    entity.icon = 'merge_type'
+  } else if (entity.entityType === EntityType.DerivedPhenotype) {
+    entity.icon = 'functions'
+  } else if (entity.entityType === EntityType.SinglePhenotype) {
+    switch (entity.dataType) {
+      case DataType.Number:
+        entity.icon = 'calculate'
+        break
+      case DataType.DateTime:
+        entity.icon = 'today'
+        break
+      case DataType.String:
+        entity.icon = 'notes'
+        break
+      case DataType.Boolean:
+        entity.icon = 'check_box'
+        break
+    }
+  }
+
   return entity
 }
 

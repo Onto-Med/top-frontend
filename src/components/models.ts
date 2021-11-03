@@ -13,6 +13,7 @@ export interface IEntity {
   superClass?: IEntity;
   restriction?: IRestrictionComponent[];
   expression?: IExpression;
+  icon?: string;
 }
 
 export interface IRestrictionComponent {
