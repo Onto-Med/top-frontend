@@ -51,7 +51,7 @@ export class Entity {
     this.prepare()
   }
 
-  isRestricted (): boolean {
+  isRestriction (): boolean {
     return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(this.entityType)
   }
 
