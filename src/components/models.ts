@@ -1,6 +1,8 @@
-export interface IRestrictionComponent {
-  operator?: RestrictionOperator
-  value: string|number|boolean|Date
+export interface IRestriction {
+  type: DataType
+  minOperator?: RestrictionOperator
+  maxOperator?: RestrictionOperator
+  values: Array<string|number|boolean|Date>
 }
 
 export interface IEntityTreeNode {

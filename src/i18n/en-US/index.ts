@@ -38,6 +38,9 @@ export default {
   save: 'Save',
   reset: 'Reset',
   entity: 'Entity|Entities',
+  value: 'Value|Values',
+  enumeration: 'Enumeration|Enumerations',
+  valueRange: 'Value range|Value ranges',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

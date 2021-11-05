@@ -38,6 +38,9 @@ export default {
   save: 'Speichern',
   reset: 'Zurücksetzen',
   entity: 'Entität|Entitäten',
+  value: 'Wert|Werte',
+  enumeration: 'Aufzählung|Aufzählungen',
+  valueRange: 'Wertebereich|Wertebereiche',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

@@ -87,10 +87,12 @@ const _entites: IEntity[] = [
     descriptions: [],
     codes: [],
     superClass: weight,
-    restriction: [
-      { operator: RestrictionOperator.GreaterEqual, value: 1500 },
-      { operator: RestrictionOperator.LowerEqual, value: 2500 }
-    ]
+    restriction: {
+      type: DataType.Number,
+      minOperator: RestrictionOperator.GreaterEqual,
+      maxOperator: RestrictionOperator.LowerEqual,
+      values: [ 1500, 2500 ]
+    }
   },
   {
     id: 'weight_gt_80kg',

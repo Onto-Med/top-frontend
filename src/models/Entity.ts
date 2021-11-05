@@ -1,4 +1,4 @@
-import { EntityType, DataType, ICode, IRestrictionComponent, IExpression } from 'src/components/models'
+import { EntityType, DataType, ICode, IRestriction, IExpression } from 'src/components/models'
 import { useI18n } from 'vue-i18n'
 
 export interface IEntity {
@@ -13,7 +13,7 @@ export interface IEntity {
   units?: string[]
   negated?: boolean
   superClass?: IEntity
-  restriction?: IRestrictionComponent[]
+  restriction?: IRestriction
   expression?: IExpression
 }
 
@@ -29,7 +29,7 @@ export class Entity {
   units?: string[]
   negated?: boolean
   superClass?: Entity
-  restriction?: IRestrictionComponent[]
+  restriction?: IRestriction
   expression?: IExpression
 
   constructor (obj?: IEntity) {
@@ -97,7 +97,7 @@ export class Entity {
     if (!this.codes) this.codes = [] as ICode[]
   
     if ([EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(this.entityType) && !this.restriction) {
-      this.restriction = [] as IRestrictionComponent[]
+      this.restriction = { type: this.dataType, values: [] } as IRestriction
     }
     if (this.entityType === EntityType.CombinedRestriction && !this.expression) {
       this.expression = {} as IExpression
