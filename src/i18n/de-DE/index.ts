@@ -54,6 +54,10 @@ export default {
   reload: 'Neu laden',
   dismiss: 'Verwerfen',
   notFound: 'Nicht gefunden',
+  some: 'Einige',
+  all: 'Alle',
+  negated: 'Negiert',
+  quantor: 'Quantor|Quantoren',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

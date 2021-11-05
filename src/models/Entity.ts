@@ -11,7 +11,6 @@ export interface IEntity {
   codes?: ICode[]
   score?: number
   units?: string[]
-  negated?: boolean
   superClass?: IEntity
   subClasses?: Entity[]
   restriction?: IRestriction
@@ -28,7 +27,6 @@ export class Entity {
   codes?: ICode[]
   score?: number
   units?: string[]
-  negated?: boolean
   superClass?: Entity
   subClasses?: Entity[]
   restriction?: IRestriction
@@ -45,7 +43,6 @@ export class Entity {
       this.codes = obj.codes
       this.score = obj.score
       this.units = obj.units
-      this.negated = obj.negated
       this.superClass = obj.superClass ? new Entity(obj.superClass) : undefined
       this.subClasses = obj.subClasses
       this.restriction = obj.restriction
@@ -130,6 +127,9 @@ export class Entity {
     }
     if (this.entityType === EntityType.CombinedRestriction && !this.expression) {
       this.expression = {} as IExpression
+    }
+    if (this.restriction && this.restriction.negated === undefined) {
+      this.restriction.negated = false
     }
   }
 }

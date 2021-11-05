@@ -1,4 +1,4 @@
-import { DataType, EntityType, RestrictionOperator, IExpression, ExpressionType } from 'src/components/models'
+import { DataType, EntityType, RestrictionOperator, IExpression, ExpressionType, QuantorType } from 'src/components/models'
 import { Entity, IEntity } from 'src/models/Entity'
 import { useI18n } from 'vue-i18n'
 
@@ -89,6 +89,8 @@ const _entites: IEntity[] = [
     superClass: weight,
     restriction: {
       type: DataType.Number,
+      negated: true,
+      quantor: QuantorType.All,
       minOperator: RestrictionOperator.GreaterEqual,
       maxOperator: RestrictionOperator.LowerEqual,
       values: [ 1500, 2500 ]

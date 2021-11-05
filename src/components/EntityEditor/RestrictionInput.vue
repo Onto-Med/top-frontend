@@ -9,6 +9,21 @@
     <q-separator />
 
     <q-card-section class="q-pa-md">
+      <div class="row q-mb-md">
+        <q-select
+          v-model="local.quantor"
+          stack-label
+          emit-value
+          map-options
+          outlined
+          hide-bottom-space
+          style="width: 200px"
+          :label="t('quantor')"
+          :options="quantors || defaultQuantors"
+        />
+        <q-checkbox v-model="local.negated" :label="t('negated')" />
+      </div>
+
       <q-btn-toggle
         v-model="hasRange"
         no-caps
@@ -76,7 +91,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DataType, IRestriction, RestrictionOperator } from 'src/components/models'
+import { DataType, IRestriction, RestrictionOperator, QuantorType } from 'src/components/models'
 
 export default defineComponent({
   name: 'RestrictionInput',
@@ -88,6 +103,7 @@ export default defineComponent({
     name: String,
     label: String,
     operators: Array,
+    quantors: Array,
     dataType: String as () => DataType
   },
   emits: ['update:modelValue'],
@@ -96,13 +112,16 @@ export default defineComponent({
     const { t } = useI18n()
     const hasRange = ref(props.modelValue.minOperator !== undefined || props.modelValue.maxOperator !== undefined)
     const defaultOperators = computed(() => Object.values(RestrictionOperator))
+    const defaultQuantors = computed(() =>
+      Object.values(QuantorType).map(d => { return { label: t(d), value: d } })
+    )
     const local = computed({
       get: (): IRestriction => props.modelValue,
       set: (newValue): void => {
         emit('update:modelValue', newValue)
       }
     })
-    return { t, defaultOperators, local, hasRange }
+    return { t, defaultOperators, defaultQuantors, local, hasRange, QuantorType }
   }
 })
 </script>

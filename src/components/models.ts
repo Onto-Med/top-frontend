@@ -1,5 +1,7 @@
 export interface IRestriction {
   type: DataType
+  negated?: boolean
+  quantor?: QuantorType
   minOperator?: RestrictionOperator
   maxOperator?: RestrictionOperator
   values: Array<string|number|boolean|Date>
@@ -54,4 +56,9 @@ export enum RestrictionOperator {
   Equal        = '=',
   GreaterEqual = '≥',
   GreaterThan  = '>'
+}
+
+export enum QuantorType {
+  Some = 'some',
+  All  = 'all'
 }
