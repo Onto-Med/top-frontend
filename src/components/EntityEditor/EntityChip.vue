@@ -32,6 +32,7 @@ import { defineComponent, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetchEntity } from 'src/api/entityRepository'
 import { Entity } from 'src/models/Entity'
+import { EntityType } from '../models';
 
 export default defineComponent({
   name: 'EntityChip',
@@ -48,9 +49,9 @@ export default defineComponent({
 
     const reload = () => {
       loading.value = true
-      fetchEntity(props.entityId)
+      fetchEntity(props.entityId as string)
         .then(r => state.value = r)
-        .catch(() => state.value = new Entity({ id: props.entityId }))
+        .catch(() => state.value = new Entity({ id: props.entityId as string, entityType: EntityType.Category }))
         .finally(() => loading.value = false)
     }
 
