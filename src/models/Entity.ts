@@ -51,6 +51,10 @@ export class Entity {
     this.prepare()
   }
 
+  isRestricted (): boolean {
+    return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(this.entityType)
+  }
+
   getIcon (): string {
     if (this.entityType === EntityType.CombinedPhenotype) {
       return 'merge_type'
