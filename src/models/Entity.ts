@@ -56,11 +56,11 @@ export class Entity {
   }
 
   getIcon (): string {
-    if (this.entityType === EntityType.CombinedPhenotype) {
+    if ([EntityType.CombinedPhenotype, EntityType.CombinedRestriction].includes(this.entityType)) {
       return 'merge_type'
-    } else if (this.entityType === EntityType.DerivedPhenotype) {
+    } else if ([EntityType.DerivedPhenotype, EntityType.DerivedRestriction].includes(this.entityType)) {
       return 'calculate'
-    } else if (this.entityType === EntityType.SinglePhenotype) {
+    } else if ([EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(this.entityType)) {
       switch (this.dataType) {
         case DataType.Number:
           return 'pin'

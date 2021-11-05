@@ -35,7 +35,7 @@
     <template #option="scope">
       <q-item v-bind="scope.itemProps">
         <q-item-section avatar>
-          <q-icon :name="scope.opt.getIcon()" />
+          <q-icon :name="scope.opt.getIcon()" :title="scope.opt.getIconTooltip()" :class="{ restriction: scope.opt.isRestriction() }" />
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ scope.opt.getTitle() }}</q-item-label>

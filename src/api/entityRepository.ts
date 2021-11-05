@@ -100,6 +100,7 @@ const _entites: IEntity[] = [
     id: 'weight_gt_80kg',
     titles: [ { lang: 'en', text: '>80kg' } ],
     entityType: EntityType.SingleRestriction,
+    dataType: DataType.Number,
     synonyms: [],
     descriptions: [],
     codes: [],
@@ -197,6 +198,7 @@ export async function fetchEntityTree (): Promise<Entity[]> {
               id: 'weight_gt_80kg',
               titles: [ { lang: 'en', text: '>80kg' } ],
               entityType: EntityType.SingleRestriction,
+              dataType: DataType.Number,
             })
           ]
         })

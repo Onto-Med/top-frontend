@@ -37,6 +37,7 @@
                     v-if="prop.node.getIcon()"
                     :name="prop.node.getIcon()"
                     :title="prop.node.getIconTooltip()"
+                    :class="{ restriction: prop.node.isRestriction() }"
                     class="q-mr-sm"
                   />
                   <div :title="prop.node.getDescriptions().join('\n')">
