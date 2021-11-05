@@ -32,6 +32,7 @@
     <entity-chip
       v-else-if="modelValue.id"
       :entity-id="modelValue.id"
+      :entity="entity"
       @entity-clicked="$emit('entityClicked', $event)"
       @remove-clicked="$emit('removeClicked')"
     />
@@ -41,7 +42,7 @@
       :label="t('selectThing', { thing: t(modelValue.type) })"
       :entity-types="entityTypeFilter"
       @clear-Clicked="$emit('removeClicked')"
-      @entity-selected="setId($event.id)"
+      @entity-selected="setEntity($event)"
     />
 
     <span v-for="(operand, index) in modelValue.operands || []" :key="index">
@@ -99,6 +100,7 @@
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { IExpression, ExpressionType, EntityType } from 'src/components/models'
+import { Entity } from 'src/models/Entity'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 
@@ -131,6 +133,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const hover = ref(false)
+    const entity = ref(undefined as unknown as Entity)
     const operatorSymbol = computed(() => {
       switch (props.modelValue.type) {
         case ExpressionType.Union:
@@ -156,7 +159,7 @@ export default defineComponent({
       return []
     })
     
-    return { t, hover, operatorSymbol, ExpressionType, showAddButton, entityTypeFilter }
+    return { t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypeFilter }
   },
   methods: {
     setType (type: ExpressionType): void {
@@ -164,9 +167,10 @@ export default defineComponent({
       newModelValue.type = type
       this.$emit('update:modelValue', newModelValue)
     },
-    setId (id: string|number): void {
+    setEntity (entity: Entity): void {
       let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
-      newModelValue.id = id
+      newModelValue.id = entity.id
+      this.entity = entity
       this.$emit('update:modelValue', newModelValue)
     },
     addOperand (type: ExpressionType): void {
