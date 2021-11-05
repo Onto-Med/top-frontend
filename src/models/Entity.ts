@@ -91,6 +91,26 @@ export class Entity {
     return this.id as string
   }
 
+  getSynonyms (): string[] {
+    return this.getLocalizedPropertyValues('synonyms')
+  }
+
+  getDescriptions (): string[] {
+    return this.getLocalizedPropertyValues('descriptions')
+  }
+
+  getLocalizedPropertyValues (property: keyof Entity): string[] {
+    const { locale } = useI18n({ useScope: 'global' })
+    const lang = locale.value.split('-')[0]
+    if (this[property]) {
+      const results = (this[property] as Record<string, string>[])
+        .filter(d => d.lang === lang && d.text.length > 0)
+        .map(d => d.text)
+      if (results) return results
+    }
+    return []
+  }
+
   clone (): Entity {
     return new Entity(JSON.parse(JSON.stringify(this)))
   }

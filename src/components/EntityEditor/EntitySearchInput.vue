@@ -39,8 +39,8 @@
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ scope.opt.getTitle() }}</q-item-label>
-          <q-item-label v-for="(description, index) in scope.opt.descriptions" :key="index" caption>
-            <b>{{ description.lang }}:</b> {{ description.text }}
+          <q-item-label v-for="(description, index) in scope.opt.getDescriptions()" :key="index" caption>
+            {{ description }}
           </q-item-label>
         </q-item-section>
       </q-item>

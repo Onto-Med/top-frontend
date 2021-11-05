@@ -39,7 +39,9 @@
                     :title="prop.node.getIconTooltip()"
                     class="q-mr-sm"
                   />
-                  {{ prop.node.getTitle() }}
+                  <div :title="prop.node.getDescriptions().join('\n')">
+                    {{ prop.node.getTitle() }}
+                  </div>
                 </div>
               </template>
             </q-tree>

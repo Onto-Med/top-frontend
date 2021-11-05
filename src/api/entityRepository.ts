@@ -169,6 +169,10 @@ export async function fetchEntityTree (): Promise<Entity[]> {
             { lang: 'de', text: 'Größe' },
             { lang: 'en', text: 'Height' }
           ],
+          descriptions: [
+            { lang: 'de', text: 'Beispielbeschreibung' },
+            { lang: 'en', text: 'Example description' }
+          ],
           entityType: EntityType.SinglePhenotype,
           dataType: DataType.Number,
         }),
