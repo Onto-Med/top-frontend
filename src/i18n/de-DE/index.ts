@@ -1,4 +1,13 @@
 export default {
+  category: 'Kategorie|Kategorien',
+  missing_value: 'Fehlender Wert|Fehlende Werte',
+  phenotype_group: 'Phänotypgruppe|Phänotypgruppen',
+  single_phenotype: 'Einzelner Phänotyp|Einzelne Phänotypen',
+  combined_phenotype: 'Kombinierter Phänotyp|Kombinierte Phänotypen',
+  derived_phenotype: 'Abgeleiteter Phänotyp|Abgeleitete Phänotypen',
+  single_restriction: 'Einzelne Restriktion|Einzelne Restriktionen',
+  combined_restriction: 'Kombinierte Restriktion|Kombinierte Restriktionen',
+  derived_restriction: 'Abgeleitete Restriktion|Abgeleitete Restriktionen',
   dataType: 'Datentyp|Datentypen',
   number: 'Zahl|Zahlen',
   boolean: 'Boolesch',

@@ -74,6 +74,12 @@ export class Entity {
     return ''
   }
 
+  getIconTooltip (): string {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t } = useI18n()
+    return t(this.entityType) + (this.dataType ? ': ' + t(this.dataType) : '')
+  }
+
   getTitle (): string {
     const { locale } = useI18n({ useScope: 'global' })
     const lang = locale.value.split('-')[0]

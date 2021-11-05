@@ -1,4 +1,13 @@
 export default {
+  category: 'Category|Categories',
+  missing_value: 'Missing value|Missing values',
+  phenotype_group: 'Phenotype group|Phenotype groups',
+  single_phenotype: 'Single phenotype|Single phenotypes',
+  combined_phenotype: 'Combined phenotype|Combined phenotypes',
+  derived_phenotype: 'Derived phenotype|Derived phenotypes',
+  single_restriction: 'Single restriction|Single restrictions',
+  combined_restriction: 'Combined restriction|Combined restrictions',
+  derived_restriction: 'Derived restriction|Derived restrictions',
   dataType: 'Data Type|Data Types',
   number: 'Number|Numbers',
   boolean: 'Boolean',

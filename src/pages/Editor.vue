@@ -33,7 +33,12 @@
             >
               <template #default-header="prop">
                 <div class="row items-center">
-                  <q-icon v-if="prop.node.getIcon()" :name="prop.node.getIcon()" class="q-mr-sm" />
+                  <q-icon
+                    v-if="prop.node.getIcon()"
+                    :name="prop.node.getIcon()"
+                    :title="prop.node.getIconTooltip()"
+                    class="q-mr-sm"
+                  />
                   {{ prop.node.getTitle() }}
                 </div>
               </template>
