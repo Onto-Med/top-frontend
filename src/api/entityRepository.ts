@@ -1,5 +1,6 @@
 import { DataType, EntityType, RestrictionOperator, IExpression, ExpressionType } from 'src/components/models'
 import { Entity, IEntity } from 'src/models/Entity'
+import { useI18n } from 'vue-i18n'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -126,9 +127,13 @@ const _entites: IEntity[] = [
 ]
 
 // eslint-disable-next-line @typescript-eslint/require-await
-export function fetchEntity (id: string): Entity {
+export async function fetchEntity (id: string): Promise<Entity> {
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  const { t } = useI18n()
+  await new Promise(r => setTimeout(r, 1000))
   const result = _entites.filter(e => e.id === id)
-  return new Entity(result[0])
+  if (result && result.length > 0) return new Entity(result[0])
+  throw new Error(t('not found'))
 }
 
 export async function searchEntitiesByTitle(title: string): Promise<Entity[]> {

@@ -1,6 +1,6 @@
 <template>
-  <div v-cloak class="column fit">
-    <div class="col-auto entity-editor-tab-header">
+  <div class="column fit">
+    <div v-if="entity" class="col-auto entity-editor-tab-header">
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           <q-breadcrumbs>
@@ -41,9 +41,29 @@
       </q-toolbar>
 
       <q-separator />
+
+      <q-dialog v-model="showJson">
+        <q-card>
+          <q-card-section>
+            <div v-t="'entityEditor.rawDialog.content'" class="text-h6" />
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section class="q-pt-none">
+            <pre>{{ entity }}</pre>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn v-close-popup flat :label="t('ok')" color="primary" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
 
-    <div class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
+    <div v-if="entity" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
       <localized-text-input v-model="entity.titles" unique-langs :label="t('title', 2)" />
 
       <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)" v-model="entity.dataType" />
@@ -75,25 +95,10 @@
       />
     </div>
 
-    <q-dialog v-model="showJson">
-      <q-card>
-        <q-card-section>
-          <div v-t="'entityEditor.rawDialog.content'" class="text-h6" />
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section class="q-pt-none">
-          <pre>{{ entity }}</pre>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup flat :label="t('ok')" color="primary" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <q-inner-loading
+      :showing="loading"
+      :label="t('pleaseWait') + '...'"
+    />
   </div>
 </template>
 
@@ -124,29 +129,36 @@ export default defineComponent({
       type: [String, Number]
     }
   },
-  emits: ['entityClicked'],
-  setup (props: Record<string, unknown>) {
+  emits: ['entityClicked', 'reloadFailed'],
+  setup (props: Record<string, unknown>, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }  = useI18n()
-    const entity       = ref({} as Entity)
+    const entity       = ref(undefined as unknown as Entity)
+    const initialState = ref(undefined as unknown as Entity)
     const showJson     = ref(false)
-    const initialState = ref({} as Entity)
+    const loading      = ref(false)
 
-    const getEntity = () => {
-      entity.value = fetchEntity(props.entityId as string)
-      initialState.value = entity.value.clone()
+    const reload = () => {
+      loading.value = true
+      fetchEntity(props.entityId as string)
+        .then(r => {
+          entity.value = r
+          initialState.value = r.clone()
+        })
+        .catch(e => emit('reloadFailed', e))
+        .finally(() => loading.value = false)
     }
     const reset = () => {
       entity.value = initialState.value.clone()
     }
     const hasUnsavedChanges = computed(() =>
-      entity.value.equals(initialState.value)
+      entity.value && entity.value.equals(initialState.value)
     )
 
-    getEntity()
+    reload()
 
     return {
-      t, entity, showJson, initialState, reset, hasUnsavedChanges, EntityType
+      t, entity, showJson, loading, reset, hasUnsavedChanges, EntityType
     }
   }
 })

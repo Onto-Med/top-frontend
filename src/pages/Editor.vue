@@ -72,7 +72,12 @@
           </q-tabs>
           <q-tab-panels v-model="selected" keep-alive animated class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
-              <entity-editor :entity-type="entityType" :entity-id="tab.id" @entity-clicked="selected = $event" />
+              <entity-editor
+                :entity-type="entityType"
+                :entity-id="tab.id"
+                @entity-clicked="selected = $event"
+                @reload-failed="closeTab(tab); alert($event.message)"
+              />
             </q-tab-panel>
           </q-tab-panels>
         </div>
@@ -86,7 +91,7 @@ import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType } from 'src/components/models'
 import { Entity } from 'src/models/Entity'
-import { QTree } from 'quasar'
+import { QTree, Notify } from 'quasar'
 import EntityEditor from 'src/components/EntityEditor.vue'
 import { fetchEntityTree } from 'src/api/entityRepository'
 
@@ -153,6 +158,15 @@ export default defineComponent({
       tabIds.splice(index, 1)
       if (this.selected === tab.id)
         this.selected = tabIds.pop() || ''
+    },
+    alert (msg: string): void {
+      Notify.create({
+        type: 'warning',
+        message: msg,
+        progress: true,
+        multiLine: true,
+        actions: [ { label: this.t('dismiss'), color: 'black' } ]
+      })
     }
   }
 })

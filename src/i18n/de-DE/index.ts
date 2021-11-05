@@ -43,6 +43,8 @@ export default {
   valueRange: 'Wertebereich|Wertebereiche',
   pleaseWait: 'Bitte warten',
   reload: 'Neu laden',
+  dismiss: 'Verwerfen',
+  notFound: 'Nicht gefunden',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

@@ -43,6 +43,8 @@ export default {
   valueRange: 'Value range|Value ranges',
   pleaseWait: 'Please wait',
   reload: 'Reload',
+  dismiss: 'Dismiss',
+  notFound: 'Not found',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
