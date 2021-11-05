@@ -135,7 +135,7 @@ export async function fetchEntity (id: string): Promise<Entity> {
   await new Promise(r => setTimeout(r, 1000))
   const result = _entites.filter(e => e.id === id)
   if (result && result.length > 0) return new Entity(result[0])
-  throw new Error(t('not found'))
+  throw new Error(t('notFound'))
 }
 
 export async function searchEntities(title: string, entityTypes?: EntityType[]): Promise<Entity[]> {
