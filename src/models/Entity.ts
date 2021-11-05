@@ -58,15 +58,15 @@ export class Entity {
     if (this.entityType === EntityType.CombinedPhenotype) {
       return 'merge_type'
     } else if (this.entityType === EntityType.DerivedPhenotype) {
-      return 'functions'
+      return 'calculate'
     } else if (this.entityType === EntityType.SinglePhenotype) {
       switch (this.dataType) {
         case DataType.Number:
-          return 'calculate'
+          return 'pin'
         case DataType.DateTime:
           return 'today'
         case DataType.String:
-          return 'notes'
+          return 'article'
         case DataType.Boolean:
           return 'check_box'
       }

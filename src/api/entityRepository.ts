@@ -55,8 +55,7 @@ const _entites: IEntity[] = [
       { lang: 'de', text: 'BMI' },
       { lang: 'en', text: 'BMI' }
     ],
-    entityType: EntityType.SinglePhenotype,
-    dataType: DataType.Number,
+    entityType: EntityType.DerivedPhenotype,
     synonyms: [],
     descriptions: [],
     codes: [],
@@ -161,7 +160,7 @@ export async function fetchEntityTree (): Promise<Entity[]> {
             { lang: 'de', text: 'BMI' },
             { lang: 'en', text: 'BMI' }
           ],
-          entityType: EntityType.SinglePhenotype,
+          entityType: EntityType.DerivedPhenotype,
           dataType: DataType.Number
         }),
         new Entity({
