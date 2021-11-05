@@ -29,26 +29,12 @@
       </q-menu>
     </span>
 
-    <q-chip
+    <entity-chip
       v-else-if="modelValue.id"
-      clickable
-      icon="calculate"
-      class="truncate"
-      :label="modelValue.id"
-      :title="t(modelValue.type) + ': ' + modelValue.id"
-    >
-      <q-menu>
-        <q-list dense>
-          <q-item v-close-popup clickable @click="$emit('entityClicked', modelValue.id)">
-            <q-item-section v-t="'show'" />
-          </q-item>
-          <q-separator />
-          <q-item v-close-popup clickable @click="$emit('removeClicked')">
-            <q-item-section v-t="'remove'" />
-          </q-item>
-        </q-list>
-      </q-menu>
-    </q-chip>
+      :entity-id="modelValue.id"
+      @entity-clicked="$emit('entityClicked', $event)"
+      @remove-clicked="$emit('removeClicked')"
+    />
 
     <entity-search-input
       v-else
@@ -114,11 +100,13 @@ import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { IExpression, ExpressionType, EntityType } from 'src/components/models'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
+import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 
 export default defineComponent({
   name: 'ExpressionOperandInput',
   components: {
-    EntitySearchInput
+    EntitySearchInput,
+    EntityChip
   },
   props: {
     modelValue: {

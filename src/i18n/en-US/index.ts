@@ -58,6 +58,7 @@ export default {
   all: 'All',
   negated: 'Negated',
   quantor: 'Quantor|Quantors',
+  loading: 'Loading',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
