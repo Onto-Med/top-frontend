@@ -118,7 +118,13 @@ export default defineComponent({
   computed: {
     visibleEntityNodes (): Entity[] {
       if (!this.list) return this.entityNodes as Entity[]
-      return []
+      return (this.entityNodes as Entity[]).flatMap(
+        function loop (e: Entity): Entity[] {
+          if (e.entityType === EntityType.Category && e.subClasses)
+            return e.subClasses.flatMap(loop)
+          else return [e]
+        }
+      )
     }
   },
   watch: {
