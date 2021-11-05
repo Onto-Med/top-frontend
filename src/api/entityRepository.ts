@@ -138,11 +138,17 @@ export async function fetchEntity (id: string): Promise<Entity> {
   throw new Error(t('not found'))
 }
 
-export async function searchEntitiesByTitle(title: string): Promise<Entity[]> {
+export async function searchEntities(title: string, entityTypes?: EntityType[]): Promise<Entity[]> {
   await new Promise(r => setTimeout(r, 1000))
   const needle = title.toLowerCase()
   return _entites
-    .filter(e => e.id?.includes(needle) || e.titles && e.titles.filter(t => t.text.toLowerCase().includes(needle)).length > 0)
+    .filter(e =>
+      (!entityTypes || entityTypes.length === 0 || entityTypes.includes(e.entityType))
+      && (
+        e.id?.includes(needle)
+        || e.titles && e.titles.filter(t => t.text.toLowerCase().includes(needle)).length > 0
+      )
+    )
     .map(e => new Entity(e))
 }
 

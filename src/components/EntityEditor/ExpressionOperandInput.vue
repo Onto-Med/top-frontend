@@ -53,6 +53,7 @@
     <entity-search-input
       v-else
       :label="t('selectThing', { thing: t(modelValue.type) })"
+      :entity-types="entityTypeFilter"
       @clear-Clicked="$emit('removeClicked')"
       @entity-selected="setId($event.id)"
     />
@@ -111,7 +112,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IExpression, ExpressionType } from 'src/components/models'
+import { IExpression, ExpressionType, EntityType } from 'src/components/models'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 
 export default defineComponent({
@@ -159,8 +160,15 @@ export default defineComponent({
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
         || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
     })
+    const entityTypeFilter = computed((): EntityType[] => {
+      if (props.modelValue.type === ExpressionType.Class)
+        return [EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype]
+      else if (props.modelValue.type === ExpressionType.Restriction)
+        return [EntityType.SingleRestriction, EntityType.DerivedRestriction, EntityType.CombinedRestriction]
+      return []
+    })
     
-    return { t, hover, operatorSymbol, ExpressionType, showAddButton }
+    return { t, hover, operatorSymbol, ExpressionType, showAddButton, entityTypeFilter }
   },
   methods: {
     setType (type: ExpressionType): void {

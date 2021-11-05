@@ -58,8 +58,9 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { searchEntitiesByTitle } from 'src/api/entityRepository'
+import { searchEntities } from 'src/api/entityRepository'
 import { Entity } from 'src/models/Entity'
+import { EntityType } from '../models';
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -68,7 +69,8 @@ export default defineComponent({
     minLength: {
       type: Number,
       default: 2
-    }
+    },
+    entityTypes: Array as () => EntityType[]
   },
   emits: ['clearClicked', 'entitySelected'],
   setup(props) {
@@ -87,7 +89,7 @@ export default defineComponent({
         }
 
         loading.value = true
-        let result = await searchEntitiesByTitle(val)
+        let result = await searchEntities(val, props.entityTypes)
           .finally(() => loading.value = false)
 
         update(() => options.value = result)
