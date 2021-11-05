@@ -13,6 +13,7 @@ export interface IEntity {
   units?: string[]
   negated?: boolean
   superClass?: IEntity
+  subClasses?: Entity[]
   restriction?: IRestriction
   expression?: IExpression
 }
@@ -29,6 +30,7 @@ export class Entity {
   units?: string[]
   negated?: boolean
   superClass?: Entity
+  subClasses?: Entity[]
   restriction?: IRestriction
   expression?: IExpression
 
@@ -45,6 +47,7 @@ export class Entity {
       this.units = obj.units
       this.negated = obj.negated
       this.superClass = obj.superClass ? new Entity(obj.superClass) : undefined
+      this.subClasses = obj.subClasses
       this.restriction = obj.restriction
       this.expression = obj.expression
     }

@@ -41,6 +41,8 @@ export default {
   value: 'Value|Values',
   enumeration: 'Enumeration|Enumerations',
   valueRange: 'Value range|Value ranges',
+  pleaseWait: 'Please wait',
+  reload: 'Reload',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

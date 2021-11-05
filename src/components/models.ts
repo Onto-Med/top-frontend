@@ -5,13 +5,6 @@ export interface IRestriction {
   values: Array<string|number|boolean|Date>
 }
 
-export interface IEntityTreeNode {
-  id: string|number
-  label: string
-  icon?: string
-  children?: IEntityTreeNode[]
-}
-
 export interface ICodeSystem {
   uri: string
   name: string

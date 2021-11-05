@@ -2,8 +2,8 @@
   <q-page>
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
-        <div class="column fit q-pa-md">
-          <q-toolbar>
+        <div class="column fit">
+          <q-toolbar class="q-pr-none">
             <q-toolbar-title>
               <q-input v-model="treeFilter" dense filled :label="t('filter')">
                 <template #append>
@@ -11,8 +11,15 @@
                 </template>
               </q-input>
             </q-toolbar-title>
-            <q-btn :icon="list ? 'account_tree' : 'view_list'" :title="t('entityTree.listDescription')" @click="list = !list" />
+
+            <q-separator vertical />
+            <q-btn stretch flat :icon="list ? 'account_tree' : 'view_list'" :title="t('entityTree.listDescription')" @click="list = !list" />
+            <q-separator vertical />
+            <q-btn stretch flat icon="refresh" :title="t('reload')" @click="refreshTree()" />
           </q-toolbar>
+
+          <q-separator />
+
           <div class="col">
             <q-tree
               ref="tree"
@@ -21,7 +28,19 @@
               :nodes="visibleEntityNodes"
               :filter="treeFilter"
               node-key="id"
+              children-key="subClasses"
               selected-color="primary"
+            >
+              <template #default-header="prop">
+                <div class="row items-center">
+                  <q-icon v-if="prop.node.getIcon()" :name="prop.node.getIcon()" class="q-mr-sm" />
+                  {{ prop.node.getTitle() }}
+                </div>
+              </template>
+            </q-tree>
+            <q-inner-loading
+              :showing="treeLoading"
+              :label="t('pleaseWait') + '...'"
             />
             <q-menu context-menu>
               <q-list dense>
@@ -39,7 +58,7 @@
           <q-tabs v-model="selected" dense no-caps align="left" class="bg-primary text-white shadow-2 entity-editor-tabs-bar">
             <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
               <span class="no-wrap">
-                {{ tab.label }}
+                {{ tab.getTitle() }}
                 <q-btn
                   flat
                   dense
@@ -65,7 +84,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IEntityTreeNode, EntityType } from 'src/components/models'
+import { EntityType } from 'src/components/models'
+import { Entity } from 'src/models/Entity'
 import { QTree } from 'quasar'
 import EntityEditor from 'src/components/EntityEditor.vue'
 import { fetchEntityTree } from 'src/api/entityRepository'
@@ -86,35 +106,41 @@ export default defineComponent({
       showJson: false,
       splitterModel: 25,
       entityType: EntityType.SinglePhenotype,
-      entityNodes: [] as IEntityTreeNode[],
+      entityNodes: [] as Entity[],
       treeExpansion: [],
       treeFilter: '',
       selected: '' as string|number,
-      tabs: [] as IEntityTreeNode[],
-      list: false
+      tabs: [] as Entity[],
+      list: false,
+      treeLoading: false
     }
   },
   computed: {
-    visibleEntityNodes (): IEntityTreeNode[] {
-      if (!this.list) return this.entityNodes
+    visibleEntityNodes (): Entity[] {
+      if (!this.list) return this.entityNodes as Entity[]
       return []
     }
   },
   watch: {
     selected (key: string) {
       if (!key) return
-      if (!this.tabs.map((t: IEntityTreeNode) => t.id).includes(key)) {
+      if (!this.tabs.map(t => t.id).includes(key)) {
         let tree = this.$refs.tree as QTree
-        this.tabs.push(tree.getNodeByKey(key) as IEntityTreeNode)
+        this.tabs.push(tree.getNodeByKey(key) as Entity)
       }
     }
   },
   mounted () {
-    // TODO: load entity nodes
-    this.entityNodes = fetchEntityTree()
+    this.refreshTree()
   },
   methods: {
-    closeTab (tab: IEntityTreeNode): void {
+    refreshTree (): void {
+      this.treeLoading = true
+      fetchEntityTree()
+        .then(r => this.entityNodes = r)
+        .finally(() => this.treeLoading = false)
+    },
+    closeTab (tab: Entity): void {
       const tabIds = this.tabs.map(t => t.id)
       const index = tabIds.indexOf(tab.id)
       this.tabs.splice(index, 1)

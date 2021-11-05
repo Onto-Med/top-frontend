@@ -41,6 +41,8 @@ export default {
   value: 'Wert|Werte',
   enumeration: 'Aufzählung|Aufzählungen',
   valueRange: 'Wertebereich|Wertebereiche',
+  pleaseWait: 'Bitte warten',
+  reload: 'Neu laden',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

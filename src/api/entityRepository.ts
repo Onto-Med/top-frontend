@@ -1,4 +1,4 @@
-import { DataType, EntityType, IEntityTreeNode, RestrictionOperator, IExpression, ExpressionType } from 'src/components/models'
+import { DataType, EntityType, RestrictionOperator, IExpression, ExpressionType } from 'src/components/models'
 import { Entity, IEntity } from 'src/models/Entity'
 
 const anthropometry: IEntity = {
@@ -139,38 +139,80 @@ export async function searchEntitiesByTitle(title: string): Promise<Entity[]> {
     .map(e => new Entity(e))
 }
 
-export function fetchEntityTree (): IEntityTreeNode[] {
+export async function fetchEntityTree (): Promise<Entity[]> {
+  await new Promise(r => setTimeout(r, 1000))
   return [
-    {
+    new Entity({
       id: 'anthropometry',
-      label: 'Anthropometry',
-      children: [
-        { id: 'bmi', label: 'BMI', icon: 'calculate' },
-        { id: 'height', label: 'Height', icon: 'calculate' },
-        {
+      titles: [
+        { lang: 'de', text: 'Anthropometrie' },
+        { lang: 'en', text: 'Anthropometry' }
+      ],
+      entityType: EntityType.Category,
+      subClasses: [
+        new Entity({
+          id: 'bmi',
+          titles: [
+            { lang: 'de', text: 'BMI' },
+            { lang: 'en', text: 'BMI' }
+          ],
+          entityType: EntityType.SinglePhenotype,
+          dataType: DataType.Number
+        }),
+        new Entity({
+          id: 'height',
+          titles: [
+            { lang: 'de', text: 'Größe' },
+            { lang: 'en', text: 'Height' }
+          ],
+          entityType: EntityType.SinglePhenotype,
+          dataType: DataType.Number,
+        }),
+        new Entity({
           id: 'weight',
-          label: 'Weight',
-          icon: 'calculate',
-          children: [
-            { id: 'weight_1500_to_2500g', label: '1500-2500g' },
-            { id: 'weight_gt_80kg', label: '>80kg' }
+          titles: [
+            { lang: 'de', text: 'Gewicht' },
+            { lang: 'en', text: 'Weight' }
+          ],
+          entityType: EntityType.SinglePhenotype,
+          dataType: DataType.Number,
+          subClasses: [
+            new Entity({
+              id: 'weight_1500_to_2500g',
+              titles: [ { lang: 'en', text: '1500-2500g' } ],
+              entityType: EntityType.SingleRestriction,
+              dataType: DataType.Number,
+            }),
+            new Entity({
+              id: 'weight_gt_80kg',
+              titles: [ { lang: 'en', text: '>80kg' } ],
+              entityType: EntityType.SingleRestriction,
+            })
           ]
-        }
+        })
       ]
-    },
-    {
+    }),
+    new Entity({
       id: 'laboratory_values',
-      label: 'Laboratory values',
-      children: [
-        {
+      titles: [
+        { lang: 'de', text: 'Laborwerte' },
+        { lang: 'en', text: 'Laboratory Values' }
+      ],
+      entityType: EntityType.Category,
+      subClasses: [
+        new Entity({
           id: 'combined_phenotype',
-          label: 'Combined Phenotype',
-          icon: 'merge_type',
-          children: [
-            { id: 'combined_restriction', label: 'Combined Restriction' }
+          titles: [ { lang: 'en', text: 'Combined Phenotype' } ],
+          entityType: EntityType.CombinedPhenotype,
+          subClasses: [
+            new Entity({
+              id: 'combined_restriction',
+              titles: [ { lang: 'en', text: 'Combined Restriction' } ],
+              entityType: EntityType.CombinedRestriction,
+            })
           ]
-        }
+        })
       ]
-    }
+    })
   ]
 }
