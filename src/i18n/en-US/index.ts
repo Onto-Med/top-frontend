@@ -24,6 +24,7 @@ export default {
   oneThingPerThing: 'There can only exist one {thing1} per {thing2}!',
   language: 'Language|Languages',
   remove: 'Remove',
+  delete: 'Delete',
   score: 'Score',
   component: 'Component',
   restriction: 'Restriction',

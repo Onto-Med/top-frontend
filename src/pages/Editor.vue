@@ -43,20 +43,15 @@
                   <div :title="prop.node.getDescriptions().join('\n')">
                     {{ prop.node.getTitle() }}
                   </div>
+                  <entity-tree-context-menu :entity="prop.node" />
                 </div>
               </template>
             </q-tree>
+            <entity-tree-context-menu />
             <q-inner-loading
               :showing="treeLoading"
               :label="t('pleaseWait') + '...'"
             />
-            <q-menu context-menu>
-              <q-list dense>
-                <q-item v-close-popup clickable>
-                  <q-item-section>Example Entry</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
           </div>
         </div>
       </template>
@@ -81,7 +76,6 @@
           <q-tab-panels v-model="selected" keep-alive animated class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
               <entity-editor
-                :entity-type="entityType"
                 :entity-id="tab.id"
                 @entity-clicked="selected = $event"
                 @reload-failed="closeTab(tab); alert($event.message)"
@@ -101,12 +95,14 @@ import { EntityType } from 'src/components/models'
 import { Entity } from 'src/models/Entity'
 import { QTree, Notify } from 'quasar'
 import EntityEditor from 'src/components/EntityEditor.vue'
+import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
 import { fetchEntityTree } from 'src/api/entityRepository'
 
 export default defineComponent({
   name: 'Editor',
   components: {
-    EntityEditor
+    EntityEditor,
+    EntityTreeContextMenu
   },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -118,7 +114,6 @@ export default defineComponent({
     return {
       showJson: false,
       splitterModel: 25,
-      entityType: EntityType.SinglePhenotype,
       entityNodes: [] as Entity[],
       treeExpansion: [],
       treeFilter: '',
