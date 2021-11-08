@@ -82,14 +82,15 @@ export class Entity {
   }
 
   getTitle (): string {
-    const { locale } = useI18n({ useScope: 'global' })
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { locale, t } = useI18n({ useScope: 'global' })
     const lang = locale.value.split('-')[0]
     if (this.titles) {
       const result = this.titles.filter(t => t.lang === lang).shift()
       if (result && result.text) return result.text
       if (this.titles[0] && this.titles[0].text) return this.titles[0].text
     }
-    return this.id as string
+    return t('unnamedThing', { thing: t(this.entityType) })
   }
 
   getSynonyms (): string[] {
