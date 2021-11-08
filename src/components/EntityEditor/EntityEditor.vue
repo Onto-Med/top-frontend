@@ -137,7 +137,7 @@ export default defineComponent({
 
     const reload = () => {
       loading.value = true
-      fetchEntity(props.entity.id as string)
+      fetchEntity(props.entity.id)
         .then(r => {
           local.value = r
           if (!local.value.equals(props.entity))
