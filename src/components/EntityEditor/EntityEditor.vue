@@ -87,7 +87,7 @@
         </q-card>
       </q-dialog>
 
-      <version-history-dialog v-model:show="showVersionHistory" :entity-id="local.id" @restore="local = $event.clone()" />
+      <version-history-dialog v-model:show="showVersionHistory" :entity-id="local.id" @restore="handleRestore" />
     </div>
 
     <div v-if="local" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
@@ -111,6 +111,7 @@
 
       <restriction-input
         v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
+        :key="restrictionKey"
         v-model="local.restriction"
       />
 
@@ -165,6 +166,7 @@ export default defineComponent({
     const loading  = ref(false)
     const showVersionHistory = ref(false)
     const showClearDialog    = ref(false)
+    const restrictionKey = ref(0)
 
     const reload = () => {
       loading.value = true
@@ -181,7 +183,11 @@ export default defineComponent({
     const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
 
     return {
-      t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, reload, reset, EntityType
+      t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType,
+      handleRestore (entity: Entity): void {
+        local.value = entity.clone()
+        restrictionKey.value++
+      }
     }
   }
 })
