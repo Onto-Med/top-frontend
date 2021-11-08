@@ -33,7 +33,7 @@
         @update:selected="handleSelectedChange"
       >
         <template #default-header="{ node }">
-          <div class="row items-center">
+          <div class="row items-center fit">
             <q-icon
               v-if="node.getIcon()"
               :name="node.getIcon()"
@@ -44,11 +44,11 @@
             <div :title="node.getDescriptions().join('\n')">
               {{ node.getTitle() }}
             </div>
-            <entity-tree-context-menu :entity="node" @delete-entity-clicked="$emit('deleteEntity', $event)" @create-entity-clicked="null" />
+            <entity-tree-context-menu :entity="node" @delete-entity-clicked="$emit('deleteEntity', $event)" @create-entity-clicked="(t, e) => $emit('createEntity', t, e)" />
           </div>
         </template>
       </q-tree>
-      <entity-tree-context-menu @create-entity-clicked="null" />
+      <entity-tree-context-menu @create-entity-clicked="(t, e) => $emit('createEntity', t, e)" />
     </div>
     <q-inner-loading
       :showing="loading"
@@ -76,7 +76,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['update:selected', 'refreshClicked', 'deleteEntity'],
+  emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()

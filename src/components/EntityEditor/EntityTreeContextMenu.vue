@@ -1,24 +1,30 @@
 <template>
   <q-menu context-menu>
     <q-list v-if="!entity || entity.entityType === EntityType.Category" dense>
-      <q-item v-for="entityType in [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype]" :key="entityType" v-close-popup clickable @click="$emit('createEntityClicked', entityType)">
+      <q-item
+        v-for="entityType in [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype]"
+        :key="entityType"
+        v-close-popup
+        clickable
+        @click="$emit('createEntityClicked', entityType, entity ? entity.id : null)"
+      >
         <q-item-section>{{ t('addThing', { thing: t(entityType) }) }}</q-item-section>
       </q-item>
     </q-list>
     <q-list v-else-if="entity" dense>
-      <q-item v-if="entity.entityType === EntityType.SinglePhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.SingleRestriction, entity)">
+      <q-item v-if="entity.entityType === EntityType.SinglePhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.SingleRestriction, entity.id)">
         <q-item-section>{{ t('addThing', { thing: t(EntityType.SingleRestriction) }) }}</q-item-section>
       </q-item>
-      <q-item v-if="entity.entityType === EntityType.DerivedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.DerivedRestriction, entity)">
+      <q-item v-if="entity.entityType === EntityType.DerivedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.DerivedRestriction, entity.id)">
         <q-item-section>{{ t('addThing', { thing: t(EntityType.DerivedRestriction) }) }}</q-item-section>
       </q-item>
-      <q-item v-if="entity.entityType === EntityType.CombinedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.CombinedRestriction, entity)">
+      <q-item v-if="entity.entityType === EntityType.CombinedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.CombinedRestriction, entity.id)">
         <q-item-section>{{ t('addThing', { thing: t(EntityType.SingleRestriction) }) }}</q-item-section>
       </q-item>
     </q-list>
     <q-separator />
     <q-list v-if="entity" dense>
-      <q-item v-close-popup clickable @click="$emit('deleteEntityClicked', entity)">
+      <q-item v-close-popup clickable @click="$emit('deleteEntityClicked', entity.id)">
         <q-item-section v-t="'delete'" />
       </q-item>
     </q-list>

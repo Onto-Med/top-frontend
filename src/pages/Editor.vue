@@ -9,6 +9,7 @@
           class="column fit"
           @refreshClicked="reloadEntities"
           @deleteEntity="handleEntityDeletion"
+          @createEntity="handleEntityCreation"
         />
       </template>
 
@@ -55,10 +56,12 @@
 import { defineComponent, ref, watch, onMounted, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Notify } from 'quasar'
+import { v4 as uuidv4 } from 'uuid'
 import { Entity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { fetchEntityTree, deleteEntity } from 'src/api/entityRepository'
+import { EntityType } from 'src/components/models'
 
 export default defineComponent({
   name: 'Editor',
@@ -124,15 +127,6 @@ export default defineComponent({
       return result ? result as Entity : null
     }
 
-    const handleEntityDeletion = (entity: Entity): void => {
-      if (!entity || !entity.id) return
-      treeLoading.value = true
-      deleteEntity(entity.id)
-        .then(reloadEntities)
-        .catch((e: Error) => alert(e.message))
-        .finally(() => treeLoading.value = false)
-    }
-
     watch(
       selected as Ref<Entity>,
       (entity: Entity) => {
@@ -146,7 +140,23 @@ export default defineComponent({
 
     return {
       t, showJson, splitterModel, entities, selected, tabs, treeLoading,
-      reloadEntities, selectTabByKey, closeTab, alert, handleEntityDeletion }
+      reloadEntities, selectTabByKey, closeTab, alert,
+
+      handleEntityDeletion (entityId: string): void {
+        if (!entityId) return
+        treeLoading.value = true
+        deleteEntity(entityId)
+          .then(reloadEntities)
+          .catch((e: Error) => alert(e.message))
+          .finally(() => treeLoading.value = false)
+      },
+      handleEntityCreation (entityType: EntityType, superClassId: string): void {
+        const superClass = getEntityById(superClassId)
+        const entity = new Entity({ id: (uuidv4 as () => string)(), entityType: entityType })
+        if (superClass) superClass.subClasses?.push(entity)
+        else entities.value.push(entity)
+      }
+    }
   }
 })
 </script>
