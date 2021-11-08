@@ -1,6 +1,5 @@
-import { DataType, EntityType, RestrictionOperator, IExpression, ExpressionType, QuantorType } from 'src/components/models'
+import { DataType, EntityType, RestrictionOperator, IExpression, ExpressionType, QuantorType, IUserAccount } from 'src/components/models'
 import { Entity, IEntity } from 'src/models/Entity'
-import { useI18n } from 'vue-i18n'
 
 const anthropometry: IEntity = {
   id: 'anthropometry',
@@ -130,15 +129,13 @@ const _entites: IEntity[] = [
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export async function fetchEntity (id: string): Promise<Entity> {
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { t } = useI18n()
   await new Promise(r => setTimeout(r, 500))
   const result = _entites.filter(e => e.id === id)
   if (result && result.length > 0) return new Entity(result[0])
-  throw new Error(t('notFound'))
+  throw new Error('Not Found!')
 }
 
-export async function searchEntities(title: string, entityTypes?: EntityType[]): Promise<Entity[]> {
+export async function searchEntities (title: string, entityTypes?: EntityType[]): Promise<Entity[]> {
   await new Promise(r => setTimeout(r, 500))
   const needle = title.toLowerCase()
   return _entites
@@ -153,7 +150,7 @@ export async function searchEntities(title: string, entityTypes?: EntityType[]):
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function deleteEntity(entityId: string): Promise<void> {
+export async function deleteEntity (entityId: string): Promise<void> {
   await new Promise(r => setTimeout(r, 500))
   throw new Error('Not implemented!')
 }
@@ -161,6 +158,17 @@ export async function deleteEntity(entityId: string): Promise<void> {
 export async function fetchEntityTree (): Promise<Entity[]> {
   await new Promise(r => setTimeout(r, 500))
   return toDataTree(_entites).map(e => new Entity(e))
+}
+
+export async function fetchEntityVersions (entityId: string): Promise<Entity[]> {
+  const entity = await fetchEntity(entityId)
+  return [ new Entity({
+    entityType: entity.entityType,
+    titles: [{ lang: 'de', text: 'Beispieltitel' }],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    author: { name: 'user', id: '1' } as IUserAccount
+  }) ]
 }
 
 const toDataTree = (entities: IEntity[]): IEntity[] => {

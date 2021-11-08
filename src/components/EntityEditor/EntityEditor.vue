@@ -87,7 +87,7 @@
         </q-card>
       </q-dialog>
 
-      <version-history-dialog v-model:show="showVersionHistory" @restore="local = $event.clone()" />
+      <version-history-dialog v-model:show="showVersionHistory" :entity-id="local.id" @restore="local = $event.clone()" />
     </div>
 
     <div v-if="local" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">

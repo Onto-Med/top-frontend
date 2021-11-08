@@ -47,6 +47,10 @@
         <q-btn flat :label="t('reload')" color="primary" @click="reload" />
         <q-btn v-close-popup flat :label="t('close')" color="primary" />
       </q-card-actions>
+      <q-inner-loading
+        :showing="loading"
+        :label="t('pleaseWait') + '...'"
+      />
     </q-card>
   </q-dialog>
 </template>
@@ -54,14 +58,18 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, IUserAccount } from 'src/components/models'
 import { Entity } from 'src/models/Entity'
+import { fetchEntityVersions } from 'src/api/entityRepository'
 
 export default defineComponent({
   name: 'VersionHistoryDialog',
   props: {
     show: {
       type: Boolean,
+      required: true
+    },
+    entityId: {
+      type: String,
       required: true
     }
   },
@@ -75,15 +83,14 @@ export default defineComponent({
       { name: 'timestamp', label: t('timestamp') }
     ]
     const versions = ref<Entity[]>([])
+    const loading = ref(false)
 
     const reload = () => {
-      versions.value = [ new Entity({
-        entityType: EntityType.Category,
-        titles: [{ lang: 'de', text: 'Beispieltitel' }],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        author: { name: 'user', id: '1' } as IUserAccount
-      }) ]
+      loading.value = true
+      fetchEntityVersions(props.entityId)
+        .then(r => versions.value = r)
+        .catch((e: Error) => alert(e.message))
+        .finally(() => loading.value = false)
     }
 
     watch(
@@ -93,7 +100,7 @@ export default defineComponent({
       }
     )
 
-    return { t, d, columns, versions, reload }
+    return { t, d, columns, versions, loading, reload }
   }
 })
 </script>
