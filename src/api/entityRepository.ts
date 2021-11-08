@@ -132,14 +132,14 @@ const _entites: IEntity[] = [
 export async function fetchEntity (id: string): Promise<Entity> {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { t } = useI18n()
-  await new Promise(r => setTimeout(r, 1000))
+  await new Promise(r => setTimeout(r, 500))
   const result = _entites.filter(e => e.id === id)
   if (result && result.length > 0) return new Entity(result[0])
   throw new Error(t('notFound'))
 }
 
 export async function searchEntities(title: string, entityTypes?: EntityType[]): Promise<Entity[]> {
-  await new Promise(r => setTimeout(r, 1000))
+  await new Promise(r => setTimeout(r, 500))
   const needle = title.toLowerCase()
   return _entites
     .filter(e =>
@@ -153,7 +153,7 @@ export async function searchEntities(title: string, entityTypes?: EntityType[]):
 }
 
 export async function fetchEntityTree (): Promise<Entity[]> {
-  await new Promise(r => setTimeout(r, 1000))
+  await new Promise(r => setTimeout(r, 500))
   return [
     new Entity({
       id: 'anthropometry',
