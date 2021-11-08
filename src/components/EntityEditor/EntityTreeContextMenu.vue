@@ -12,13 +12,13 @@
       <q-item v-if="entity.entityType === EntityType.DerivedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.DerivedRestriction, entity)">
         <q-item-section>{{ t('addThing', { thing: t(EntityType.DerivedRestriction) }) }}</q-item-section>
       </q-item>
-      <q-item v-if="entity.entityType === EntityType.CombinedPhenotype" v-close-popup clickable @click="$emit('deleteEntityClicked', entity)">
+      <q-item v-if="entity.entityType === EntityType.CombinedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.CombinedRestriction, entity)">
         <q-item-section>{{ t('addThing', { thing: t(EntityType.SingleRestriction) }) }}</q-item-section>
       </q-item>
     </q-list>
     <q-separator />
     <q-list v-if="entity" dense>
-      <q-item v-close-popup clickable>
+      <q-item v-close-popup clickable @click="$emit('deleteEntityClicked', entity)">
         <q-item-section v-t="'delete'" />
       </q-item>
     </q-list>

@@ -44,11 +44,11 @@
             <div :title="node.getDescriptions().join('\n')">
               {{ node.getTitle() }}
             </div>
-            <entity-tree-context-menu :entity="node" />
+            <entity-tree-context-menu :entity="node" @delete-entity-clicked="$emit('deleteEntity', $event)" @create-entity-clicked="null" />
           </div>
         </template>
       </q-tree>
-      <entity-tree-context-menu />
+      <entity-tree-context-menu @create-entity-clicked="null" />
     </div>
     <q-inner-loading
       :showing="loading"
@@ -76,7 +76,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['update:selected', 'refreshClicked'],
+  emits: ['update:selected', 'refreshClicked', 'deleteEntity'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()

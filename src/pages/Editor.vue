@@ -8,6 +8,7 @@
           :loading="treeLoading"
           class="column fit"
           @refreshClicked="reloadEntities"
+          @deleteEntity="handleEntityDeletion"
         />
       </template>
 
@@ -57,7 +58,7 @@ import { Notify } from 'quasar'
 import { Entity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { fetchEntityTree } from 'src/api/entityRepository'
+import { fetchEntityTree, deleteEntity } from 'src/api/entityRepository'
 
 export default defineComponent({
   name: 'Editor',
@@ -123,6 +124,15 @@ export default defineComponent({
       return result ? result as Entity : null
     }
 
+    const handleEntityDeletion = (entity: Entity): void => {
+      if (!entity || !entity.id) return
+      treeLoading.value = true
+      deleteEntity(entity.id)
+        .then(reloadEntities)
+        .catch((e: Error) => alert(e.message))
+        .finally(() => treeLoading.value = false)
+    }
+
     watch(
       selected as Ref<Entity>,
       (entity: Entity) => {
@@ -136,7 +146,7 @@ export default defineComponent({
 
     return {
       t, showJson, splitterModel, entities, selected, tabs, treeLoading,
-      reloadEntities, selectTabByKey, closeTab, alert }
+      reloadEntities, selectTabByKey, closeTab, alert, handleEntityDeletion }
   }
 })
 </script>

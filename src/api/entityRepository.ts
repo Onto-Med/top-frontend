@@ -152,6 +152,12 @@ export async function searchEntities(title: string, entityTypes?: EntityType[]):
     .map(e => new Entity(e))
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function deleteEntity(entityId: string): Promise<void> {
+  await new Promise(r => setTimeout(r, 500))
+  throw new Error('Not implemented!')
+}
+
 export async function fetchEntityTree (): Promise<Entity[]> {
   await new Promise(r => setTimeout(r, 500))
   return [
