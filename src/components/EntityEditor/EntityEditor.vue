@@ -26,7 +26,7 @@
           color="grey-7"
           :label="t('reset')"
           :disable="!hasUnsavedChanges"
-          @click="reset()"
+          @click="showClearDialog = true"
         />
         <q-separator vertical />
         <q-btn
@@ -58,6 +58,22 @@
 
           <q-card-actions align="right">
             <q-btn v-close-popup flat :label="t('ok')" color="primary" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
+      <q-dialog v-model="showClearDialog">
+        <q-card>
+          <q-card-section class="row items-center">
+            <q-avatar icon="warning_amber" color="warning" text-color="white" />
+            <span v-t="'confirmDiscardChanges'" class="q-ml-sm" />
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
+            <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="reset()" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -134,6 +150,7 @@ export default defineComponent({
     const local        = ref(props.entity.clone())
     const showJson     = ref(false)
     const loading      = ref(false)
+    const showClearDialog = ref(false)
 
     const reload = () => {
       loading.value = true
@@ -150,7 +167,7 @@ export default defineComponent({
     const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
 
     return {
-      t, local, showJson, loading, reset, hasUnsavedChanges, reload, EntityType
+      t, local, showJson, loading, showClearDialog, hasUnsavedChanges, reload, reset, EntityType
     }
   }
 })

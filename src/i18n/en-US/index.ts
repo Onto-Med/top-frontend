@@ -45,6 +45,7 @@ export default {
   setting: 'Setting|Settings',
   indentWithSpaces: 'Indent with spaces',
   confirmClearExpression: 'Please confirm that you want to delete the current expression.',
+  confirmDiscardChanges: 'Please confirm that you want to discard the current changes.',
   selectThing: 'Select {thing}',
   save: 'Save',
   reset: 'Reset',

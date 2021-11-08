@@ -45,6 +45,7 @@ export default {
   setting: 'Einstellung|Einstellungen',
   indentWithSpaces: 'Einrücken mit Leerzeichen',
   confirmClearExpression: 'Bitte bestätigen Sie, dass Sie den aktuellen Ausdruck löschen möchten.',
+  confirmDiscardChanges: 'Bitte bestätigen Sie, dass Sie die aktuellen Änderungen verwerfen möchten.',
   selectThing: '{thing} auswählen',
   save: 'Speichern',
   reset: 'Zurücksetzen',
