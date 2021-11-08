@@ -71,7 +71,7 @@ export default {
     }
   },
   entityTree: {
-    listDescription: 'Switch between the tree view with categories and phenotypes, and the list view without categories.',
+    listDescription: 'Switch between the tree view with categories and the list view without categories.',
     noNodesLabel: 'There are no entities.',
     noResultsLabel: 'The filtering has no results.'
   },
