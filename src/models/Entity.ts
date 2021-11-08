@@ -1,5 +1,6 @@
 import { EntityType, DataType, ICode, IRestriction, IExpression } from 'src/components/models'
 import { useI18n } from 'vue-i18n'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface IEntity {
   id?: string
@@ -12,13 +13,13 @@ export interface IEntity {
   score?: number
   units?: string[]
   superClass?: IEntity
-  subClasses?: Entity[]
+  subClasses?: IEntity[]
   restriction?: IRestriction
   expression?: IExpression
 }
 
 export class Entity {
-  id?: string
+  id: string = (uuidv4 as () => string)()
   entityType: EntityType = EntityType.Category
   titles?: Record<string, string>[]
   synonyms?: Record<string, string>[]
@@ -34,7 +35,7 @@ export class Entity {
 
   constructor (obj?: IEntity) {
     if (obj) {
-      this.id = obj.id
+      if (obj.id) this.id = obj.id
       this.entityType = obj.entityType
       this.titles = obj.titles
       this.synonyms = obj.synonyms
@@ -44,7 +45,7 @@ export class Entity {
       this.score = obj.score
       this.units = obj.units
       this.superClass = obj.superClass ? new Entity(obj.superClass) : undefined
-      this.subClasses = obj.subClasses
+      this.subClasses = obj.subClasses?.map(c => new Entity(c))
       this.restriction = obj.restriction
       this.expression = obj.expression
     }

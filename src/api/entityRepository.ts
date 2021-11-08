@@ -160,83 +160,23 @@ export async function deleteEntity(entityId: string): Promise<void> {
 
 export async function fetchEntityTree (): Promise<Entity[]> {
   await new Promise(r => setTimeout(r, 500))
-  return [
-    new Entity({
-      id: 'anthropometry',
-      titles: [
-        { lang: 'de', text: 'Anthropometrie' },
-        { lang: 'en', text: 'Anthropometry' }
-      ],
-      entityType: EntityType.Category,
-      subClasses: [
-        new Entity({
-          id: 'bmi',
-          titles: [
-            { lang: 'de', text: 'BMI' },
-            { lang: 'en', text: 'BMI' }
-          ],
-          entityType: EntityType.DerivedPhenotype,
-          dataType: DataType.Number
-        }),
-        new Entity({
-          id: 'height',
-          titles: [
-            { lang: 'de', text: 'Größe' },
-            { lang: 'en', text: 'Height' }
-          ],
-          descriptions: [
-            { lang: 'de', text: 'Beispielbeschreibung' },
-            { lang: 'en', text: 'Example description' }
-          ],
-          entityType: EntityType.SinglePhenotype,
-          dataType: DataType.Number,
-        }),
-        new Entity({
-          id: 'weight',
-          titles: [
-            { lang: 'de', text: 'Gewicht' },
-            { lang: 'en', text: 'Weight' }
-          ],
-          entityType: EntityType.SinglePhenotype,
-          dataType: DataType.Number,
-          subClasses: [
-            new Entity({
-              id: 'weight_1500_to_2500g',
-              titles: [ { lang: 'en', text: '1500-2500g' } ],
-              entityType: EntityType.SingleRestriction,
-              dataType: DataType.Number,
-            }),
-            new Entity({
-              id: 'weight_gt_80kg',
-              titles: [ { lang: 'en', text: '>80kg' } ],
-              entityType: EntityType.SingleRestriction,
-              dataType: DataType.Number,
-            })
-          ]
-        })
-      ]
-    }),
-    new Entity({
-      id: 'laboratory_values',
-      titles: [
-        { lang: 'de', text: 'Laborwerte' },
-        { lang: 'en', text: 'Laboratory Values' }
-      ],
-      entityType: EntityType.Category,
-      subClasses: [
-        new Entity({
-          id: 'combined_phenotype',
-          titles: [ { lang: 'en', text: 'Combined Phenotype' } ],
-          entityType: EntityType.CombinedPhenotype,
-          subClasses: [
-            new Entity({
-              id: 'combined_restriction',
-              titles: [ { lang: 'en', text: 'Combined Restriction' } ],
-              entityType: EntityType.CombinedRestriction,
-            })
-          ]
-        })
-      ]
-    })
-  ]
+  return toDataTree(_entites).map(e => new Entity(e))
+}
+
+const toDataTree = (entities: IEntity[]): IEntity[] => {
+  const hashTable: Record<string, IEntity> = {}
+  const dataTree: IEntity[] = []
+
+  entities.forEach(entity => {
+    if (entity.id) hashTable[entity.id] = { ...entity, subClasses: [] }
+  })
+
+  entities.forEach(entity => {
+    if (entity.id && entity.superClass && entity.superClass.id)
+      hashTable[entity.superClass.id].subClasses?.push(hashTable[entity.id])
+    else if (entity.id)
+      dataTree.push(hashTable[entity.id])
+  })
+
+  return dataTree
 }

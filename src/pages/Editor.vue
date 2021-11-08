@@ -56,7 +56,6 @@
 import { defineComponent, ref, watch, onMounted, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Notify } from 'quasar'
-import { v4 as uuidv4 } from 'uuid'
 import { Entity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
@@ -82,7 +81,7 @@ export default defineComponent({
         .then(r => entities.value = r)
         .finally(() => treeLoading.value = false)
     }
-    const selectTabByKey = (key: string|undefined): void => {
+    const selectTabByKey = (key: string): void => {
       const index = tabs.value.map(t => t.id).indexOf(key)
       if (index !== -1)
         selected.value = tabs.value[index]
@@ -152,7 +151,7 @@ export default defineComponent({
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const superClass = getEntityById(superClassId)
-        const entity = new Entity({ id: (uuidv4 as () => string)(), entityType: entityType })
+        const entity = new Entity({ entityType: entityType })
         if (superClass) superClass.subClasses?.push(entity)
         else entities.value.push(entity)
         selectTabByKey(entity.id)
