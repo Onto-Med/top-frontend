@@ -5,7 +5,7 @@
       v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
       class="cursor-pointer"
-      :title="t(modelValue.type)"
+      :title="modelValue.type ? t(modelValue.type) : ''"
       @mouseover="hover = true"
       @mouseleave="hover = false"
     >
@@ -143,7 +143,7 @@ export default defineComponent({
         case ExpressionType.Complement:
           return t('not').toUpperCase()
         default:
-          return ''
+          return t('selectThing', { thing: t('operator') })
       }
     })
     const showAddButton = computed((): boolean => {

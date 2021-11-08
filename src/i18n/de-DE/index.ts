@@ -40,6 +40,7 @@ export default {
   clearAll: 'Alles löschen',
   show: 'Anzeigen',
   filter: 'Filter',
+  operator: 'Operator',
   operand: 'Operand',
   setting: 'Einstellung|Einstellungen',
   indentWithSpaces: 'Einrücken mit Leerzeichen',

@@ -40,6 +40,7 @@ export default {
   clearAll: 'Clear all',
   show: 'Show',
   filter: 'Filter',
+  operator: 'Operator',
   operand: 'Operand',
   setting: 'Setting|Settings',
   indentWithSpaces: 'Indent with spaces',
