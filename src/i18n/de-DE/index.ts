@@ -61,7 +61,7 @@ export default {
   negated: 'Negiert',
   quantor: 'Quantor|Quantoren',
   loading: 'Laden',
-  unnamedThing: 'Unbenannte(r) {thing}',
+  unnamedEntity: 'Unbenannte Entität',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

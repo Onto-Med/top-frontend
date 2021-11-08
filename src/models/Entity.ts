@@ -91,7 +91,7 @@ export class Entity {
       if (result && result.text) return result.text
       if (this.titles[0] && this.titles[0].text) return this.titles[0].text
     }
-    return t('unnamedThing', { thing: t(this.entityType) })
+    return t('unnamedEntity')
   }
 
   getSynonyms (): string[] {
