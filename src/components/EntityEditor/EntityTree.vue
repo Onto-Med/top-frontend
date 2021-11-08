@@ -44,11 +44,11 @@
             <div :title="node.getDescriptions().join('\n')">
               {{ node.getTitle() }}
             </div>
-            <entity-tree-context-menu :entity="node" @delete-entity-clicked="$emit('deleteEntity', $event)" @create-entity-clicked="(t, e) => $emit('createEntity', t, e)" />
+            <entity-tree-context-menu :entity="node" @delete-entity-clicked="$emit('deleteEntity', $event)" @create-entity-clicked="handleCreateEntityClicked" />
           </div>
         </template>
       </q-tree>
-      <entity-tree-context-menu @create-entity-clicked="(t, e) => $emit('createEntity', t, e)" />
+      <entity-tree-context-menu @create-entity-clicked="handleCreateEntityClicked" />
     </div>
     <q-inner-loading
       :showing="loading"
@@ -81,7 +81,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()
     const tree      = ref(null as unknown as QTree)
-    const expansion = ref([])
+    const expansion = ref([] as string[])
     const filter    = ref('')
     const asList    = ref(false)
 
@@ -108,7 +108,11 @@ export default defineComponent({
       node.getTitle().toLowerCase().includes(filter.toLowerCase())
 
     return {
-      t, tree, visibleNodes, expansion, filter, asList, handleSelectedChange, filterFn, EntityType
+      t, tree, visibleNodes, expansion, filter, asList, handleSelectedChange, filterFn, EntityType,
+      handleCreateEntityClicked (t: EntityType, e?: string) {
+        if (e) expansion.value.push(e)
+        emit('createEntity', t, e)
+      }
     }
   }
 })
