@@ -73,7 +73,7 @@ export class Entity {
           return 'check_box'
       }
     }
-    return ''
+    return 'folder'
   }
 
   getIconTooltip (): string {
