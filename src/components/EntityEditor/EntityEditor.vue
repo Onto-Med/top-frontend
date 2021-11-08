@@ -33,6 +33,15 @@
           flat
           round
           dense
+          icon="history"
+          color="primary"
+          :title="t('versionHistory')"
+          @click="showVersionHistory = true"
+        />
+        <q-btn
+          flat
+          round
+          dense
           icon="raw_on"
           color="primary"
           :title="t('entityEditor.rawBtn.label')"
@@ -77,6 +86,8 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
+
+      <version-history-dialog :show="showVersionHistory" />
     </div>
 
     <div v-if="local" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
@@ -128,6 +139,7 @@ import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.v
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
+import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -135,7 +147,8 @@ export default defineComponent({
     LocalizedTextInput,
     DataTypeSelect,
     RestrictionInput,
-    ExpressionInput
+    ExpressionInput,
+    VersionHistoryDialog
   },
   props: {
     entity: {
@@ -146,11 +159,12 @@ export default defineComponent({
   emits: ['entityClicked', 'reloadFailed', 'entityReloaded'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t }        = useI18n()
-    const local        = ref(props.entity.clone())
-    const showJson     = ref(false)
-    const loading      = ref(false)
-    const showClearDialog = ref(false)
+    const { t }    = useI18n()
+    const local    = ref(props.entity.clone())
+    const showJson = ref(false)
+    const loading  = ref(false)
+    const showVersionHistory = ref(false)
+    const showClearDialog    = ref(false)
 
     const reload = () => {
       loading.value = true
@@ -167,7 +181,7 @@ export default defineComponent({
     const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
 
     return {
-      t, local, showJson, loading, showClearDialog, hasUnsavedChanges, reload, reset, EntityType
+      t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, reload, reset, EntityType
     }
   }
 })

@@ -11,7 +11,9 @@ export default {
   dataType: 'Data Type|Data Types',
   number: 'Number|Numbers',
   boolean: 'Boolean',
+  date: 'Date|Dates',
   dateTime: 'Date and Time|Dates and Times',
+  timestamp: 'Timestamp',
   string: 'Text|Texts',
   title: 'Title|Titles',
   describingMetadata: 'Describing Metadata',
@@ -65,6 +67,10 @@ export default {
   unnamedEntity: 'Unnamed entity',
   showThing: 'Show {thing}',
   help: 'Help',
+  versionHistory: 'Version history',
+  noDataPresent: 'No data present',
+  close: 'Close',
+  author: 'Author',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
