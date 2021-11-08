@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :model-value="show">
+  <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
     <q-card>
       <q-table
         class="sticky-header-table"
