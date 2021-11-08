@@ -67,10 +67,12 @@ export default {
   unnamedEntity: 'Unnamed entity',
   showThing: 'Show {thing}',
   help: 'Help',
+  version: 'Version|Versions',
   versionHistory: 'Version history',
   noDataPresent: 'No data present',
   close: 'Close',
   author: 'Author',
+  restoreThing: 'Restore {thing}',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

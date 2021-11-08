@@ -22,29 +22,29 @@
           </q-tr>
         </template>
 
-        <template #body="props">
+        <template #body="{ row }">
           <q-td auto-width>
             <q-btn
+              v-close-popup
               size="sm"
               color="accent"
               round
               dense
               icon="fast_rewind"
-              :title="t('entityEditor.restore')"
-              @click="$emit('restore', props)"
+              :title="t('restoreThing', { thing: t('version') })"
+              @click="$emit('restore', row)"
             />
           </q-td>
-          <q-tr :props="$props">
-            <q-td>{{ props.getTitle() }}</q-td>
-            <q-td>{{ props.author }}</q-td>
-            <q-td>{{ props.updatedAt }}</q-td>
-          </q-tr>
+          <q-td>{{ row.getTitle() }}</q-td>
+          <q-td>{{ row.author.name }}</q-td>
+          <q-td>{{ d(row.updatedAt, 'long') }}</q-td>
         </template>
       </q-table>
 
       <q-separator />
 
       <q-card-actions align="right">
+        <q-btn flat :label="t('reload')" color="primary" @click="reload" />
         <q-btn v-close-popup flat :label="t('close')" color="primary" />
       </q-card-actions>
     </q-card>
@@ -52,8 +52,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { EntityType, IUserAccount } from 'src/components/models'
+import { Entity } from 'src/models/Entity'
 
 export default defineComponent({
   name: 'VersionHistoryDialog',
@@ -61,22 +63,37 @@ export default defineComponent({
     show: {
       type: Boolean,
       required: true
-    },
-    versions: {
-      type: Array as () => Entity[]
     }
   },
-emits: ['restore'],
-  setup () {
+  emits: ['restore', 'update:show'],
+  setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n()
+    const { t, d } = useI18n()
     const columns = [
       { name: 'title', label: t('title') },
       { name: 'userAccount', label: t('author') },
       { name: 'timestamp', label: t('timestamp') }
     ]
+    const versions = ref<Entity[]>([])
 
-    return { t, columns }
+    const reload = () => {
+      versions.value = [ new Entity({
+        entityType: EntityType.Category,
+        titles: [{ lang: 'de', text: 'Beispieltitel' }],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        author: { name: 'user', id: '1' } as IUserAccount
+      }) ]
+    }
+
+    watch(
+      () => props.show,
+      (newShow: boolean) => {
+        if (newShow && !versions.value.length) reload()
+      }
+    )
+
+    return { t, d, columns, versions, reload }
   }
 })
 </script>

@@ -23,6 +23,11 @@ export interface IExpression {
   operands?: IExpression[]
 }
 
+export interface IUserAccount {
+  id: string
+  name: string
+}
+
 export enum EntityType {
   Category            = 'category',
   MissingValue        = 'missing_value',

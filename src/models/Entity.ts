@@ -1,4 +1,4 @@
-import { EntityType, DataType, ICode, IRestriction, IExpression } from 'src/components/models'
+import { EntityType, DataType, ICode, IRestriction, IExpression, IUserAccount } from 'src/components/models'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -16,6 +16,9 @@ export interface IEntity {
   subClasses?: IEntity[]
   restriction?: IRestriction
   expression?: IExpression
+  createdAt?: Date
+  updatedAt?: Date
+  author?: IUserAccount
 }
 
 export class Entity {
@@ -32,6 +35,9 @@ export class Entity {
   subClasses?: Entity[]
   restriction?: IRestriction
   expression?: IExpression
+  createdAt?: Date
+  updatedAt?: Date
+  author?: IUserAccount
 
   constructor (obj?: IEntity) {
     if (obj) {
@@ -48,6 +54,9 @@ export class Entity {
       this.subClasses = obj.subClasses?.map(c => new Entity(c))
       this.restriction = obj.restriction
       this.expression = obj.expression
+      this.createdAt = obj.createdAt
+      this.updatedAt = obj.updatedAt
+      this.author = obj.author
     }
     this.prepare()
   }
