@@ -132,7 +132,7 @@ export default defineComponent({
   emits: ['entityClicked', 'reloadFailed'],
   setup (props: Record<string, unknown>, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t }  = useI18n()
+    const { t }        = useI18n()
     const entity       = ref(undefined as unknown as Entity)
     const initialState = ref(undefined as unknown as Entity)
     const showJson     = ref(false)

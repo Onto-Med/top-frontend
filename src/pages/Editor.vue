@@ -2,63 +2,25 @@
   <q-page>
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
-        <div class="column fit">
-          <q-toolbar class="q-pr-none">
-            <q-toolbar-title>
-              <q-input v-model="treeFilter" dense filled :label="t('filter')">
-                <template #append>
-                  <q-icon v-show="treeFilter !== ''" name="clear" class="cursor-pointer" @click="treeFilter = ''" />
-                </template>
-              </q-input>
-            </q-toolbar-title>
-
-            <q-separator vertical />
-            <q-btn stretch flat :icon="list ? 'account_tree' : 'view_list'" :title="t('entityTree.listDescription')" @click="list = !list" />
-            <q-separator vertical />
-            <q-btn stretch flat icon="refresh" :title="t('reload')" @click="refreshTree()" />
-          </q-toolbar>
-
-          <q-separator />
-
-          <div class="col">
-            <q-tree
-              ref="tree"
-              v-model:expanded="treeExpansion"
-              v-model:selected="selected"
-              :nodes="visibleEntityNodes"
-              :filter="treeFilter"
-              node-key="id"
-              children-key="subClasses"
-              selected-color="primary"
-            >
-              <template #default-header="prop">
-                <div class="row items-center">
-                  <q-icon
-                    v-if="prop.node.getIcon()"
-                    :name="prop.node.getIcon()"
-                    :title="prop.node.getIconTooltip()"
-                    :class="{ restriction: prop.node.isRestriction() }"
-                    class="q-mr-sm"
-                  />
-                  <div :title="prop.node.getDescriptions().join('\n')">
-                    {{ prop.node.getTitle() }}
-                  </div>
-                  <entity-tree-context-menu :entity="prop.node" />
-                </div>
-              </template>
-            </q-tree>
-            <entity-tree-context-menu />
-            <q-inner-loading
-              :showing="treeLoading"
-              :label="t('pleaseWait') + '...'"
-            />
-          </div>
-        </div>
+        <entity-tree
+          v-model:selected="selected"
+          :nodes="entities"
+          :loading="treeLoading"
+          class="column fit"
+          @refreshClicked="reloadEntities"
+        />
       </template>
 
       <template #after>
         <div class="column fit">
-          <q-tabs v-model="selected" dense no-caps align="left" class="bg-primary text-white shadow-2 entity-editor-tabs-bar">
+          <q-tabs
+            :model-value="selected ? selected.id : undefined"
+            dense
+            no-caps
+            align="left"
+            class="bg-primary text-white shadow-2 entity-editor-tabs-bar"
+            @update:model-value="selectTabByKey($event)"
+          >
             <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
               <span class="no-wrap">
                 {{ tab.getTitle() }}
@@ -73,11 +35,11 @@
               </span>
             </q-tab>
           </q-tabs>
-          <q-tab-panels v-model="selected" keep-alive animated class="col entity-editor-tab">
+          <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive animated class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
               <entity-editor
                 :entity-id="tab.id"
-                @entity-clicked="selected = $event"
+                @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"
               />
             </q-tab-panel>
@@ -89,88 +51,92 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref, watch, onMounted, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType } from 'src/components/models'
+import { Notify } from 'quasar'
 import { Entity } from 'src/models/Entity'
-import { QTree, Notify } from 'quasar'
-import EntityEditor from 'src/components/EntityEditor.vue'
-import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
+import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
+import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { fetchEntityTree } from 'src/api/entityRepository'
 
 export default defineComponent({
   name: 'Editor',
-  components: {
-    EntityEditor,
-    EntityTreeContextMenu
-  },
+  components: { EntityEditor, EntityTree },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n()
+    const { t }         = useI18n()
+    const showJson      = ref(false)
+    const splitterModel = ref(25)
+    const entities      = ref<Entity[]>([])
+    const selected      = ref<Entity|undefined>(undefined)
+    const tabs          = ref([] as Entity[])
+    const treeLoading   = ref(false)
 
-    return { t }
-  },
-  data () {
-    return {
-      showJson: false,
-      splitterModel: 25,
-      entityNodes: [] as Entity[],
-      treeExpansion: [],
-      treeFilter: '',
-      selected: '' as string|number,
-      tabs: [] as Entity[],
-      list: false,
-      treeLoading: false
+    const reloadEntities = (): void => {
+      treeLoading.value = true
+      fetchEntityTree()
+        .then(r => entities.value = r)
+        .finally(() => treeLoading.value = false)
     }
-  },
-  computed: {
-    visibleEntityNodes (): Entity[] {
-      if (!this.list) return this.entityNodes as Entity[]
-      return (this.entityNodes as Entity[]).flatMap(
-        function loop (e: Entity): Entity[] {
-          if (e.entityType === EntityType.Category && e.subClasses)
-            return e.subClasses.flatMap(loop)
-          else return [e]
-        }
-      )
-    }
-  },
-  watch: {
-    selected (key: string) {
-      if (!key) return
-      if (!this.tabs.map(t => t.id).includes(key)) {
-        let tree = this.$refs.tree as QTree
-        this.tabs.push(tree.getNodeByKey(key) as Entity)
+    const selectTabByKey = (key: string|undefined): void => {
+      const index = tabs.value.map(t => t.id).indexOf(key)
+      if (index !== -1)
+        selected.value = tabs.value[index]
+      else {
+        const selection = getEntityById(key)
+        selected.value = selection ? selection : undefined
       }
     }
-  },
-  mounted () {
-    this.refreshTree()
-  },
-  methods: {
-    refreshTree (): void {
-      this.treeLoading = true
-      fetchEntityTree()
-        .then(r => this.entityNodes = r)
-        .finally(() => this.treeLoading = false)
-    },
-    closeTab (tab: Entity): void {
-      const tabIds = this.tabs.map(t => t.id)
-      const index = tabIds.indexOf(tab.id)
-      this.tabs.splice(index, 1)
-      tabIds.splice(index, 1)
-      if (this.selected === tab.id)
-        this.selected = tabIds.pop() || ''
-    },
-    alert (msg: string): void {
+    const closeTab = (tab: Entity): void => {
+      const index = tabs.value.map(t => t.id).indexOf(tab.id)
+      tabs.value.splice(index, 1)
+      if (selected.value && selected.value.id === tab.id)
+        selected.value = tabs.value[tabs.value.length - 1] || undefined
+    }
+    const alert = (msg: string): void => {
       Notify.create({
         type: 'warning',
         message: msg,
         progress: true,
         multiLine: true,
-        actions: [ { label: this.t('dismiss'), color: 'black' } ]
+        actions: [ { label: t('dismiss'), color: 'black' } ]
       })
     }
+    const getEntityById = (id: string|number|undefined): Entity|null => {
+      const find = (result: unknown, node: unknown): unknown => {
+        if (result || !node) {
+          return result
+        }
+        if (Array.isArray(node) === true) {
+          return [].reduce.call(Object(node), find, result)
+        }
+        if ((node as Record<string, unknown>).id === id) {
+          return node
+        }
+        if ((node as Record<string, unknown>).subClasses) {
+          return find(null, (node as Record<string, unknown>).subClasses)
+        }
+        return result
+      }
+
+      const result = find(null, entities.value)
+      return result ? result as Entity : null
+    }
+
+    watch(
+      selected as Ref<Entity>,
+      (entity: Entity) => {
+        if (!entity) return
+        if (!tabs.value.map(t => t.id).includes(entity.id))
+          tabs.value.push(entity)
+      }
+    )
+
+    onMounted(reloadEntities)
+
+    return {
+      t, showJson, splitterModel, entities, selected, tabs, treeLoading,
+      reloadEntities, selectTabByKey, closeTab, alert }
   }
 })
 </script>

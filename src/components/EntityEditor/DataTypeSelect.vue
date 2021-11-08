@@ -19,7 +19,6 @@ export default defineComponent({
   props: {
     modelValue: {
       type: String,
-      required: true
     },
     label: String,
     options: Array

@@ -69,7 +69,9 @@ export default {
     }
   },
   entityTree: {
-    listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und Phenotypen, und der Listenansicht ohne Kategorien.'
+    listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und Phenotypen, und der Listenansicht ohne Kategorien.',
+    noNodesLabel: 'Es sind keine Entitäten vorhanden.',
+    noResultsLabel: 'Die Filterung liefert keine Ergebnisse.'
   },
   entitySearchInput: {
     description: 'Geben Sie mindestens {minLength} Zeichen ein um nach passenden {types} zu suchen.',
