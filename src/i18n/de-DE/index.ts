@@ -63,6 +63,8 @@ export default {
   quantor: 'Quantor|Quantoren',
   loading: 'Laden',
   unnamedEntity: 'Unbenannte Entität',
+  showThing: '{thing} anzeigen',
+  help: 'Hilfe',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

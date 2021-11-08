@@ -80,14 +80,14 @@
     </div>
 
     <div v-if="local" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
-      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" />
+      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titles.help')" />
 
       <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)" v-model="local.dataType" />
 
       <q-expansion-item expand-separator icon="description" :label="t('describingMetadata')">
         <div class="q-gutter-md">
-          <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" />
-          <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" />
+          <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonyms.help')" />
+          <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" :help-text="t('entityEditor.descriptions.help')" />
         </div>
       </q-expansion-item>
 

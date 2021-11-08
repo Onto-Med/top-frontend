@@ -1,6 +1,6 @@
 <template>
   <q-card>
-    <q-card-section v-if="label">
+    <q-card-section v-if="label" class="q-pa-sm">
       <q-toolbar>
         <q-toolbar-title>{{ label }}</q-toolbar-title>
         <q-btn
