@@ -40,7 +40,7 @@
           <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive animated class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
               <entity-editor
-                :entity-id="tab.id"
+                :entity="tab"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"
               />
@@ -155,6 +155,7 @@ export default defineComponent({
         const entity = new Entity({ id: (uuidv4 as () => string)(), entityType: entityType })
         if (superClass) superClass.subClasses?.push(entity)
         else entities.value.push(entity)
+        selectTabByKey(entity.id)
       }
     }
   }

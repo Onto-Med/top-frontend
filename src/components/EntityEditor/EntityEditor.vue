@@ -1,16 +1,16 @@
 <template>
   <div class="column fit">
-    <div v-if="entity" class="col-auto entity-editor-tab-header">
+    <div v-if="local" class="col-auto entity-editor-tab-header">
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           <q-breadcrumbs>
             <q-breadcrumbs-el
-              v-if="entity.superClass"
+              v-if="local.superClass"
               class="cursor-pointer"
-              :label="entity.superClass.getTitle()"
-              @click="entity.superClass ? $emit('entityClicked', entity.superClass.id) : null"
+              :label="local.superClass.getTitle()"
+              @click="local.superClass ? $emit('entityClicked', local.superClass.id) : null"
             />
-            <q-breadcrumbs-el :label="entity.getTitle()" />
+            <q-breadcrumbs-el :label="local.getTitle()" />
           </q-breadcrumbs>
         </q-toolbar-title>
         <q-btn
@@ -51,7 +51,7 @@
           <q-separator />
 
           <q-card-section class="q-pt-none">
-            <pre>{{ entity }}</pre>
+            <pre>{{ local }}</pre>
           </q-card-section>
 
           <q-separator />
@@ -63,33 +63,33 @@
       </q-dialog>
     </div>
 
-    <div v-if="entity" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
-      <localized-text-input v-model="entity.titles" unique-langs :label="t('title', 2)" />
+    <div v-if="local" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
+      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" />
 
-      <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)" v-model="entity.dataType" />
+      <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)" v-model="local.dataType" />
 
       <q-expansion-item expand-separator icon="description" :label="t('describingMetadata')">
         <div class="q-gutter-md">
-          <localized-text-input v-model="entity.synonyms" :label="t('synonym', 2)" />
-          <localized-text-input v-model="entity.descriptions" text-area rows="3" :label="t('description', 2)" />
+          <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" />
+          <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" />
         </div>
       </q-expansion-item>
 
       <q-input
-        v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(entity.entityType)"
-        v-model="entity.score"
+        v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
+        v-model="local.score"
         type="number"
         :label="t('score')"
       />
 
       <restriction-input
-        v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)"
-        v-model="entity.restriction"
+        v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
+        v-model="local.restriction"
       />
 
       <expression-input
-        v-if="entity.entityType === EntityType.CombinedRestriction"
-        v-model="entity.expression"
+        v-if="local.entityType === EntityType.CombinedRestriction"
+        v-model="local.expression"
         :label="t('expression')"
         @entity-clicked="$emit('entityClicked', $event)"
       />
@@ -122,43 +122,39 @@ export default defineComponent({
     ExpressionInput
   },
   props: {
-    entityType: {
-      type: String as () => EntityType
-    },
-    entityId: {
-      type: [String, Number]
+    entity: {
+      type: Entity,
+      required: true
     }
   },
-  emits: ['entityClicked', 'reloadFailed'],
-  setup (props: Record<string, unknown>, { emit }) {
+  emits: ['entityClicked', 'reloadFailed', 'entityReloaded'],
+  setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }        = useI18n()
-    const entity       = ref(undefined as unknown as Entity)
-    const initialState = ref(undefined as unknown as Entity)
+    const local        = ref(props.entity.clone())
     const showJson     = ref(false)
     const loading      = ref(false)
 
     const reload = () => {
       loading.value = true
-      fetchEntity(props.entityId as string)
+      fetchEntity(props.entity.id as string)
         .then(r => {
-          entity.value = r
-          initialState.value = r.clone()
+          local.value = r
+          if (!local.value.equals(props.entity))
+            emit('entityReloaded', r)
         })
         .catch(e => emit('reloadFailed', e))
         .finally(() => loading.value = false)
     }
     const reset = () => {
-      entity.value = initialState.value.clone()
+      local.value = props.entity
     }
-    const hasUnsavedChanges = computed(() =>
-      entity.value && entity.value.equals(initialState.value)
-    )
-
-    reload()
+    const hasUnsavedChanges = computed(() => {
+      return !local.value.equals(props.entity)
+    })
 
     return {
-      t, entity, showJson, loading, reset, hasUnsavedChanges, EntityType
+      t, local, showJson, loading, reset, hasUnsavedChanges, reload, EntityType
     }
   }
 })
