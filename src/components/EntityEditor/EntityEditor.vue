@@ -146,12 +146,8 @@ export default defineComponent({
         .catch(e => emit('reloadFailed', e))
         .finally(() => loading.value = false)
     }
-    const reset = () => {
-      local.value = props.entity
-    }
-    const hasUnsavedChanges = computed(() => {
-      return !local.value.equals(props.entity)
-    })
+    const reset = () => local.value = props.entity
+    const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
 
     return {
       t, local, showJson, loading, reset, hasUnsavedChanges, reload, EntityType
