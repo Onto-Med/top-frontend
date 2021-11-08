@@ -118,7 +118,7 @@ export class Entity {
   }
 
   equals (obj: unknown): boolean {
-    return JSON.stringify(this) !== JSON.stringify(obj)
+    return JSON.stringify(this) === JSON.stringify(obj)
   }
 
   private prepare (): void {
