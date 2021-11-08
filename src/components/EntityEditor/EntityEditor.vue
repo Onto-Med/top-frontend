@@ -146,7 +146,7 @@ export default defineComponent({
         .catch(e => emit('reloadFailed', e))
         .finally(() => loading.value = false)
     }
-    const reset = () => local.value = props.entity
+    const reset = () => local.value = props.entity.clone()
     const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
 
     return {
