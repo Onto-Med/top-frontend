@@ -53,7 +53,6 @@ export enum ExpressionType {
 export enum RestrictionOperator {
   LowerThan    = '<',
   LowerEqual   = '≤',
-  Equal        = '=',
   GreaterEqual = '≥',
   GreaterThan  = '>'
 }
