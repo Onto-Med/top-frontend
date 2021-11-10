@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered>
+  <q-card>
     <q-card-section v-if="label" class="q-pa-sm">
       <q-toolbar>
         <q-toolbar-title>{{ label }}</q-toolbar-title>
@@ -17,44 +17,41 @@
 
     <q-separator v-if="label" />
 
-    <q-card-section class="q-pa-none">
-      <div class="row">
-        <div class="col q-pa-md">
-          <div v-for="(entry, index) in modelValue" :key="index" class="row">
-            <q-input
-              v-model="entry.text"
-              outlined
-              :type="textArea ? 'textarea' : 'text'"
-              :rows="rows"
-              :cols="cols"
-            >
-              <template #before>
-                <q-select v-model="entry.lang" outlined :options="supportedLangs" />
-              </template>
-              <template #after>
-                <q-btn
-                  color="red"
-                  icon="remove"
-                  class="remove-localized-text-btn"
-                  :title="t('remove')"
-                  @click="removeEntryByIndex(index)"
-                />
-              </template>
-            </q-input>
-          </div>
-          <div v-show="uniqueLangs && duplicatedLangs.length > 0">
-            {{ t('oneThingPerThing', { thing1: name || t('entry'), thing2: t('language') }) }}
-          </div>
+    <q-card-section class="row q-pa-none">
+      <div class="col q-pa-md">
+        <div v-for="(entry, index) in modelValue" :key="index" class="row">
+          <q-input
+            v-model="entry.text"
+            :type="textArea ? 'textarea' : 'text'"
+            :rows="rows"
+            :cols="cols"
+          >
+            <template #before>
+              <q-select v-model="entry.lang" :options="supportedLangs" />
+            </template>
+            <template #after>
+              <q-btn
+                color="red"
+                icon="remove"
+                class="remove-localized-text-btn"
+                :title="t('remove')"
+                @click="removeEntryByIndex(index)"
+              />
+            </template>
+          </q-input>
         </div>
-
-        <q-separator v-if="showHelp" vertical />
-
-        <div v-if="showHelp" class="col-6 q-pa-md">
-          <div class="text-subtitle1">
-            {{ t('help') }}:
-          </div>
-          {{ helpText }}
+        <div v-show="uniqueLangs && duplicatedLangs.length > 0">
+          {{ t('oneThingPerThing', { thing1: name || t('entry'), thing2: t('language') }) }}
         </div>
+      </div>
+
+      <q-separator v-show="showHelp" vertical />
+
+      <div v-show="showHelp" class="col-6 q-pa-md">
+        <div class="text-subtitle1">
+          {{ t('help') }}:
+        </div>
+        {{ helpText }}
       </div>
     </q-card-section>
 
