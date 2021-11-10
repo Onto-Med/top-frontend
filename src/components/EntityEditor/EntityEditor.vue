@@ -102,6 +102,11 @@
         </div>
       </q-expansion-item>
 
+      <ucum-card
+        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
+        v-model="local.units"
+      />
+
       <q-input
         v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
         v-model="local.score"
@@ -133,7 +138,7 @@
 <script lang="ts">
 import { ref, computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType } from 'src/components/models'
+import { EntityType, DataType } from 'src/components/models'
 import { Entity } from 'src/models/Entity'
 import { fetchEntity } from 'src/api/entityRepository'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
@@ -141,6 +146,7 @@ import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
+import UcumCard from 'src/components/UcumCard.vue'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -149,7 +155,8 @@ export default defineComponent({
     DataTypeSelect,
     RestrictionInput,
     ExpressionInput,
-    VersionHistoryDialog
+    VersionHistoryDialog,
+    UcumCard
   },
   props: {
     entity: {
@@ -183,7 +190,7 @@ export default defineComponent({
     const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
 
     return {
-      t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType,
+      t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType, DataType,
       handleRestore (entity: Entity): void {
         local.value = entity.clone()
         restrictionKey.value++

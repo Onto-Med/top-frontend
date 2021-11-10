@@ -7,3 +7,5 @@
 /// <reference types="@quasar/app" />
 
 declare module 'uuid'
+
+declare module '@lhncbc/ucum-lhc'

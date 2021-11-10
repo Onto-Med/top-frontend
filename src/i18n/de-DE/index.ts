@@ -73,6 +73,9 @@ export default {
   close: 'Schließen',
   author: 'Autor',
   restoreThing: '{thing} wiederherstellen',
+  invalid: 'Ungültig',
+  valid: 'Gültig',
+  unit: 'Einheit|Einheiten',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

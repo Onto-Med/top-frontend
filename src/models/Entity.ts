@@ -136,6 +136,7 @@ export class Entity {
     if (!this.synonyms) this.synonyms = [] as Record<string, string>[]
     if (!this.descriptions) this.descriptions = [] as Record<string, string>[]
     if (!this.codes) this.codes = [] as ICode[]
+    if (!this.units) this.units = []
   
     if ([EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(this.entityType) && !this.restriction) {
       this.restriction = { type: this.dataType, values: [] } as IRestriction

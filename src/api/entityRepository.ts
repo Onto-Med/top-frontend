@@ -74,6 +74,7 @@ const _entites: IEntity[] = [
       { lang: 'en', text: 'Example description' }
     ],
     codes: [],
+    units: ['cm', 'm'],
     superClass: anthropometry
   },
   weight,
