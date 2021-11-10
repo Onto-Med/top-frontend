@@ -92,5 +92,8 @@ export default {
   entitySearchInput: {
     description: 'Geben Sie mindestens {minLength} Zeichen ein um nach passenden {types} zu suchen.',
     emptyResult: 'Es wurden keine passenden {types} gefunden.'
+  },
+  ucumCard: {
+    help: 'Geben Sie eine Einheit oder eine Einheitenbezeichnung ein. Es wird Ihnen anschließend eine Liste mit Vorschlägen angezeigt, aus der Sie die passende UCUM Einheit auswählen können.'
   }
 };

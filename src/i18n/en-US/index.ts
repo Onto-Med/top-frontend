@@ -92,5 +92,8 @@ export default {
   entitySearchInput: {
     description: 'Enter at least {minLength} characters to search for matching {types}.',
     emptyResult: 'No matching {types} could be found.'
+  },
+  ucumCard: {
+    help: 'Enter a unit or a unit designation. A list of suggestions will then be displayed from which you can select the appropriate UCUM unit.'
   }
 };
