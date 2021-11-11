@@ -72,7 +72,5 @@ module.exports = {
   },
   transformIgnorePatterns: [`node_modules/(?!(${esModules}))`],
   snapshotSerializers: ['<rootDir>/node_modules/jest-serializer-vue'],
-  setupFiles: [
-    '<rootDir>/test/jest/setup/i18n.init.ts',
-  ]
+  setupFiles: [ ]
 };

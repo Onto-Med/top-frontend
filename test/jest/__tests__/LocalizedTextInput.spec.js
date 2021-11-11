@@ -1,15 +1,23 @@
 import { describe, expect, it } from '@jest/globals';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-jest';
 import { mount } from '@vue/test-utils';
+import { createI18n } from 'vue-i18n'
+import messages from 'src/i18n';
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 
 // Specify here Quasar config you'll need to test your component
 installQuasarPlugin();
 
+const i18n = createI18n({
+  legacy: false,
+  messages
+})
+
 describe('LocalizedTextInput.vue', () => {
   it('adds empty localized string', async () => {
     const wrapper = mount(LocalizedTextInput, {
-      props: { modelValue: [] }
+      props: { modelValue: [] },
+      global: { plugins: [i18n] }
     })
     expect(wrapper).toBeTruthy()
     expect(wrapper.find('button.remove-localized-text-btn').exists()).toBeFalsy()
@@ -27,7 +35,8 @@ describe('LocalizedTextInput.vue', () => {
           { lang: 'de', text: 'Beispiel' },
           { lang: 'en', text: 'Example' }
         ]
-      }
+      },
+      global: { plugins: [i18n] }
     })
     expect(wrapper).toBeTruthy()
     const btns = wrapper.findAll('button.remove-localized-text-btn')
