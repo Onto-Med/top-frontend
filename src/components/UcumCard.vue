@@ -19,7 +19,7 @@
         <div v-for="(unit, index) in modelValue" :key="index" class="row">
           <ucum-input :model-value="modelValue[index]" @update:modelValue="updateUnitByIndex($event, index)">
             <template #after>
-              <q-btn icon="remove" :title="t('remove')" color="red" @click="removeUnitByIndex(index)" />
+              <q-btn icon="remove" class="remove-ucum-btn" :title="t('remove')" color="red" @click="removeUnitByIndex(index)" />
             </template>
           </ucum-input>
         </div>
@@ -34,7 +34,7 @@
     </q-card-section>
     <q-separator />
     <q-card-actions>
-      <q-btn icon="add" color="primary" :label="t('addThing', { thing: t('unit') })" @click="addUnit" />
+      <q-btn icon="add" color="primary" class="add-ucum-btn" :label="t('addThing', { thing: t('unit') })" @click="addUnit" />
     </q-card-actions>
   </q-card>
 </template>
