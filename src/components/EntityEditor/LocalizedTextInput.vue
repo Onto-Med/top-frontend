@@ -21,13 +21,19 @@
       <div class="col q-pa-md">
         <div v-for="(entry, index) in modelValue" :key="index" class="row">
           <q-input
-            v-model="entry.text"
+            :model-value="modelValue[index].text"
             :type="textArea ? 'textarea' : 'text'"
             :rows="rows"
             :cols="cols"
+            debounce="200"
+            @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"
           >
             <template #before>
-              <q-select v-model="entry.lang" :options="supportedLangs" />
+              <q-select
+                :model-value="modelValue[index].lang"
+                :options="supportedLangs"
+                @update:modelValue="updateEntryByIndex(index, modelValue[index].text, $event)"
+              />
             </template>
             <template #after>
               <q-btn
@@ -76,7 +82,7 @@ import { useI18n } from 'vue-i18n'
 export default defineComponent({
   props: {
     modelValue: {
-      type: Array as () => Array<Record<string, string>>,
+      type: Array as () => Array<Record<string, string|undefined>>,
       required: true
     },
     helpText: String,
@@ -100,12 +106,12 @@ export default defineComponent({
     return { t, showHelp }
   },
   computed: {
-    duplicatedLangs (): string[] {
+    duplicatedLangs (): (string|undefined)[] {
       return this.modelValue
         .map(x => x.lang)
-        .filter((l: string, i: number, a: Array<string>) => a.indexOf(l) !== i)
+        .filter((l: string|undefined, i: number, a: Array<string|undefined>) => a.indexOf(l) !== i)
     },
-    unusedSupportedLangs (): string[] {
+    unusedSupportedLangs (): (string|undefined)[] {
       return this.supportedLangs.filter(l => !this.duplicatedLangs.includes(l))
     }
   },
@@ -113,6 +119,12 @@ export default defineComponent({
     removeEntryByIndex (index: number) {
       let newModelValue = this.modelValue.slice()
       newModelValue.splice(index, 1)
+      this.$emit('update:modelValue', newModelValue)
+    },
+    updateEntryByIndex (index: number, text?: string, lang?: string) {
+      let newModelValue = this.modelValue.slice()
+      newModelValue[index].text = text
+      newModelValue[index].lang = lang
       this.$emit('update:modelValue', newModelValue)
     },
     addEntry () {
