@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -98,39 +98,40 @@ export default defineComponent({
     }
   },
   emits: ['update:modelValue'],
-  setup () {
+  setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const showHelp = ref(false)
 
-    return { t, showHelp }
-  },
-  computed: {
-    duplicatedLangs (): (string|undefined)[] {
-      return this.modelValue
+    const duplicatedLangs = computed((): (string|undefined)[] => {
+      return props.modelValue
         .map(x => x.lang)
         .filter((l: string|undefined, i: number, a: Array<string|undefined>) => a.indexOf(l) !== i)
-    },
-    unusedSupportedLangs (): (string|undefined)[] {
-      return this.supportedLangs.filter(l => !this.duplicatedLangs.includes(l))
-    }
-  },
-  methods: {
-    removeEntryByIndex (index: number) {
-      let newModelValue = this.modelValue.slice()
-      newModelValue.splice(index, 1)
-      this.$emit('update:modelValue', newModelValue)
-    },
-    updateEntryByIndex (index: number, text?: string, lang?: string) {
-      let newModelValue = this.modelValue.slice()
-      newModelValue[index].text = text
-      newModelValue[index].lang = lang
-      this.$emit('update:modelValue', newModelValue)
-    },
-    addEntry () {
-      let newModelValue = this.modelValue.slice()
-      newModelValue.push({ lang: this.unusedSupportedLangs[0] })
-      this.$emit('update:modelValue', newModelValue)
+    })
+
+    const unusedSupportedLangs = computed((): (string|undefined)[] => {
+      return props.supportedLangs.filter(l => !duplicatedLangs.value.includes(l))
+    })
+
+    return {
+      t, showHelp, duplicatedLangs,
+      
+      removeEntryByIndex (index: number) {
+        let newModelValue = props.modelValue.slice()
+        newModelValue.splice(index, 1)
+        emit('update:modelValue', newModelValue)
+      },
+      updateEntryByIndex (index: number, text?: string, lang?: string) {
+        let newModelValue = props.modelValue.slice()
+        newModelValue[index].text = text
+        newModelValue[index].lang = lang
+        emit('update:modelValue', newModelValue)
+      },
+      addEntry () {
+        let newModelValue = props.modelValue.slice()
+        newModelValue.push({ lang: unusedSupportedLangs.value[0] })
+        emit('update:modelValue', newModelValue)
+      }
     }
   }
 })
