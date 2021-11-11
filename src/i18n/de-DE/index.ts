@@ -76,6 +76,10 @@ export default {
   invalid: 'Ungültig',
   valid: 'Gültig',
   unit: 'Einheit|Einheiten',
+  developPhenotype: 'Phänotyp entwickeln|Phänotypen entwickeln',
+  repository: 'Repositorium|Repositorien',
+  organisation: 'Organisation|Organisationen',
+  collaborativeWork: 'Kollaborative Arbeit',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'
