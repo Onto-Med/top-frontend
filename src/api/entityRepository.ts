@@ -120,7 +120,7 @@ const _entites: IEntity[] = [
         {
           type: ExpressionType.Complement,
           operands: [
-            { type: ExpressionType.Class, id: 'height' }
+            { type: ExpressionType.Restriction, id: 'weight_gt_80kg' }
           ]
         }
       ]

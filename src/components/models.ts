@@ -48,11 +48,10 @@ export enum DataType {
 }
 
 export enum ExpressionType {
-  Class        = 'class',
-  Restriction  = 'restriction',
   Union        = 'union',
   Intersection = 'intersection',
-  Complement   = 'complement'
+  Complement   = 'complement',
+  Restriction  = 'restriction'
 }
 
 export enum RestrictionOperator {

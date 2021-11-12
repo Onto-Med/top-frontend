@@ -61,6 +61,14 @@ export class Entity {
     this.prepare()
   }
 
+  static restrictionEntityTypes (): EntityType[] {
+    return [
+      EntityType.CombinedRestriction,
+      EntityType.DerivedRestriction,
+      EntityType.SingleRestriction
+    ]
+  }
+
   /**
    * Apply field values of another entity to this entity.
    * The id field is not transfered.

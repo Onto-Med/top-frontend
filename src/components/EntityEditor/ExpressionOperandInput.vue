@@ -2,7 +2,7 @@
   <span>
     <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
     <span
-      v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
+      v-if="![ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
       class="cursor-pointer"
       :title="modelValue.type ? t(modelValue.type) : ''"
@@ -40,7 +40,7 @@
     <entity-search-input
       v-else
       :label="t('selectThing', { thing: t(modelValue.type) })"
-      :entity-types="entityTypeFilter"
+      :entity-types="entityTypes"
       @clear-Clicked="$emit('removeClicked')"
       @entity-selected="setEntity($event)"
     />
@@ -73,7 +73,7 @@
       ><span class="add-btn">+</span><q-menu>
         <q-list dense>
           <q-item
-            v-for="type in [ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Class, ExpressionType.Restriction]"
+            v-for="type in Object.values(ExpressionType)"
             :key="type"
             v-close-popup
             clickable
@@ -99,7 +99,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IExpression, ExpressionType, EntityType } from 'src/components/models'
+import { IExpression, ExpressionType } from 'src/components/models'
 import { Entity } from 'src/models/Entity'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
@@ -147,19 +147,13 @@ export default defineComponent({
       }
     })
     const showAddButton = computed((): boolean => {
-      if ([ExpressionType.Class, ExpressionType.Restriction].includes(props.modelValue.type)) return false
+      if (props.modelValue.type === ExpressionType.Restriction) return false
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
         || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
     })
-    const entityTypeFilter = computed((): EntityType[] => {
-      if (props.modelValue.type === ExpressionType.Class)
-        return [EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype]
-      else if (props.modelValue.type === ExpressionType.Restriction)
-        return [EntityType.SingleRestriction, EntityType.DerivedRestriction, EntityType.CombinedRestriction]
-      return []
-    })
-    
-    return { t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypeFilter }
+    const entityTypes = computed(() => Entity.restrictionEntityTypes())
+
+    return { t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypes }
   },
   methods: {
     setType (type: ExpressionType): void {
