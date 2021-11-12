@@ -182,5 +182,8 @@ export class Entity {
     if (this.restriction && this.restriction.negated === undefined) {
       this.restriction.negated = false
     }
+    if (!this.subClasses) {
+      this.subClasses = []
+    }
   }
 }
