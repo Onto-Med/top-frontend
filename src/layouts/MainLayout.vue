@@ -50,7 +50,7 @@ import { useI18n } from 'vue-i18n'
 import EssentialLink from 'components/EssentialLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue';
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -65,7 +65,7 @@ export default defineComponent({
     const { t } = useI18n()
     const leftDrawerOpen = ref(false)
 
-    const linksList = [
+    const linksList = computed(() => [
       {
         title: t('repository', 2),
         icon: 'folder',
@@ -76,7 +76,7 @@ export default defineComponent({
         icon: 'groups',
         caption: t('collaborativeWork')
       }
-    ];
+    ])
 
     return {
       t,
