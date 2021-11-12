@@ -21,57 +21,61 @@
           :label="t('quantor')"
           :options="quantors || defaultQuantors"
         />
-        <q-checkbox v-model="state.negated" :label="t('negated')" />
       </div>
 
-      <q-btn-toggle
-        v-model="hasRange"
-        no-caps
-        class="q-mb-md"
-        :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
-        @update:model-value="handleHasRangeChanged($event)"
-      />
+      <div v-show="![QuantorType.None, QuantorType.Exists].includes(state.quantor)">
+        <div class="row">
+          <q-btn-toggle
+            v-model="hasRange"
+            no-caps
+            class="q-mb-md"
+            :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
+            @update:model-value="handleHasRangeChanged"
+          />
+          <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
+        </div>
 
-      <div v-show="hasRange" class="row">
-        <q-input v-model="state.values[0]" outlined :type="state.type">
-          <template #before>
-            <q-select
-              v-model="state.minOperator"
-              :options="operators || defaultOperators"
-              outlined
-              emit-value
-              map-options
-            />
-          </template>
-        </q-input>
-      </div>
+        <div v-show="hasRange" class="row">
+          <q-input v-model="state.values[0]" outlined :type="state.type">
+            <template #before>
+              <q-select
+                v-model="state.minOperator"
+                :options="operators || defaultOperators"
+                outlined
+                emit-value
+                map-options
+              />
+            </template>
+          </q-input>
+        </div>
 
-      <div v-show="hasRange" class="row">
-        <q-input v-model="state.values[1]" outlined :type="state.type">
-          <template #before>
-            <q-select
-              v-model="state.maxOperator"
-              :options="operators || defaultOperators"
-              emit-value
-              map-options
-              outlined
-            />
-          </template>
-        </q-input>
-      </div>
+        <div v-show="hasRange" class="row">
+          <q-input v-model="state.values[1]" outlined :type="state.type">
+            <template #before>
+              <q-select
+                v-model="state.maxOperator"
+                :options="operators || defaultOperators"
+                emit-value
+                map-options
+                outlined
+              />
+            </template>
+          </q-input>
+        </div>
 
-      <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
-        <q-input v-model="state.values[index]" outlined :type="state.type">
-          <template #after>
-            <q-btn
-              color="red"
-              icon="remove"
-              class="remove-localized-text-btn"
-              :title="t('remove')"
-              @click="state.values.splice(index, 1)"
-            />
-          </template>
-        </q-input>
+        <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
+          <q-input v-model="state.values[index]" outlined :type="state.type">
+            <template #after>
+              <q-btn
+                color="red"
+                icon="remove"
+                class="remove-localized-text-btn"
+                :title="t('remove')"
+                @click="state.values.splice(index, 1)"
+              />
+            </template>
+          </q-input>
+        </div>
       </div>
     </q-card-section>
 
@@ -90,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, watch } from 'vue'
+import { defineComponent, ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DataType, IRestriction, RestrictionOperator, QuantorType } from 'src/components/models'
 
@@ -121,7 +125,17 @@ export default defineComponent({
 
     watch(
       () => state,
-      () => emit('update:modelValue', state),
+      () => {
+        const newState = JSON.parse(JSON.stringify(state)) as IRestriction
+        if (newState.quantor && [QuantorType.None, QuantorType.Exists].includes(newState.quantor)) {
+          newState.minOperator = undefined
+          newState.maxOperator = undefined
+          newState.values.splice(2)
+          newState.negated = undefined
+          newState.values = []
+        }
+        emit('update:modelValue', newState)
+      },
       { deep: true }
     )
 
