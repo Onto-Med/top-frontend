@@ -35,7 +35,8 @@
 		"gamunu.vscode-yarn",
 		"hollowtree.vue-snippets",
 		"dariofuzinato.vue-peek",
-		"mhutchie.git-graph"
+		"mhutchie.git-graph",
+		"syler.sass-indented"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
