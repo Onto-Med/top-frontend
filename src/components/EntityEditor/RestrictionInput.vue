@@ -1,81 +1,100 @@
 <template>
   <q-card>
-    <q-card-section>
-      <div class="text-h6">
-        {{ label || t('restriction') }}
-      </div>
+    <q-card-section class="q-pa-sm">
+      <q-toolbar>
+        <q-toolbar-title>{{ label || t('restriction') }}</q-toolbar-title>
+        <q-btn
+          dense
+          round
+          flat
+          icon="info"
+          :title="t('showThing', { thing: t('help') })"
+          @click="showHelp = !showHelp"
+        />
+      </q-toolbar>
     </q-card-section>
 
     <q-separator />
 
-    <q-card-section class="q-pa-md">
-      <div class="row q-mb-md">
-        <q-select
-          v-model="state.quantor"
-          stack-label
-          emit-value
-          map-options
-          outlined
-          hide-bottom-space
-          style="width: 200px"
-          :label="t('quantor')"
-          :options="quantors || defaultQuantors"
-        />
+    <q-card-section class="row q-pa-none">
+      <div class="col q-pa-md">
+        <div class="row q-mb-md">
+          <q-select
+            v-model="state.quantor"
+            stack-label
+            emit-value
+            map-options
+            outlined
+            hide-bottom-space
+            style="width: 200px"
+            :label="t('quantor')"
+            :options="quantors || defaultQuantors"
+          />
+        </div>
+
+        <div v-show="![QuantorType.None, QuantorType.Exists].includes(state.quantor)">
+          <div class="row">
+            <q-btn-toggle
+              v-model="hasRange"
+              no-caps
+              class="q-mb-md"
+              :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
+              @update:model-value="handleHasRangeChanged"
+            />
+            <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
+          </div>
+
+          <div v-show="hasRange" class="row">
+            <q-input v-model="state.values[0]" outlined :type="state.type">
+              <template #before>
+                <q-select
+                  v-model="state.minOperator"
+                  :options="operators || defaultOperators"
+                  outlined
+                  emit-value
+                  map-options
+                />
+              </template>
+            </q-input>
+          </div>
+
+          <div v-show="hasRange" class="row">
+            <q-input v-model="state.values[1]" outlined :type="state.type">
+              <template #before>
+                <q-select
+                  v-model="state.maxOperator"
+                  :options="operators || defaultOperators"
+                  emit-value
+                  map-options
+                  outlined
+                />
+              </template>
+            </q-input>
+          </div>
+
+          <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
+            <q-input v-model="state.values[index]" outlined :type="state.type">
+              <template #after>
+                <q-btn
+                  color="red"
+                  icon="remove"
+                  class="remove-localized-text-btn"
+                  :title="t('remove')"
+                  @click="state.values.splice(index, 1)"
+                />
+              </template>
+            </q-input>
+          </div>
+        </div>
       </div>
 
-      <div v-show="![QuantorType.None, QuantorType.Exists].includes(state.quantor)">
-        <div class="row">
-          <q-btn-toggle
-            v-model="hasRange"
-            no-caps
-            class="q-mb-md"
-            :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
-            @update:model-value="handleHasRangeChanged"
-          />
-          <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
-        </div>
+      <q-separator v-show="showHelp" vertical />
 
-        <div v-show="hasRange" class="row">
-          <q-input v-model="state.values[0]" outlined :type="state.type">
-            <template #before>
-              <q-select
-                v-model="state.minOperator"
-                :options="operators || defaultOperators"
-                outlined
-                emit-value
-                map-options
-              />
-            </template>
-          </q-input>
+      <div v-show="showHelp" class="col-6 q-pa-md">
+        <div class="text-subtitle1">
+          {{ t('help') }}:
         </div>
-
-        <div v-show="hasRange" class="row">
-          <q-input v-model="state.values[1]" outlined :type="state.type">
-            <template #before>
-              <q-select
-                v-model="state.maxOperator"
-                :options="operators || defaultOperators"
-                emit-value
-                map-options
-                outlined
-              />
-            </template>
-          </q-input>
-        </div>
-
-        <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
-          <q-input v-model="state.values[index]" outlined :type="state.type">
-            <template #after>
-              <q-btn
-                color="red"
-                icon="remove"
-                class="remove-localized-text-btn"
-                :title="t('remove')"
-                @click="state.values.splice(index, 1)"
-              />
-            </template>
-          </q-input>
-        </div>
+        {{ t('entityEditor.restrictionHelp') }}
       </div>
     </q-card-section>
 
@@ -118,6 +137,7 @@ export default defineComponent({
     const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as IRestriction)
     const hasRange = ref(props.modelValue.minOperator !== undefined || props.modelValue.maxOperator !== undefined)
     const defaultOperators = ([ null ] as Array<RestrictionOperator|null>).concat(Object.values(RestrictionOperator))
+    const showHelp = ref(false)
 
     const defaultQuantors = computed(() =>
       Object.values(QuantorType).map(d => { return { label: t('quantorType.' + d), value: d } })
@@ -150,7 +170,7 @@ export default defineComponent({
       emit('update:modelValue', newState)
     }
 
-    return { t, defaultOperators, defaultQuantors, state, hasRange, handleHasRangeChanged, QuantorType }
+    return { t, defaultOperators, defaultQuantors, state, showHelp, hasRange, handleHasRangeChanged, QuantorType }
   }
 })
 </script>
