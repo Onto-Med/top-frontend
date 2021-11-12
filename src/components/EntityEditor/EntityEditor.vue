@@ -1,6 +1,6 @@
 <template>
   <div class="column fit">
-    <div v-if="local" class="col-auto entity-editor-tab-header">
+    <div class="col-auto entity-editor-tab-header">
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           <q-breadcrumbs>
@@ -91,21 +91,14 @@
       <version-history-dialog v-model:show="showVersionHistory" :entity-id="local.id" @restore="handleRestore" />
     </div>
 
-    <div v-if="local" class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
+    <div class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
       <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" />
+      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" />
+      <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" :help-text="t('entityEditor.descriptionsHelp')" />
 
-      <data-type-select v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)" v-model="local.dataType" />
-
-      <q-expansion-item expand-separator icon="description" :label="t('describingMetadata')">
-        <div class="q-gutter-md">
-          <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" />
-          <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" :help-text="t('entityEditor.descriptionsHelp')" />
-        </div>
-      </q-expansion-item>
-
-      <ucum-card
-        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
-        v-model="local.units"
+      <data-type-select
+        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
+        v-model="local.dataType"
       />
 
       <q-input
@@ -113,6 +106,11 @@
         v-model="local.score"
         type="number"
         :label="t('score')"
+      />
+
+      <ucum-card
+        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
+        v-model="local.units"
       />
 
       <formula-input
