@@ -39,9 +39,9 @@
             </q-tab>
           </q-tabs>
           <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
-            <q-tab-panel v-for="tab in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
+            <q-tab-panel v-for="(tab, index) in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
               <entity-editor
-                :entity="tab"
+                v-model:entity="tabs[index]"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"
               />

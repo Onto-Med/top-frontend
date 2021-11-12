@@ -19,6 +19,7 @@
           color="primary"
           :label="t('save')"
           :disabled="!hasUnsavedChanges"
+          @click="save"
         />
         <q-btn
           dense
@@ -164,7 +165,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['entityClicked', 'reloadFailed', 'entityReloaded'],
+  emits: ['entityClicked', 'reloadFailed', 'update:entity'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }    = useI18n()
@@ -181,7 +182,7 @@ export default defineComponent({
         .then(r => {
           local.value = r
           if (!local.value.equals(props.entity))
-            emit('entityReloaded', r)
+            emit('update:entity', r)
         })
         .catch(e => emit('reloadFailed', e))
         .finally(() => loading.value = false)
@@ -191,9 +192,15 @@ export default defineComponent({
 
     return {
       t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType, DataType,
+
       handleRestore (entity: Entity): void {
         local.value = entity.clone()
         restrictionKey.value++
+      },
+
+      save () {
+        // TODO: send entity to API and handle errors
+        emit('update:entity', local.value)
       }
     }
   }
