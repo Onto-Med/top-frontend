@@ -86,7 +86,12 @@ export default {
     },
     rawDialog: {
       content: 'Aktueller Zustand der Entität'
-    }
+    },
+    titlesHelp: 'Sie können je Sprache genau einen Titel angeben. Die Titel sollten dabei kurz und verständlich sein. '
+      + 'Bei der Darstellung einer Entität wird der für die aktuelle Spracheinstellung passende Titel gewählt. '
+      + 'Ist für die Spracheinstellung kein passender Titel angegeben, wird der erste Eintrag in der Liste verwendet.',
+    synonymsHelp: 'Synonyme sind alternative Bezeichnungen für Entitäten. Beispielsweise könnte der Phänotyp "BMI" das Synonym "Body Mass Index" besitzen.',
+    descriptionsHelp: 'Hier können Sie weiterführende Beschreibungen oder Definitionen der Entität in verschiedenen Sprachen angeben.'
   },
   entityTree: {
     listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und der Listenansicht ohne Kategorien.',

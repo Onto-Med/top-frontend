@@ -86,7 +86,12 @@ export default {
     },
     rawDialog: {
       content: 'Current state of the entity'
-    }
+    },
+    titlesHelp: 'You can enter exactly one title per language. The titles should be short and comprehensible. '
+      + 'When displaying an entity, the title appropriate for the current language setting is selected. '
+      + 'If no suitable title is specified for the language setting, the first entry in the list is used.',
+    synonymsHelp: 'Synonyms are alternative names for entities. For example, the phenotype "BMI" could have the synonym "Body Mass Index".',
+    descriptionsHelp: 'Here you can specify further descriptions or definitions of the entity in different languages.'
   },
   entityTree: {
     listDescription: 'Switch between the tree view with categories and the list view without categories.',
