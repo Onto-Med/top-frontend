@@ -26,21 +26,35 @@
             <q-input v-model.number="indent" type="number" :label="t('indentWithSpaces')" />
           </q-menu>
         </q-btn>
+        <q-btn
+          flat
+          round
+          dense
+          icon="info"
+          :title="t('showThing', { thing: t('help') })"
+          @click="showHelp = !showHelp"
+        />
       </q-toolbar>
     </q-card-section>
 
     <q-separator />
 
-    <q-card-section>
-      <expression-operand-input
-        class="text-subtitle1"
-        :class="{ monospace: monospace }"
-        :model-value="modelValue"
-        :expand="expand"
-        :indent="indent || 2"
-        @update:model-value="$emit('update:modelValue', $event)"
-        @entity-clicked="$emit('entityClicked', $event)"
-      />
+    <q-card-section class="row q-pa-none">
+      <div class="col q-pa-md">
+        <expression-operand-input
+          class="text-subtitle1"
+          :class="{ monospace: monospace }"
+          :model-value="modelValue"
+          :expand="expand"
+          :indent="indent || 2"
+          @update:model-value="$emit('update:modelValue', $event)"
+          @entity-clicked="$emit('entityClicked', $event)"
+        />
+      </div>
+
+      <q-separator v-show="showHelp" vertical />
+
+      <div v-show="showHelp" v-t="'entityEditor.expressionHelp'" class="col-4 q-pa-md" />
     </q-card-section>
 
     <q-dialog v-model="showClearDialog">
@@ -97,8 +111,9 @@ export default defineComponent({
     const expand = ref(false)
     const indent = ref(2)
     const showClearDialog = ref(false)
+    const showHelp = ref(false)
 
-    return { t, hover, expand, showClearDialog, indent, ExpressionType }
+    return { t, hover, expand, showClearDialog, indent, showHelp, ExpressionType }
   }
 })
 </script>
