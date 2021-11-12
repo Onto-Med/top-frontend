@@ -129,8 +129,8 @@ export default defineComponent({
     }
 
     watch(
-      selected as Ref<Entity>,
-      (entity: Entity) => {
+      selected as Ref<Entity|undefined>,
+      (entity: Entity|undefined) => {
         if (!entity) return
         if (!tabs.value.map(t => t.id).includes(entity.id))
           tabs.value.push(entity)
