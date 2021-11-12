@@ -37,10 +37,18 @@
                 />
               </span>
             </q-tab>
+            <q-menu context-menu>
+              <q-list>
+                <q-item v-close-popup dense clickable @click="closeTab(tabs)">
+                  <q-item-section v-t="'closeAll'" />
+                </q-item>
+              </q-list>
+            </q-menu>
           </q-tabs>
           <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
             <q-tab-panel v-for="(tab, index) in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
               <entity-editor
+                v-if="tabs[index]"
                 :entity="tabs[index]"
                 @update:entity="tabs[index].apply($event)"
                 @entity-clicked="selectTabByKey($event)"
@@ -92,11 +100,16 @@ export default defineComponent({
         selected.value = selection ? selection : undefined
       }
     }
-    const closeTab = (tab: Entity): void => {
-      const index = tabs.value.map(t => t.id).indexOf(tab.id)
-      tabs.value.splice(index, 1)
-      if (selected.value && selected.value.id === tab.id)
-        selected.value = tabs.value[tabs.value.length - 1] || undefined
+    const closeTab = (tab: Entity|Entity[]): void => {
+      if (tab instanceof Entity) {
+        const index = tabs.value.map(t => t.id).indexOf(tab.id)
+        tabs.value.splice(index, 1)
+        if (selected.value && selected.value.id === tab.id)
+          selected.value = tabs.value[tabs.value.length - 1] || undefined
+      } else {
+        tabs.value = []
+        selected.value = undefined
+      }
     }
     const alert = (msg: string): void => {
       Notify.create({

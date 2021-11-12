@@ -79,6 +79,7 @@ export default {
   organisation: 'Organisation|Organisatios',
   collaborativeWork: 'Collaborative Work',
   formula: 'Formula|Formulas',
+  closeAll: 'Close all',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
