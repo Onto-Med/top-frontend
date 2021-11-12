@@ -114,12 +114,17 @@ export default defineComponent({
     const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as IRestriction)
     const hasRange = ref(props.modelValue.minOperator !== undefined || props.modelValue.maxOperator !== undefined)
     const defaultOperators = ([ null ] as Array<RestrictionOperator|null>).concat(Object.values(RestrictionOperator))
-    const defaultQuantors = Object.values(QuantorType).map(d => { return { label: t('quantorType.' + d), value: d } })
+
+    const defaultQuantors = computed(() =>
+      Object.values(QuantorType).map(d => { return { label: t('quantorType.' + d), value: d } })
+    )
+
     watch(
       () => state,
       () => emit('update:modelValue', state),
       { deep: true }
     )
+
     const handleHasRangeChanged = (newValue: boolean) => {
       const newState = JSON.parse(JSON.stringify(state)) as IRestriction
       if (!newValue) {
