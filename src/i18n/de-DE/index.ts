@@ -59,8 +59,6 @@ export default {
   reload: 'Neu laden',
   dismiss: 'Verwerfen',
   notFound: 'Nicht gefunden',
-  some: 'Einige',
-  all: 'Alle',
   negated: 'Negiert',
   quantor: 'Quantor|Quantoren',
   loading: 'Laden',
@@ -105,5 +103,11 @@ export default {
   },
   ucumCard: {
     help: 'Geben Sie eine Einheit oder eine Einheitenbezeichnung ein. Es wird Ihnen anschließend eine Liste mit Vorschlägen angezeigt, aus der Sie die passende UCUM Einheit auswählen können.'
+  },
+  quantorType: {
+    none: 'Keine Werte vorhanden',
+    exists: 'Werte vorhanden',
+    some: 'Mindestens ein Wert in Bereich',
+    all: 'Alle Werte in Bereich',
   }
 };

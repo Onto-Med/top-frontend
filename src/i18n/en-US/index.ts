@@ -59,8 +59,6 @@ export default {
   reload: 'Reload',
   dismiss: 'Dismiss',
   notFound: 'Not found',
-  some: 'Some',
-  all: 'All',
   negated: 'Negated',
   quantor: 'Quantor|Quantors',
   loading: 'Loading',
@@ -105,5 +103,11 @@ export default {
   },
   ucumCard: {
     help: 'Enter a unit or a unit designation. A list of suggestions will then be displayed from which you can select the appropriate UCUM unit.'
+  },
+  quantorType: {
+    none: 'No values present',
+    exists: 'Values present',
+    some: 'At least one value in range',
+    all: 'All values in range',
   }
 };
