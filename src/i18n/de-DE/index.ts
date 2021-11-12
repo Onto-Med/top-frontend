@@ -80,6 +80,7 @@ export default {
   repository: 'Repositorium|Repositorien',
   organisation: 'Organisation|Organisationen',
   collaborativeWork: 'Kollaborative Arbeit',
+  formula: 'Formel|Formeln',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

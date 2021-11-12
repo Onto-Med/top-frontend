@@ -115,6 +115,13 @@
         :label="t('score')"
       />
 
+      <formula-input
+        v-if="local.entityType === EntityType.DerivedPhenotype"
+        v-model="local.formula"
+        :label="t('formula')"
+        :help-text="t('entityEditor.formulaHelp')"
+      />
+
       <restriction-input
         v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
         :key="restrictionKey"
@@ -148,6 +155,7 @@ import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import UcumCard from 'src/components/UcumCard.vue'
+import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -157,7 +165,8 @@ export default defineComponent({
     RestrictionInput,
     ExpressionInput,
     VersionHistoryDialog,
-    UcumCard
+    UcumCard,
+    FormulaInput
   },
   props: {
     entity: {
