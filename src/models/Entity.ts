@@ -61,10 +61,39 @@ export class Entity {
     this.prepare()
   }
 
+  /**
+   * Apply field values of another entity to this entity.
+   * The id field is not transfered.
+   * 
+   * @param entity The other entity, of which field values are transfered to this entity.
+   */
+  apply (entity: Entity): void {
+    this.entityType = entity.entityType
+    this.titles = entity.titles
+    this.synonyms = entity.synonyms
+    this.descriptions = entity.descriptions
+    this.dataType = entity.dataType
+    this.codes = entity.codes
+    this.score = entity.score
+    this.units = entity.units
+    this.superClass = entity.superClass
+    this.subClasses = entity.subClasses
+    this.restriction = entity.restriction
+    this.expression = entity.expression
+    this.createdAt = entity.createdAt
+    this.updatedAt = entity.updatedAt
+    this.author = entity.author
+  }
+
   isRestriction (): boolean {
     return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(this.entityType)
   }
 
+  /**
+   * Get an appropriate material icon name for this entity.
+   * When building an icon, you should make restrictions visually distinguishable from phenotypes.
+   * @returns Material icon name as string
+   */
   getIcon (): string {
     if ([EntityType.CombinedPhenotype, EntityType.CombinedRestriction].includes(this.entityType)) {
       return 'merge_type'
@@ -91,6 +120,12 @@ export class Entity {
     return t(this.entityType) + (this.dataType ? ': ' + t(this.dataType) : '')
   }
 
+  /**
+   * Get a title for the entity. The resulting title is derived from the titles field.
+   * A title, were lang matches the currently selected language for i18n, is priortized.
+   * If the entity has no titles, 'unnamed entity' is returned.
+   * @returns the title
+   */
   getTitle (): string {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { locale, t } = useI18n({ useScope: 'global' })
