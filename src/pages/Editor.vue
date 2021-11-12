@@ -25,6 +25,7 @@
           >
             <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
               <span class="no-wrap">
+                <q-icon :name="tab.getIcon()" :class="{ restriction: tab.isRestriction() }" />
                 {{ tab.getTitle() }}
                 <q-btn
                   flat
