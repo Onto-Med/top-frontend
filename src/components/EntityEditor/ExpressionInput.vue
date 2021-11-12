@@ -54,7 +54,12 @@
 
       <q-separator v-show="showHelp" vertical />
 
-      <div v-show="showHelp" v-t="'entityEditor.expressionHelp'" class="col-4 q-pa-md" />
+      <div v-show="showHelp" class="col-4 q-pa-md">
+        <div class="text-subtitle1">
+          {{ t('help') }}:
+        </div>
+        {{ t('entityEditor.expressionHelp') }}
+      </div>
     </q-card-section>
 
     <q-dialog v-model="showClearDialog">
