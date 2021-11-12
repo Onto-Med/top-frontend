@@ -62,8 +62,8 @@ export enum RestrictionOperator {
 }
 
 export enum QuantorType {
-  None   = 'none',
-  Exists = 'exists',
   Some   = 'some',
-  All    = 'all'
+  All    = 'all',
+  Exists = 'exists',
+  None   = 'none'
 }
