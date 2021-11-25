@@ -67,8 +67,15 @@ const _entites: IEntity[] = [
     titles: [
       { lang: 'en', text: 'BMI > 30kg/m²' }
     ],
-    entityType: EntityType.CombinedRestriction,
-    superClass: bmi
+    entityType: EntityType.DerivedRestriction,
+    superClass: bmi,
+    restriction: {
+      type: DataType.Number,
+      negated: false,
+      quantor: QuantorType.Some,
+      minOperator: RestrictionOperator.GreaterThan,
+      values: [ 30 ]
+    }
   },
   {
     id: 'height',
