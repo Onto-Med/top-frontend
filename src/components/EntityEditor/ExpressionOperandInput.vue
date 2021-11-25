@@ -87,7 +87,7 @@
     </span>
 
     <span
-      v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
+      v-if="![ExpressionType.Clazz, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
     >
       <span v-show="expand"><br>{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
@@ -147,7 +147,7 @@ export default defineComponent({
       }
     })
     const showAddButton = computed((): boolean => {
-      if ([ExpressionType.Restriction, ExpressionType.Class].includes(props.modelValue.type))
+      if ([ExpressionType.Restriction, ExpressionType.Clazz].includes(props.modelValue.type))
         return false
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
         || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
@@ -168,7 +168,7 @@ export default defineComponent({
     setEntity (entity: Entity): void {
       let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
       newModelValue.id = entity.id
-      newModelValue.type = entity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class
+      newModelValue.type = entity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Clazz
       this.entity = entity
       this.$emit('update:modelValue', newModelValue)
     },

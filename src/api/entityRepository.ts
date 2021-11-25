@@ -137,7 +137,7 @@ const _entites: IEntity[] = [
         {
           type: ExpressionType.Complement,
           operands: [
-            { type: ExpressionType.Class, id: 'bmi_gt_30kg/m2' }
+            { type: ExpressionType.Clazz, id: 'bmi_gt_30kg/m2' }
           ]
         }
       ]

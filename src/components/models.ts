@@ -52,7 +52,7 @@ export enum ExpressionType {
   Intersection = 'intersection',
   Complement   = 'complement',
   Restriction  = 'restriction',
-  Class        = 'class'
+  Clazz        = 'class'
 }
 
 export enum RestrictionOperator {
