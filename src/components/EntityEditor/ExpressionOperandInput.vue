@@ -73,7 +73,7 @@
       ><span class="add-btn">+</span><q-menu>
         <q-list dense>
           <q-item
-            v-for="type in Object.values(ExpressionType)"
+            v-for="type in selectableExpressionTypes"
             :key="type"
             v-close-popup
             clickable
@@ -99,7 +99,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IExpression, ExpressionType } from 'src/components/models'
+import { IExpression, ExpressionType, EntityType } from 'src/components/models'
 import { Entity } from 'src/models/Entity'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
@@ -147,13 +147,17 @@ export default defineComponent({
       }
     })
     const showAddButton = computed((): boolean => {
-      if (props.modelValue.type === ExpressionType.Restriction) return false
+      if ([ExpressionType.Restriction, ExpressionType.Class].includes(props.modelValue.type))
+        return false
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
         || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
     })
     const entityTypes = computed(() => Entity.restrictionEntityTypes())
+    const selectableExpressionTypes = computed(() => [
+      ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Restriction
+    ])
 
-    return { t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypes }
+    return { t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypes, selectableExpressionTypes }
   },
   methods: {
     setType (type: ExpressionType): void {
@@ -164,6 +168,7 @@ export default defineComponent({
     setEntity (entity: Entity): void {
       let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
       newModelValue.id = entity.id
+      newModelValue.type = entity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class
       this.entity = entity
       this.$emit('update:modelValue', newModelValue)
     },

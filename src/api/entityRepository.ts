@@ -13,6 +13,19 @@ const anthropometry: IEntity = {
   descriptions: []
 }
 
+const bmi: IEntity = {
+  id: 'bmi',
+  titles: [
+    { lang: 'de', text: 'BMI' },
+    { lang: 'en', text: 'BMI' }
+  ],
+  entityType: EntityType.DerivedPhenotype,
+  synonyms: [],
+  descriptions: [],
+  codes: [],
+  superClass: anthropometry
+}
+
 const weight: IEntity = {
   id: 'weight',
   titles: [
@@ -48,17 +61,14 @@ const combinedPhenotype: IEntity = {
 
 const _entites: IEntity[] = [
   anthropometry,
+  bmi,
   {
-    id: 'bmi',
+    id: 'bmi_gt_30kg/m2',
     titles: [
-      { lang: 'de', text: 'BMI' },
-      { lang: 'en', text: 'BMI' }
+      { lang: 'en', text: 'BMI > 30kg/m²' }
     ],
-    entityType: EntityType.DerivedPhenotype,
-    synonyms: [],
-    descriptions: [],
-    codes: [],
-    superClass: anthropometry
+    entityType: EntityType.CombinedRestriction,
+    superClass: bmi
   },
   {
     id: 'height',
@@ -120,7 +130,7 @@ const _entites: IEntity[] = [
         {
           type: ExpressionType.Complement,
           operands: [
-            { type: ExpressionType.Restriction, id: 'weight_gt_80kg' }
+            { type: ExpressionType.Class, id: 'bmi_gt_30kg/m2' }
           ]
         }
       ]

@@ -51,7 +51,8 @@ export enum ExpressionType {
   Union        = 'union',
   Intersection = 'intersection',
   Complement   = 'complement',
-  Restriction  = 'restriction'
+  Restriction  = 'restriction',
+  Class        = 'class'
 }
 
 export enum RestrictionOperator {
