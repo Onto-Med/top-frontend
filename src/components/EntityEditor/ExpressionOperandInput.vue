@@ -2,7 +2,7 @@
   <span>
     <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
     <span
-      v-if="![ExpressionType.Restriction, ExpressionType.Clazz].includes(modelValue.type)"
+      v-if="![ExpressionType.Restriction, ExpressionType.Class].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
       class="cursor-pointer"
       :title="modelValue.type ? t(modelValue.type) : ''"
@@ -87,7 +87,7 @@
     </span>
 
     <span
-      v-if="![ExpressionType.Clazz, ExpressionType.Restriction].includes(modelValue.type)"
+      v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
     >
       <span v-show="expand"><br>{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
