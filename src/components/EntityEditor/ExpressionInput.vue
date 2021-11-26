@@ -89,8 +89,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IExpression, ExpressionType } from 'src/components/models'
 import ExpressionOperandInput from 'src/components/EntityEditor/ExpressionOperandInput.vue'
+import { Expression, ExpressionType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'ExpressionInput',
@@ -99,7 +99,7 @@ export default defineComponent({
   },
   props: {
     modelValue: {
-      type: Object as () => IExpression,
+      type: Object as () => Expression,
       required: true
     },
     label: String,

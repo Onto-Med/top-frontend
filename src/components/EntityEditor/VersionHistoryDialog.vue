@@ -58,7 +58,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Entity } from 'src/models/Entity'
+import { FullEntity } from 'src/models/Entity'
 import { fetchEntityVersions } from 'src/api/entityRepository'
 
 export default defineComponent({
@@ -82,7 +82,7 @@ export default defineComponent({
       { name: 'userAccount', label: t('author') },
       { name: 'timestamp', label: t('timestamp') }
     ]
-    const versions = ref<Entity[]>([])
+    const versions = ref<FullEntity[]>([])
     const loading = ref(false)
 
     const reload = () => {

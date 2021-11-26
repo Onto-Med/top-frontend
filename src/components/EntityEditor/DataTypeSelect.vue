@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent, SetupContext, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DataType } from 'src/components/models'
+import { DataType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'DataTypeSelect',

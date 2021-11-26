@@ -32,7 +32,7 @@
           />
         </div>
 
-        <div v-show="![QuantorType.None, QuantorType.Exists].includes(state.quantor)">
+        <div v-show="![Quantor.None, Quantor.Exists].includes(state.quantor)">
           <div class="row">
             <q-btn-toggle
               v-model="hasRange"
@@ -113,15 +113,15 @@
 </template>
 
 <script lang="ts">
+import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantor, Restriction, RestrictionOperator, StringRestriction } from '@onto-med/top-api'
 import { defineComponent, ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DataType, IRestriction, RestrictionOperator, QuantorType } from 'src/components/models'
 
 export default defineComponent({
   name: 'RestrictionInput',
   props: {
     modelValue: {
-      type: Object as () => IRestriction,
+      type: Object as () => Restriction,
       required: true
     },
     name: String,
@@ -134,23 +134,31 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as IRestriction)
-    const hasRange = ref(props.modelValue.minOperator !== undefined || props.modelValue.maxOperator !== undefined)
+    const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as Restriction)
+    const hasRange = ref(
+      (props.modelValue.type === DataType.Number || props.modelValue.type === DataType.DateTime)
+      && (
+        (props.modelValue as NumberRestriction|DateTimeRestriction).minOperator !== undefined
+        || (props.modelValue as NumberRestriction|DateTimeRestriction).maxOperator !== undefined
+      )
+    )
     const defaultOperators = ([ null ] as Array<RestrictionOperator|null>).concat(Object.values(RestrictionOperator))
     const showHelp = ref(false)
 
     const defaultQuantors = computed(() =>
-      Object.values(QuantorType).map(d => { return { label: t('quantorType.' + d), value: d } })
+      Object.values(Quantor).map(d => { return { label: t('quantorType.' + d), value: d } })
     )
 
     watch(
       () => state,
       () => {
-        const newState = JSON.parse(JSON.stringify(state)) as IRestriction
-        if (newState.quantor && [QuantorType.None, QuantorType.Exists].includes(newState.quantor)) {
-          newState.minOperator = undefined
-          newState.maxOperator = undefined
-          newState.values.splice(2)
+        const newState = JSON.parse(JSON.stringify(state)) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
+        if (newState.quantor && [Quantor.None, Quantor.Exists].includes(newState.quantor)) {
+          if (newState.type === DataType.Number || newState.type === DataType.DateTime) {
+            {(newState as NumberRestriction|DateTimeRestriction).minOperator = undefined}
+            (newState as NumberRestriction|DateTimeRestriction).maxOperator = undefined
+          }
+          if (newState.values) newState.values.splice(2)
           newState.negated = undefined
           newState.values = []
         }
@@ -160,17 +168,17 @@ export default defineComponent({
     )
 
     const handleHasRangeChanged = (newValue: boolean) => {
-      const newState = JSON.parse(JSON.stringify(state)) as IRestriction
-      if (!newValue) {
-        newState.minOperator = undefined
-        newState.maxOperator = undefined
+      const newState = JSON.parse(JSON.stringify(state)) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
+      if (!newValue && (newState.type === DataType.Number || newState.type === DataType.DateTime)) {
+        {(newState as NumberRestriction|DateTimeRestriction).minOperator = undefined}
+        (newState as NumberRestriction|DateTimeRestriction).maxOperator = undefined
       } else {
-        newState.values.splice(2)
+        if (newState.values) newState.values.splice(2)
       }
       emit('update:modelValue', newState)
     }
 
-    return { t, defaultOperators, defaultQuantors, state, showHelp, hasRange, handleHasRangeChanged, QuantorType }
+    return { t, defaultOperators, defaultQuantors, state, showHelp, hasRange, handleHasRangeChanged, Quantor }
   }
 })
 </script>

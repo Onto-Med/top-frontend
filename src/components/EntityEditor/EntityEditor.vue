@@ -144,8 +144,8 @@
 <script lang="ts">
 import { ref, computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType } from 'src/components/models'
-import { Entity } from 'src/models/Entity'
+import { FullEntity } from 'src/models/Entity'
+import { EntityType, DataType } from '@onto-med/top-api'
 import { fetchEntity } from 'src/api/entityRepository'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
@@ -168,7 +168,7 @@ export default defineComponent({
   },
   props: {
     entity: {
-      type: Entity,
+      type: FullEntity,
       required: true
     }
   },
@@ -181,7 +181,7 @@ export default defineComponent({
     const loading  = ref(false)
     const showVersionHistory = ref(false)
     const showClearDialog    = ref(false)
-    const restrictionKey = ref(0)
+    const restrictionKey     = ref(0)
 
     const reload = () => {
       loading.value = true
@@ -200,7 +200,7 @@ export default defineComponent({
     return {
       t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType, DataType,
 
-      handleRestore (entity: Entity): void {
+      handleRestore (entity: FullEntity): void {
         local.value = entity.clone()
         restrictionKey.value++
       },

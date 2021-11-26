@@ -31,27 +31,27 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetchEntity } from 'src/api/entityRepository'
-import { Entity } from 'src/models/Entity'
-import { EntityType } from '../models';
+import { FullEntity } from 'src/models/Entity'
+import { EntityType } from '@onto-med/top-api';
 
 export default defineComponent({
   name: 'EntityChip',
   props: {
     entityId: [String, Number],
-    entity: Entity
+    entity: FullEntity
   },
   emits: ['entityClicked', 'removeClicked'],
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
     const loading = ref(false)
-    const state = ref(undefined as unknown as Entity)
+    const state = ref(undefined as unknown as FullEntity)
 
     const reload = () => {
       loading.value = true
       fetchEntity(props.entityId as string)
         .then(r => state.value = r)
-        .catch(() => state.value = new Entity({ id: props.entityId as string, entityType: EntityType.Category }))
+        .catch(() => state.value = new FullEntity({ id: props.entityId as string, entityType: EntityType.Category }))
         .finally(() => loading.value = false)
     }
 

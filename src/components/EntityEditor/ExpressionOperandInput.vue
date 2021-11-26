@@ -99,10 +99,10 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IExpression, ExpressionType, EntityType } from 'src/components/models'
-import { Entity } from 'src/models/Entity'
+import { FullEntity } from 'src/models/Entity'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
+import { EntityType, Expression, ExpressionType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'ExpressionOperandInput',
@@ -112,7 +112,7 @@ export default defineComponent({
   },
   props: {
     modelValue: {
-      type: Object as () => IExpression,
+      type: Object as () => Expression,
       required: true
     },
     expand: {
@@ -133,7 +133,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const hover = ref(false)
-    const entity = ref(undefined as unknown as Entity)
+    const entity = ref(undefined as unknown as FullEntity)
     const operatorSymbol = computed(() => {
       switch (props.modelValue.type) {
         case ExpressionType.Union:
@@ -147,12 +147,12 @@ export default defineComponent({
       }
     })
     const showAddButton = computed((): boolean => {
-      if ([ExpressionType.Restriction, ExpressionType.Clazz].includes(props.modelValue.type))
+      if ([ExpressionType.Restriction, ExpressionType.Class].includes(props.modelValue.type))
         return false
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
         || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
     })
-    const entityTypes = computed(() => Entity.restrictionEntityTypes())
+    const entityTypes = computed(() => FullEntity.restrictionEntityTypes())
     const selectableExpressionTypes = computed(() => [
       ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Restriction
     ])
@@ -161,25 +161,25 @@ export default defineComponent({
   },
   methods: {
     setType (type: ExpressionType): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
       newModelValue.type = type
       this.$emit('update:modelValue', newModelValue)
     },
-    setEntity (entity: Entity): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+    setEntity (entity: FullEntity): void {
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
       newModelValue.id = entity.id
-      newModelValue.type = entity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Clazz
+      newModelValue.type = entity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class
       this.entity = entity
       this.$emit('update:modelValue', newModelValue)
     },
     addOperand (type: ExpressionType): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
       if (!newModelValue.operands) newModelValue.operands = []
       newModelValue.operands.push({ type: type })
       this.$emit('update:modelValue', newModelValue)
     },
-    handleOperandUpdate (index: number, operand: IExpression|null): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as IExpression
+    handleOperandUpdate (index: number, operand: Expression|null): void {
+      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
       if (newModelValue.operands) {
         if (operand) newModelValue.operands[index] = operand
         else newModelValue.operands.splice(index, 1)

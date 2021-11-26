@@ -59,8 +59,8 @@
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { searchEntities } from 'src/api/entityRepository'
-import { Entity } from 'src/models/Entity'
-import { EntityType } from '../models';
+import { FullEntity } from 'src/models/Entity'
+import { EntityType } from '@onto-med/top-api';
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -76,7 +76,7 @@ export default defineComponent({
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
-    const options = ref([] as Entity[])
+    const options = ref([] as FullEntity[])
     const selection = ref(null)
     const loading = ref(false)
 

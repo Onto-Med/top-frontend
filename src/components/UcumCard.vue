@@ -77,7 +77,7 @@ export default defineComponent({
       },
       addUnit () {
         let newModelValue = props.modelValue.slice()
-        newModelValue.push(undefined)
+        newModelValue.push({ unit: undefined, preferred: false })
         emit('update:modelValue', newModelValue)
       },
     }

@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { EntityType, LocalisableText, Phenotype, Unit, Code, Restriction, Expression, UserAccount, DataType } from '@onto-med/top-api'
 
 export interface PhenotypeInTaxonomy extends Phenotype {
-  superClass?: Phenotype
-  subClasses?: Phenotype[]
+  superClass?: PhenotypeInTaxonomy
+  subClasses?: PhenotypeInTaxonomy[]
 }
 
 export class FullEntity implements PhenotypeInTaxonomy {
@@ -17,8 +17,8 @@ export class FullEntity implements PhenotypeInTaxonomy {
   codes?: Code[]
   score?: number
   units?: Unit[]
-  superClass?: Phenotype
-  subClasses?: Phenotype[]
+  superClass?: FullEntity
+  subClasses?: FullEntity[]
   restriction?: Restriction
   expression?: Expression
   createdAt?: Date

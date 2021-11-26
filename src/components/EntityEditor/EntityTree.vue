@@ -61,16 +61,16 @@
 import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { QTree } from 'quasar'
-import { EntityType } from 'src/components/models'
-import { Entity } from 'src/models/Entity'
+import { FullEntity } from 'src/models/Entity'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
+import { EntityType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTree',
   components: { EntityTreeContextMenu },
   props: {
-    nodes: Array as () => Entity[],
-    selected: undefined as unknown as () => Entity,
+    nodes: Array as () => FullEntity[],
+    selected: undefined as unknown as () => FullEntity,
     loading: {
       type: Boolean,
       default: false
@@ -85,11 +85,11 @@ export default defineComponent({
     const filter    = ref('')
     const asList    = ref(false)
 
-    const visibleNodes = computed((): Entity[] => {
+    const visibleNodes = computed((): FullEntity[] => {
       if (!props.nodes) return []
       if (!asList.value) return props.nodes
       return props.nodes.flatMap(
-        function loop (e: Entity): Entity[] {
+        function loop (e: FullEntity): FullEntity[] {
           if (e.entityType === EntityType.Category && e.subClasses)
             return e.subClasses.flatMap(loop)
           else return [e]
@@ -104,7 +104,7 @@ export default defineComponent({
         emit('update:selected', tree.value.getNodeByKey(key))
     }
 
-    const filterFn = (node: Entity, filter: string): boolean =>
+    const filterFn = (node: FullEntity, filter: string): boolean =>
       node.getTitle().toLowerCase().includes(filter.toLowerCase())
 
     return {
