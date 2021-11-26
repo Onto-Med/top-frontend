@@ -1,7 +1,7 @@
-import { DataType, EntityType, RestrictionOperator, IExpression, ExpressionType, QuantorType, IUserAccount } from 'src/components/models'
-import { Entity, IEntity } from 'src/models/Entity'
+import { DataType, EntityType, Expression, ExpressionType, NumberRestriction, Quantor, RestrictionOperator, UserAccount } from '@onto-med/top-api'
+import { FullEntity, PhenotypeInTaxonomy } from 'src/models/Entity'
 
-const anthropometry: IEntity = {
+const anthropometry: PhenotypeInTaxonomy = {
   id: 'anthropometry',
   titles: [
     { lang: 'de', text: 'Anthropometrie' },
@@ -13,7 +13,7 @@ const anthropometry: IEntity = {
   descriptions: []
 }
 
-const bmi: IEntity = {
+const bmi: PhenotypeInTaxonomy = {
   id: 'bmi',
   titles: [
     { lang: 'de', text: 'BMI' },
@@ -26,7 +26,7 @@ const bmi: IEntity = {
   superClass: anthropometry
 }
 
-const weight: IEntity = {
+const weight: PhenotypeInTaxonomy = {
   id: 'weight',
   titles: [
     { lang: 'de', text: 'Gewicht' },
@@ -40,7 +40,7 @@ const weight: IEntity = {
   superClass: anthropometry
 }
 
-const laboratoryValues: IEntity = {
+const laboratoryValues: PhenotypeInTaxonomy = {
   id: 'laboratory_values',
   titles: [
     { lang: 'de', text: 'Laborwerte' },
@@ -52,14 +52,14 @@ const laboratoryValues: IEntity = {
   descriptions: []
 }
 
-const combinedPhenotype: IEntity = {
+const combinedPhenotype: PhenotypeInTaxonomy = {
   id: 'combined_phenotype',
   titles: [ { lang: 'en', text: 'Combined Phenotype' } ],
   entityType: EntityType.CombinedPhenotype,
   superClass: laboratoryValues
 }
 
-const _entites: IEntity[] = [
+const _entites: PhenotypeInTaxonomy[] = [
   anthropometry,
   bmi,
   {
@@ -72,10 +72,10 @@ const _entites: IEntity[] = [
     restriction: {
       type: DataType.Number,
       negated: false,
-      quantor: QuantorType.Some,
+      quantor: Quantor.Some,
       minOperator: RestrictionOperator.GreaterThan,
       values: [ 30 ]
-    }
+    } as NumberRestriction
   },
   {
     id: 'height',
@@ -91,7 +91,7 @@ const _entites: IEntity[] = [
       { lang: 'en', text: 'Example description' }
     ],
     codes: [],
-    units: ['cm', 'm'],
+    units: [ { unit: 'cm' }, { unit: 'm' }],
     superClass: anthropometry
   },
   weight,
@@ -107,11 +107,11 @@ const _entites: IEntity[] = [
     restriction: {
       type: DataType.Number,
       negated: true,
-      quantor: QuantorType.All,
-      minOperator: RestrictionOperator.GreaterEqual,
-      maxOperator: RestrictionOperator.LowerEqual,
+      quantor: Quantor.All,
+      minOperator: RestrictionOperator.GreaterThan,
+      maxOperator: RestrictionOperator.LessThanOrEqualTo,
       values: [ 1500, 2500 ]
-    }
+    } as NumberRestriction
   },
   {
     id: 'weight_gt_80kg',
@@ -137,23 +137,23 @@ const _entites: IEntity[] = [
         {
           type: ExpressionType.Complement,
           operands: [
-            { type: ExpressionType.Clazz, id: 'bmi_gt_30kg/m2' }
+            { type: ExpressionType.Class, id: 'bmi_gt_30kg/m2' }
           ]
         }
       ]
-    } as IExpression
+    } as Expression
   }
 ]
 
 // eslint-disable-next-line @typescript-eslint/require-await
-export async function fetchEntity (id: string): Promise<Entity> {
+export async function fetchEntity (id: string): Promise<FullEntity> {
   await new Promise(r => setTimeout(r, 500))
   const result = _entites.filter(e => e.id === id)
-  if (result && result.length > 0) return new Entity(result[0])
+  if (result && result.length > 0) return new FullEntity(result[0])
   throw new Error('Not Found!')
 }
 
-export async function searchEntities (title: string, entityTypes?: EntityType[]): Promise<Entity[]> {
+export async function searchEntities (title: string, entityTypes?: EntityType[]): Promise<FullEntity[]> {
   await new Promise(r => setTimeout(r, 500))
   const needle = title.toLowerCase()
   return _entites
@@ -164,7 +164,7 @@ export async function searchEntities (title: string, entityTypes?: EntityType[])
         || e.titles && e.titles.filter(t => t.text.toLowerCase().includes(needle)).length > 0
       )
     )
-    .map(e => new Entity(e))
+    .map(e => new FullEntity(e))
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -173,25 +173,24 @@ export async function deleteEntity (entityId: string): Promise<void> {
   throw new Error('Not implemented!')
 }
 
-export async function fetchEntityTree (): Promise<Entity[]> {
+export async function fetchEntityTree (): Promise<FullEntity[]> {
   await new Promise(r => setTimeout(r, 500))
-  return toDataTree(_entites).map(e => new Entity(e))
+  return toDataTree(_entites).map(e => new FullEntity(e))
 }
 
-export async function fetchEntityVersions (entityId: string): Promise<Entity[]> {
+export async function fetchEntityVersions (entityId: string): Promise<FullEntity[]> {
   const entity = await fetchEntity(entityId)
-  return [ new Entity({
+  return [ new FullEntity({
     entityType: entity.entityType,
     titles: [{ lang: 'de', text: 'Beispieltitel' }],
     createdAt: new Date(),
-    updatedAt: new Date(),
-    author: { name: 'user', id: '1' } as IUserAccount
+    author: { username: 'user', email: 'user@example.com', id: '1' } as UserAccount
   }) ]
 }
 
-const toDataTree = (entities: IEntity[]): IEntity[] => {
-  const hashTable: Record<string, IEntity> = {}
-  const dataTree: IEntity[] = []
+const toDataTree = (entities: PhenotypeInTaxonomy[]): PhenotypeInTaxonomy[] => {
+  const hashTable: Record<string, PhenotypeInTaxonomy> = {}
+  const dataTree: PhenotypeInTaxonomy[] = []
 
   entities.forEach(entity => {
     if (entity.id) hashTable[entity.id] = { ...entity, subClasses: [] }
