@@ -1,45 +1,30 @@
-import { EntityType, DataType, ICode, IRestriction, IExpression, IUserAccount } from 'src/components/models'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
+import { EntityType, LocalisableText, Phenotype, Unit, Code, Restriction, Expression, UserAccount, DataType } from '@onto-med/top-api'
 
-export interface IEntity {
-  id?: string
-  entityType: EntityType
-  titles?: Record<string, string>[]
-  synonyms?: Record<string, string>[]
-  descriptions?: Record<string, string>[]
-  dataType?: DataType
-  codes?: ICode[]
-  score?: number
-  units?: string[]
-  superClass?: IEntity
-  subClasses?: IEntity[]
-  restriction?: IRestriction
-  expression?: IExpression
-  createdAt?: Date
-  updatedAt?: Date
-  author?: IUserAccount
+export interface PhenotypeInTaxonomy extends Phenotype {
+  superClass?: Phenotype
+  subClasses?: Phenotype[]
 }
 
-export class Entity {
+export class FullEntity implements PhenotypeInTaxonomy {
   id: string = (uuidv4 as () => string)()
   entityType: EntityType = EntityType.Category
-  titles?: Record<string, string>[]
-  synonyms?: Record<string, string>[]
-  descriptions?: Record<string, string>[]
+  titles?: LocalisableText[]
+  synonyms?: LocalisableText[]
+  descriptions?: LocalisableText[]
   dataType?: DataType
-  codes?: ICode[]
+  codes?: Code[]
   score?: number
-  units?: string[]
-  superClass?: Entity
-  subClasses?: Entity[]
-  restriction?: IRestriction
-  expression?: IExpression
+  units?: Unit[]
+  superClass?: Phenotype
+  subClasses?: Phenotype[]
+  restriction?: Restriction
+  expression?: Expression
   createdAt?: Date
-  updatedAt?: Date
-  author?: IUserAccount
+  author?: UserAccount
 
-  constructor (obj?: IEntity) {
+  constructor (obj?: PhenotypeInTaxonomy) {
     if (obj) {
       if (obj.id) this.id = obj.id
       this.entityType = obj.entityType
@@ -50,12 +35,11 @@ export class Entity {
       this.codes = obj.codes
       this.score = obj.score
       this.units = obj.units
-      this.superClass = obj.superClass ? new Entity(obj.superClass) : undefined
-      this.subClasses = obj.subClasses?.map(c => new Entity(c))
+      this.superClass = obj.superClass ? new FullEntity(obj.superClass) : undefined
+      this.subClasses = obj.subClasses?.map(c => new FullEntity(c))
       this.restriction = obj.restriction
       this.expression = obj.expression
       this.createdAt = obj.createdAt
-      this.updatedAt = obj.updatedAt
       this.author = obj.author
     }
     this.prepare()
@@ -75,7 +59,7 @@ export class Entity {
    * 
    * @param entity The other entity, of which field values are transfered to this entity.
    */
-  apply (entity: Entity): void {
+  apply (entity: FullEntity): void {
     this.entityType = entity.entityType
     this.titles = entity.titles
     this.synonyms = entity.synonyms
@@ -89,7 +73,6 @@ export class Entity {
     this.restriction = entity.restriction
     this.expression = entity.expression
     this.createdAt = entity.createdAt
-    this.updatedAt = entity.updatedAt
     this.author = entity.author
   }
 
@@ -154,11 +137,11 @@ export class Entity {
     return this.getLocalizedPropertyValues('descriptions')
   }
 
-  getLocalizedPropertyValues (property: keyof Entity): string[] {
+  getLocalizedPropertyValues (property: keyof FullEntity): string[] {
     const { locale } = useI18n({ useScope: 'global' })
     const lang = locale.value.split('-')[0]
     if (this[property]) {
-      const results = (this[property] as Record<string, string>[])
+      const results = (this[property] as LocalisableText[])
         .filter(d => d.lang === lang && d.text.length > 0)
         .map(d => d.text)
       if (results) return results
@@ -166,8 +149,8 @@ export class Entity {
     return []
   }
 
-  clone (): Entity {
-    return new Entity(JSON.parse(JSON.stringify(this)))
+  clone (): FullEntity {
+    return new FullEntity(JSON.parse(JSON.stringify(this)))
   }
 
   equals (obj: unknown): boolean {
@@ -175,17 +158,17 @@ export class Entity {
   }
 
   private prepare (): void {
-    if (!this.titles) this.titles = [] as Record<string, string>[]
-    if (!this.synonyms) this.synonyms = [] as Record<string, string>[]
-    if (!this.descriptions) this.descriptions = [] as Record<string, string>[]
-    if (!this.codes) this.codes = [] as ICode[]
+    if (!this.titles) this.titles = [] as LocalisableText[]
+    if (!this.synonyms) this.synonyms = [] as LocalisableText[]
+    if (!this.descriptions) this.descriptions = [] as LocalisableText[]
+    if (!this.codes) this.codes = [] as Code[]
     if (!this.units) this.units = []
   
     if ([EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(this.entityType) && !this.restriction) {
-      this.restriction = { type: this.dataType, values: [] } as IRestriction
+      this.restriction = { type: this.dataType, values: [] } as Restriction
     }
     if (this.entityType === EntityType.CombinedRestriction && !this.expression) {
-      this.expression = {} as IExpression
+      this.expression = {} as Expression
     }
     if (this.restriction && this.restriction.negated === undefined) {
       this.restriction.negated = false
