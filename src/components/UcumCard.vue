@@ -17,7 +17,7 @@
     <q-card-section class="row q-pa-none">
       <div class="col q-pa-md">
         <div v-for="(unit, index) in modelValue" :key="index" class="row">
-          <ucum-input :model-value="modelValue[index]" @update:modelValue="updateUnitByIndex($event, index)">
+          <ucum-input :model-value="modelValue[index].unit" @update:modelValue="updateUnitByIndex({ unit: $event }, index)">
             <template #after>
               <q-btn icon="remove" class="remove-ucum-btn" :title="t('remove')" color="red" @click="removeUnitByIndex(index)" />
             </template>
@@ -43,6 +43,7 @@
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import UcumInput from 'src/components/UcumInput.vue'
+import { Unit } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'UcumCard',
@@ -51,7 +52,7 @@ export default defineComponent({
   },
   props: {
     modelValue: {
-      type: Array as () => Array<string|undefined>,
+      type: Array as () => Array<Unit>,
       required: true
     }
   },
@@ -69,7 +70,7 @@ export default defineComponent({
         newModelValue.splice(index, 1)
         emit('update:modelValue', newModelValue)
       },
-      updateUnitByIndex (unit: string, index: number) {
+      updateUnitByIndex (unit: Unit, index: number) {
         let newModelValue = props.modelValue.slice()
         newModelValue[index] = unit
         emit('update:modelValue', newModelValue)
