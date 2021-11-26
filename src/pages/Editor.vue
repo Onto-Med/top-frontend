@@ -66,11 +66,11 @@
 import { defineComponent, ref, watch, onMounted, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Notify } from 'quasar'
-import { Entity } from 'src/models/Entity'
+import { FullEntity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { fetchEntityTree, deleteEntity } from 'src/api/entityRepository'
-import { EntityType } from 'src/components/models'
+import { EntityType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'Editor',
@@ -80,9 +80,9 @@ export default defineComponent({
     const { t }         = useI18n()
     const showJson      = ref(false)
     const splitterModel = ref(25)
-    const entities      = ref<Entity[]>([])
-    const selected      = ref<Entity|undefined>(undefined)
-    const tabs          = ref([] as Entity[])
+    const entities      = ref<FullEntity[]>([])
+    const selected      = ref<FullEntity|undefined>(undefined)
+    const tabs          = ref([] as FullEntity[])
     const treeLoading   = ref(false)
 
     const reloadEntities = (): void => {
@@ -100,8 +100,8 @@ export default defineComponent({
         selected.value = selection ? selection : undefined
       }
     }
-    const closeTab = (tab: Entity|Entity[]): void => {
-      if (tab instanceof Entity) {
+    const closeTab = (tab: FullEntity|FullEntity[]): void => {
+      if (tab instanceof FullEntity) {
         const index = tabs.value.map(t => t.id).indexOf(tab.id)
         tabs.value.splice(index, 1)
         if (selected.value && selected.value.id === tab.id)
@@ -120,7 +120,7 @@ export default defineComponent({
         actions: [ { label: t('dismiss'), color: 'black' } ]
       })
     }
-    const getEntityById = (id: string|number|undefined): Entity|null => {
+    const getEntityById = (id: string|number|undefined): FullEntity|null => {
       const find = (result: unknown, node: unknown): unknown => {
         if (result || !node) {
           return result
@@ -138,12 +138,12 @@ export default defineComponent({
       }
 
       const result = find(null, entities.value)
-      return result ? result as Entity : null
+      return result ? result as FullEntity : null
     }
 
     watch(
-      selected as Ref<Entity|undefined>,
-      (entity: Entity|undefined) => {
+      selected as Ref<FullEntity|undefined>,
+      (entity: FullEntity|undefined) => {
         if (!entity) return
         if (!tabs.value.map(t => t.id).includes(entity.id))
           tabs.value.push(entity)
@@ -166,7 +166,7 @@ export default defineComponent({
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const superClass = getEntityById(superClassId)
-        const entity = new Entity({ entityType: entityType })
+        const entity = new FullEntity({ entityType: entityType })
         if (superClass) superClass.subClasses?.push(entity)
         else entities.value.push(entity)
         selectTabByKey(entity.id)
