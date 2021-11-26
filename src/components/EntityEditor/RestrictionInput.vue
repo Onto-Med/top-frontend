@@ -158,7 +158,6 @@ export default defineComponent({
             {(newState as NumberRestriction|DateTimeRestriction).minOperator = undefined}
             (newState as NumberRestriction|DateTimeRestriction).maxOperator = undefined
           }
-          if (newState.values) newState.values.splice(2)
           newState.negated = undefined
           newState.values = []
         }
@@ -173,7 +172,7 @@ export default defineComponent({
         {(newState as NumberRestriction|DateTimeRestriction).minOperator = undefined}
         (newState as NumberRestriction|DateTimeRestriction).maxOperator = undefined
       } else {
-        if (newState.values) newState.values.splice(2)
+        newState.values?.splice(2)
       }
       emit('update:modelValue', newState)
     }
