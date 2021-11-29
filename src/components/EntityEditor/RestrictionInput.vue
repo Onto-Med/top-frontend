@@ -2,7 +2,7 @@
   <q-card>
     <q-card-section class="q-pa-sm">
       <q-toolbar>
-        <q-toolbar-title>{{ label || t('restriction') }}</q-toolbar-title>
+        <q-toolbar-title>{{ label || t('restriction') }} <small>({{ t(state.type) }})</small></q-toolbar-title>
         <q-btn
           dense
           round
