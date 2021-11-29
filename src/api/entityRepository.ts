@@ -20,6 +20,7 @@ const bmi: PhenotypeInTaxonomy = {
     { lang: 'en', text: 'BMI' }
   ],
   entityType: EntityType.DerivedPhenotype,
+  dataType: DataType.Number,
   synonyms: [],
   descriptions: [],
   codes: [],
@@ -71,6 +72,7 @@ const _entites: PhenotypeInTaxonomy[] = [
       { code: '162864005', codeSystem: { uri: 'http://snomed.info/id', name: 'SNOMED CT' } }
     ],
     entityType: EntityType.DerivedRestriction,
+    dataType: DataType.Number,
     superClass: bmi,
     restriction: {
       type: DataType.Number,
