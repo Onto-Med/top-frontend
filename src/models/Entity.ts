@@ -80,6 +80,10 @@ export class FullEntity implements PhenotypeInTaxonomy {
     return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(this.entityType)
   }
 
+  isPhenotype (): boolean {
+    return [EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype].includes(this.entityType)
+  }
+
   /**
    * Get an appropriate material icon name for this entity.
    * When building an icon, you should make restrictions visually distinguishable from phenotypes.
