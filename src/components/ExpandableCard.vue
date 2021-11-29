@@ -1,6 +1,6 @@
 <template>
   <q-card>
-    <q-card-section class="q-pa-sm" @click="isExpanded = !isExpanded">
+    <q-card-section class="q-pa-sm cursor-pointer" @click="isExpanded = !isExpanded">
       <q-toolbar>
         <q-btn color="grey" round flat dense :icon="isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
         <q-toolbar-title v-if="title">
