@@ -12,7 +12,7 @@ export default {
   number: 'Zahl|Zahlen',
   boolean: 'Boolesch',
   date: 'Datum|Daten',
-  dateTime: 'Datum und Zeit|Daten und Zeiten',
+  date_time: 'Datum und Zeit|Daten und Zeiten',
   timestamp: 'Zeitstempel',
   string: 'Text|Texte',
   title: 'Titel',
