@@ -92,7 +92,7 @@
     </div>
 
     <div class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
-      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" :expanded="true" />
+      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
       <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" />
       <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" :help-text="t('entityEditor.descriptionsHelp')" />
 
@@ -120,13 +120,14 @@
         v-model="local.formula"
         :label="t('formula')"
         :help-text="t('entityEditor.formulaHelp')"
-        :expanded="true"
+        expanded
       />
 
       <restriction-input
         v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
         :key="restrictionKey"
         v-model="local.restriction"
+        expanded
       />
 
       <expression-input
