@@ -38,6 +38,7 @@
         <div v-show="![Quantor.None, Quantor.Exists].includes(state.quantor)">
           <div class="row">
             <q-btn-toggle
+              v-if="canHaveRange"
               v-model="hasRange"
               no-caps
               class="q-mb-md"
@@ -138,8 +139,9 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as Restriction)
+    const canHaveRange = computed(() => [DataType.Number, DataType.DateTime].includes(state.type))
     const hasRange = ref(
-      (props.modelValue.type === DataType.Number || props.modelValue.type === DataType.DateTime)
+      canHaveRange.value
       && (
         (props.modelValue as NumberRestriction|DateTimeRestriction).minOperator !== undefined
         || (props.modelValue as NumberRestriction|DateTimeRestriction).maxOperator !== undefined
@@ -180,7 +182,7 @@ export default defineComponent({
       emit('update:modelValue', newState)
     }
 
-    return { t, defaultOperators, defaultQuantors, state, showHelp, hasRange, handleHasRangeChanged, Quantor }
+    return { t, defaultOperators, defaultQuantors, state, showHelp, hasRange, canHaveRange, handleHasRangeChanged, Quantor }
   }
 })
 </script>
