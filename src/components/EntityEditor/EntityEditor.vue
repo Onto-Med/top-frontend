@@ -92,7 +92,7 @@
     </div>
 
     <div class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
-      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" />
+      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" :expanded="true" />
       <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" />
       <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" :help-text="t('entityEditor.descriptionsHelp')" />
 
