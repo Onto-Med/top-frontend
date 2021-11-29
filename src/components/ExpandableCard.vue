@@ -6,6 +6,7 @@
         <q-toolbar-title v-if="title">
           {{ title }}
         </q-toolbar-title>
+        <slot name="toolbar" />
         <q-btn
           v-if="helpText"
           flat

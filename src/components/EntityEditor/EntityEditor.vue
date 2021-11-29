@@ -134,6 +134,7 @@
         v-if="local.entityType === EntityType.CombinedRestriction"
         v-model="local.expression"
         :label="t('expression')"
+        expanded
         @entity-clicked="$emit('entityClicked', $event)"
       />
     </div>
