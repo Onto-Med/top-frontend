@@ -13,7 +13,7 @@
           dense
           icon="info"
           :title="t('showThing', { thing: t('help') })"
-          @click.stop="isHelpVisible = !isHelpVisible; isExpanded = isHelpVisible || isExpanded"
+          @click.stop="isHelpVisible = !(isHelpVisible && isExpanded); isExpanded = isHelpVisible || isExpanded"
         />
       </q-toolbar>
     </q-card-section>
