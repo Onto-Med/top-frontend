@@ -91,7 +91,7 @@
       <version-history-dialog v-model:show="showVersionHistory" :entity-id="local.id" @restore="handleRestore" />
     </div>
 
-    <div class="q-gutter-md q-mt-none q-px-md col entity-editor-tab-content">
+    <div class="q-gutter-md q-mt-none q-px-md q-pb-md col entity-editor-tab-content">
       <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
       <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" />
       <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" :help-text="t('entityEditor.descriptionsHelp')" />
