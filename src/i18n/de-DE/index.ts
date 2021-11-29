@@ -80,6 +80,7 @@ export default {
   collaborativeWork: 'Kollaborative Arbeit',
   formula: 'Formel|Formeln',
   closeAll: 'Alle schließen',
+  code: 'Code|Codes',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

@@ -96,6 +96,8 @@
       <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" />
       <localized-text-input v-model="local.descriptions" text-area rows="3" :label="t('description', 2)" :help-text="t('entityEditor.descriptionsHelp')" />
 
+      <code-input v-model="local.codes" />
+
       <data-type-select
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
         v-model="local.dataType"
@@ -154,6 +156,7 @@ import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import UcumCard from 'src/components/UcumCard.vue'
 import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
+import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -164,7 +167,8 @@ export default defineComponent({
     ExpressionInput,
     VersionHistoryDialog,
     UcumCard,
-    FormulaInput
+    FormulaInput,
+    CodeInput
   },
   props: {
     entity: {

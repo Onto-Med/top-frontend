@@ -67,6 +67,9 @@ const _entites: PhenotypeInTaxonomy[] = [
     titles: [
       { lang: 'en', text: 'BMI > 30kg/m²' }
     ],
+    codes: [
+      { code: '162864005', codeSystem: { uri: 'http://snomed.info/id', name: 'SNOMED CT' } }
+    ],
     entityType: EntityType.DerivedRestriction,
     superClass: bmi,
     restriction: {
