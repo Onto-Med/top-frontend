@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import UcumInput from 'src/components/UcumInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
