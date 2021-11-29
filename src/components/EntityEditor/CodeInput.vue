@@ -1,111 +1,87 @@
 <template>
-  <q-card>
-    <q-card-section class="q-pa-sm">
-      <q-toolbar>
-        <q-toolbar-title>{{ t('code', 2) }}</q-toolbar-title>
+  <expandable-card :title="t('code', 2)" :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
+    <template #default>
+      <div v-for="(entry, index) in modelValue" :key="index" class="row">
+        <q-input
+          :model-value="modelValue[index].code"
+          type="text"
+          debounce="200"
+          @update:model-value="updateEntryByIndex(index, $event, modelValue[index].codeSystem)"
+        >
+          <template #before>
+            <code-system-input
+              :model-value="modelValue[index].codeSystem"
+              :options="codeSystems"
+              @selection-changed="updateEntryByIndex(index, modelValue[index].code, $event)"
+            />
+          </template>
+          <template #after>
+            <q-btn
+              icon="search"
+              type="a"
+              target="_blank"
+              :title="t('showThing', { thing: t('code') })"
+              :href="codeUrl(modelValue[index])"
+              @click.stop
+            />
+            <q-btn
+              color="red"
+              icon="remove"
+              class="remove-localized-text-btn"
+              :title="t('remove')"
+              @click="removeEntryByIndex(index)"
+            />
+          </template>
+        </q-input>
+      </div>
+    </template>
+
+    <template #append>
+      <q-card-actions>
         <q-btn
-          flat
-          round
-          dense
-          icon="info"
-          :title="t('showThing', { thing: t('help') })"
-          @click="showHelp = !showHelp"
+          color="primary"
+          icon="add"
+          class="add-localized-text-btn"
+          :label="t('addThing', { thing: t('code') })"
+          @click="addEntry()"
         />
-      </q-toolbar>
-    </q-card-section>
-
-    <q-separator />
-
-    <q-card-section class="row q-pa-none">
-      <div class="col q-pa-md">
-        <div v-for="(entry, index) in modelValue" :key="index" class="row">
-          <q-input
-            :model-value="modelValue[index].code"
-            type="text"
-            debounce="200"
-            @update:model-value="updateEntryByIndex(index, $event, modelValue[index].codeSystem)"
-          >
-            <template #before>
-              <code-system-input
-                :model-value="modelValue[index].codeSystem"
-                :options="codeSystems"
-                @selection-changed="updateEntryByIndex(index, modelValue[index].code, $event)"
-              />
-            </template>
-            <template #after>
-              <q-btn
-                icon="search"
-                type="a"
-                target="_blank"
-                :title="t('showThing', { thing: t('code') })"
-                :href="codeUrl(modelValue[index])"
-                @click.stop
-              />
-              <q-btn
-                color="red"
-                icon="remove"
-                class="remove-localized-text-btn"
-                :title="t('remove')"
-                @click="removeEntryByIndex(index)"
-              />
-            </template>
-          </q-input>
-        </div>
-      </div>
-
-      <q-separator v-show="showHelp" vertical />
-
-      <div v-show="showHelp" class="col-6 q-pa-md">
-        <div class="text-subtitle1">
-          {{ t('help') }}:
-        </div>
-        {{ t('entityEditor.codesHelp') }}
-      </div>
-    </q-card-section>
-
-    <q-separator />
-
-    <q-card-actions>
-      <q-btn
-        color="primary"
-        icon="add"
-        class="add-localized-text-btn"
-        :label="t('addThing', { thing: t('code') })"
-        @click="addEntry()"
-      />
-    </q-card-actions>
-  </q-card>
+      </q-card-actions>
+    </template>
+  </expandable-card>
 </template>
 
 <script lang="ts">
 import { Code, CodeSystem } from '@onto-med/top-api'
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
+import ExpandableCard from 'src/components/ExpandableCard.vue'
 
 export default defineComponent({
   name: 'CodeInput',
   components: {
-    CodeSystemInput
+    CodeSystemInput,
+    ExpandableCard
   },
   props: {
     modelValue: {
       type: Array as () => Code[],
       required: true
-    }
+    },
+    expanded: Boolean,
+    showHelp: Boolean
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const showHelp = ref(false)
     const codeSystems = [
       { uri: 'http://snomed.info/id', name: 'SNOMED CT' },
       { uri: 'http://loinc.org', name: 'LOINC' }
     ] as CodeSystem[]
 
     return {
-      t, showHelp, codeSystems,
+      t, codeSystems,
 
       codeUrl (code: Code) {
         if (!code || !code.codeSystem) return null
