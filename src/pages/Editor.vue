@@ -166,9 +166,14 @@ export default defineComponent({
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const superClass = getEntityById(superClassId)
-        const entity = new FullEntity({ entityType: entityType })
-        if (superClass) superClass.subClasses?.push(entity)
-        else entities.value.push(entity)
+        const entity = new FullEntity({
+          entityType: entityType,
+          dataType: superClass?.dataType
+        })
+        if (superClass)
+          superClass.subClasses?.push(entity)
+        else
+          entities.value.push(entity)
         selectTabByKey(entity.id)
       }
     }
