@@ -120,6 +120,7 @@
         v-model="local.formula"
         :label="t('formula')"
         :help-text="t('entityEditor.formulaHelp')"
+        :expanded="true"
       />
 
       <restriction-input
