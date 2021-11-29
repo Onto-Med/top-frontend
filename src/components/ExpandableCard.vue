@@ -1,0 +1,69 @@
+<template>
+  <q-card>
+    <q-card-section class="q-pa-sm" @click="isExpanded = !isExpanded">
+      <q-toolbar>
+        <q-btn color="grey" round flat dense :icon="isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+        <q-toolbar-title v-if="title">
+          {{ title }}
+        </q-toolbar-title>
+        <q-btn
+          v-if="helpText"
+          flat
+          round
+          dense
+          icon="info"
+          :title="t('showThing', { thing: t('help') })"
+          @click.stop="isHelpVisible = !isHelpVisible; isExpanded = isHelpVisible || isExpanded"
+        />
+      </q-toolbar>
+    </q-card-section>
+
+    <q-slide-transition>
+      <div v-show="isExpanded">
+        <q-separator />
+
+        <q-card-section class="row q-pa-none">
+          <div class="col q-pa-md">
+            <slot />
+          </div>
+
+          <q-separator v-show="isHelpVisible" vertical />
+
+          <div v-show="isHelpVisible" class="col-6 q-pa-md">
+            <div class="text-subtitle1">
+              {{ t('help') }}:
+            </div>
+            {{ helpText }}
+          </div>
+        </q-card-section>
+
+        <q-separator v-show="$slots['append']" />
+
+        <slot name="append" />
+      </div>
+    </q-slide-transition>
+  </q-card>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+export default defineComponent({
+  name: 'ExpandableCard',
+  props: {
+    title: String,
+    helpText: String,
+    expanded: Boolean,
+    showHelp: Boolean
+  },
+  setup (props) {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t } = useI18n()
+    const isExpanded    = ref(props.expanded)
+    const isHelpVisible = ref(props.showHelp)
+
+    return { t, isExpanded, isHelpVisible }
+  },
+})
+</script>
