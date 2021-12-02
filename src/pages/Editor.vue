@@ -63,14 +63,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted, Ref } from 'vue'
+import { defineComponent, ref, watch, onMounted, Ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Notify } from 'quasar'
 import { FullEntity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { fetchEntityTree, deleteEntity } from 'src/api/entityRepository'
+import { fetchEntityTree } from 'src/api/entityRepository'
 import { EntityType } from '@onto-med/top-api'
+import { EntityApiKey } from 'src/boot/axios'
 
 export default defineComponent({
   name: 'Editor',
@@ -78,6 +79,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
+    const entityApi     = inject(EntityApiKey)
     const showJson      = ref(false)
     const splitterModel = ref(25)
     const entities      = ref<FullEntity[]>([])
@@ -157,9 +159,11 @@ export default defineComponent({
       reloadEntities, selectTabByKey, closeTab, alert,
 
       handleEntityDeletion (entityId: string): void {
-        if (!entityId) return
+        if (!entityId || !entityApi) return
         treeLoading.value = true
-        deleteEntity(entityId)
+
+        entityApi
+          .deleteEntityById('organisationName', 'repositoryName', entityId)
           .then(reloadEntities)
           .catch((e: Error) => alert(e.message))
           .finally(() => treeLoading.value = false)
