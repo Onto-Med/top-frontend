@@ -36,8 +36,8 @@
             />
           </q-td>
           <q-td>{{ row.getTitle() }}</q-td>
-          <q-td>{{ row.author.name }}</q-td>
-          <q-td>{{ d(row.updatedAt, 'long') }}</q-td>
+          <q-td>{{ row.author.username }}</q-td>
+          <q-td>{{ d(row.createdAt, 'long') }}</q-td>
         </template>
       </q-table>
 
