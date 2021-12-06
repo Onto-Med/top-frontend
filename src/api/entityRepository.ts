@@ -24,7 +24,8 @@ const bmi: PhenotypeInTaxonomy = {
   synonyms: [],
   descriptions: [],
   codes: [],
-  superClass: anthropometry
+  superClass: anthropometry,
+  formula: 'weight / height^(2)'
 }
 
 const weight: PhenotypeInTaxonomy = {

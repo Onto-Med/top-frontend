@@ -81,6 +81,14 @@ export default {
   formula: 'Formula|Formulas',
   closeAll: 'Close all',
   code: 'Code|Codes',
+  condition: 'Condition|Conditions',
+  squareRoot: 'Square root',
+  exponent: 'Exponent|Exponents',
+  base: 'Base|Bases',
+  addition: 'Addition|Additions',
+  subtraction: 'Subtraction|Subtractions',
+  multiplication: 'Multiplication|Multiplications',
+  division: 'Division|Divisions',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

@@ -21,6 +21,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
   subClasses?: FullEntity[]
   restriction?: Restriction
   expression?: Expression
+  formula?: string
   createdAt?: Date
   author?: UserAccount
 
@@ -39,6 +40,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
       this.subClasses = obj.subClasses?.map(c => new FullEntity(c))
       this.restriction = obj.restriction
       this.expression = obj.expression
+      this.formula = obj.formula
       this.createdAt = obj.createdAt
       this.author = obj.author
     }
@@ -72,6 +74,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
     this.subClasses = entity.subClasses
     this.restriction = entity.restriction
     this.expression = entity.expression
+    this.formula = entity.formula
     this.createdAt = entity.createdAt
     this.author = entity.author
   }
@@ -173,6 +176,9 @@ export class FullEntity implements PhenotypeInTaxonomy {
     }
     if (this.entityType === EntityType.CombinedRestriction && !this.expression) {
       this.expression = {} as Expression
+    }
+    if (this.entityType === EntityType.DerivedPhenotype && !this.formula) {
+      this.formula = ''
     }
     if (this.restriction && this.restriction.negated === undefined) {
       this.restriction.negated = false
