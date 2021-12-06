@@ -60,7 +60,7 @@
 
           <q-separator />
 
-          <q-card-section class="q-pt-none">
+          <q-card-section class="q-pt-none scroll json-section text-caption">
             <pre>{{ local }}</pre>
           </q-card-section>
 
@@ -234,4 +234,6 @@ export default defineComponent({
   width: 100%
 .entity-editor-tab-content
   overflow-y: scroll
+.json-section
+  max-height: 80vh
 </style>
