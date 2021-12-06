@@ -50,7 +50,7 @@
               <entity-editor
                 v-if="tabs[index]"
                 :entity="tabs[index]"
-                @update:entity="tabs[index].apply($event)"
+                @update:entity="handleEntityUpdate"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"
               />
@@ -70,7 +70,7 @@ import { FullEntity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { fetchEntityTree } from 'src/api/entityRepository'
-import { EntityType } from '@onto-med/top-api'
+import { Entity, EntityType } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 
 export default defineComponent({
@@ -167,6 +167,13 @@ export default defineComponent({
           .then(reloadEntities)
           .catch((e: Error) => alert(e.message))
           .finally(() => treeLoading.value = false)
+      },
+      handleEntityUpdate (entity: Entity) {
+        if (!entity || !entityApi) return
+
+        entityApi.updateEntityById('organisationName', 'repositoryName', entity.id as string, entity)
+          .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
+          .catch((e: Error) => alert(e.message))
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const superClass = getEntityById(superClassId)
