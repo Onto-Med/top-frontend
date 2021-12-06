@@ -8,12 +8,14 @@
           :rows="rows"
           :cols="cols"
           debounce="200"
+          class="col"
           @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"
         >
           <template #before>
             <q-select
               :model-value="modelValue[index].lang"
               :options="supportedLangs"
+              class="lang-input"
               @update:modelValue="updateEntryByIndex(index, modelValue[index].text, $event)"
             />
           </template>
@@ -33,7 +35,7 @@
       </div>
     </template>
     <template #append>
-      <q-card-actions>
+      <q-card-actions class="q-pa-md">
         <q-btn
           color="primary"
           icon="add"
@@ -113,3 +115,8 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="sass" scoped>
+.lang-input
+  width: 60px
+</style>

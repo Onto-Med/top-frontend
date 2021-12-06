@@ -6,12 +6,14 @@
           :model-value="modelValue[index].code"
           type="text"
           debounce="200"
+          class="col"
           @update:model-value="updateEntryByIndex(index, $event, modelValue[index].codeSystem)"
         >
           <template #before>
             <code-system-input
               :model-value="modelValue[index].codeSystem"
               :options="codeSystems"
+              class="system-input"
               @selection-changed="updateEntryByIndex(index, modelValue[index].code, $event)"
             />
           </template>
@@ -37,7 +39,7 @@
     </template>
 
     <template #append>
-      <q-card-actions>
+      <q-card-actions class="q-pa-md">
         <q-btn
           color="primary"
           icon="add"
@@ -107,3 +109,8 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="sass" scoped>
+.system-input
+  width: 150px
+</style>

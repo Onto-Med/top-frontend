@@ -9,71 +9,74 @@
           map-options
           outlined
           hide-bottom-space
-          style="width: 200px"
           :label="t('quantor')"
           :options="quantors || defaultQuantors"
         />
       </div>
 
-      <div v-show="![Quantor.None, Quantor.Exists].includes(state.quantor)">
-        <div class="row">
-          <q-btn-toggle
-            v-if="canHaveRange"
-            v-model="hasRange"
-            no-caps
-            class="q-mb-md"
-            :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
-            @update:model-value="handleHasRangeChanged"
-          />
-          <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
-        </div>
+      <q-slide-transition>
+        <div v-show="![Quantor.None, Quantor.Exists].includes(state.quantor)">
+          <div class="row">
+            <q-btn-toggle
+              v-if="canHaveRange"
+              v-model="hasRange"
+              no-caps
+              class="q-mb-md"
+              :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
+              @update:model-value="handleHasRangeChanged"
+            />
+            <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
+          </div>
 
-        <div v-show="hasRange" class="row">
-          <q-input v-model="state.values[0]" outlined :type="state.type">
-            <template #before>
-              <q-select
-                v-model="state.minOperator"
-                :options="operators || defaultOperators"
-                outlined
-                emit-value
-                map-options
-              />
-            </template>
-          </q-input>
-        </div>
+          <div v-show="hasRange" class="row">
+            <q-input v-model="state.values[0]" outlined :type="state.type">
+              <template #before>
+                <q-select
+                  v-model="state.minOperator"
+                  :options="operators || defaultOperators"
+                  outlined
+                  emit-value
+                  map-options
+                  class="operator-input"
+                />
+              </template>
+            </q-input>
+          </div>
 
-        <div v-show="hasRange" class="row">
-          <q-input v-model="state.values[1]" outlined :type="state.type">
-            <template #before>
-              <q-select
-                v-model="state.maxOperator"
-                :options="operators || defaultOperators"
-                emit-value
-                map-options
-                outlined
-              />
-            </template>
-          </q-input>
-        </div>
+          <div v-show="hasRange" class="row">
+            <q-input v-model="state.values[1]" outlined :type="state.type">
+              <template #before>
+                <q-select
+                  v-model="state.maxOperator"
+                  :options="operators || defaultOperators"
+                  emit-value
+                  map-options
+                  outlined
+                  class="operator-input"
+                />
+              </template>
+            </q-input>
+          </div>
 
-        <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
-          <q-input v-model="state.values[index]" outlined :type="state.type">
-            <template #after>
-              <q-btn
-                color="red"
-                icon="remove"
-                class="remove-localized-text-btn"
-                :title="t('remove')"
-                @click="state.values.splice(index, 1)"
-              />
-            </template>
-          </q-input>
+          <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
+            <q-input v-model="state.values[index]" outlined :type="state.type">
+              <template #after>
+                <q-btn
+                  color="red"
+                  icon="remove"
+                  class="remove-localized-text-btn"
+                  :title="t('remove')"
+                  @click="state.values.splice(index, 1)"
+                />
+              </template>
+            </q-input>
+          </div>
         </div>
-      </div>
+      </q-slide-transition>
     </template>
 
     <template v-if="!hasRange" #append>
-      <q-card-actions>
+      <q-card-actions class="q-pa-md">
         <q-btn
           color="primary"
           icon="add"
@@ -161,3 +164,8 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="sass" scoped>
+.operator-input
+  width: 80px
+</style>

@@ -11,7 +11,7 @@
     </template>
 
     <template #append>
-      <q-card-actions>
+      <q-card-actions class="q-pa-md">
         <q-btn icon="add" color="primary" class="add-ucum-btn" :label="t('addThing', { thing: t('unit') })" @click="addUnit" />
       </q-card-actions>
     </template>
