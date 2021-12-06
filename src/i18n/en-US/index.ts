@@ -92,7 +92,17 @@ export default {
       + 'When displaying an entity, the title appropriate for the current language setting is selected. '
       + 'If no suitable title is specified for the language setting, the first entry in the list is used.',
     synonymsHelp: 'Synonyms are alternative names for entities. For example, the phenotype "BMI" could have the synonym "Body Mass Index".',
-    descriptionsHelp: 'Here you can specify further descriptions or definitions of the entity in different languages.'
+    descriptionsHelp: 'Here you can specify further descriptions or definitions of the entity in different languages.',
+    codesHelp: 'In this section, specify links to taxonomies (e.g. SNOMED CT) so that the phenotype is mapped to the standards and can be linked to other IT systems. '
+      + 'In this way, on the one hand, data from other sources can be read in and used for phenotyping. '
+      + 'On the other hand, results can be fed back to external IT systems.',
+    formulaHelp: 'Mathematical formulas can be entered here to calculate the values of the phenotype. Formulas can contain other phenotypes as well as constants.',
+    restrictionHelp: 'Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantor. '
+      + 'Then you have to choose between value range (with minimum and/or maximum) or enumeration (any number of predefined values) for the type of restriction. '
+      + 'No restriction type can be selected for the quantifiers "Values present" and "No values present" because the restriction of the values is implicit.',
+    expressionHelp: 'To define restrictions for combined phenotypes. A Boolean expression must be specified. '
+      + 'The expression can contain unions (OR), intersections (AND) and complements (NOT) of phenotypes. '
+      + 'Click the plus button to add components to the expression. You can also click on already added components to modify or remove them.'
   },
   entityTree: {
     listDescription: 'Switch between the tree view with categories and the list view without categories.',

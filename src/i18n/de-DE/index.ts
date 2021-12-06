@@ -92,7 +92,20 @@ export default {
       + 'Bei der Darstellung einer Entität wird der für die aktuelle Spracheinstellung passende Titel gewählt. '
       + 'Ist für die Spracheinstellung kein passender Titel angegeben, wird der erste Eintrag in der Liste verwendet.',
     synonymsHelp: 'Synonyme sind alternative Bezeichnungen für Entitäten. Beispielsweise könnte der Phänotyp "BMI" das Synonym "Body Mass Index" besitzen.',
-    descriptionsHelp: 'Hier können Sie weiterführende Beschreibungen oder Definitionen der Entität in verschiedenen Sprachen angeben.'
+    descriptionsHelp: 'Hier können Sie weiterführende Beschreibungen oder Definitionen der Entität in verschiedenen Sprachen angeben.',
+    codesHelp: 'Geben Sie in diesem Abschnitt Verknüpfungen zu Taxonomien an (z.B. SNOMED CT), '
+      + 'sodass der Phänotyp auf die Standards gemappt ist und mit anderen IT-Systemen verbunden werden kann. '
+      + 'Auf diese Weise können zum einen Daten aus anderen Quellen eingelesen und zur Phänotypisierung verwendet werden. '
+      + 'Auf der anderen Seite können Ergebnisse an externe IT-Systeme zurückgespielt werden.',
+    formulaHelp: 'Hier können mathematische Formeln eingegeben werden, mit denen die Werte des Phänotypes berechnet werden. '
+      + 'Formeln können sowohl andere Phänotypen als auch Konstanten enthalten.',
+    restrictionHelp: 'Spezifizieren Sie die Einschränkungen, die auf Werte des Phänotyps angewendet werden sollen. Wählen Sie dafür bitte zunächst einen passenden Quantor aus. '
+      + 'Anschließend müssen Sie für den Typ der Restriktion zwischen Wertebereich (mit Minimum und/oder Maximum) oder Aufzählung (beliebige Anzahl von vordefinierten Werten) wählen. '
+      + 'Für die Quantoren "Werte vorhanden" und "Keine Werte vorhanden" kann kein Restriktionstyp gewählt werden, da die Beschränkung der Werte implizit ist.',
+    expressionHelp: 'Um Restriktionen für kombinierte Phänotypen zu definieren. Muss ein Boolescher Ausdruck angegeben werden. '
+      + 'In dem Ausdrück können Vereinigungen (ODER), Schnittmengen (UND) und Komplemente (NICHT) von Phänotypen enthalten sein. '
+      + 'Klicken Sie auf die Plus-Schaltfläche um Komponenten zum Ausdruck hinzuzufügen. '
+      + 'Außerdem können Sie auf bereits hinzugefügte Komponenten klicken, um diese zu verändern oder zu entfernen.'
   },
   entityTree: {
     listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und der Listenansicht ohne Kategorien.',
