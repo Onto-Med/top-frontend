@@ -93,17 +93,17 @@
 
     <div class="q-gutter-md q-mt-none q-px-md q-pb-md col entity-editor-tab-content">
       <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
-      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms.length" />
+      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms.length > 0" />
       <localized-text-input
         v-model="local.descriptions"
         text-area
         rows="3"
         :label="t('description', 2)"
         :help-text="t('entityEditor.descriptionsHelp')"
-        :expanded="local.descriptions.length"
+        :expanded="local.descriptions.length > 0"
       />
 
-      <code-input v-model="local.codes" :expanded="local.codes.length" />
+      <code-input v-model="local.codes" :expanded="local.codes.length > 0" />
 
       <data-type-select
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
@@ -120,7 +120,7 @@
       <ucum-card
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
         v-model="local.units"
-        :expanded="local.units.length"
+        :expanded="local.units.length > 0"
       />
 
       <formula-input
