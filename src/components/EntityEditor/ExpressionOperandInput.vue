@@ -45,7 +45,7 @@
       @entity-selected="setEntity($event)"
     />
 
-    <span v-for="(operand, index) in modelValue.operands || []" :key="index">
+    <span v-for="(operand, index) in operands" :key="index">
       <span
         v-if="index != 0"
         :class="{ 'text-weight-bolder text-primary': hover }"
@@ -63,7 +63,7 @@
     </span>
 
     <span v-show="showAddButton" :class="{ 'text-weight-bolder text-primary': hover }">
-      <span v-show="(modelValue.operands || []).length > 0">, </span>
+      <span v-show="operands.length > 0">, </span>
       <span v-show="expand"><br>{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
       <span
         class="cursor-pointer"
@@ -129,7 +129,7 @@ export default defineComponent({
     }
   },
   emits: ['update:modelValue', 'entityClicked', 'removeClicked'],
-  setup (props) {
+  setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const hover = ref(false)
@@ -156,35 +156,41 @@ export default defineComponent({
     const selectableExpressionTypes = computed(() => [
       ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Restriction
     ])
+    const operands = computed(() => {
+      if ([ExpressionType.Complement, ExpressionType.Class, ExpressionType.Restriction].includes(props.modelValue.type))
+        return props.modelValue.operands?.slice(0, 1) || []
+      return props.modelValue.operands || []
+    })
 
-    return { t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypes, selectableExpressionTypes }
-  },
-  methods: {
-    setType (type: ExpressionType): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
-      newModelValue.type = type
-      this.$emit('update:modelValue', newModelValue)
-    },
-    setEntity (entity: FullEntity): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
-      newModelValue.id = entity.id
-      newModelValue.type = entity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class
-      this.entity = entity
-      this.$emit('update:modelValue', newModelValue)
-    },
-    addOperand (type: ExpressionType): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
-      if (!newModelValue.operands) newModelValue.operands = []
-      newModelValue.operands.push({ type: type })
-      this.$emit('update:modelValue', newModelValue)
-    },
-    handleOperandUpdate (index: number, operand: Expression|null): void {
-      let newModelValue = JSON.parse(JSON.stringify(this.modelValue)) as Expression
-      if (newModelValue.operands) {
-        if (operand) newModelValue.operands[index] = operand
-        else newModelValue.operands.splice(index, 1)
+    return {
+      t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypes, selectableExpressionTypes, operands,
+
+      setType (type: ExpressionType): void {
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        newModelValue.type = type
+        emit('update:modelValue', newModelValue)
+      },
+      setEntity (newEntity: FullEntity): void {
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        newModelValue.id = newEntity.id
+        newModelValue.type = newEntity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class
+        entity.value = newEntity
+        emit('update:modelValue', newModelValue)
+      },
+      addOperand (type: ExpressionType): void {
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        if (!newModelValue.operands) newModelValue.operands = []
+        newModelValue.operands.push({ type: type })
+        emit('update:modelValue', newModelValue)
+      },
+      handleOperandUpdate (index: number, operand: Expression|null): void {
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        if (newModelValue.operands) {
+          if (operand) newModelValue.operands[index] = operand
+          else newModelValue.operands.splice(index, 1)
+        }
+        emit('update:modelValue', newModelValue)
       }
-      this.$emit('update:modelValue', newModelValue)
     }
   }
 })
