@@ -130,7 +130,7 @@ export default defineComponent({
 
       insertEntity (entity: FullEntity): void {
         const editor = editorRef.value
-        editor.runCmd('insertHTML', entity.id)
+        editor.runCmd('insertHTML', '[' + entity.id + ']')
         showClassMenu.value = false
       },
       insert
