@@ -89,6 +89,7 @@ export default {
   subtraction: 'Subtraction|Subtractions',
   multiplication: 'Multiplication|Multiplications',
   division: 'Division|Divisions',
+  searchThing: 'Search {thing}',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

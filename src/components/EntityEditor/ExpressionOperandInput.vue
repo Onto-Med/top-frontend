@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span class="expression-operand">
     <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
     <span
       v-if="![ExpressionType.Restriction, ExpressionType.Class].includes(modelValue.type)"
@@ -202,7 +202,7 @@ export default defineComponent({
 </style>
 
 <style lang="sass">
-.entity-search-input-field
+.expression-operand .entity-search-input-field
   width: 200px
   margin: 4px
   vertical-align: middle

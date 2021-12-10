@@ -14,14 +14,15 @@
     :loading="loading"
     :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
     @filter="filterFn"
-    @update:model-value="$emit('entitySelected', $event)"
+    @update:model-value="handleSelectionChanged"
   >
     <template #append>
       <q-btn
+        v-show="!loading"
         round
         dense
         flat
-        icon="close"
+        :icon="icon"
         :title="t('remove')"
         @click="$emit('clearClicked')"
       />
@@ -70,10 +71,18 @@ export default defineComponent({
       type: Number,
       default: 2
     },
-    entityTypes: Array as () => EntityType[]
+    icon: {
+      type: String,
+      default: 'close'
+    },
+    entityTypes: Array as () => EntityType[],
+    clearOnSelect: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['clearClicked', 'entitySelected'],
-  setup(props) {
+  setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
     const options = ref([] as FullEntity[])
@@ -93,8 +102,12 @@ export default defineComponent({
           .finally(() => loading.value = false)
 
         update(() => options.value = result)
+      },
+      handleSelectionChanged (entity: FullEntity) {
+        if (props.clearOnSelect) selection.value = null
+        emit('entitySelected', entity)
       }
-    };
+    }
   },
 });
 </script>

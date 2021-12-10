@@ -15,6 +15,15 @@
           TOP Framework
         </q-toolbar-title>
 
+        <entity-search-input
+          :label="t('searchThing', { thing: t('entity') }) + '...'"
+          icon="search"
+          clear-on-select
+          dark
+          class="q-mr-sm"
+          @entitySelected="routeToEntity"
+        />
+
         <language-switch />
       </q-toolbar>
     </q-header>
@@ -47,22 +56,27 @@
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
-import LanguageSwitch from 'src/components/LanguageSwitch.vue';
+import LanguageSwitch from 'src/components/LanguageSwitch.vue'
+import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 
 import { defineComponent, ref, computed } from 'vue'
+import { Entity } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
     EssentialLink,
-    LanguageSwitch
+    LanguageSwitch,
+    EntitySearchInput
   },
 
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const router = useRouter()
     const leftDrawerOpen = ref(false)
 
     const linksList = computed(() => [
@@ -84,6 +98,9 @@ export default defineComponent({
       leftDrawerOpen,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
+      },
+      routeToEntity (entity: Entity) {
+        void router.push({ name: 'editor', params: { organisationName: 'example_organisation', repositoryName: 'example_repository', entityId: entity.id } })
       }
     }
   }
