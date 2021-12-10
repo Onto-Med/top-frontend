@@ -51,7 +51,6 @@ export default defineComponent({
   setup () {
     const route = useRoute()
     const currentRouteName = computed(() => route.name)
-    console.log(currentRouteName.value)
 
     return { currentRouteName }
   }
