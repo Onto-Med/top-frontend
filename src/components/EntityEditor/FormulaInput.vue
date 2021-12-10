@@ -55,7 +55,10 @@ export default defineComponent({
     EntitySearchInput
   },
   props: {
-    modelValue: String,
+    modelValue: {
+      type: String,
+      required: true
+    },
     label: String,
     helpText: String,
     expanded: Boolean,
