@@ -76,6 +76,11 @@ import { EntityApiKey } from 'src/boot/axios'
 export default defineComponent({
   name: 'Editor',
   components: { EntityEditor, EntityTree },
+  params: {
+    organisationName: String,
+    repositoryName: String,
+    entityId: String
+  },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
