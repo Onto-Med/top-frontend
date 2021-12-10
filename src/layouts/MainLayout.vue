@@ -34,14 +34,10 @@
       bordered
     >
       <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
+        <q-item-label v-t="'navigation'" header />
 
-        <EssentialLink
-          v-for="link in essentialLinks"
+        <NavbarLink
+          v-for="link in links"
           :key="link.title"
           v-bind="link"
         />
@@ -57,7 +53,7 @@
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import EssentialLink from 'components/EssentialLink.vue'
+import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 
@@ -68,7 +64,7 @@ export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink,
+    NavbarLink,
     LanguageSwitch,
     EntitySearchInput
   },
@@ -81,20 +77,26 @@ export default defineComponent({
 
     const linksList = computed(() => [
       {
+        title: t('home'),
+        icon: 'house'
+      },
+      {
         title: t('repository', 2),
         icon: 'folder',
-        caption: t('developPhenotype', 2)
+        caption: t('developPhenotype', 2),
+        routeName: 'repository'
       },
       {
         title: t('organisation', 2),
         icon: 'groups',
-        caption: t('collaborativeWork')
+        caption: t('collaborativeWork'),
+        routeName: 'organisation'
       }
     ])
 
     return {
       t,
-      essentialLinks: linksList,
+      links: linksList,
       leftDrawerOpen,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value

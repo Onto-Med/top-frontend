@@ -2,9 +2,10 @@ import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
+    name: 'root',
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Editor.vue') }],
+    children: [{ name: 'editor', path: '/:organisationName/:repositoryName/:entityId?', component: () => import('pages/Editor.vue') }],
   },
 
   // Always leave this as last one,

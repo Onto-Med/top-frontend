@@ -2,8 +2,8 @@
   <q-item
     clickable
     tag="a"
-    target="_blank"
-    :href="link"
+    :to="{ name: routeName }"
+    exact
   >
     <q-item-section
       v-if="icon"
@@ -22,10 +22,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
-  name: 'EssentialLink',
+  name: 'NavbarLink',
   props: {
     title: {
       type: String,
@@ -37,15 +38,22 @@ export default defineComponent({
       default: ''
     },
 
-    link: {
+    routeName: {
       type: String,
-      default: '#'
+      default: 'root'
     },
 
     icon: {
       type: String,
       default: ''
     }
+  },
+  setup () {
+    const route = useRoute()
+    const currentRouteName = computed(() => route.name)
+    console.log(currentRouteName.value)
+
+    return { currentRouteName }
   }
 })
 </script>

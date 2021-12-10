@@ -90,6 +90,8 @@ export default {
   multiplication: 'Multiplication|Multiplications',
   division: 'Division|Divisions',
   searchThing: 'Search {thing}',
+  home: 'Home',
+  navigation: 'Navigation',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
