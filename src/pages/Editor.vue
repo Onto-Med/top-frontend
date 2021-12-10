@@ -64,7 +64,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, onMounted, Ref, inject } from 'vue'
-import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Notify } from 'quasar'
 import { FullEntity } from 'src/models/Entity'
@@ -77,10 +76,20 @@ import { EntityApiKey } from 'src/boot/axios'
 export default defineComponent({
   name: 'Editor',
   components: { EntityEditor, EntityTree },
-  setup () {
+  props: {
+    organisationName: {
+      type: String,
+      required: true
+    },
+    repositoryName: {
+      type: String,
+      required: true
+    },
+    entityId: String
+  },
+  setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
-    const route         = useRoute()
     const entityApi     = inject(EntityApiKey)
     const showJson      = ref(false)
     const splitterModel = ref(25)
@@ -155,21 +164,22 @@ export default defineComponent({
     )
 
     watch(
-      route,
-      (to) => {
-        if (to.params.entityId) {
-          if (!selected.value || to.params.entityId !== selected.value.id)
-            selected.value = getEntityById(to.params.entityId as string) || undefined
+      () => props.entityId,
+      (newVal) => {
+        if (newVal) {
+          if (!selected.value || newVal !== selected.value.id)
+            selected.value = getEntityById(newVal) || undefined
         } else {
           selected.value = undefined
         }
       }
     )
+    // TODO: watch organisationName and repositoryName
 
     onMounted(async () => {
       await reloadEntities().then(() => {
-        if (route.params.entityId)
-          selected.value = getEntityById(route.params.entityId as string) || undefined
+        if (props.entityId)
+          selected.value = getEntityById(props.entityId) || undefined
       })
     })
 
