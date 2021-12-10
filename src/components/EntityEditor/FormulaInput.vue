@@ -27,7 +27,7 @@
                   <entity-search-input
                     :entity-types="[ EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype ]"
                     @entitySelected="insertEntity"
-                    @clearClicked="showClassMenu = false"
+                    @btnClicked="showClassMenu = false"
                   />
                 </q-item-section>
               </q-item>

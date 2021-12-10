@@ -24,7 +24,7 @@
         flat
         :icon="icon"
         :title="t('remove')"
-        @click="$emit('clearClicked')"
+        @click="$emit('btnClicked')"
       />
     </template>
     <template #selected>
@@ -81,7 +81,7 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['clearClicked', 'entitySelected'],
+  emits: ['btnClicked', 'entitySelected'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
