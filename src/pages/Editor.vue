@@ -64,6 +64,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, onMounted, Ref, inject } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Notify } from 'quasar'
 import { FullEntity } from 'src/models/Entity'
@@ -90,6 +91,7 @@ export default defineComponent({
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
+    const router        = useRouter()
     const entityApi     = inject(EntityApiKey)
     const showJson      = ref(false)
     const splitterModel = ref(25)
@@ -157,9 +159,16 @@ export default defineComponent({
     watch(
       selected as Ref<FullEntity|undefined>,
       (entity: FullEntity|undefined) => {
-        if (!entity) return
-        if (!tabs.value.map(t => t.id).includes(entity.id))
-          tabs.value.push(entity)
+        let id = undefined
+        if (entity) {
+          id = entity.id
+          if (!tabs.value.map(t => t.id).includes(entity.id))
+            tabs.value.push(entity)
+        }
+        void router.push({
+          name: 'editor',
+          params: { organisationName: props.organisationName, repositoryName: props.repositoryName, entityId: id }
+        })
       }
     )
 
