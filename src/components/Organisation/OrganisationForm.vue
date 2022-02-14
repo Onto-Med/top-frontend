@@ -2,8 +2,8 @@
   <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
     <q-card>
       <q-card-section>
-        <div class="text-h6">
-          {{ t('createThing', { thing: t('organisation') }) }}
+        <div v-if="state.createdAt != null" class="text-h6">
+          {{ t('editThing', { thing: t('organisation') }) }}
           <q-btn
             v-show="state.createdAt != null"
             dense
@@ -13,6 +13,9 @@
             :title="t('deleteThing', { thing: t('organisation') })"
             @click="showDeleteDialog = true"
           />
+        </div>
+        <div v-else class="text-h6">
+          {{ t('createThing', { thing: t('organisation') }) }}
         </div>
       </q-card-section>
 
