@@ -64,6 +64,8 @@ export default {
   loading: 'Laden',
   unnamedEntity: 'Unbenannte Entität',
   showThing: '{thing} anzeigen',
+  createThing: '{thing} anlegen',
+  thingSaved: '{thing} wurde gespeichert',
   help: 'Hilfe',
   version: 'Version|Versionen',
   versionHistory: 'Versionsverlauf',

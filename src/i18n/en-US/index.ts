@@ -64,6 +64,8 @@ export default {
   loading: 'Loading',
   unnamedEntity: 'Unnamed entity',
   showThing: 'Show {thing}',
+  createThing: 'Create {thing}',
+  thingSaved: '{thing} has been saved',
   help: 'Help',
   version: 'Version|Versions',
   versionHistory: 'Version history',
