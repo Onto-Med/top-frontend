@@ -59,7 +59,10 @@ export default defineComponent({
     const showForm  = ref(false)
     const organisationApi = inject(OrganisationApiKey)
     const organisations   = ref<Organisation[]>([])
-    const organisation    = ref(null)
+    const  newOrganisation = () => {
+      return { id: (uuidv4 as () => string)() } as Organisation
+    }
+    const organisation    = ref(newOrganisation())
 
     const reload = async () => {
       if (!organisationApi) return
@@ -82,9 +85,7 @@ export default defineComponent({
       loading,
       saving,
       showForm: showForm,
-      newOrganisation () {
-        return { id: (uuidv4 as () => string)() } as Organisation
-      },
+      newOrganisation,
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return
         saving.value = true

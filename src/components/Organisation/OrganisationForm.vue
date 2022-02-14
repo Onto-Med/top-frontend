@@ -5,7 +5,7 @@
         <div class="text-h6">
           {{ t('createThing', { thing: t('organisation') }) }}
           <q-btn
-            v-show="modelValue.createdAt != null"
+            v-show="state.createdAt != null"
             dense
             color="red"
             icon="delete"
@@ -17,8 +17,8 @@
       </q-card-section>
 
       <q-card-section>
-        <q-input :model-value="modelValue.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
-        <q-input :model-value="modelValue.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
+        <q-input :model-value="state.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
+        <q-input :model-value="state.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
         TODO: super organisation
       </q-card-section>
 
@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
 
@@ -67,11 +67,18 @@ export default defineComponent({
     loading: Boolean
   },
   emits: ['update:show', 'update:model-value', 'delete-clicked'],
-  setup() {
+  setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const state = ref<Organisation>({})
+    const copy = (value) => {
+      return JSON.parse(JSON.stringify(value)) as Organisation
+    }
+    const state = ref(copy(props.modelValue))
     const showDeleteDialog = ref(false)
+
+    watch(() => props.modelValue, (value) => {
+      state.value = copy(value)
+    })
 
     return {
       t,
