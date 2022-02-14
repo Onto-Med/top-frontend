@@ -65,8 +65,8 @@
 <script lang="ts">
 import { defineComponent, ref, watch, onMounted, Ref, inject } from 'vue'
 import { useRouter } from 'vue-router'
+import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
-import { Notify } from 'quasar'
 import { FullEntity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
@@ -92,6 +92,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
     const router        = useRouter()
+    const { alert }     = useAlert()
     const entityApi     = inject(EntityApiKey)
     const showJson      = ref(false)
     const splitterModel = ref(25)
@@ -126,15 +127,7 @@ export default defineComponent({
         selected.value = undefined
       }
     }
-    const alert = (msg: string): void => {
-      Notify.create({
-        type: 'warning',
-        message: msg,
-        progress: true,
-        multiLine: true,
-        actions: [ { label: t('dismiss'), color: 'black' } ]
-      })
-    }
+
     const getEntityById = (id: string|number|undefined): FullEntity|null => {
       const find = (result: unknown, node: unknown): unknown => {
         if (result || !node) {
