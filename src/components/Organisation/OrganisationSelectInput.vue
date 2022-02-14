@@ -1,10 +1,10 @@
 <template>
   <q-select
-    v-model="selection"
+    :model-value="modelValue"
     use-input
     emit-value
     clearable
-    :label="selection ? '' : label || t('selectThing', { thing: t('organisation') })"
+    :label="modelValue ? '' : label || t('selectThing', { thing: t('organisation') })"
     :options="options"
     :loading="loading"
     :title="t('entitySearchInput.description', { minLength: minLength, types: t('organisation', 2) })"
@@ -12,8 +12,8 @@
     @update:model-value="$emit('update:model-value', $event)"
   >
     <template #selected>
-      <span v-if="selection">
-        {{ selection.name }}
+      <span v-if="modelValue">
+        {{ modelValue.name }}
       </span>
     </template>
     <template #option="scope">
@@ -58,11 +58,10 @@ export default defineComponent({
     const { t } = useI18n();
     const organisationApi = inject(OrganisationApiKey)
     const options = ref([] as Organisation[])
-    const selection = ref(null)
     const loading = ref(false)
 
     return {
-      t, options, selection, loading,
+      t, options, loading,
       async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
         if (!organisationApi || val.length < props.minLength) {
           abort()
