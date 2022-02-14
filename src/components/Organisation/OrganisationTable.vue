@@ -44,7 +44,7 @@
 
 <script lang="ts">
 import { Organisation } from '@onto-med/top-api'
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -58,17 +58,15 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
 
-    const columns = [
-      { name: 'name', field: 'name', label: t('name'), align: 'left', required: true, sortable: true },
-      { name: 'description', field: 'description', label: t('description'), align: 'left', sortable: true },
-      { name: 'createdAt', field: 'createdAt', label: t('createdAt'), align: 'left', sortable: true }
-    ]
-
     return {
       t,
       d,
       initialPagination: { sortBy: 'name', descenting: false, page: 1, rowsPerPage: 10 },
-      columns: columns
+      columns: computed(() => [
+        { name: 'name', field: 'name', label: t('name'), align: 'left', required: true, sortable: true },
+        { name: 'description', field: 'description', label: t('description'), align: 'left', sortable: true },
+        { name: 'createdAt', field: 'createdAt', label: t('createdAt'), align: 'left', sortable: true }
+      ])
     }
   },
 })
