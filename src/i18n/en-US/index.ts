@@ -81,7 +81,7 @@ export default {
   unit: 'Unit|Units',
   developPhenotype: 'Develop Phenotype|Develop Phenotypes',
   repository: 'Repository|Repositories',
-  organisation: 'Organisation|Organisatios',
+  organisation: 'Organisation|Organisations',
   collaborativeWork: 'Collaborative Work',
   formula: 'Formula|Formulas',
   closeAll: 'Close all',
