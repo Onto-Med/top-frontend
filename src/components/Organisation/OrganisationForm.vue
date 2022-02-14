@@ -5,7 +5,7 @@
         <div class="text-h6">
           {{ t('createThing', { thing: t('organisation') }) }}
           <q-btn
-            v-show="state.createdAt"
+            v-show="modelValue.createdAt != null"
             dense
             color="red"
             icon="delete"
@@ -17,9 +17,9 @@
       </q-card-section>
 
       <q-card-section>
-        <q-input v-model="state.name" type="text" :label="t('name')" />
-        <q-input v-model="state.description" type="textarea" :label="t('description')" />
-        <q-select :label="t('superOrganisation')" />
+        <q-input :model-value="modelValue.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
+        <q-input :model-value="modelValue.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
+        TODO: super organisation
       </q-card-section>
 
       <q-card-actions align="right">
@@ -33,7 +33,7 @@
       />
     </q-card>
 
-    <q-dialog v-model="deletePossible">
+    <q-dialog v-model="showDeleteDialog">
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="warning_amber" color="red" text-color="white" />
@@ -44,7 +44,7 @@
 
         <q-card-actions align="right">
           <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('delete-clicked', state)" />
+          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('delete-clicked', modelValue)" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -52,38 +52,31 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
-import { v4 as uuidv4 } from 'uuid'
 
 export default defineComponent({
   name: 'OrganisationForm',
   props: {
     modelValue: {
       type: Object as () => Organisation,
-      default () {
-        return { id: (uuidv4 as () => string)() } as Organisation
-      }
+      required: true
     },
     show: Boolean,
     loading: Boolean
   },
   emits: ['update:show', 'update:model-value', 'delete-clicked'],
-  setup(props) {
+  setup() {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const state = ref<Organisation>({})
     const showDeleteDialog = ref(false)
 
-    if (props.modelValue)
-      state.value = JSON.parse(JSON.stringify(props.modelValue)) as Organisation
-
     return {
       t,
       state,
-      showDeleteDialog: showDeleteDialog,
-      deletePossible: computed(() => showDeleteDialog.value && state.value.createdAt)
+      showDeleteDialog: showDeleteDialog
     }
   }
 })

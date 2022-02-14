@@ -9,7 +9,7 @@
             color="primary"
             icon="add"
             :title="t('createThing', { thing: t('organisation') })"
-            @click="showForm = true"
+            @click="organisation = newOrganisation(); showForm = true"
           />
         </div>
       </q-card-section>
@@ -19,7 +19,7 @@
     <organisation-table
       :organisations="organisations"
       :loading="loading"
-      @row-clicked="organisation = $event; showForm = true"
+      @edit-clicked="organisation = $event; showForm = true"
     />
 
     <organisation-form
@@ -41,6 +41,8 @@ import { Organisation } from '@onto-med/top-api'
 import OrganisationTable from 'src/components/Organisation/OrganisationTable.vue'
 import OrganisationForm from 'src/components/Organisation/OrganisationForm.vue'
 import { AxiosResponse } from 'axios'
+import { v4 as uuidv4 } from 'uuid'
+
 
 export default defineComponent({
   name: 'Editor',
@@ -80,6 +82,9 @@ export default defineComponent({
       loading,
       saving,
       showForm: showForm,
+      newOrganisation () {
+        return { id: (uuidv4 as () => string)() } as Organisation
+      },
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return
         saving.value = true
