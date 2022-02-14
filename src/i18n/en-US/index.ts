@@ -92,6 +92,8 @@ export default {
   searchThing: 'Search {thing}',
   home: 'Home',
   navigation: 'Navigation',
+  createdAt: 'Created at',
+  name: 'Name',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
