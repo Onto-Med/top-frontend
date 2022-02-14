@@ -4,7 +4,6 @@
       class="sticky-header-table"
       :rows="organisations"
       :columns="columns"
-      :title="t('organisation', 2)"
       :loading="loading"
       :pagination="initialPagination"
       :no-data-label="t('noDataPresent')"
@@ -29,8 +28,8 @@ export default defineComponent({
     const { t } = useI18n()
 
     const columns = [
-      { name: 'name', field: 'name', label: t('name'), required: true, sortable: true },
-      { name: 'description', field: 'description', label: t('description'), sortable: true },
+      { name: 'name', field: 'name', label: t('name'), align: 'left', required: true, sortable: true },
+      { name: 'description', field: 'description', label: t('description'), align: 'left', sortable: true },
       { name: 'createdAt', field: 'createdAt', label: t('createdAt'), sortable: true }
     ]
 
