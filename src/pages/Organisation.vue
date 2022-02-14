@@ -27,6 +27,7 @@
       v-model:show="showForm"
       :loading="saving"
       @update:model-value="saveOrganisation($event)"
+      @delete-clicked="deleteOrganisation($event)"
     />
   </q-page>
 </template>
@@ -80,7 +81,6 @@ export default defineComponent({
       saving,
       showForm: showForm,
       async saveOrganisation (organisation: Organisation) {
-        console.log(organisation)
         if (!organisationApi) return
         saving.value = true
 
@@ -95,6 +95,19 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             alert(t('thingSaved', { thing: t('organisation') }), 'positive')
+            void reload()
+          })
+          .catch((e: Error) => alert(e.message))
+          .finally(() => saving.value = false)
+      },
+      async deleteOrganisation (organisation: Organisation) {
+        if (!organisationApi) return
+        saving.value = true
+
+        await organisationApi.deleteOrganisationById(organisation.id)
+          .then(() => {
+            showForm.value = false
+            alert(t('thingDeleted', { thing: t('organisation') }), 'positive')
             void reload()
           })
           .catch((e: Error) => alert(e.message))

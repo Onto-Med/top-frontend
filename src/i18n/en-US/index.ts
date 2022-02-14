@@ -66,6 +66,7 @@ export default {
   showThing: 'Show {thing}',
   createThing: 'Create {thing}',
   thingSaved: '{thing} has been saved',
+  deleteThing: 'Delete {thing}',
   help: 'Help',
   version: 'Version|Versions',
   versionHistory: 'Version history',

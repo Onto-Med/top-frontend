@@ -4,6 +4,15 @@
       <q-card-section>
         <div class="text-h6">
           {{ t('createThing', { thing: t('organisation') }) }}
+          <q-btn
+            v-show="state.createdAt"
+            dense
+            color="red"
+            icon="delete"
+            class="float-right"
+            :title="t('deleteThing', { thing: t('organisation') })"
+            @click="showDeleteDialog = true"
+          />
         </div>
       </q-card-section>
 
@@ -23,11 +32,27 @@
         :label="t('pleaseWait') + '...'"
       />
     </q-card>
+
+    <q-dialog v-model="deletePossible">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="warning_amber" color="red" text-color="white" />
+          <span v-t="'confirmDelete'" class="q-ml-sm" />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
+          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('delete-clicked', state)" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
 import { v4 as uuidv4 } from 'uuid'
@@ -44,16 +69,22 @@ export default defineComponent({
     show: Boolean,
     loading: Boolean
   },
-  emits: ['update:show', 'update:model-value'],
+  emits: ['update:show', 'update:model-value', 'delete-clicked'],
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const state = ref<Organisation>({})
+    const showDeleteDialog = ref(false)
 
     if (props.modelValue)
       state.value = JSON.parse(JSON.stringify(props.modelValue)) as Organisation
 
-    return { t, state }
+    return {
+      t,
+      state,
+      showDeleteDialog: showDeleteDialog,
+      deletePossible: computed(() => showDeleteDialog.value && state.value.createdAt)
+    }
   }
 })
 </script>
