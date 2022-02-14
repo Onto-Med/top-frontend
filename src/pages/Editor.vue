@@ -209,9 +209,15 @@ export default defineComponent({
       handleEntityUpdate (entity: Entity) {
         if (!entity || !entityApi) return
 
-        entityApi.updateEntityById('organisationName', 'repositoryName', entity.id as string, entity)
-          .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
-          .catch((e: Error) => alert(e.message))
+        if (!entity.createdAt) {
+          entityApi.createEntity('organisationName', 'repositoryName', entity)
+            .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
+            .catch((e: Error) => alert(e.message))
+        } else {
+          entityApi.updateEntityById('organisationName', 'repositoryName', entity.id as string, entity)
+            .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
+            .catch((e: Error) => alert(e.message))
+        }
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const superClass = getEntityById(superClassId)

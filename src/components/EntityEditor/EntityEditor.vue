@@ -221,7 +221,6 @@ export default defineComponent({
       },
 
       save () {
-        // TODO: send entity to API and handle errors
         emit('update:entity', local.value)
       }
     }
