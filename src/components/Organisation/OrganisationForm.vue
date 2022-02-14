@@ -22,7 +22,7 @@
       <q-card-section>
         <q-input :model-value="state.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
         <q-input :model-value="state.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
-        TODO: super organisation
+        <organisation-select-input :model-value="state.superOrganisation" :label="t('superOrganisation')" @update:model-value="state.superOrganisation = $event" />
       </q-card-section>
 
       <q-card-actions align="right">
@@ -58,9 +58,13 @@
 import { defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
+import OrganisationSelectInput from 'src/components/Organisation/OrganisationSelectInput.vue'
 
 export default defineComponent({
   name: 'OrganisationForm',
+  components: {
+    OrganisationSelectInput
+  },
   props: {
     modelValue: {
       type: Object as () => Organisation,
