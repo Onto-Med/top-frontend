@@ -122,6 +122,9 @@ export default {
       + 'The expression can contain unions (OR), intersections (AND) and complements (NOT) of phenotypes. '
       + 'Click the plus button to add components to the expression. You can also click on already added components to modify or remove them.'
   },
+  organisationPage: {
+    description: 'Manage your organisations or create new ones.'
+  },
   entityTree: {
     listDescription: 'Switch between the tree view with categories and the list view without categories.',
     noNodesLabel: 'There are no entities.',

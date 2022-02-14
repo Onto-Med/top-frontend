@@ -13,7 +13,9 @@
           />
         </div>
       </q-card-section>
-      <q-card-section v-t="'organisation.description'" />
+      <q-card-section>
+        {{ t('organisationPage.description') }}
+      </q-card-section>
     </q-card>
 
     <organisation-table

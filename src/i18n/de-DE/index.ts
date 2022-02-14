@@ -125,6 +125,9 @@ export default {
       + 'Klicken Sie auf die Plus-Schaltfläche um Komponenten zum Ausdruck hinzuzufügen. '
       + 'Außerdem können Sie auf bereits hinzugefügte Komponenten klicken, um diese zu verändern oder zu entfernen.'
   },
+  organisationPage: {
+    description: 'Verwalten Sie Ihre Organisationen oder erstellen Sie neue.'
+  },
   entityTree: {
     listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und der Listenansicht ohne Kategorien.',
     noNodesLabel: 'Es sind keine Entitäten vorhanden.',
