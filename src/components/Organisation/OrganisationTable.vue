@@ -22,7 +22,7 @@
         </q-tr>
       </template>
       <template #body="props">
-        <q-tr :props="props">
+        <q-tr class="cursor-pointer" :props="props" @click="$emit('row-clicked', props.row)">
           <q-td auto-width>
             <q-btn
               size="sm"
@@ -30,7 +30,7 @@
               dense
               icon="edit"
               :title="t('editThing', { thing: t('organisation') })"
-              @click="$emit('edit-clicked', props.row)"
+              @click.stop="$emit('edit-clicked', props.row)"
             />
           </q-td>
           <q-td>{{ props.row.name }}</q-td>
@@ -53,7 +53,7 @@ export default defineComponent({
     organisations: Array as () => Organisation[],
     loading: Boolean
   },
-  emits: ['edit-clicked'],
+  emits: ['edit-clicked', 'row-clicked'],
   setup() {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
