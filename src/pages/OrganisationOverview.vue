@@ -22,6 +22,7 @@
       :organisations="organisations"
       :loading="loading"
       @edit-clicked="organisation = $event; showForm = true"
+      @row-clicked="routeToOrganisation($event)"
     />
 
     <organisation-form
@@ -38,6 +39,7 @@
 import { defineComponent, inject, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useAlert from 'src/mixins/useAlert'
+import { useRouter } from 'vue-router'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { Organisation } from '@onto-med/top-api'
 import OrganisationTable from 'src/components/Organisation/OrganisationTable.vue'
@@ -56,6 +58,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()
     const { alert } = useAlert()
+    const router    = useRouter()
     const loading   = ref(false)
     const saving    = ref(false)
     const showForm  = ref(false)
@@ -88,6 +91,9 @@ export default defineComponent({
       saving,
       showForm: showForm,
       newOrganisation,
+      routeToOrganisation (organisation: Organisation) {
+        void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
+      },
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return
         saving.value = true
