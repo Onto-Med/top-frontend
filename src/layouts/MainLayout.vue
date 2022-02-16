@@ -90,7 +90,7 @@ export default defineComponent({
         title: t('organisation', 2),
         icon: 'groups',
         caption: t('collaborativeWork'),
-        routeName: 'organisation'
+        routeName: 'organisations'
       }
     ])
 

@@ -7,7 +7,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { name: 'editor', path: '/:organisationName/:repositoryName/:entityId?', props: true, component: () => import('pages/Editor.vue') },
-      { name: 'organisation', path: '/organisation', component: () => import('pages/OrganisationOverview.vue') }
+      { name: 'organisations', path: '/organisation', component: () => import('pages/OrganisationOverview.vue') },
+      { name: 'showOrganisation', path: '/:organisationId', props: true, component: () => import('pages/Organisation.vue') }
     ],
   },
 
