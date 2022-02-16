@@ -77,7 +77,7 @@ export default defineComponent({
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const copy = (value) => {
+    const copy = (value: unknown) => {
       return JSON.parse(JSON.stringify(value)) as Organisation
     }
     const state = ref(copy(props.modelValue))
