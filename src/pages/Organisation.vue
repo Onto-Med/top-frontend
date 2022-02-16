@@ -1,6 +1,6 @@
 <template>
-  <q-page class="q-gutter-md">
-    <q-card v-if="organisation && !loading">
+  <q-page v-if="organisation && !loading" class="q-gutter-md">
+    <q-card>
       <q-card-section>
         <div class="text-h6">
           {{ organisation.name }}
@@ -11,6 +11,9 @@
         {{ organisation.description }}
       </q-card-section>
     </q-card>
+  </q-page>
+  <q-page else>
+    <q-inner-loading showing :label="t('pleaseWait') + '...'" />
   </q-page>
 </template>
 
