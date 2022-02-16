@@ -69,7 +69,7 @@ export default defineComponent({
         }
 
         loading.value = true
-        await organisationApi.getOrganisations(null, val)
+        await organisationApi.getOrganisations(undefined, val)
           .then((r) => update(() => options.value = r.data))
           .finally(() => loading.value = false)
       }
