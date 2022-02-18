@@ -155,7 +155,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineComponent } from 'vue'
+import { ref, computed, defineComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { FullEntity } from 'src/models/Entity'
 import { EntityType, DataType } from '@onto-med/top-api'
@@ -197,6 +197,14 @@ export default defineComponent({
     const showVersionHistory = ref(false)
     const showClearDialog    = ref(false)
     const restrictionKey     = ref(0)
+
+    watch(
+      () => props.entity,
+      (value: FullEntity) => {
+        local.value = value.clone()
+      },
+      { deep: true }
+    )
 
     const reload = () => {
       loading.value = true
