@@ -91,6 +91,7 @@
       <version-history-dialog
         v-model:show="showVersionHistory"
         :entity-id="local.id"
+        :current-version="local.version"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         @restore="handleRestore"

@@ -26,6 +26,7 @@
           <q-tr :props="props">
             <q-td auto-width>
               <q-btn
+                v-show="!currentVersion || row.version != currentVersion"
                 v-close-popup
                 size="sm"
                 color="accent"
@@ -82,7 +83,8 @@ export default defineComponent({
     repositoryId: {
       type: String,
       required: true
-    }
+    },
+    currentVersion: Number
   },
   emits: ['restore', 'update:show'],
   setup (props) {
