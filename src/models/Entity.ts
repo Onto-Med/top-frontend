@@ -24,6 +24,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
   formula?: string
   createdAt?: Date
   author?: UserAccount
+  version?: number
 
   constructor (obj?: PhenotypeInTaxonomy) {
     if (obj) {
@@ -43,6 +44,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
       this.formula = obj.formula
       this.createdAt = obj.createdAt
       this.author = obj.author
+      this.version = obj.version
     }
     this.prepare()
   }
@@ -77,6 +79,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
     this.formula = entity.formula
     this.createdAt = entity.createdAt
     this.author = entity.author
+    this.version = entity.version
   }
 
   isRestriction (): boolean {
