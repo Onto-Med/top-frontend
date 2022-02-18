@@ -70,7 +70,6 @@ import { useI18n } from 'vue-i18n'
 import { FullEntity } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { fetchEntityTree } from 'src/api/entityRepository'
 import { Entity, EntityType } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 
@@ -102,9 +101,10 @@ export default defineComponent({
     const treeLoading   = ref(false)
 
     const reloadEntities = async () => {
+      if (!entityApi) return
       treeLoading.value = true
-      await fetchEntityTree()
-        .then(r => entities.value = r)
+      await entityApi.getEntities(props.organisationId, props.repositoryId)
+        .then(r => entities.value = r.data.map((e) => new FullEntity(e)))
         .finally(() => treeLoading.value = false)
     }
     const selectTabByKey = (key: string): void => {
