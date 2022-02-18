@@ -87,10 +87,7 @@ export default defineComponent({
       repositoriesLoading.value = true
 
       await repositoryApi.getRepositoriesByOrganisationId(props.organisationId)
-        .then(r => {
-          console.log(r.data)
-          repositories.value = r.data
-        })
+        .then(r => repositories.value = r.data)
         .catch((e: Error) => alert(e.message))
         .finally(() => repositoriesLoading.value = false)
     }
