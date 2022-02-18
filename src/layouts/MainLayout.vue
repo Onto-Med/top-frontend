@@ -102,7 +102,8 @@ export default defineComponent({
         leftDrawerOpen.value = !leftDrawerOpen.value
       },
       routeToEntity (entity: Entity) {
-        void router.push({ name: 'editor', params: { organisationName: 'example_organisation', repositoryName: 'example_repository', entityId: entity.id } })
+        if (!entity.repository || !entity.repository.organisation) return
+        void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
       }
     }
   }

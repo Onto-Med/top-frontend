@@ -78,11 +78,11 @@ export default defineComponent({
   name: 'Editor',
   components: { EntityEditor, EntityTree },
   props: {
-    organisationName: {
+    organisationId: {
       type: String,
       required: true
     },
-    repositoryName: {
+    repositoryId: {
       type: String,
       required: true
     },
@@ -160,7 +160,7 @@ export default defineComponent({
         }
         void router.push({
           name: 'editor',
-          params: { organisationName: props.organisationName, repositoryName: props.repositoryName, entityId: id }
+          params: { organisationId: props.organisationId, repositoryId: props.repositoryId, entityId: id }
         })
       }
     )
@@ -176,7 +176,6 @@ export default defineComponent({
         }
       }
     )
-    // TODO: watch organisationName and repositoryName
 
     onMounted(async () => {
       await reloadEntities().then(() => {
@@ -194,7 +193,7 @@ export default defineComponent({
         treeLoading.value = true
 
         entityApi
-          .deleteEntityById('organisationName', 'repositoryName', entityId)
+          .deleteEntityById(props.organisationId, props.repositoryId, entityId)
           .then(reloadEntities)
           .catch((e: Error) => alert(e.message))
           .finally(() => treeLoading.value = false)
@@ -203,11 +202,11 @@ export default defineComponent({
         if (!entity || !entityApi) return
 
         if (!entity.createdAt) {
-          entityApi.createEntity('organisationName', 'repositoryName', entity)
+          entityApi.createEntity(props.organisationId, props.repositoryId, entity)
             .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
             .catch((e: Error) => alert(e.message))
         } else {
-          entityApi.updateEntityById('organisationName', 'repositoryName', entity.id as string, entity)
+          entityApi.updateEntityById(props.organisationId, props.repositoryId, entity.id as string, entity)
             .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
             .catch((e: Error) => alert(e.message))
         }
