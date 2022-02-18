@@ -74,6 +74,7 @@ import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { Entity, EntityType } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
+import { AxiosResponse } from 'axios'
 
 export default defineComponent({
   name: 'Editor',
@@ -196,22 +197,28 @@ export default defineComponent({
 
         entityApi
           .deleteEntityById(props.organisationId, props.repositoryId, entityId)
-          .then(reloadEntities)
+          .then(() => {
+            alert(t('thingDeleted', { thing: t('entity') }), 'positive')
+            void reloadEntities()
+          })
           .catch((e: Error) => alert(e.message))
           .finally(() => treeLoading.value = false)
       },
       handleEntityUpdate (entity: Entity) {
         if (!entity || !entityApi) return
 
+        let promise: Promise<AxiosResponse<Entity>>
         if (!entity.createdAt) {
-          entityApi.createEntity(props.organisationId, props.repositoryId, entity)
-            .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
-            .catch((e: Error) => alert(e.message))
+          promise = entityApi.createEntity(props.organisationId, props.repositoryId, entity)
         } else {
-          entityApi.updateEntityById(props.organisationId, props.repositoryId, entity.id as string, entity)
-            .then(response => tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data)))
-            .catch((e: Error) => alert(e.message))
+          promise = entityApi.updateEntityById(props.organisationId, props.repositoryId, entity.id as string, entity)
         }
+        promise
+          .then(response => {
+            alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
+            tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data))
+          })
+          .catch((e: Error) => alert(e.message))
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const superClass = getEntityById(superClassId)
