@@ -99,6 +99,7 @@ export default {
   navigation: 'Navigation',
   createdAt: 'Created at',
   name: 'Name',
+  notSavedJet: 'Not saved jet!',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'

@@ -11,6 +11,8 @@
               @click="local.superClass ? $emit('entityClicked', local.superClass.id) : null"
             />
             <q-breadcrumbs-el :label="local.getTitle()" />
+            <small v-if="local.version">{{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})</small>
+            <small v-else class="text-accent">{{ t('notSavedJet') }}</small>
           </q-breadcrumbs>
         </q-toolbar-title>
         <q-btn
@@ -205,7 +207,7 @@ export default defineComponent({
   emits: ['entityClicked', 'reloadFailed', 'update:entity'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t }    = useI18n()
+    const { t, d }    = useI18n()
     const local    = ref(props.entity.clone())
     const showJson = ref(false)
     const loading  = ref(false)
@@ -236,7 +238,7 @@ export default defineComponent({
     const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
 
     return {
-      t, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType, DataType,
+      t, d, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType, DataType,
 
       handleRestore (entity: FullEntity): void {
         local.value = entity.clone()
