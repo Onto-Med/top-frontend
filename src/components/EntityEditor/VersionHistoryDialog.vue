@@ -22,11 +22,11 @@
           </q-tr>
         </template>
 
-        <template #body="{ row }">
+        <template #body="props">
           <q-tr :props="props">
             <q-td auto-width>
               <q-btn
-                v-show="!currentVersion || row.version != currentVersion"
+                v-show="!currentVersion || props.row.version != currentVersion"
                 v-close-popup
                 size="sm"
                 color="accent"
@@ -34,12 +34,12 @@
                 dense
                 icon="fast_rewind"
                 :title="t('restoreThing', { thing: t('version') })"
-                @click="$emit('restore', row)"
+                @click="$emit('restore', props.row)"
               />
             </q-td>
-            <q-td>{{ row.getTitle() }}</q-td>
-            <q-td>{{ row.author ? row.author.username : '' }}</q-td>
-            <q-td>{{ d(row.createdAt, 'long') }}</q-td>
+            <q-td>{{ props.row.getTitle() }}</q-td>
+            <q-td>{{ props.row.author ? props.row.author.username : '' }}</q-td>
+            <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
           </q-tr>
         </template>
       </q-table>
