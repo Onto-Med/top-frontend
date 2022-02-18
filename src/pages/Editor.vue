@@ -69,7 +69,7 @@ import { defineComponent, ref, watch, onMounted, Ref, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
-import { FullEntity } from 'src/models/Entity'
+import { FullEntity, PhenotypeInTaxonomy } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { Entity, EntityType } from '@onto-med/top-api'
@@ -224,12 +224,19 @@ export default defineComponent({
         const superClass = getEntityById(superClassId)
         const entity = new FullEntity({
           entityType: entityType,
-          dataType: superClass?.dataType
+          dataType: superClass?.dataType,
         })
-        if (superClass)
+        if (superClass) {
           superClass.subClasses?.push(entity)
-        else
+          const short = { id: superClass.id, entityType: superClass.entityType } as PhenotypeInTaxonomy
+          if (superClass.isPhenotype()) {
+            entity.superPhenotype = short
+          } else {
+            entity.superCategories = [ short ]
+          }
+        } else {
           entities.value.push(entity)
+        }
         selectTabByKey(entity.id)
       }
     }

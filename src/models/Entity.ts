@@ -25,6 +25,8 @@ export class FullEntity implements PhenotypeInTaxonomy {
   createdAt?: Date
   author?: UserAccount
   version?: number
+  superPhenotype?: PhenotypeInTaxonomy
+  superCategories?: PhenotypeInTaxonomy[]
 
   constructor (obj?: PhenotypeInTaxonomy) {
     if (obj) {
@@ -45,6 +47,8 @@ export class FullEntity implements PhenotypeInTaxonomy {
       this.createdAt = obj.createdAt
       this.author = obj.author
       this.version = obj.version
+      this.superCategories = obj.superCategories
+      this.superPhenotype = obj.superPhenotype
     }
     this.prepare()
   }
@@ -80,6 +84,8 @@ export class FullEntity implements PhenotypeInTaxonomy {
     this.createdAt = entity.createdAt
     this.author = entity.author
     this.version = entity.version
+    this.superCategories = entity.superCategories
+    this.superPhenotype = entity.superPhenotype
   }
 
   isRestriction (): boolean {
