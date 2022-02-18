@@ -20,6 +20,7 @@
       </q-card-section>
 
       <q-card-section>
+        <q-input :model-value="state.id" type="text" :label="t('id')" @update:model-value="state.id = $event" />
         <q-input :model-value="state.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
         <q-input :model-value="state.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
       </q-card-section>
