@@ -89,7 +89,7 @@ export default defineComponent({
       organisation,
       loading,
       saving,
-      showForm: showForm,
+      showForm,
       newOrganisation,
       routeToOrganisation (organisation: Organisation) {
         void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
