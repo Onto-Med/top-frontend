@@ -23,20 +23,23 @@
         </template>
 
         <template #body="{ row }">
-          <q-td auto-width>
-            <q-btn
-              v-close-popup
-              size="sm"
-              color="accent"
-              round
-              dense
-              icon="fast_rewind"
-              :title="t('restoreThing', { thing: t('version') })"
-              @click="$emit('restore', row)"
-            />
-          </q-td>
-          <q-td>{{ row.getTitle() }}</q-td>
+          <q-tr :props="props">
+            <q-td auto-width>
+              <q-btn
+                v-close-popup
+                size="sm"
+                color="accent"
+                round
+                dense
+                icon="fast_rewind"
+                :title="t('restoreThing', { thing: t('version') })"
+                @click="$emit('restore', row)"
+              />
+            </q-td>
+            <q-td>{{ row.getTitle() }}</q-td>
             <q-td>{{ row.author ? row.author.username : '' }}</q-td>
+            <q-td>{{ d(row.createdAt, 'long') }}</q-td>
+          </q-tr>
         </template>
       </q-table>
 
