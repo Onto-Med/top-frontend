@@ -23,6 +23,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import useAlert from 'src/mixins/useAlert'
 import { OrganisationApiKey } from 'src/boot/axios'
+import { Organisation } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'Editor',
@@ -40,7 +41,7 @@ export default defineComponent({
     const router = useRouter()
     const loading   = ref(false)
     const organisationApi = inject(OrganisationApiKey)
-    const organisation = ref(null)
+    const organisation = ref<Organisation|undefined>(undefined)
 
     const reload = async () => {
       if (!organisationApi) return
