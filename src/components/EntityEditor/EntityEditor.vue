@@ -88,7 +88,13 @@
         </q-card>
       </q-dialog>
 
-      <version-history-dialog v-model:show="showVersionHistory" :entity-id="local.id" @restore="handleRestore" />
+      <version-history-dialog
+        v-model:show="showVersionHistory"
+        :entity-id="local.id"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
+        @restore="handleRestore"
+      />
     </div>
 
     <div class="q-gutter-md q-mt-none q-px-md q-pb-xl col entity-editor-tab-content">
@@ -184,6 +190,14 @@ export default defineComponent({
   props: {
     entity: {
       type: FullEntity,
+      required: true
+    },
+    repositoryId: {
+      type: String,
+      required: true
+    },
+    organisationId: {
+      type: String,
       required: true
     }
   },

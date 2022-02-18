@@ -50,6 +50,8 @@
               <entity-editor
                 v-if="tabs[index]"
                 :entity="tabs[index]"
+                :repository-id="repositoryId"
+                :organisation-id="organisationId"
                 @update:entity="handleEntityUpdate"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"

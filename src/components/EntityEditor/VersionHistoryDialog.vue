@@ -58,10 +58,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue'
+import { defineComponent, ref, watch, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { FullEntity } from 'src/models/Entity'
-import { fetchEntityVersions } from 'src/api/entityRepository'
+import { EntityApiKey } from 'src/boot/axios'
+import { Entity } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'VersionHistoryDialog',
@@ -73,12 +74,21 @@ export default defineComponent({
     entityId: {
       type: String,
       required: true
+    },
+    organisationId: {
+      type: String,
+      required: true
+    },
+    repositoryId: {
+      type: String,
+      required: true
     }
   },
   emits: ['restore', 'update:show'],
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
+    const entityApi = inject(EntityApiKey)
     const columns = [
       { name: 'title', label: t('title') },
       { name: 'userAccount', label: t('author') },
@@ -87,10 +97,12 @@ export default defineComponent({
     const versions = ref<FullEntity[]>([])
     const loading = ref(false)
 
-    const reload = () => {
+    const reload = async () => {
+      if (!entityApi) return
       loading.value = true
-      fetchEntityVersions(props.entityId)
-        .then(r => versions.value = r)
+
+      await entityApi.getEntityVersionsById(props.organisationId, props.repositoryId, props.entityId)
+        .then(r => versions.value = r.data.map((v: Entity) => new FullEntity(v)))
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
     }
@@ -98,7 +110,7 @@ export default defineComponent({
     watch(
       () => props.show,
       (newShow: boolean) => {
-        if (newShow && !versions.value.length) reload()
+        if (newShow && !versions.value.length) void reload()
       }
     )
 
