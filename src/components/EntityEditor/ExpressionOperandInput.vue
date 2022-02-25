@@ -151,6 +151,7 @@ export default defineComponent({
       }
     })
     const showAddButton = computed((): boolean => {
+      if (props.modelValue.type == undefined) return false
       if ([ExpressionType.Restriction, ExpressionType.Class].includes(props.modelValue.type))
         return false
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
