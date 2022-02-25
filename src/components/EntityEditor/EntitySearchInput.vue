@@ -59,6 +59,7 @@
 <script lang="ts">
 import { defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useAlert from 'src/mixins/useAlert'
 import { EntityType, Entity } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios';
@@ -89,6 +90,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const entityApi = inject(EntityApiKey)
+    const { alert } = useAlert()
     const options = ref([] as Entity[])
     const selection = ref(null)
     const loading = ref(false)
@@ -108,7 +110,9 @@ export default defineComponent({
         } else {
           promise = entityApi.getEntities(undefined, val, props.entityTypes)
         }
-        await promise.then((r) => update(() => options.value = r.data.map((e) => new FullEntity(e))))
+        await promise
+          .then((r) => update(() => options.value = r.data.map((e) => new FullEntity(e))))
+          .catch((e: Error) => alert(e.message))
           .finally(() => loading.value = false)
       },
       handleSelectionChanged (entity: Entity) {
