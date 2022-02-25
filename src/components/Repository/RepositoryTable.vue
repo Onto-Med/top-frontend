@@ -33,7 +33,7 @@
               @click.stop="$emit('edit-clicked', props.row)"
             />
           </q-td>
-          <q-td>{{ props.row.name }}</q-td>
+          <q-td>{{ props.row.name || props.row.id }}</q-td>
           <q-td>{{ props.row.description }}</q-td>
           <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
         </q-tr>
