@@ -106,7 +106,7 @@ export default defineComponent({
     const reloadEntities = async () => {
       if (!entityApi) return
       treeLoading.value = true
-      await entityApi.getEntities(props.organisationId, props.repositoryId)
+      await entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId)
         .then(r => entities.value = r.data.map((e) => new FullEntity(e)))
         .finally(() => treeLoading.value = false)
     }

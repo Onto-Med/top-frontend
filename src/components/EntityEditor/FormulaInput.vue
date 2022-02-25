@@ -26,6 +26,8 @@
                 <q-item-section>
                   <entity-search-input
                     :entity-types="[ EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype ]"
+                    :organisation-id="organisationId"
+                    :repository-id="repositoryId"
                     @entitySelected="insertEntity"
                     @btnClicked="showClassMenu = false"
                   />
@@ -62,7 +64,9 @@ export default defineComponent({
     label: String,
     helpText: String,
     expanded: Boolean,
-    showHelp: Boolean
+    showHelp: Boolean,
+    organisationId: String,
+    repositoryId: String
   },
   emits: ['update:modelValue'],
   setup () {

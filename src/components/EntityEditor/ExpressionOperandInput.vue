@@ -41,6 +41,8 @@
       v-else
       :label="t('selectThing', { thing: t(modelValue.type) })"
       :entity-types="entityTypes"
+      :organisation-id="organisationId"
+      :repository-id="repositoryId"
       @clear-Clicked="$emit('removeClicked')"
       @entity-selected="setEntity($event)"
     />
@@ -126,7 +128,9 @@ export default defineComponent({
     indentLevel: {
       type: Number,
       default: 0
-    }
+    },
+    organisationId: String,
+    repositoryId: String
   },
   emits: ['update:modelValue', 'entityClicked', 'removeClicked'],
   setup (props, { emit }) {

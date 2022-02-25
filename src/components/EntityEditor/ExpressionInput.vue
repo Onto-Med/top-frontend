@@ -89,7 +89,9 @@ export default defineComponent({
       default: true
     },
     expanded: Boolean,
-    showHelp: Boolean
+    showHelp: Boolean,
+    organisationId: String,
+    repositoryId: String
   },
   emits: ['update:modelValue', 'entityClicked', 'removeClicked'],
   setup () {

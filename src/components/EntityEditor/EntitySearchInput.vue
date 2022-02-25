@@ -57,11 +57,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { searchEntities } from 'src/api/entityRepository'
-import { FullEntity } from 'src/models/Entity'
-import { EntityType } from '@onto-med/top-api';
+import { EntityType, Entity } from '@onto-med/top-api'
+import { EntityApiKey } from 'boot/axios'
+import { AxiosResponse } from 'axios';
+import { FullEntity } from 'src/models/Entity';
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -79,31 +80,38 @@ export default defineComponent({
     clearOnSelect: {
       type: Boolean,
       default: false
-    }
+    },
+    organisationId: String,
+    repositoryId: String
   },
   emits: ['btnClicked', 'entitySelected'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n();
-    const options = ref([] as FullEntity[])
+    const { t } = useI18n()
+    const entityApi = inject(EntityApiKey)
+    const options = ref([] as Entity[])
     const selection = ref(null)
     const loading = ref(false)
 
     return {
       t, options, selection, loading,
       async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
-        if (val.length < props.minLength) {
+        if (val.length < props.minLength || !entityApi) {
           abort()
           return
         }
 
         loading.value = true
-        let result = await searchEntities(val, props.entityTypes)
+        let promise: Promise<AxiosResponse<Entity[]>>
+        if (props.organisationId && props.repositoryId) {
+          promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, val, props.entityTypes)
+        } else {
+          promise = entityApi.getEntities(undefined, val, props.entityTypes)
+        }
+        await promise.then((r) => update(() => options.value = r.data.map((e) => new FullEntity(e))))
           .finally(() => loading.value = false)
-
-        update(() => options.value = result)
       },
-      handleSelectionChanged (entity: FullEntity) {
+      handleSelectionChanged (entity: Entity) {
         if (props.clearOnSelect) selection.value = null
         emit('entitySelected', entity)
       }

@@ -137,6 +137,8 @@
         v-model="local.formula"
         :label="t('formula')"
         :help-text="t('entityEditor.formulaHelp')"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
         expanded
       />
 
@@ -151,6 +153,8 @@
         v-if="local.entityType === EntityType.CombinedRestriction"
         v-model="local.expression"
         :label="t('expression')"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
         expanded
         @entity-clicked="$emit('entityClicked', $event)"
       />
