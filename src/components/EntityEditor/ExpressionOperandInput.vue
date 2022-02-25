@@ -65,8 +65,8 @@
     </span>
 
     <span v-show="showAddButton" :class="{ 'text-weight-bolder text-primary': hover }">
-      <span v-show="operands.length > 0">, </span>
-      <span v-show="expand"><br>{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
+      <span v-show="operands.length > 0">, <span v-show="expand"><br></span></span>
+      <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
       <span
         class="cursor-pointer"
         :title="t('addThing', { thing: t('operand') })"
