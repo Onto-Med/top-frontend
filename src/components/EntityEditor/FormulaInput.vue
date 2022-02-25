@@ -28,8 +28,8 @@
                     :entity-types="[ EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype ]"
                     :organisation-id="organisationId"
                     :repository-id="repositoryId"
-                    @entitySelected="insertEntity"
-                    @btnClicked="showClassMenu = false"
+                    @entity-selected="insertEntity"
+                    @btn-clicked="showClassMenu = false"
                   />
                 </q-item-section>
               </q-item>

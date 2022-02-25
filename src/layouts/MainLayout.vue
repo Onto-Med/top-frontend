@@ -21,7 +21,7 @@
           clear-on-select
           dark
           class="q-mr-sm"
-          @entitySelected="routeToEntity"
+          @entity-selected="routeToEntity"
         />
 
         <language-switch />

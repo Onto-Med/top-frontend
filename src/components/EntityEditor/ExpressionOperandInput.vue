@@ -43,7 +43,7 @@
       :entity-types="entityTypes"
       :organisation-id="organisationId"
       :repository-id="repositoryId"
-      @clear-Clicked="$emit('removeClicked')"
+      @btn-Clicked="$emit('removeClicked')"
       @entity-selected="setEntity($event)"
     />
 
