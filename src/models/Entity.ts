@@ -1,6 +1,6 @@
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
-import { EntityType, LocalisableText, Phenotype, Unit, Code, Restriction, Expression, UserAccount, DataType } from '@onto-med/top-api'
+import { EntityType, LocalisableText, Phenotype, Unit, Code, Restriction, Expression, UserAccount, DataType, Repository } from '@onto-med/top-api'
 
 export interface PhenotypeInTaxonomy extends Phenotype {
   superClass?: PhenotypeInTaxonomy
@@ -27,6 +27,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
   version?: number
   superPhenotype?: PhenotypeInTaxonomy
   superCategories?: PhenotypeInTaxonomy[]
+  repository?: Repository
 
   constructor (obj?: PhenotypeInTaxonomy) {
     if (obj) {
@@ -49,6 +50,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
       this.version = obj.version
       this.superCategories = obj.superCategories
       this.superPhenotype = obj.superPhenotype
+      this.repository = obj.repository
     }
     this.prepare()
   }
@@ -86,6 +88,7 @@ export class FullEntity implements PhenotypeInTaxonomy {
     this.version = entity.version
     this.superCategories = entity.superCategories
     this.superPhenotype = entity.superPhenotype
+    this.repository = entity.repository
   }
 
   isRestriction (): boolean {
