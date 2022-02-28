@@ -8,6 +8,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { name: 'editor', path: '/:organisationId/:repositoryId/:entityId?', props: true, component: () => import('pages/Editor.vue') },
       { name: 'organisations', path: '/organisation', component: () => import('pages/OrganisationOverview.vue') },
+      { name: 'repositories', path: '/repository', component: () => import('pages/RepositoryOverview.vue') },
       { name: 'showOrganisation', path: '/:organisationId', props: true, component: () => import('pages/Organisation.vue') }
     ],
   },

@@ -81,16 +81,16 @@ export default defineComponent({
         icon: 'house'
       },
       {
-        title: t('repository', 2),
-        icon: 'folder',
-        caption: t('developPhenotype', 2),
-        routeName: 'repository'
-      },
-      {
         title: t('organisation', 2),
         icon: 'groups',
         caption: t('collaborativeWork'),
         routeName: 'organisations'
+      },
+      {
+        title: t('repository', 2),
+        icon: 'folder',
+        caption: t('developPhenotype', 2),
+        routeName: 'repositories'
       }
     ])
 
