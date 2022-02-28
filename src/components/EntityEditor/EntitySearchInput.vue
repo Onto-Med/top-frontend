@@ -39,6 +39,9 @@
           <q-icon :name="scope.opt.getIcon()" :title="scope.opt.getIconTooltip()" :class="{ restriction: scope.opt.isRestriction() }" />
         </q-item-section>
         <q-item-section>
+          <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
+            {{ scope.opt.repository.name }}
+          </q-item-label>
           <q-item-label>{{ scope.opt.getTitle() }}</q-item-label>
           <q-item-label v-for="(description, index) in scope.opt.getDescriptions()" :key="index" caption>
             {{ description }}
