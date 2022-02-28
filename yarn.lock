@@ -1884,10 +1884,15 @@
     "@vue/compiler-dom" "3.2.20"
     "@vue/shared" "3.2.20"
 
-"@vue/devtools-api@^6.0.0-beta.11", "@vue/devtools-api@^6.0.0-beta.18", "@vue/devtools-api@^6.0.0-beta.7":
+"@vue/devtools-api@^6.0.0-beta.18", "@vue/devtools-api@^6.0.0-beta.7":
   version "6.0.0-beta.19"
   resolved "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.0.0-beta.19.tgz"
   integrity sha512-ObzQhgkoVeoyKv+e8+tB/jQBL2smtk/NmC9OmFK8UqdDpoOdv/Kf9pyDWL+IFyM7qLD2C75rszJujvGSPSpGlw==
+
+"@vue/devtools-api@^6.0.0-beta.21":
+  version "6.0.12"
+  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.12.tgz#7b57cce215ae9f37a86984633b3aa3d595aa5b46"
+  integrity sha512-iO/4FIezHKXhiDBdKySCvJVh8/mZPxHpiQrTy+PXVqJZgpTPTdHy4q8GXulaY+UKEagdkBb0onxNQZ0LNiqVhw==
 
 "@vue/reactivity@3.2.20":
   version "3.2.20"
@@ -6762,6 +6767,14 @@ picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3:
   resolved "https://registry.npmjs.org/picomatch/-/picomatch-2.3.0.tgz"
   integrity sha512-lY1Q/PiJGC2zOv/z391WOTD+Z02bCgsFfvxoXXf6h7kv9o+WmsmzYqrAwY63sNgOxE4xEdq0WyUnXfKeBrSvYw==
 
+pinia@^2.0.11:
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/pinia/-/pinia-2.0.11.tgz#ff03c714f5e5f16207280a4fc2eab01f3701ee2b"
+  integrity sha512-JzcmnMqu28PNWOjDgEDK6fTrIzX8eQZKPPKvu/fpHdpXARUj1xeVdFi3YFIMOWswqaBd589cpmAMdSSTryI9iw==
+  dependencies:
+    "@vue/devtools-api" "^6.0.0-beta.21"
+    vue-demi "*"
+
 pirates@^4.0.1:
   version "4.0.1"
   resolved "https://registry.npmjs.org/pirates/-/pirates-4.0.1.tgz"
@@ -8626,6 +8639,11 @@ vendors@^1.0.3:
   resolved "https://registry.npmjs.org/vendors/-/vendors-1.0.4.tgz"
   integrity sha512-/juG65kTL4Cy2su4P8HjtkTxk6VmJDiOPBufWniqQ6wknac6jNiXS9vU+hO3wgusiyqWlzTbVHi0dyJqRONg3w==
 
+vue-demi@*:
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.12.1.tgz#f7e18efbecffd11ab069d1472d7a06e319b4174c"
+  integrity sha512-QL3ny+wX8c6Xm1/EZylbgzdoDolye+VpCXRhI2hug9dJTP3OUJ3lmiKN3CsVV3mOJKwFi0nsstbgob0vG7aoIw==
+
 vue-eslint-parser@^7.10.0:
   version "7.11.0"
   resolved "https://registry.npmjs.org/vue-eslint-parser/-/vue-eslint-parser-7.11.0.tgz"
@@ -8695,13 +8713,6 @@ vue@3.2.20:
     "@vue/runtime-dom" "3.2.20"
     "@vue/server-renderer" "3.2.20"
     "@vue/shared" "3.2.20"
-
-vuex@^4.0.1:
-  version "4.0.2"
-  resolved "https://registry.npmjs.org/vuex/-/vuex-4.0.2.tgz"
-  integrity sha512-M6r8uxELjZIK8kTKDGgZTYX/ahzblnzC4isU1tpmEuOIIKmV+TRdc+H4s8ds2NuZ7wpUTdGRzJRtoj+lI+pc0Q==
-  dependencies:
-    "@vue/devtools-api" "^6.0.0-beta.11"
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
