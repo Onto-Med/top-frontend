@@ -84,7 +84,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as () => Expression,
-      required: true
+      default: () => { return {} }
     },
     label: String,
     monospace: {

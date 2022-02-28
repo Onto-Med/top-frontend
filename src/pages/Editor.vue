@@ -25,8 +25,8 @@
           >
             <q-tab v-for="tab in tabs" :key="tab.id" :name="tab.id">
               <span class="no-wrap">
-                <q-icon :name="tab.getIcon()" :class="{ restriction: tab.isRestriction() }" />
-                {{ tab.getTitle() }}
+                <q-icon :name="getIcon(tab)" :class="{ restriction: isRestricted(tab) }" />
+                {{ getTitle(tab) }}
                 <q-btn
                   flat
                   dense
@@ -66,15 +66,18 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, onMounted, Ref, inject } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import { useEntity } from 'src/pinia/entity'
 import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
-import { FullEntity, PhenotypeInTaxonomy } from 'src/models/Entity'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { Entity, EntityType } from '@onto-med/top-api'
+import { Entity, EntityType, Phenotype, Category } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import { AxiosResponse } from 'axios'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { v4 as uuidv4 } from 'uuid'
 
 export default defineComponent({
   name: 'Editor',
@@ -93,24 +96,25 @@ export default defineComponent({
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
+    const { getIcon, getTitle, isRestricted, isPhenotype } = useEntityFormatter()
     const router        = useRouter()
+    const entityStore   = useEntity()
     const { alert }     = useAlert()
     const entityApi     = inject(EntityApiKey)
     const showJson      = ref(false)
     const splitterModel = ref(25)
-    const entities      = ref<FullEntity[]>([])
-    const selected      = ref<FullEntity|undefined>(undefined)
-    const tabs          = ref([] as FullEntity[])
+    const { entities }  = storeToRefs(entityStore)
+    const selected      = ref<Entity|undefined>(undefined)
+    const tabs          = ref([] as Entity[])
     const treeLoading   = ref(false)
 
     const reloadEntities = async () => {
-      if (!entityApi) return
       treeLoading.value = true
-      await entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId)
-        .then(r => entities.value = r.data.map((e) => new FullEntity(e)))
+      await entityStore.reloadEntities(props.organisationId, props.repositoryId)
+        .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
-    const selectTabByKey = (key: string): void => {
+    const selectTabByKey = (key: string|undefined): void => {
       const index = tabs.value.map(t => t.id).indexOf(key)
       if (index !== -1)
         selected.value = tabs.value[index]
@@ -119,11 +123,12 @@ export default defineComponent({
         selected.value = selection ? selection : undefined
       }
     }
-    const closeTab = (tab: FullEntity|FullEntity[]): void => {
-      if (tab instanceof FullEntity) {
-        const index = tabs.value.map(t => t.id).indexOf(tab.id)
+    const closeTab = (tab: Entity|Entity[]): void => {
+      if (Array.isArray(tab)) {
+        const id = (tab as unknown as Entity).id
+        const index = tabs.value.map(t => t.id).indexOf(id)
         tabs.value.splice(index, 1)
-        if (selected.value && selected.value.id === tab.id)
+        if (selected.value && selected.value.id === id)
           selected.value = tabs.value[tabs.value.length - 1] || undefined
       } else {
         tabs.value = []
@@ -131,7 +136,7 @@ export default defineComponent({
       }
     }
 
-    const getEntityById = (id: string|number|undefined): FullEntity|null => {
+    const getEntityById = (id: string|number|undefined): Entity|null => {
       const find = (result: unknown, node: unknown): unknown => {
         if (result || !node) {
           return result
@@ -149,12 +154,12 @@ export default defineComponent({
       }
 
       const result = find(null, entities.value)
-      return result ? result as FullEntity : null
+      return result ? result as Entity : null
     }
 
     watch(
-      selected as Ref<FullEntity|undefined>,
-      (entity: FullEntity|undefined) => {
+      selected as Ref<Entity|undefined>,
+      (entity: Entity|undefined) => {
         let id = undefined
         if (entity) {
           id = entity.id
@@ -189,6 +194,7 @@ export default defineComponent({
 
     return {
       t, showJson, splitterModel, entities, selected, tabs, treeLoading,
+      isRestricted, getTitle, getIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
 
       handleEntityDeletion (entityId: string): void {
@@ -216,26 +222,29 @@ export default defineComponent({
         promise
           .then(response => {
             alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
-            tabs.value.find(t => t.id === response.data.id)?.apply(new FullEntity(response.data))
+            const index = tabs.value.findIndex(t => t.id === response.data.id)
+            if (index != -1)
+              tabs.value[index] = response.data
           })
           .catch((e: Error) => alert(e.message))
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
+        const entity = { id: (uuidv4 as () => string)(), entityType: entityType } as Entity
+
         const superClass = getEntityById(superClassId)
-        const entity = new FullEntity({
-          entityType: entityType,
-          dataType: superClass?.dataType,
-        })
+        if (superClass && superClass.entityType === EntityType.SinglePhenotype)
+          (entity as Phenotype).dataType = (superClass as Phenotype).dataType
+
         if (superClass) {
-          superClass.subClasses?.push(entity)
-          const short = { id: superClass.id, entityType: superClass.entityType } as PhenotypeInTaxonomy
-          if (superClass.isPhenotype()) {
-            entity.superPhenotype = short
+          // superClass.subClasses?.push(entity)
+          const short = { id: superClass.id, entityType: superClass.entityType } as Entity
+          if (isPhenotype(superClass)) {
+            (entity as Phenotype).superPhenotype = short
           } else {
-            entity.superCategories = [ short ]
+            (entity as Category).superCategories = [ short ]
           }
         } else {
-          entities.value.push(entity)
+          entityStore.addEntity(entity)
         }
         selectTabByKey(entity.id)
       }

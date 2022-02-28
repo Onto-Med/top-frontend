@@ -106,10 +106,10 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { FullEntity } from 'src/models/Entity'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
-import { EntityType, Expression, ExpressionType } from '@onto-med/top-api'
+import { EntityType, Expression, ExpressionType, Entity } from '@onto-med/top-api'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'ExpressionOperandInput',
@@ -120,7 +120,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as () => Expression,
-      required: true
+      default: () => { return {} }
     },
     expand: {
       type: Boolean,
@@ -145,8 +145,9 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const { restrictionEntityTypes } = useEntityFormatter()
     const hover = ref(false)
-    const entity = ref(undefined as unknown as FullEntity)
+    const entity = ref(undefined as unknown as Entity)
     const operatorSymbol = computed(() => {
       switch (props.modelValue.type) {
         case ExpressionType.Union:
@@ -166,7 +167,7 @@ export default defineComponent({
       return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
         || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
     })
-    const entityTypes = computed(() => FullEntity.restrictionEntityTypes())
+    const entityTypes = computed(() => restrictionEntityTypes())
     const selectableExpressionTypes = computed(() => [
       ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Restriction
     ])
@@ -184,7 +185,7 @@ export default defineComponent({
         newModelValue.type = type
         emit('update:modelValue', newModelValue)
       },
-      setEntity (newEntity: FullEntity): void {
+      setEntity (newEntity: Entity): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.id = newEntity.id
         newModelValue.type = newEntity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class

@@ -17,9 +17,7 @@ import { DataType } from '@onto-med/top-api'
 export default defineComponent({
   name: 'DataTypeSelect',
   props: {
-    modelValue: {
-      type: String,
-    },
+    modelValue: String,
     label: String,
     options: Array
   },

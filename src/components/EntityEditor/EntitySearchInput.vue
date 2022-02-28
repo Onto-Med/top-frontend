@@ -29,21 +29,21 @@
     </template>
     <template #selected>
       <span v-if="selection">
-        <q-icon :name="selection.icon" />
-        {{ selection.getTitle() }}
+        <q-icon :name="getIcon(selection)" />
+        {{ getTitle(selection) }}
       </span>
     </template>
     <template #option="scope">
       <q-item v-bind="scope.itemProps">
         <q-item-section avatar>
-          <q-icon :name="scope.opt.getIcon()" :title="scope.opt.getIconTooltip()" :class="{ restriction: scope.opt.isRestriction() }" />
+          <q-icon :name="getIcon(scope.opt)" :title="getIconTooltip(scope.opt)" :class="{ restriction: isRestricted(scope.opt) }" />
         </q-item-section>
         <q-item-section>
           <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
             {{ scope.opt.repository.name }}
           </q-item-label>
-          <q-item-label>{{ scope.opt.getTitle() }}</q-item-label>
-          <q-item-label v-for="(description, index) in scope.opt.getDescriptions()" :key="index" caption>
+          <q-item-label>{{ getTitle(scope.opt) }}</q-item-label>
+          <q-item-label v-for="(description, index) in getDescriptions(scope.opt)" :key="index" caption>
             {{ description }}
           </q-item-label>
         </q-item-section>
@@ -65,8 +65,8 @@ import { useI18n } from 'vue-i18n'
 import useAlert from 'src/mixins/useAlert'
 import { EntityType, Entity } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
-import { AxiosResponse } from 'axios';
-import { FullEntity } from 'src/models/Entity';
+import { AxiosResponse } from 'axios'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -92,6 +92,7 @@ export default defineComponent({
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const { getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted } = useEntityFormatter()
     const entityApi = inject(EntityApiKey)
     const { alert } = useAlert()
     const options = ref([] as Entity[])
@@ -99,7 +100,8 @@ export default defineComponent({
     const loading = ref(false)
 
     return {
-      t, options, selection, loading,
+      t, getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted,
+      options, selection, loading,
       async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
         if (val.length < props.minLength || !entityApi) {
           abort()
@@ -114,7 +116,7 @@ export default defineComponent({
           promise = entityApi.getEntities(undefined, val, props.entityTypes)
         }
         await promise
-          .then((r) => update(() => options.value = r.data.map((e) => new FullEntity(e))))
+          .then((r) => update(() => options.value = r.data))
           .catch((e: Error) => alert(e.message))
           .finally(() => loading.value = false)
       },

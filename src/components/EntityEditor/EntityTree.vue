@@ -28,21 +28,20 @@
         :no-nodes-label="t('entityTree.noNodesLabel')"
         :no-results-label="t('entityTree.noResultsLabel')"
         node-key="id"
-        children-key="subClasses"
         selected-color="primary"
         @update:selected="handleSelectedChange"
       >
         <template #default-header="{ node }">
           <div class="row items-center fit">
             <q-icon
-              v-if="node.getIcon()"
-              :name="node.getIcon()"
-              :title="node.getIconTooltip()"
-              :class="{ restriction: node.isRestriction() }"
+              v-if="getIcon(node)"
+              :name="getIcon(node)"
+              :title="getIconTooltip(node)"
+              :class="{ restriction: isRestricted(node) }"
               class="q-mr-sm"
             />
-            <div :title="node.getDescriptions().join('\n')">
-              {{ node.getTitle() }}
+            <div :title="getDescriptions(node).join('\n')">
+              {{ getTitle(node) }}
             </div>
             <entity-tree-context-menu :entity="node" @delete-entity-clicked="$emit('deleteEntity', $event)" @create-entity-clicked="handleCreateEntityClicked" />
           </div>
@@ -60,17 +59,17 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { QTree } from 'quasar'
-import { FullEntity } from 'src/models/Entity'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
-import { EntityType } from '@onto-med/top-api'
+import { EntityType, Entity } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTree',
   components: { EntityTreeContextMenu },
   props: {
-    nodes: Array as () => FullEntity[],
-    selected: undefined as unknown as () => FullEntity,
+    nodes: Array as () => Entity[],
+    selected: Object as () => Entity,
     loading: {
       type: Boolean,
       default: false
@@ -80,18 +79,20 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
     const tree      = ref(null as unknown as QTree)
     const expansion = ref([] as string[])
     const filter    = ref('')
     const asList    = ref(false)
 
-    const visibleNodes = computed((): FullEntity[] => {
+    const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
       if (!asList.value) return props.nodes
       return props.nodes.flatMap(
-        function loop (e: FullEntity): FullEntity[] {
-          if (e.entityType === EntityType.Category && e.subClasses)
-            return e.subClasses.flatMap(loop)
+        function loop (e: Entity): Entity[] {
+          if (e.entityType === EntityType.Category) // && e.children)
+            return [e]
+            // return e.children.flatMap(loop)
           else return [e]
         }
       )
@@ -104,11 +105,12 @@ export default defineComponent({
         emit('update:selected', tree.value.getNodeByKey(key))
     }
 
-    const filterFn = (node: FullEntity, filter: string): boolean =>
-      node.getTitle().toLowerCase().includes(filter.toLowerCase())
+    const filterFn = (node: Entity, filter: string): boolean =>
+      getTitle(node).toLowerCase().includes(filter.toLowerCase())
 
     return {
       t, tree, visibleNodes, expansion, filter, asList, handleSelectedChange, filterFn, EntityType,
+      getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted,
       handleCreateEntityClicked (t: EntityType, e?: string) {
         if (e) expansion.value.push(e)
         emit('createEntity', t, e)

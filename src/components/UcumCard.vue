@@ -34,7 +34,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Array as () => Array<Unit>,
-      required: true
+      default: () => []
     },
     expanded: Boolean,
     showHelp: Boolean

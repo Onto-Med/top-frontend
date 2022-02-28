@@ -28,31 +28,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { fetchEntity } from 'src/api/entityRepository'
-import { FullEntity } from 'src/models/Entity'
-import { EntityType } from '@onto-med/top-api';
+import { EntityType, Entity } from '@onto-med/top-api';
+import { EntityApiKey } from 'src/boot/axios';
 
 export default defineComponent({
   name: 'EntityChip',
   props: {
-    entityId: [String, Number],
-    entity: FullEntity
+    entityId: String,
+    entity: Object as () => Entity,
+    organisationId: String,
+    repositoryId: String
   },
   emits: ['entityClicked', 'removeClicked'],
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
     const loading = ref(false)
-    const state = ref(undefined as unknown as FullEntity)
+    const entityApi = inject(EntityApiKey)
+    const state = ref(undefined as unknown as Entity)
 
     const reload = () => {
       loading.value = true
-      fetchEntity(props.entityId as string)
-        .then(r => state.value = r)
-        .catch(() => state.value = new FullEntity({ id: props.entityId as string, entityType: EntityType.Category }))
-        .finally(() => loading.value = false)
+      if (entityApi && props.organisationId && props.repositoryId && props.entityId)
+        entityApi.getEntityById(props.organisationId, props.repositoryId, props.entityId)
+          .then(r => state.value = r.data)
+          .catch(() => state.value = { id: props.entityId as string, entityType: EntityType.Category })
+          .finally(() => loading.value = false)
     }
 
     onMounted(() => {

@@ -7,10 +7,10 @@
             <q-breadcrumbs-el
               v-if="local.superClass"
               class="cursor-pointer"
-              :label="local.superClass.getTitle()"
+              :label="getTitle(local.superClass)"
               @click="local.superClass ? $emit('entityClicked', local.superClass.id) : null"
             />
-            <q-breadcrumbs-el :label="local.getTitle()" />
+            <q-breadcrumbs-el :label="getTitle(local)" />
             <small v-if="local.version">{{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})</small>
             <small v-else class="text-accent">{{ t('notSavedJet') }}</small>
           </q-breadcrumbs>
@@ -102,17 +102,17 @@
 
     <div class="q-gutter-md q-mt-none q-px-md q-pb-xl col entity-editor-tab-content">
       <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
-      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms.length > 0" />
+      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms && local.synonyms.length > 0" />
       <localized-text-input
         v-model="local.descriptions"
         text-area
         rows="3"
         :label="t('description', 2)"
         :help-text="t('entityEditor.descriptionsHelp')"
-        :expanded="local.descriptions.length > 0"
+        :expanded="local.description && local.descriptions.length > 0"
       />
 
-      <code-input v-model="local.codes" :expanded="local.codes.length > 0" />
+      <code-input v-model="local.codes" :expanded="local.codes && local.codes.length > 0" />
 
       <data-type-select
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
@@ -129,7 +129,7 @@
       <ucum-card
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
         v-model="local.units"
-        :expanded="local.units.length > 0"
+        :expanded="local.units && local.units.length > 0"
       />
 
       <formula-input
@@ -170,9 +170,7 @@
 <script lang="ts">
 import { ref, computed, defineComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { FullEntity } from 'src/models/Entity'
-import { EntityType, DataType } from '@onto-med/top-api'
-import { fetchEntity } from 'src/api/entityRepository'
+import { EntityType, DataType, Entity } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
@@ -181,6 +179,7 @@ import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDial
 import UcumCard from 'src/components/UcumCard.vue'
 import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -196,7 +195,7 @@ export default defineComponent({
   },
   props: {
     entity: {
-      type: FullEntity,
+      type: Object as () => Entity,
       required: true
     },
     repositoryId: {
@@ -208,11 +207,17 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['entityClicked', 'reloadFailed', 'update:entity'],
+  emits: ['entityClicked', 'update:entity'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, d }    = useI18n()
-    const local    = ref(props.entity.clone())
+    const { t, d } = useI18n()
+    const clone = (value: Entity) =>
+      JSON.parse(JSON.stringify(value)) as Entity
+    const equals = (expected: unknown, actual: unknown): boolean => 
+      JSON.stringify(expected) === JSON.stringify(actual)
+
+    const { getTitle } = useEntityFormatter()
+    const local    = ref(clone(props.entity))
     const showJson = ref(false)
     const loading  = ref(false)
     const showVersionHistory = ref(false)
@@ -221,31 +226,20 @@ export default defineComponent({
 
     watch(
       () => props.entity,
-      (value: FullEntity) => {
-        local.value = value.clone()
+      (value: Entity) => {
+        local.value = clone(value)
       },
       { deep: true }
     )
 
-    const reload = () => {
-      loading.value = true
-      fetchEntity(props.entity.id)
-        .then(r => {
-          local.value = r
-          if (!local.value.equals(props.entity))
-            emit('update:entity', r)
-        })
-        .catch(e => emit('reloadFailed', e))
-        .finally(() => loading.value = false)
-    }
-    const reset = () => local.value = props.entity.clone()
-    const hasUnsavedChanges = computed(() => !local.value.equals(props.entity))
+    const reset = () => local.value = clone(props.entity)
+    const hasUnsavedChanges = computed(() => !equals(local.value, props.entity))
 
     return {
-      t, d, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reload, reset, EntityType, DataType,
+      t, d, getTitle, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reset, EntityType, DataType,
 
-      handleRestore (entity: FullEntity): void {
-        local.value = entity.clone()
+      handleRestore (entity: Entity): void {
+        local.value = clone(entity)
         restrictionKey.value++
       },
 

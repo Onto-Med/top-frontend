@@ -46,8 +46,7 @@ import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
-import { FullEntity } from 'src/models/Entity'
-import { EntityType } from '@onto-med/top-api'
+import { EntityType, Entity } from '@onto-med/top-api'
 import { QEditor } from 'quasar'
 
 export default defineComponent({
@@ -59,7 +58,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: String,
-      required: true
+      default: () => ''
     },
     label: String,
     helpText: String,
@@ -135,10 +134,12 @@ export default defineComponent({
     return {
       t, editorRef, showClassMenu, definitions, toolbar, EntityType,
 
-      insertEntity (entity: FullEntity): void {
+      insertEntity (entity: Entity): void {
         const editor = editorRef.value
-        editor.runCmd('insertHTML', '[' + entity.id + ']')
-        showClassMenu.value = false
+        if (entity.id) {
+          editor.runCmd('insertHTML', '[' + entity.id + ']')
+          showClassMenu.value = false
+        }
       },
       insert
     }

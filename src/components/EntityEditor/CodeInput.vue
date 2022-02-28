@@ -68,7 +68,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Array as () => Code[],
-      required: true
+      default: () => []
     },
     expanded: Boolean,
     showHelp: Boolean

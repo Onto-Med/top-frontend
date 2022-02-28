@@ -34,13 +34,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType } from '@onto-med/top-api'
-import { FullEntity } from 'src/models/Entity'
+import { EntityType, Entity } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTreeContextMenu',
   props: {
-    entity: FullEntity
+    entity: Object as () => Entity
   },
   emits: ['deleteEntityClicked', 'createEntityClicked'],
   setup () {

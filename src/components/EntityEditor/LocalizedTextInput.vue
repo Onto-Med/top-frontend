@@ -61,7 +61,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Array as () => Array<Record<string, string|undefined>>,
-      required: true
+      default: () => []
     },
     helpText: String,
     uniqueLangs: Boolean,

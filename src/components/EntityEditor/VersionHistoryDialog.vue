@@ -37,7 +37,7 @@
                 @click="$emit('restore', props.row)"
               />
             </q-td>
-            <q-td>{{ props.row.getTitle() }}</q-td>
+            <q-td>{{ getTitle(props.row) }}</q-td>
             <q-td>{{ props.row.author ? props.row.author.username : '' }}</q-td>
             <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
           </q-tr>
@@ -61,9 +61,9 @@
 <script lang="ts">
 import { defineComponent, ref, watch, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { FullEntity } from 'src/models/Entity'
 import { EntityApiKey } from 'src/boot/axios'
 import { Entity } from '@onto-med/top-api'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'VersionHistoryDialog',
@@ -91,12 +91,13 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
     const entityApi = inject(EntityApiKey)
+    const { getTitle } = useEntityFormatter()
     const columns = [
       { name: 'title', label: t('title') },
       { name: 'userAccount', label: t('author') },
       { name: 'timestamp', label: t('timestamp') }
     ]
-    const versions = ref<FullEntity[]>([])
+    const versions = ref<Entity[]>([])
     const loading = ref(false)
 
     const reload = async () => {
@@ -104,7 +105,7 @@ export default defineComponent({
       loading.value = true
 
       await entityApi.getEntityVersionsById(props.organisationId, props.repositoryId, props.entityId)
-        .then(r => versions.value = r.data.map((v: Entity) => new FullEntity(v)))
+        .then(r => versions.value = r.data)
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
     }
@@ -116,7 +117,7 @@ export default defineComponent({
       }
     )
 
-    return { t, d, columns, versions, loading, reload }
+    return { t, d, getTitle, columns, versions, loading, reload }
   }
 })
 </script>

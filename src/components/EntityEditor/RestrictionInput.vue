@@ -103,7 +103,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as () => Restriction,
-      required: true
+      default: () => { return {} }
     },
     name: String,
     label: String,
