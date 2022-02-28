@@ -119,6 +119,8 @@ export class FullEntity implements PhenotypeInTaxonomy {
           return 'article'
         case DataType.Boolean:
           return 'check_box'
+        default:
+          return 'help_center'
       }
     }
     return 'folder'
