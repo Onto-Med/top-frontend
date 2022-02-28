@@ -199,7 +199,6 @@ export default defineComponent({
       },
       handleOperandUpdate (index: number, operand: Expression|null): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        console.log(newModelValue)
         if (newModelValue.operands) {
           if (operand) newModelValue.operands[index] = operand
           else newModelValue.operands.splice(index, 1)
