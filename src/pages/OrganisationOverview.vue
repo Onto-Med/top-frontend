@@ -18,12 +18,22 @@
       </q-card-section>
     </q-card>
 
-    <organisation-table
-      :organisations="organisations"
+    <table-with-actions
+      :rows="organisations"
       :loading="loading"
-      @edit-clicked="organisation = $event; showForm = true"
       @row-clicked="routeToOrganisation($event)"
-    />
+    >
+      <template #default="{ row }">
+        <q-btn
+          size="sm"
+          color="primary"
+          dense
+          icon="edit"
+          :title="t('editThing', { thing: t('organisation') })"
+          @click.stop="organisation = row; showForm = true"
+        />
+      </template>
+    </table-with-actions>
 
     <organisation-form
       v-model="organisation"
@@ -42,16 +52,16 @@ import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { Organisation } from '@onto-med/top-api'
-import OrganisationTable from 'src/components/Organisation/OrganisationTable.vue'
+import TableWithActions from 'src/components/TableWithActions.vue'
 import OrganisationForm from 'src/components/Organisation/OrganisationForm.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 
 
 export default defineComponent({
-  name: 'Editor',
+  name: 'OrganisationOverview',
   components: {
-    OrganisationTable,
+    TableWithActions,
     OrganisationForm
   },
   setup () {

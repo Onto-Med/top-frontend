@@ -2,7 +2,7 @@
   <q-page>
     <q-table
       class="sticky-header-table"
-      :rows="organisations"
+      :rows="rows"
       :columns="columns"
       :loading="loading"
       :pagination="initialPagination"
@@ -24,14 +24,7 @@
       <template #body="props">
         <q-tr class="cursor-pointer" :props="props" @click="$emit('row-clicked', props.row)">
           <q-td auto-width>
-            <q-btn
-              size="sm"
-              color="primary"
-              dense
-              icon="edit"
-              :title="t('editThing', { thing: t('organisation') })"
-              @click.stop="$emit('edit-clicked', props.row)"
-            />
+            <slot :row="props.row" />
           </q-td>
           <q-td>{{ props.row.name || props.row.id }}</q-td>
           <q-td>{{ props.row.description }}</q-td>
@@ -43,17 +36,16 @@
 </template>
 
 <script lang="ts">
-import { Organisation } from '@onto-med/top-api'
 import { defineComponent, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
-  name: 'OrganisationTable',
+  name: 'TableWithActions',
   props: {
-    organisations: Array as () => Organisation[],
+    rows: Array,
     loading: Boolean
   },
-  emits: ['edit-clicked', 'row-clicked'],
+  emits: ['row-clicked'],
   setup() {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()

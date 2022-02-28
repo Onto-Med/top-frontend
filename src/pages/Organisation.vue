@@ -19,12 +19,22 @@
       </q-card-section>
     </q-card>
 
-    <repository-table
-      :repositories="repositories"
+    <table-with-actions
+      :rows="repositories"
       :loading="repositoriesLoading"
-      @edit-clicked="repository = $event; showForm = true"
       @row-clicked="routeToEditor($event)"
-    />
+    >
+      <template #default="{ row }">
+        <q-btn
+          size="sm"
+          color="primary"
+          dense
+          icon="edit"
+          :title="t('editThing', { thing: t('repository') })"
+          @click.stop="repository = row; showForm = true"
+        />
+      </template>
+    </table-with-actions>
 
     <repository-form
       v-model="repository"
@@ -47,7 +57,7 @@ import useAlert from 'src/mixins/useAlert'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { RepositoryApiKey } from 'src/boot/axios'
 import { Organisation, Repository } from '@onto-med/top-api'
-import RepositoryTable from 'src/components/Repository/RepositoryTable.vue'
+import TableWithActions from 'src/components/TableWithActions.vue'
 import RepositoryForm from 'src/components/Repository/RepositoryForm.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
@@ -55,7 +65,7 @@ import { v4 as uuidv4 } from 'uuid'
 export default defineComponent({
   name: 'Editor',
   components: {
-    RepositoryTable,
+    TableWithActions,
     RepositoryForm
   },
   props: {
