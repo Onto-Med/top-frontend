@@ -61,6 +61,8 @@
         :expand="expand"
         :indent="indent"
         :indent-level="indentLevel + 1"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
         @entity-clicked="$emit('entityClicked', $event)"
         @remove-clicked="handleOperandUpdate(index, null)"
         @update:model-value="handleOperandUpdate(index, $event)"
