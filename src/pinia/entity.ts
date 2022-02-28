@@ -16,7 +16,7 @@ export const useEntity = defineStore('entity', {
           name: 'MissingParametersException',
           message: 'organisationId or repositoryId missing'
         }
-      await entityApi.getEntitiesByRepositoryId(organisationId, repositoryId)
+      await entityApi.getRootEntitiesByRepositoryId(organisationId, repositoryId)
         .then((r) => this.entities = r.data)
     },
     addEntity (entity: Entity) {

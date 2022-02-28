@@ -138,18 +138,16 @@ export default defineComponent({
 
     const getEntityById = (id: string|number|undefined): Entity|null => {
       const find = (result: unknown, node: unknown): unknown => {
-        if (result || !node) {
-          return result
-        }
-        if (Array.isArray(node) === true) {
+        if (result || !node) return result
+        if (Array.isArray(node) === true)
           return [].reduce.call(Object(node), find, result)
-        }
-        if ((node as Record<string, unknown>).id === id) {
+        if ((node as Record<string, unknown>).id === id)
           return node
-        }
-        if ((node as Record<string, unknown>).subClasses) {
-          return find(null, (node as Record<string, unknown>).subClasses)
-        }
+        if ((node as Record<string, unknown>).subCategories)
+          result = find(null, (node as Record<string, unknown>).subCategories)
+        if (result) return result
+        if ((node as Record<string, unknown>).phenotypes)
+          return find(null, (node as Record<string, unknown>).phenotypes)
         return result
       }
 
@@ -236,12 +234,20 @@ export default defineComponent({
           (entity as Phenotype).dataType = (superClass as Phenotype).dataType
 
         if (superClass) {
-          // superClass.subClasses?.push(entity)
           const short = { id: superClass.id, entityType: superClass.entityType } as Entity
           if (isPhenotype(superClass)) {
             (entity as Phenotype).superPhenotype = short
           } else {
             (entity as Category).superCategories = [ short ]
+          }
+          if (isPhenotype(entity)) {
+            if (!(superClass as Category).phenotypes)
+              (superClass as Category).phenotypes = [] as Entity[]
+            (superClass as Category).phenotypes?.push(entity)
+          } else {
+            if (!(superClass as Category).subCategories)
+              (superClass as Category).subCategories = [] as Entity[]
+            (superClass as Category).subCategories?.push(entity)
           }
         } else {
           entityStore.addEntity(entity)
