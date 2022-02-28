@@ -78,7 +78,7 @@ export default defineComponent({
       repositories,
       loading,
       routeToRepository (repository: Repository) {
-        void router.push({ name: 'editor', params: { organisationId: repository.organisation.id, repositoryId: repository.id } })
+        void router.push({ name: 'editor', params: { organisationId: repository.organisation?.id, repositoryId: repository.id } })
       }
     }
   }
