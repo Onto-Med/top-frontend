@@ -24,7 +24,7 @@
       :loading="repositoriesLoading"
       @row-clicked="routeToEditor($event)"
     >
-      <template #default="{ row }">
+      <template #actions="{ row }">
         <q-btn
           size="sm"
           color="primary"

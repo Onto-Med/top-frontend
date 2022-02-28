@@ -23,7 +23,7 @@
       :loading="loading"
       @row-clicked="routeToOrganisation($event)"
     >
-      <template #default="{ row }">
+      <template #actions="{ row }">
         <q-btn
           size="sm"
           color="primary"
