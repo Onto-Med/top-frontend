@@ -100,6 +100,7 @@ export default {
   createdAt: 'Erzeugt am',
   name: 'Name',
   notSavedJet: 'Noch nicht gespeichert!',
+  encloseWithExpression: 'Mit Ausdruck umschließen',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

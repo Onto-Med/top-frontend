@@ -22,7 +22,10 @@
             <q-item-section v-t="type" />
           </q-item>
           <q-separator />
-          <q-item v-close-popup clickable @click="$emit('removeClicked')">
+          <q-item v-close-popup clickable @click="enclose">
+            <q-item-section v-t="'encloseWithExpression'" />
+          </q-item>
+          <q-item v-if="!root" v-close-popup clickable @click="$emit('removeClicked')">
             <q-item-section v-t="'remove'" />
           </q-item>
         </q-list>
@@ -129,6 +132,10 @@ export default defineComponent({
       type: Number,
       default: 0
     },
+    root: {
+      type: Boolean,
+      default: false
+    },
     organisationId: String,
     repositoryId: String
   },
@@ -190,10 +197,17 @@ export default defineComponent({
       },
       handleOperandUpdate (index: number, operand: Expression|null): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        console.log(newModelValue)
         if (newModelValue.operands) {
           if (operand) newModelValue.operands[index] = operand
           else newModelValue.operands.splice(index, 1)
         }
+        emit('update:modelValue', newModelValue)
+      },
+      enclose (): void {
+        const newModelValue = {
+          operands: [ JSON.parse(JSON.stringify(props.modelValue)) ]
+        } as Expression
         emit('update:modelValue', newModelValue)
       }
     }

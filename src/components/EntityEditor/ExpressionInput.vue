@@ -7,6 +7,7 @@
         :model-value="modelValue"
         :expand="expandExpression"
         :indent="indent || 2"
+        root
         @update:model-value="$emit('update:modelValue', $event)"
         @entity-clicked="$emit('entityClicked', $event)"
       />
