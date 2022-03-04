@@ -11,7 +11,7 @@
               @click="local.superClass ? $emit('entityClicked', local.superClass.id) : null"
             />
             <q-breadcrumbs-el :label="getTitle(local)" />
-            <small v-if="local.version">{{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})</small>
+            <small v-if="!isNew">{{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})</small>
             <small v-else class="text-accent">{{ t('notSavedJet') }}</small>
           </q-breadcrumbs>
         </q-toolbar-title>
@@ -20,7 +20,7 @@
           no-caps
           color="primary"
           :label="t('save')"
-          :disabled="!hasUnsavedChanges"
+          :disabled="!hasUnsavedChanges && !isNew"
           @click="save"
         />
         <q-btn
@@ -38,6 +38,7 @@
           dense
           icon="history"
           color="primary"
+          :disabled="isNew"
           :title="t('versionHistory')"
           @click="showVersionHistory = true"
         />
@@ -232,20 +233,21 @@ export default defineComponent({
       { deep: true }
     )
 
-    const reset = () => local.value = clone(props.entity)
-    const hasUnsavedChanges = computed(() => !equals(local.value, props.entity))
-
     return {
-      t, d, getTitle, local, showJson, showVersionHistory, loading, showClearDialog, hasUnsavedChanges, restrictionKey, reset, EntityType, DataType,
+      t, d, getTitle, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,
+
+      isNew: computed(() => !local.value.version),
+
+      hasUnsavedChanges: computed(() => !equals(local.value, props.entity)),
 
       handleRestore (entity: Entity): void {
         local.value = clone(entity)
         restrictionKey.value++
       },
 
-      save () {
-        emit('update:entity', local.value)
-      }
+      reset: () => local.value = clone(props.entity),
+
+      save: () => emit('update:entity', local.value)
     }
   }
 })
