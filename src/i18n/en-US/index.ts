@@ -76,6 +76,7 @@ export default {
   close: 'Close',
   author: 'Author',
   restoreThing: 'Restore {thing}',
+  thingRestored: '{thing} has been restored',
   invalid: 'Invalid',
   valid: 'Valid',
   unit: 'Unit|Units',

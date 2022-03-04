@@ -76,6 +76,7 @@ export default {
   close: 'Schließen',
   author: 'Autor',
   restoreThing: '{thing} wiederherstellen',
+  thingRestored: '{thing} wurde wiederhergestellt',
   invalid: 'Ungültig',
   valid: 'Gültig',
   unit: 'Einheit|Einheiten',

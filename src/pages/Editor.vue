@@ -206,7 +206,7 @@ export default defineComponent({
       restoreVersion (entity: Entity) {
         entityStore.restoreVersion(entity)
           .then(() => {
-            alert(t('thingReset', { thing: t('version') }), 'positive')
+            alert(t('thingRestored', { thing: t('version') }), 'positive')
             const index = tabs.value.findIndex(t => t.id == entity.id)
             if (index !== -1) Object.assign(tabs.value[index], entity)
           })
