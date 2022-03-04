@@ -39,7 +39,7 @@
             </q-tab>
             <q-menu context-menu>
               <q-list>
-                <q-item v-close-popup dense clickable @click="closeTab(tabs)">
+                <q-item v-close-popup dense clickable @click="closeTab(undefined)">
                   <q-item-section v-t="'closeAll'" />
                 </q-item>
               </q-list>
@@ -115,16 +115,16 @@ export default defineComponent({
         selected.value = selection ? selection : undefined
       }
     }
-    const closeTab = (tab: Entity|Entity[]): void => {
-      if (Array.isArray(tab)) {
+    const closeTab = (tab: Entity|undefined): void => {
+      if (tab === undefined) {
+        tabs.value = []
+        selected.value = undefined
+      } else {
         const id = (tab as unknown as Entity).id
         const index = tabs.value.map(t => t.id).indexOf(id)
         tabs.value.splice(index, 1)
         if (selected.value && selected.value.id === id)
           selected.value = tabs.value[tabs.value.length - 1] || undefined
-      } else {
-        tabs.value = []
-        selected.value = undefined
       }
     }
 
@@ -177,8 +177,7 @@ export default defineComponent({
         entityStore.deleteEntity(entity)
           .then(() => {
             alert(t('thingDeleted', { thing: t('entity') }), 'positive')
-            const index = tabs.value.findIndex(t => t.id == entity.id)
-            if (index !== -1) tabs.value.splice(index, 1)
+            closeTab(entity)
           })
           .catch((e: Error) => alert(t(e.message)))
           .finally(() => treeLoading.value = false)
