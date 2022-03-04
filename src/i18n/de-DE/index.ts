@@ -101,6 +101,7 @@ export default {
   name: 'Name',
   notSavedJet: 'Noch nicht gespeichert!',
   encloseWithExpression: 'Mit Ausdruck umschließen',
+  attributesMissing: 'Ein oder mehrere Attribute fehlen.',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'
@@ -125,7 +126,8 @@ export default {
     expressionHelp: 'Um Restriktionen für kombinierte Phänotypen zu definieren. Muss ein Boolescher Ausdruck angegeben werden. '
       + 'In dem Ausdrück können Vereinigungen (ODER), Schnittmengen (UND) und Komplemente (NICHT) von Phänotypen enthalten sein. '
       + 'Klicken Sie auf die Plus-Schaltfläche um Komponenten zum Ausdruck hinzuzufügen. '
-      + 'Außerdem können Sie auf bereits hinzugefügte Komponenten klicken, um diese zu verändern oder zu entfernen.'
+      + 'Außerdem können Sie auf bereits hinzugefügte Komponenten klicken, um diese zu verändern oder zu entfernen.',
+    confirmDelete: 'Möchten Sie die Entität wirklich unwiderruflich löschen? Alle gespeicherten Versionen und Restriktionen werden ebenfalls gelöscht.',
   },
   organisationPage: {
     description: 'Verwalten Sie Ihre Organisationen oder erstellen Sie neue.'

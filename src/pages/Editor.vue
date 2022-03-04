@@ -195,17 +195,15 @@ export default defineComponent({
       isRestricted, getTitle, getIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
 
-      handleEntityDeletion (entityId: string): void {
-        if (!entityId || !entityApi) return
+      handleEntityDeletion (entity: Entity): void {
+        if (!entity || !entityApi) return
         treeLoading.value = true
 
-        entityApi
-          .deleteEntityById(props.organisationId, props.repositoryId, entityId)
+        entityStore.deleteEntity(entity)
           .then(() => {
             alert(t('thingDeleted', { thing: t('entity') }), 'positive')
-            void reloadEntities()
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => alert(t(e.message)))
           .finally(() => treeLoading.value = false)
       },
       handleEntityUpdate (entity: Entity) {

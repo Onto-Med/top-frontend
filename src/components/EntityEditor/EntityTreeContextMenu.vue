@@ -12,27 +12,44 @@
       </q-item>
     </q-list>
     <q-list v-else-if="entity" dense>
-      <q-item v-if="entity.entityType === EntityType.SinglePhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.SingleRestriction, entity.id)">
-        <q-item-section>{{ t('addThing', { thing: t(EntityType.SingleRestriction) }) }}</q-item-section>
-      </q-item>
-      <q-item v-if="entity.entityType === EntityType.DerivedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.DerivedRestriction, entity.id)">
-        <q-item-section>{{ t('addThing', { thing: t(EntityType.DerivedRestriction) }) }}</q-item-section>
-      </q-item>
-      <q-item v-if="entity.entityType === EntityType.CombinedPhenotype" v-close-popup clickable @click="$emit('createEntityClicked', EntityType.CombinedRestriction, entity.id)">
-        <q-item-section>{{ t('addThing', { thing: t(EntityType.SingleRestriction) }) }}</q-item-section>
-      </q-item>
+      <template v-for="entry in entries" :key="entry.phenotype">
+        <q-item
+          v-if="entity.entityType === entry.phenotype"
+          v-close-popup
+          clickable
+          @click="$emit('createEntityClicked',entry.restriction, entity.id)"
+        >
+          <q-item-section>{{ t('addThing', { thing: t(entry.restriction) }) }}</q-item-section>
+        </q-item>
+      </template>
     </q-list>
     <q-separator />
     <q-list v-if="entity" dense>
-      <q-item v-close-popup clickable @click="$emit('deleteEntityClicked', entity.id)">
+      <q-item clickable @click="showDeleteDialog = true">
         <q-item-section v-t="'delete'" />
       </q-item>
     </q-list>
+
+    <q-dialog v-model="showDeleteDialog">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="warning_amber" color="warning" text-color="white" />
+          <span v-t="'entityEditor.confirmDelete'" class="q-ml-sm" />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
+          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('deleteEntityClicked', entity)" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-menu>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, Entity } from '@onto-med/top-api'
 
@@ -46,7 +63,19 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
 
-    return { t, EntityType }
+    return {
+      t,
+
+      entries: [
+        { phenotype: EntityType.SinglePhenotype, restriction: EntityType.SingleRestriction },
+        { phenotype: EntityType.DerivedPhenotype, restriction: EntityType.DerivedRestriction },
+        { phenotype: EntityType.CombinedPhenotype, restriction: EntityType.CombinedRestriction },
+      ],
+
+      EntityType,
+
+      showDeleteDialog: ref(false)
+    }
   }
 })
 </script>

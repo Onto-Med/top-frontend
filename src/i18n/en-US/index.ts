@@ -101,6 +101,7 @@ export default {
   name: 'Name',
   notSavedJet: 'Not saved jet!',
   encloseWithExpression: 'Enclose with expression',
+  attributesMissing: 'One or more attributes are missing.',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
@@ -122,7 +123,8 @@ export default {
       + 'No restriction type can be selected for the quantifiers "Values present" and "No values present" because the restriction of the values is implicit.',
     expressionHelp: 'To define restrictions for combined phenotypes. A Boolean expression must be specified. '
       + 'The expression can contain unions (OR), intersections (AND) and complements (NOT) of phenotypes. '
-      + 'Click the plus button to add components to the expression. You can also click on already added components to modify or remove them.'
+      + 'Click the plus button to add components to the expression. You can also click on already added components to modify or remove them.',
+      confirmDelete: 'Do you really want to delete the entity irrevocably? All saved versions and restrictions will also be deleted.',
   },
   organisationPage: {
     description: 'Manage your organisations or create new ones.'

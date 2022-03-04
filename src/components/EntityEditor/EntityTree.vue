@@ -43,7 +43,11 @@
             <div :title="getDescriptions(node).join('\n')">
               {{ getTitle(node) }}
             </div>
-            <entity-tree-context-menu :entity="node" @delete-entity-clicked="$emit('deleteEntity', $event)" @create-entity-clicked="handleCreateEntityClicked" />
+            <entity-tree-context-menu
+              :entity="node"
+              @delete-entity-clicked="$emit('deleteEntity', $event)"
+              @create-entity-clicked="handleCreateEntityClicked"
+            />
           </div>
         </template>
       </q-tree>
