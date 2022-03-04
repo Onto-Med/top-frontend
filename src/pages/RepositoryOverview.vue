@@ -16,6 +16,7 @@
       :columns="columns"
       :loading="loading"
       @row-clicked="routeToRepository($event)"
+      @reload-clicked="reload()"
     >
       <template #row-cells="{ row }">
         <q-td>{{ row.organisation.name || row.organisation.id }}</q-td>
@@ -74,6 +75,7 @@ export default defineComponent({
       t,
       d,
       alert,
+      reload,
       columns,
       repositories,
       loading,

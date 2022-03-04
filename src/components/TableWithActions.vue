@@ -6,9 +6,19 @@
       :columns="cols"
       :loading="loading"
       :pagination="initialPagination"
+      :filter="filter"
       :no-data-label="t('noDataPresent')"
       row-key="id"
     >
+      <template #top>
+        <q-btn color="primary" :disabled="loading" :label="t('reload')" icon="refresh" @click="$emit('reload-clicked')" />
+        <q-space />
+        <q-input v-model="filter" dense debounce="300" color="primary">
+          <template #append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
       <template #header="props">
         <q-tr :props="props">
           <q-th auto-width />
@@ -38,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -48,7 +58,7 @@ export default defineComponent({
     columns: Array,
     loading: Boolean
   },
-  emits: ['row-clicked'],
+  emits: ['row-clicked', 'reload-clicked'],
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
@@ -56,6 +66,7 @@ export default defineComponent({
     return {
       t,
       d,
+      filter: ref(''),
       initialPagination: { sortBy: 'name', descenting: false, page: 1, rowsPerPage: 10 },
       cols: computed(() => {
         if (props.columns) return props.columns

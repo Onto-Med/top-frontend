@@ -22,6 +22,7 @@
       :rows="organisations"
       :loading="loading"
       @row-clicked="routeToOrganisation($event)"
+      @reload-clicked="reload()"
     >
       <template #actions="{ row }">
         <q-btn
@@ -95,6 +96,7 @@ export default defineComponent({
     return {
       t,
       alert,
+      reload,
       organisations,
       organisation,
       loading,
