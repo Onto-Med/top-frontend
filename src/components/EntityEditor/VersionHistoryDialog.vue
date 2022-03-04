@@ -24,7 +24,7 @@
 
         <template #body="props">
           <q-tr :props="props">
-            <q-td auto-width>
+            <q-td v-if="currentVersion && props.row.version == currentVersion" auto-width>
               <q-btn
                 v-close-popup
                 size="sm"
@@ -33,7 +33,6 @@
                 dense
                 icon="search"
                 :title="t('prefillWithThing', { thing: t('version') })"
-                :disabled="currentVersion && props.row.version == currentVersion"
                 @click="$emit('prefill', props.row)"
               />
               <q-btn
@@ -43,7 +42,6 @@
                 dense
                 icon="fast_rewind"
                 :title="t('restoreThing', { thing: t('version') })"
-                :disabled="currentVersion && props.row.version == currentVersion"
                 @click="$emit('restore', props.row)"
               />
               <q-btn
@@ -54,9 +52,11 @@
                 dense
                 icon="delete"
                 :title="t('deleteThing', { thing: t('version') })"
-                :disabled="currentVersion && props.row.version == currentVersion"
                 @click="$emit('delete', props.row)"
               />
+            </q-td>
+            <q-td v-else-if="currentVersion" auto-width>
+              {{ t('current') }}:
             </q-td>
             <q-td>{{ getTitle(props.row) }}</q-td>
             <q-td>{{ props.row.author ? props.row.author.username : '' }}</q-td>

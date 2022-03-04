@@ -77,6 +77,7 @@ export default {
   author: 'Autor',
   restoreThing: '{thing} wiederherstellen',
   thingRestored: '{thing} wurde wiederhergestellt',
+  current: 'Aktuell',
   invalid: 'Ungültig',
   valid: 'Gültig',
   unit: 'Einheit|Einheiten',
