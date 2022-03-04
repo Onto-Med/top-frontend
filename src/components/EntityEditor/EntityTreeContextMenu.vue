@@ -33,8 +33,12 @@
     <q-dialog v-model="showDeleteDialog">
       <q-card>
         <q-card-section class="row items-center">
-          <q-avatar icon="warning_amber" color="warning" text-color="white" />
-          <span v-t="'entityEditor.confirmDelete'" class="q-ml-sm" />
+          <q-item>
+            <q-item-section avatar>
+              <q-avatar icon="warning_amber" color="warning" text-color="white" />
+            </q-item-section>
+            <q-item-section v-t="'entityEditor.confirmDelete'" />
+          </q-item>
         </q-card-section>
 
         <q-separator />

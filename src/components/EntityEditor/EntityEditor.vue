@@ -78,8 +78,12 @@
       <q-dialog v-model="showClearDialog">
         <q-card>
           <q-card-section class="row items-center">
-            <q-avatar icon="warning_amber" color="warning" text-color="white" />
-            <span v-t="'confirmDiscardChanges'" class="q-ml-sm" />
+            <q-item>
+              <q-item-section avatar>
+                <q-avatar icon="warning_amber" color="warning" text-color="white" />
+              </q-item-section>
+              <q-item-section v-t="'confirmDiscardChanges'" />
+            </q-item>
           </q-card-section>
 
           <q-separator />
