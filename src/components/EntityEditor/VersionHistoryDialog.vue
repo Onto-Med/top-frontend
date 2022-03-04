@@ -11,6 +11,7 @@
       >
         <template #header="props">
           <q-tr :props="props">
+            <q-th>#</q-th>
             <q-th auto-width />
             <q-th
               v-for="col in props.cols"
@@ -23,40 +24,33 @@
         </template>
 
         <template #body="props">
-          <q-tr :props="props">
-            <q-td v-if="currentVersion && props.row.version == currentVersion" auto-width>
-              <q-btn
-                v-close-popup
-                size="sm"
-                color="primary"
-                round
-                dense
-                icon="search"
-                :title="t('prefillWithThing', { thing: t('version') })"
-                @click="$emit('prefill', props.row)"
-              />
-              <q-btn
-                size="sm"
-                color="accent"
-                round
-                dense
-                icon="fast_rewind"
-                :title="t('restoreThing', { thing: t('version') })"
-                @click="$emit('restore', props.row)"
-              />
-              <q-btn
-                v-close-popup
-                size="sm"
-                color="red"
-                round
-                dense
-                icon="delete"
-                :title="t('deleteThing', { thing: t('version') })"
-                @click="$emit('delete', props.row)"
-              />
-            </q-td>
-            <q-td v-else-if="currentVersion" auto-width>
-              {{ t('current') }}:
+          <q-tr :props="props" :title="t('prefillWithThing', { thing: t('version') })" class="cursor-pointer" :class="{ 'bg-blue-2': props.row.version === currentVersion }" @click="$emit('prefill', props.row)">
+            <q-td>{{ props.row.version }}</q-td>
+            <q-td auto-width>
+              <q-btn-group v-if="currentVersion && props.row.version !== currentVersion">
+                <q-btn
+                  size="sm"
+                  color="accent"
+                  round
+                  dense
+                  icon="fast_rewind"
+                  :title="t('restoreThing', { thing: t('version') })"
+                  @click.stop="$emit('restore', props.row)"
+                />
+                <q-btn
+                  v-close-popup
+                  size="sm"
+                  color="red"
+                  round
+                  dense
+                  icon="delete"
+                  :title="t('deleteThing', { thing: t('version') })"
+                  @click.stop="$emit('delete', props.row)"
+                />
+              </q-btn-group>
+              <b v-else-if="currentVersion">
+                {{ t('current') }}:
+              </b>
             </q-td>
             <q-td>{{ getTitle(props.row) }}</q-td>
             <q-td>{{ props.row.author ? props.row.author.username : '' }}</q-td>
@@ -80,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, inject } from 'vue'
+import { defineComponent, ref, watch, inject, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityApiKey } from 'src/boot/axios'
 import { Entity } from '@onto-med/top-api'
@@ -113,11 +107,6 @@ export default defineComponent({
     const { t, d } = useI18n()
     const entityApi = inject(EntityApiKey)
     const { getTitle } = useEntityFormatter()
-    const columns = [
-      { name: 'title', label: t('title') },
-      { name: 'userAccount', label: t('author') },
-      { name: 'timestamp', label: t('timestamp') }
-    ]
     const versions = ref<Entity[]>([])
     const loading = ref(false)
 
@@ -138,7 +127,19 @@ export default defineComponent({
       }
     )
 
-    return { t, d, getTitle, columns, versions, loading, reload }
+    return {
+      t,
+      d,
+      getTitle,
+      columns: computed(() => [
+        { name: 'title', label: t('title'), align: 'left' },
+        { name: 'userAccount', label: t('author'), align: 'left' },
+        { name: 'timestamp', label: t('timestamp') }
+      ]),
+      versions,
+      loading,
+      reload
+    }
   }
 })
 </script>

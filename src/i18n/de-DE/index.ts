@@ -77,6 +77,7 @@ export default {
   author: 'Autor',
   restoreThing: '{thing} wiederherstellen',
   thingRestored: '{thing} wurde wiederhergestellt',
+  prefillWithThing: 'Mit {thing} vorbefüllen',
   current: 'Aktuell',
   invalid: 'Ungültig',
   valid: 'Gültig',
