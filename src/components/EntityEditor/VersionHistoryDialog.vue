@@ -37,7 +37,6 @@
                 @click="$emit('prefill', props.row)"
               />
               <q-btn
-                v-close-popup
                 size="sm"
                 color="accent"
                 round
