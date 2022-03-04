@@ -92,6 +92,27 @@ export const useEntity = defineStore('entity', {
       }
     },
 
+    async deleteVersion (entity: Entity) {
+      if (!entity || !entityApi || !this.organisationId || !this.repositoryId)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+
+      await entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+    },
+
+    async restoreVersion (entity: Entity) {
+      if (!entity || !entityApi || !this.organisationId || !this.repositoryId)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+
+      await entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+        .then(() => Object.assign(this.entities.find(e => e.id == entity.id), entity))
+    },
+
     isPhenotype (entity: Entity): entity is Phenotype {
       return [EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)
     },

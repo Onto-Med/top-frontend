@@ -101,7 +101,9 @@
         :current-version="local.version"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        @restore="handleRestore"
+        @prefill="prefillFromVersion"
+        @delete="$emit('deleteVersion', $event)"
+        @restore="$emit('restoreVersion', $event)"
       />
     </div>
 
@@ -212,7 +214,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['entityClicked', 'update:entity'],
+  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'deleteVersion'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
@@ -244,8 +246,10 @@ export default defineComponent({
 
       hasUnsavedChanges: computed(() => !equals(local.value, props.entity)),
 
-      handleRestore (entity: Entity): void {
+      prefillFromVersion (entity: Entity): void {
+        const version = local.value.version
         local.value = clone(entity)
+        local.value.version = version
         restrictionKey.value++
       },
 

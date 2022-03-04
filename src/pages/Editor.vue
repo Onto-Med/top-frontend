@@ -8,7 +8,7 @@
           :loading="treeLoading"
           class="column fit"
           @refreshClicked="reloadEntities"
-          @deleteEntity="handleEntityDeletion"
+          @deleteEntity="deleteEntity"
           @createEntity="handleEntityCreation"
         />
       </template>
@@ -52,9 +52,11 @@
                 :entity="tabs[index]"
                 :repository-id="repositoryId"
                 :organisation-id="organisationId"
-                @update:entity="handleEntityUpdate"
+                @update:entity="saveEntity"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"
+                @delete-version="deleteVersion"
+                @restore-version="restoreVersion"
               />
             </q-tab-panel>
           </q-tab-panels>
@@ -168,19 +170,21 @@ export default defineComponent({
       organisationId: entityStore.organisationId,
       repositoryId: entityStore.repositoryId,
 
-      handleEntityDeletion (entity: Entity): void {
+      deleteEntity (entity: Entity): void {
         if (!entity || !entityApi) return
         treeLoading.value = true
 
         entityStore.deleteEntity(entity)
           .then(() => {
             alert(t('thingDeleted', { thing: t('entity') }), 'positive')
+            const index = tabs.value.findIndex(t => t.id == entity.id)
+            if (index !== -1) tabs.value.splice(index, 1)
           })
           .catch((e: Error) => alert(t(e.message)))
           .finally(() => treeLoading.value = false)
       },
 
-      handleEntityUpdate (entity: Entity) {
+      saveEntity (entity: Entity) {
         entityStore.saveEntity(entity)
           .then((r) => {
             alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
@@ -188,6 +192,25 @@ export default defineComponent({
             if (index != -1) tabs.value[index] = r.data
           })
           .catch((e: Error) => alert(t(e.message)))
+      },
+
+      deleteVersion (entity: Entity) {
+        entityStore.deleteVersion(entity)
+          .then(() => {
+            alert(t('thingDeleted', { thing: t('version') }), 'positive')
+            // TODO: reload/invalidate version table
+          })
+          .catch((e: Error) => alert(e.message))
+      },
+
+      restoreVersion (entity: Entity) {
+        entityStore.restoreVersion(entity)
+          .then(() => {
+            alert(t('thingReset', { thing: t('version') }), 'positive')
+            const index = tabs.value.findIndex(t => t.id == entity.id)
+            if (index !== -1) Object.assign(tabs.value[index], entity)
+          })
+          .catch((e: Error) => alert(e.message))
       },
 
       handleEntityCreation (entityType: EntityType, superClassId: string): void {

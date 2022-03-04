@@ -26,7 +26,17 @@
           <q-tr :props="props">
             <q-td auto-width>
               <q-btn
-                v-show="!currentVersion || props.row.version != currentVersion"
+                v-close-popup
+                size="sm"
+                color="primary"
+                round
+                dense
+                icon="search"
+                :title="t('prefillWithThing', { thing: t('version') })"
+                :disabled="currentVersion && props.row.version == currentVersion"
+                @click="$emit('prefill', props.row)"
+              />
+              <q-btn
                 v-close-popup
                 size="sm"
                 color="accent"
@@ -34,7 +44,19 @@
                 dense
                 icon="fast_rewind"
                 :title="t('restoreThing', { thing: t('version') })"
+                :disabled="currentVersion && props.row.version == currentVersion"
                 @click="$emit('restore', props.row)"
+              />
+              <q-btn
+                v-close-popup
+                size="sm"
+                color="red"
+                round
+                dense
+                icon="delete"
+                :title="t('deleteThing', { thing: t('version') })"
+                :disabled="currentVersion && props.row.version == currentVersion"
+                @click="$emit('delete', props.row)"
               />
             </q-td>
             <q-td>{{ getTitle(props.row) }}</q-td>
@@ -86,7 +108,7 @@ export default defineComponent({
     },
     currentVersion: Number
   },
-  emits: ['restore', 'update:show'],
+  emits: ['restore', 'update:show', 'prefill', 'delete'],
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
