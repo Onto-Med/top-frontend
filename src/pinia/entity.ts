@@ -7,17 +7,19 @@ const entityApi = new EntityApi()
 export const useEntity = defineStore('entity', {
   state: () => {
     return {
-      entities: [] as Entity[]
+      organisationId: undefined as string|undefined,
+      repositoryId: undefined as string|undefined,
+      entities: [] as Entity[],
     }
   },
   actions: {
-    async reloadEntities (organisationId: string, repositoryId: string) {
-      if (!organisationId || !repositoryId)
+    async reloadEntities () {
+      if (!this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingParametersException',
           message: 'organisationId or repositoryId missing'
         }
-      await entityApi.getRootEntitiesByRepositoryId(organisationId, repositoryId)
+      await entityApi.getRootEntitiesByRepositoryId(this.organisationId, this.repositoryId)
         .then((r) => this.entities = r.data)
     },
 
@@ -60,17 +62,30 @@ export const useEntity = defineStore('entity', {
       return entity
     },
 
+    async saveEntity (entity: Entity) {
+      if (!entity || !entityApi || !this.organisationId || !this.repositoryId)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+
+      if (!entity.createdAt) {
+        return entityApi.createEntity(this.organisationId, this.repositoryId, entity)
+      }
+      return entityApi.updateEntityById(this.organisationId, this.repositoryId, entity.id as string, entity)
+    },
+
     async deleteEntity (entity: Entity) {
       const index = this.entities.findIndex(e => e.id === entity.id)
       if (index === -1) return
 
       if (entity.version) {
-        if (!entity.repository || !entity.repository.organisation || !entity.id)
+        if (!this.organisationId || !this.repositoryId || !entity.id)
           throw {
             name: 'MissingAttributesException',
             message: 'attributesMissing'
           }
-        await entityApi.deleteEntityById(entity.repository.organisation.id, entity.repository?.id, entity.id)
+        await entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id)
           .then(() => this.entities.splice(index, 1))
       } else {
         this.entities.splice(index, 1)

@@ -75,21 +75,12 @@ import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { Entity, EntityType } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
-import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'Editor',
   components: { EntityEditor, EntityTree },
   props: {
-    organisationId: {
-      type: String,
-      required: true
-    },
-    repositoryId: {
-      type: String,
-      required: true
-    },
     entityId: String
   },
   setup (props) {
@@ -109,7 +100,7 @@ export default defineComponent({
 
     const reloadEntities = async () => {
       treeLoading.value = true
-      await entityStore.reloadEntities(props.organisationId, props.repositoryId)
+      await entityStore.reloadEntities()
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
@@ -146,7 +137,7 @@ export default defineComponent({
         }
         void router.push({
           name: 'editor',
-          params: { organisationId: props.organisationId, repositoryId: props.repositoryId, entityId: id }
+          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: id }
         })
       }
     )
@@ -174,6 +165,8 @@ export default defineComponent({
       t, showJson, splitterModel, entities, selected, tabs, treeLoading,
       isRestricted, getTitle, getIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
+      organisationId: entityStore.organisationId,
+      repositoryId: entityStore.repositoryId,
 
       handleEntityDeletion (entity: Entity): void {
         if (!entity || !entityApi) return
@@ -186,24 +179,17 @@ export default defineComponent({
           .catch((e: Error) => alert(t(e.message)))
           .finally(() => treeLoading.value = false)
       },
-      handleEntityUpdate (entity: Entity) {
-        if (!entity || !entityApi) return
 
-        let promise: Promise<AxiosResponse<Entity>>
-        if (!entity.createdAt) {
-          promise = entityApi.createEntity(props.organisationId, props.repositoryId, entity)
-        } else {
-          promise = entityApi.updateEntityById(props.organisationId, props.repositoryId, entity.id as string, entity)
-        }
-        promise
-          .then(response => {
+      handleEntityUpdate (entity: Entity) {
+        entityStore.saveEntity(entity)
+          .then((r) => {
             alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
-            const index = tabs.value.findIndex(t => t.id === response.data.id)
-            if (index != -1)
-              tabs.value[index] = response.data
+            const index = tabs.value.findIndex(t => t.id === r.data.id)
+            if (index != -1) tabs.value[index] = r.data
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => alert(t(e.message)))
       },
+
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const entity = entityStore.addEntity(entityType, superClassId)
         if (entity) selectTabByKey(entity.id)

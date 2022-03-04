@@ -1,4 +1,5 @@
 import { route } from 'quasar/wrappers';
+import { useEntity } from 'src/pinia/entity';
 import {
   createMemoryHistory,
   createRouter,
@@ -32,6 +33,12 @@ export default route(function (/* { store, ssrContext } */) {
       process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE
     ),
   });
+
+  Router.beforeEach((to) => {
+    const entityStore = useEntity()
+    entityStore.organisationId = to.params.organisationId as string | undefined
+    entityStore.repositoryId = to.params.repositoryId as string | undefined
+  })
 
   return Router;
 });
