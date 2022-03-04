@@ -1,4 +1,5 @@
 import { Category, Entity, EntityApi, EntityType, Phenotype } from '@onto-med/top-api'
+import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -69,10 +70,15 @@ export const useEntity = defineStore('entity', {
           message: 'attributesMissing'
         }
 
+      let promise: Promise<AxiosResponse<Entity>>
       if (!entity.createdAt) {
-        return entityApi.createEntity(this.organisationId, this.repositoryId, entity)
+        promise = entityApi.createEntity(this.organisationId, this.repositoryId, entity)
+      } else {
+        promise = entityApi.updateEntityById(this.organisationId, this.repositoryId, entity.id as string, entity)
       }
-      return entityApi.updateEntityById(this.organisationId, this.repositoryId, entity.id as string, entity)
+
+      return promise
+        .then((r) => Object.assign(this.getEntity(r.data.id), r.data))
     },
 
     async deleteEntity (entity: Entity) {

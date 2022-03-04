@@ -188,8 +188,8 @@ export default defineComponent({
         entityStore.saveEntity(entity)
           .then((r) => {
             alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
-            const index = tabs.value.findIndex(t => t.id === r.data.id)
-            if (index != -1) tabs.value[index] = r.data
+            const index = tabs.value.findIndex(t => t.id === r.id)
+            if (index != -1) tabs.value[index] = r
           })
           .catch((e: Error) => alert(t(e.message)))
       },
@@ -198,7 +198,6 @@ export default defineComponent({
         entityStore.deleteVersion(entity)
           .then(() => {
             alert(t('thingDeleted', { thing: t('version') }), 'positive')
-            // TODO: reload/invalidate version table
           })
           .catch((e: Error) => alert(e.message))
       },
