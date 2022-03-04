@@ -78,7 +78,15 @@ export const useEntity = defineStore('entity', {
       }
 
       return promise
-        .then((r) => Object.assign(this.getEntity(r.data.id), r.data))
+        .then((r) => {
+          const existing = this.getEntity(r.data.id)
+          if (existing)
+            return Object.assign(existing, r.data)
+          else {
+            this.entities.push(r.data)
+            return this.getEntity(r.data.id) as Entity
+          }
+        })
     },
 
     async deleteEntity (entity: Entity) {
