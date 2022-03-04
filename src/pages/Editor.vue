@@ -73,11 +73,10 @@ import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { Entity, EntityType, Phenotype, Category } from '@onto-med/top-api'
+import { Entity, EntityType } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { v4 as uuidv4 } from 'uuid'
 
 export default defineComponent({
   name: 'Editor',
@@ -96,7 +95,7 @@ export default defineComponent({
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
-    const { getIcon, getTitle, isRestricted, isPhenotype } = useEntityFormatter()
+    const { getIcon, getTitle, isRestricted } = useEntityFormatter()
     const router        = useRouter()
     const entityStore   = useEntity()
     const { alert }     = useAlert()
@@ -119,7 +118,7 @@ export default defineComponent({
       if (index !== -1)
         selected.value = tabs.value[index]
       else {
-        const selection = getEntityById(key)
+        const selection = entityStore.getEntity(key)
         selected.value = selection ? selection : undefined
       }
     }
@@ -134,25 +133,6 @@ export default defineComponent({
         tabs.value = []
         selected.value = undefined
       }
-    }
-
-    const getEntityById = (id: string|number|undefined): Entity|null => {
-      const find = (result: unknown, node: unknown): unknown => {
-        if (result || !node) return result
-        if (Array.isArray(node) === true)
-          return [].reduce.call(Object(node), find, result)
-        if ((node as Record<string, unknown>).id === id)
-          return node
-        if ((node as Record<string, unknown>).subCategories)
-          result = find(null, (node as Record<string, unknown>).subCategories)
-        if (result) return result
-        if ((node as Record<string, unknown>).phenotypes)
-          return find(null, (node as Record<string, unknown>).phenotypes)
-        return result
-      }
-
-      const result = find(null, entities.value)
-      return result ? result as Entity : null
     }
 
     watch(
@@ -176,7 +156,7 @@ export default defineComponent({
       (newVal) => {
         if (newVal) {
           if (!selected.value || newVal !== selected.value.id)
-            selected.value = getEntityById(newVal) || undefined
+            selected.value = entityStore.getEntity(newVal)
         } else {
           selected.value = undefined
         }
@@ -186,7 +166,7 @@ export default defineComponent({
     onMounted(async () => {
       await reloadEntities().then(() => {
         if (props.entityId)
-          selected.value = getEntityById(props.entityId) || undefined
+          selected.value = entityStore.getEntity(props.entityId)
       })
     })
 
@@ -225,32 +205,8 @@ export default defineComponent({
           .catch((e: Error) => alert(e.message))
       },
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
-        const entity = { id: (uuidv4 as () => string)(), entityType: entityType } as Entity
-
-        const superClass = getEntityById(superClassId)
-        if (superClass && superClass.entityType === EntityType.SinglePhenotype)
-          (entity as Phenotype).dataType = (superClass as Phenotype).dataType
-
-        if (superClass) {
-          const short = { id: superClass.id, entityType: superClass.entityType } as Entity
-          if (isPhenotype(superClass)) {
-            (entity as Phenotype).superPhenotype = short
-          } else {
-            (entity as Category).superCategories = [ short ]
-          }
-          if (isPhenotype(entity)) {
-            if (!(superClass as Category).phenotypes)
-              (superClass as Category).phenotypes = [] as Entity[]
-            (superClass as Category).phenotypes?.push(entity)
-          } else {
-            if (!(superClass as Category).subCategories)
-              (superClass as Category).subCategories = [] as Entity[]
-            (superClass as Category).subCategories?.push(entity)
-          }
-        } else {
-          entityStore.addEntity(entity)
-        }
-        selectTabByKey(entity.id)
+        const entity = entityStore.addEntity(entityType, superClassId)
+        if (entity) selectTabByKey(entity.id)
       }
     }
   }
