@@ -7,9 +7,9 @@
           :nodes="entities"
           :loading="treeLoading"
           class="column fit"
-          @refreshClicked="reloadEntities"
-          @deleteEntity="deleteEntity"
-          @createEntity="handleEntityCreation"
+          @refresh-clicked="reloadEntities"
+          @delete-entity="deleteEntity"
+          @create-entity="handleEntityCreation"
         />
       </template>
 

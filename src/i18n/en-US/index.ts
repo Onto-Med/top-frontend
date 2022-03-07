@@ -128,7 +128,8 @@ export default {
     expressionHelp: 'To define restrictions for combined phenotypes. A Boolean expression must be specified. '
       + 'The expression can contain unions (OR), intersections (AND) and complements (NOT) of phenotypes. '
       + 'Click the plus button to add components to the expression. You can also click on already added components to modify or remove them.',
-      confirmDelete: 'Do you really want to delete the entity irrevocably? All saved versions and restrictions will also be deleted.',
+    confirmDelete: 'Do you really want to delete the entity irrevocably? All saved versions and restrictions will also be deleted.',
+    confirmRefreshTree: 'Do you really want to reload the entities? All unsaved entities will be lost.'
   },
   organisationPage: {
     description: 'Manage your organisations or create new ones.'

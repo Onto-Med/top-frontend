@@ -12,7 +12,7 @@
       <q-separator vertical />
       <q-btn stretch flat :icon="asList ? 'account_tree' : 'view_list'" :title="t('entityTree.listDescription')" @click="asList = !asList" />
       <q-separator vertical />
-      <q-btn stretch flat icon="refresh" :title="t('reload')" @click="$emit('refreshClicked')" />
+      <q-btn stretch flat icon="refresh" :title="t('reload')" @click="handleRefreshClick" />
     </q-toolbar>
 
     <q-separator />
@@ -60,6 +60,26 @@
       :showing="loading"
       :label="t('pleaseWait') + '...'"
     />
+
+    <q-dialog v-model="showRefreshDialog">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-item>
+            <q-item-section avatar>
+              <q-avatar icon="warning_amber" color="warning" text-color="white" />
+            </q-item-section>
+            <q-item-section v-t="'entityEditor.confirmRefreshTree'" />
+          </q-item>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
+          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('refreshClicked')" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -89,11 +109,16 @@ export default defineComponent({
     const expansion = ref([] as string[])
     const filter    = ref('')
     const asList    = ref(false)
+    const showRefreshDialog = ref(false)
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
       if (!asList.value) return props.nodes
       return props.nodes.filter(n => n.entityType !== EntityType.Category)
+    })
+
+    const unsavedNodes = computed((): boolean => {
+      return props.nodes?.findIndex(n => !n.createdAt) !== -1
     })
 
     const toTree = (list: Entity[]): TreeNode[] => {
@@ -137,6 +162,7 @@ export default defineComponent({
       asList,
       filter,
       EntityType,
+      showRefreshDialog,
       getIcon,
       getIconTooltip,
       getTitle,
@@ -146,6 +172,13 @@ export default defineComponent({
       treeNodes: computed((): TreeNode[] => {
         return toTree(visibleNodes.value)
       }),
+
+      handleRefreshClick (): void {
+        if (unsavedNodes.value)
+          showRefreshDialog.value = true
+        else
+          emit('refreshClicked')
+      },
 
       handleSelectedChange (key: string): void {
         if (!key || !props.nodes) {
