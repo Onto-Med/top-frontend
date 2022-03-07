@@ -96,6 +96,7 @@ export const useEntity = defineStore('entity', {
       if (this.isCategory(entity)) {
         this.entities.filter((e: Category|Phenotype) => this.hasSuperCategory(e, entity)).forEach((e: Category|Phenotype) => {
           e.superCategories = e.superCategories?.filter(c => c.id !== entity.id)
+          e.superCategories?.push(...(entity.superCategories as Category[]))
         })
       } else if (this.isPhenotype(entity)) {
         this.entities = this.entities.filter((p: Phenotype) => p.superPhenotype?.id !== entity.id)
