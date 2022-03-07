@@ -47,17 +47,17 @@ export default defineComponent({
     return {
       t,
       removeUnitByIndex (index: number) {
-        let newModelValue = props.modelValue.slice()
+        const newModelValue = props.modelValue.slice()
         newModelValue.splice(index, 1)
         emit('update:modelValue', newModelValue)
       },
       updateUnitByIndex (unit: Unit, index: number) {
-        let newModelValue = props.modelValue.slice()
+        const newModelValue = props.modelValue.slice()
         newModelValue[index] = unit
         emit('update:modelValue', newModelValue)
       },
       addUnit () {
-        let newModelValue = props.modelValue.slice()
+        const newModelValue = props.modelValue ? props.modelValue.slice() : []
         newModelValue.push({ unit: undefined, preferred: false })
         emit('update:modelValue', newModelValue)
       },
