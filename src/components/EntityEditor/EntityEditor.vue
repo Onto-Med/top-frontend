@@ -3,17 +3,9 @@
     <div class="col-auto entity-editor-tab-header">
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
-          <q-breadcrumbs>
-            <q-breadcrumbs-el
-              v-if="local.superClass"
-              class="cursor-pointer"
-              :label="getTitle(local.superClass)"
-              @click="local.superClass ? $emit('entityClicked', local.superClass.id) : null"
-            />
-            <q-breadcrumbs-el :label="getTitle(local)" />
-            <small v-if="!isNew">{{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})</small>
-            <small v-else class="text-accent">{{ t('notSavedJet') }}</small>
-          </q-breadcrumbs>
+          {{ getTitle(local) }}
+          <small v-if="!isNew">{{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})</small>
+          <small v-else class="text-accent">{{ t('notSavedJet') }}</small>
         </q-toolbar-title>
         <q-btn
           dense
