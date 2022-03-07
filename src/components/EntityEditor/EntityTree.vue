@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+import { defineComponent, computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
@@ -116,6 +116,23 @@ export default defineComponent({
       if (!asList.value) return props.nodes
       return props.nodes.filter(n => n.entityType !== EntityType.Category)
     })
+
+    const expand = (entity: Entity|undefined): void => {
+      if (!entity || !entity.id) return
+      if (!expansion.value.includes(entity.id))
+        expansion.value.push(entity.id)
+
+      if (isRestricted(entity))
+        expand(props.nodes?.find(n => n.id === entity.superPhenotype?.id))
+      else
+        (entity as Category).superCategories?.forEach(c =>
+          expand(props.nodes?.find(n => n.id === c.id)))
+    }
+
+    watch(
+      () => props.selected,
+      (entity: Entity|undefined) => expand(entity)
+    )
 
     const unsavedNodes = computed((): boolean => {
       return props.nodes?.findIndex(n => !n.createdAt) !== -1
