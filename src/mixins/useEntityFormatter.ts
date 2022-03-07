@@ -1,4 +1,4 @@
-import { DataType, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
+import { Category, DataType, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 
 export default function (this: void) {
@@ -16,7 +16,23 @@ export default function (this: void) {
     return []
   }
 
+  /**
+     * Returns a Boolean, indicating if the provided entity is a phenotype.
+     * @param entity the entity
+     * @returns true if entity is a phenotype
+     */
+  const isPhenotype = (entity: Entity): entity is Phenotype => {
+    return [EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)
+  }
+
+  const isCategory = (entity: Entity): entity is Category => {
+    return entity.entityType === EntityType.Category
+  }
+
   return {
+    isPhenotype,
+    isCategory,
+
     /**
      * Get an appropriate material icon name for the provided entity.
      * When building an icon, you should make restrictions visually distinguishable from phenotypes.
@@ -73,7 +89,12 @@ export default function (this: void) {
         if (result && result.text) return result.text
         if (entity.titles[0] && entity.titles[0].text) return entity.titles[0].text
       }
-      return t('unnamedEntity')
+      if (isCategory(entity))
+        return t('unnamedCategory')
+      else if (isPhenotype(entity))
+        return t('unnamedPhenotype')
+
+      return t('unnamedRestriction')
     },
 
     /**
@@ -101,15 +122,6 @@ export default function (this: void) {
      */
     isRestricted (this: void, entity: Entity): entity is Phenotype {
       return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)
-    },
-
-    /**
-     * Returns a Boolean, indicating if the provided entity is a phenotype.
-     * @param entity the entity
-     * @returns true if entity is a phenotype
-     */
-    isPhenotype (this: void, entity: Entity): entity is Phenotype {
-      return [EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)
     },
 
     restrictionEntityTypes (this: void): EntityType[] {
