@@ -82,7 +82,7 @@
           icon="add"
           class="add-restriction-value-btn"
           :label="t('addThing', { thing: name || t('value') })"
-          @click="state.values.push(null)"
+          @click="addValue()"
         />
       </q-card-actions>
     </template>
@@ -117,7 +117,8 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as Restriction)
+    const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction)
+    if (!state.values) state.values = []
     const canHaveRange = computed(() => [DataType.Number, DataType.DateTime].includes(state.type))
     const hasRange = ref(
       canHaveRange.value
@@ -160,7 +161,12 @@ export default defineComponent({
       emit('update:modelValue', newState)
     }
 
-    return { t, defaultOperators, defaultQuantors, state, hasRange, canHaveRange, handleHasRangeChanged, Quantor }
+    return { t, defaultOperators, defaultQuantors, state, hasRange, canHaveRange, handleHasRangeChanged, Quantor,
+      addValue () {
+        if (!state.values) state.values = []
+        state.values.push()
+      }
+    }
   }
 })
 </script>
