@@ -2,16 +2,16 @@
   <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
     <q-card>
       <q-card-section>
-        <div v-if="state.createdAt != null" class="text-h6">
+        <div v-if="state.createdAt" class="text-h6">
           {{ t('editThing', { thing: t('organisation') }) }}
           <q-btn
-            v-show="state.createdAt != null"
+            v-show="state.createdAt"
             dense
             color="red"
             icon="delete"
             class="float-right"
             :title="t('deleteThing', { thing: t('organisation') })"
-            @click="showDeleteDialog = true"
+            @click="showDeleteDialog"
           />
         </div>
         <div v-else class="text-h6">
@@ -20,7 +20,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-input :model-value="state.id" type="text" :label="t('id')" @update:model-value="state.id = $event" />
+        <q-input :model-value="state.id" :readonly="state.createdAt != null" type="text" :label="t('id')" @update:model-value="state.id = $event" />
         <q-input :model-value="state.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
         <q-input :model-value="state.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
         <organisation-select-input :model-value="state.superOrganisation" :label="t('superOrganisation')" @update:model-value="state.superOrganisation = $event" />
