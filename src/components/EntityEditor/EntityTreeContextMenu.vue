@@ -1,6 +1,6 @@
 <template>
   <q-menu context-menu>
-    <q-list v-if="!entity || entity.entityType === EntityType.Category" dense>
+    <q-list v-if="!entity || entity.createdAt && entity.entityType === EntityType.Category" dense>
       <q-item
         v-for="entityType in [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype]"
         :key="entityType"
@@ -11,7 +11,7 @@
         <q-item-section>{{ t('addThing', { thing: t(entityType) }) }}</q-item-section>
       </q-item>
     </q-list>
-    <q-list v-else-if="entity" dense>
+    <q-list v-else-if="entity && entity.createdAt" dense>
       <template v-for="entry in entries" :key="entry.phenotype">
         <q-item
           v-if="entity.entityType === entry.phenotype"
