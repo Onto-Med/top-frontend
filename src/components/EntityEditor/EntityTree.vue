@@ -107,13 +107,13 @@ export default defineComponent({
           let root = true;
 
           (e as Category).superCategories?.forEach(c => {
-            if (c.id) {
+            if (c.id && map.get(c.id)) {
               (map.get(c.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
               root = false
             }
           })
           if (isRestricted(e)) {
-            if (e.superPhenotype && e.superPhenotype.id) {
+            if (e.superPhenotype && e.superPhenotype.id && map.get(e.superPhenotype.id)) {
               (map.get(e.superPhenotype.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
               root = false
             }
