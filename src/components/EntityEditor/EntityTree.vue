@@ -19,10 +19,9 @@
 
     <div class="col">
       <q-tree
-        ref="tree"
         v-model:expanded="expansion"
         :selected="selected ? selected.id : ''"
-        :nodes="visibleNodes"
+        :nodes="treeNodes"
         :filter="filter"
         :filter-method="filterFn"
         :no-nodes-label="t('entityTree.noNodesLabel')"
@@ -65,9 +64,8 @@
 import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { QTree } from 'quasar'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
-import { EntityType, Entity } from '@onto-med/top-api'
+import { Category, EntityType, Entity } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTree',
@@ -84,8 +82,7 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()
-    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
-    const tree      = ref(null as unknown as QTree)
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted, isPhenotype } = useEntityFormatter()
     const expansion = ref([] as string[])
     const filter    = ref('')
     const asList    = ref(false)
@@ -93,29 +90,73 @@ export default defineComponent({
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
       if (!asList.value) return props.nodes
-      return props.nodes.flatMap(
-        function loop (e: Entity): Entity[] {
-          if (e.entityType === EntityType.Category) // && e.children)
-            return [e]
-            // return e.children.flatMap(loop)
-          else return [e]
-        }
-      )
+      return props.nodes.filter(n => n.entityType !== EntityType.Category)
     })
 
-    const handleSelectedChange = (key: string): void => {
-      if (!key)
-        emit('update:selected', undefined)
-      else if (tree.value)
-        emit('update:selected', tree.value.getNodeByKey(key))
+    const toTree = (list: Entity[]): TreeNode[] => {
+      const map: Map<string, TreeNode> = new Map<string, TreeNode>()
+      const treeNodes: TreeNode[] = []
+
+      list
+        .filter(e => e.id)
+        .forEach(e => map.set(e.id as string, { ...e, children: [] } as TreeNode))
+
+      list
+        .filter(e => e.id)
+        .forEach(e => {
+          let root = true;
+
+          (e as Category).superCategories?.forEach(c => {
+            if (c.id) {
+              (map.get(c.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
+              root = false
+            }
+          })
+          if (isPhenotype(e)) {
+            if (e.superPhenotype && e.superPhenotype.id) {
+              (map.get(e.superPhenotype.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
+              root = false
+            }
+          }
+
+          if (root) {
+            treeNodes.push(map.get(e.id as string) as TreeNode)
+            return
+          }
+        })
+
+      return treeNodes
     }
 
-    const filterFn = (node: Entity, filter: string): boolean =>
-      getTitle(node).toLowerCase().includes(filter.toLowerCase())
-
     return {
-      t, tree, visibleNodes, expansion, filter, asList, handleSelectedChange, filterFn, EntityType,
-      getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted,
+      t,
+      expansion,
+      asList,
+      filter,
+      EntityType,
+      getIcon,
+      getIconTooltip,
+      getTitle,
+      getDescriptions,
+      isRestricted,
+
+      treeNodes: computed((): TreeNode[] => {
+        return toTree(visibleNodes.value)
+      }),
+
+      handleSelectedChange (key: string): void {
+        if (!key || !props.nodes) {
+          emit('update:selected', undefined)
+        } else {
+          const node = props.nodes.find(n => n.id === key)
+          emit('update:selected', node)
+        }
+      },
+
+      filterFn (node: Entity, filter: string): boolean {
+        return getTitle(node).toLowerCase().includes(filter.toLowerCase())
+      },
+
       handleCreateEntityClicked (t: EntityType, e?: string) {
         if (e) expansion.value.push(e)
         emit('createEntity', t, e)
@@ -123,4 +164,8 @@ export default defineComponent({
     }
   }
 })
+
+interface TreeNode extends Entity {
+  children: TreeNode[]
+}
 </script>
