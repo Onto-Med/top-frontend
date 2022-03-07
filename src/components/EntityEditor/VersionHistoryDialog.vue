@@ -147,7 +147,7 @@ export default defineComponent({
 
 <style lang="sass" scoped>
 .sticky-header-table
-  height: 310px
+  max-height: 80%
 
   thead tr th
     position: sticky
