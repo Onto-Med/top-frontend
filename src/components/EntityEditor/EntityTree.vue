@@ -27,6 +27,7 @@
         :filter-method="filterFn"
         :no-nodes-label="t('entityTree.noNodesLabel')"
         :no-results-label="t('entityTree.noResultsLabel')"
+        no-selection-unset
         node-key="id"
         selected-color="primary"
         @update:selected="handleSelectedChange"
