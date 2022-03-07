@@ -103,6 +103,7 @@ export default {
   createdAt: 'Created at',
   name: 'Name',
   notSavedJet: 'Not saved jet!',
+  unsaved: 'unsaved',
   encloseWithExpression: 'Enclose with expression',
   attributesMissing: 'One or more attributes are missing.',
   entityEditor: {

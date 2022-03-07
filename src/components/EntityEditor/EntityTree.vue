@@ -40,8 +40,11 @@
               :class="{ restriction: isRestricted(node) }"
               class="q-mr-sm"
             />
-            <div :title="getDescriptions(node).join('\n')">
+            <div :title="getDescriptions(node).join('\n')" :class="{ unsaved: !node.createdAt }">
               {{ getTitle(node) }}
+              <small v-show="!node.createdAt" class="text-accent">
+                ({{ t('unsaved') }})
+              </small>
             </div>
             <entity-tree-context-menu
               :entity="node"
@@ -169,3 +172,8 @@ interface TreeNode extends Entity {
   children: TreeNode[]
 }
 </script>
+
+<style lang="sass" scoped>
+.unsaved
+  font-style: italic
+</style>

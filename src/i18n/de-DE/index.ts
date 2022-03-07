@@ -103,6 +103,7 @@ export default {
   createdAt: 'Erzeugt am',
   name: 'Name',
   notSavedJet: 'Noch nicht gespeichert!',
+  unsaved: 'ungespeichert',
   encloseWithExpression: 'Mit Ausdruck umschließen',
   attributesMissing: 'Ein oder mehrere Attribute fehlen.',
   entityEditor: {
