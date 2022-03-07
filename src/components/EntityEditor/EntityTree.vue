@@ -82,7 +82,7 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()
-    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted, isPhenotype } = useEntityFormatter()
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
     const expansion = ref([] as string[])
     const filter    = ref('')
     const asList    = ref(false)
@@ -112,7 +112,7 @@ export default defineComponent({
               root = false
             }
           })
-          if (isPhenotype(e)) {
+          if (isRestricted(e)) {
             if (e.superPhenotype && e.superPhenotype.id) {
               (map.get(e.superPhenotype.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
               root = false

@@ -99,7 +99,7 @@ export default function (this: void) {
      * @param entity the entity
      * @returns true if entity is restricted
      */
-    isRestricted (this: void, entity: Entity): boolean {
+    isRestricted (this: void, entity: Entity): entity is Phenotype {
       return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)
     },
 
