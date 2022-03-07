@@ -92,6 +92,14 @@ export const useEntity = defineStore('entity', {
       } else {
         this.entities.splice(index, 1)
       }
+
+      if (this.isCategory(entity)) {
+        this.entities.filter((e: Category|Phenotype) => this.hasSuperCategory(e, entity)).forEach((e: Category|Phenotype) => {
+          e.superCategories = e.superCategories?.filter(c => c.id !== entity.id)
+        })
+      } else if (this.isPhenotype(entity)) {
+        this.entities = this.entities.filter((p: Phenotype) => p.superPhenotype?.id !== entity.id)
+      }
     },
 
     async deleteVersion (entity: Entity) {
@@ -113,6 +121,14 @@ export const useEntity = defineStore('entity', {
 
       await entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
         .then(() => Object.assign(this.entities.find(e => e.id == entity.id), entity))
+    },
+
+    hasSuperCategory (entity: Category|Phenotype, category: Category): boolean {
+      return entity.superCategories?.findIndex(c => c.id === category.id) !== -1
+    },
+
+    isCategory (entity: Entity): entity is Category {
+      return EntityType.Category === entity.entityType
     },
 
     isPhenotype (entity: Entity): entity is Phenotype {
