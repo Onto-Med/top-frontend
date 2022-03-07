@@ -75,7 +75,7 @@ import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { Entity, EntityType } from '@onto-med/top-api'
+import { Entity, EntityType, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
@@ -88,7 +88,7 @@ export default defineComponent({
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }         = useI18n()
-    const { getIcon, getTitle, isRestricted } = useEntityFormatter()
+    const { getIcon, getTitle, isRestricted, isPhenotype } = useEntityFormatter()
     const router        = useRouter()
     const entityStore   = useEntity()
     const { alert }     = useAlert()
@@ -178,6 +178,10 @@ export default defineComponent({
           .then(() => {
             alert(t('thingDeleted', { thing: t('entity') }), 'positive')
             closeTab(entity)
+            if (isPhenotype(entity))
+              tabs.value
+                .filter((t: Phenotype) => t.superPhenotype?.id === entity.id)
+                .forEach(t => closeTab(t))
           })
           .catch((e: Error) => alert(t(e.message)))
           .finally(() => treeLoading.value = false)
