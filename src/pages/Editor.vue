@@ -103,6 +103,7 @@ export default defineComponent({
     const reloadEntities = async () => {
       treeLoading.value = true
       await entityStore.reloadEntities()
+        .then(() => tabs.value = tabs.value.filter(t => entities.value.findIndex(e => e.id === t.id) !== -1))
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
