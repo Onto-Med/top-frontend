@@ -23,8 +23,8 @@ export default {
     return {
       locale,
       localeOptions: [
-        { value: 'en-US', label: 'English' },
-        { value: 'de-DE', label: 'Deutsch' }
+        { value: 'en', label: 'English' },
+        { value: 'de', label: 'Deutsch' }
       ]
     }
   }
