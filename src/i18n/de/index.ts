@@ -1,5 +1,6 @@
 export default {
   category: 'Kategorie|Kategorien',
+  superCategory: 'Super-Kategorie|Super-Kategorien',
   missing_value: 'Fehlender Wert|Fehlende Werte',
   phenotype_group: 'Phänotypgruppe|Phänotypgruppen',
   single_phenotype: 'Einzelner Phänotyp|Einzelne Phänotypen',

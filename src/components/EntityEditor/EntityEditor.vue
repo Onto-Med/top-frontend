@@ -100,6 +100,36 @@
     </div>
 
     <div class="q-gutter-md q-mt-none q-px-md q-pb-xl col entity-editor-tab-content">
+      <q-toolbar class="q-my-none">
+        {{ t('superCategory', 2) }}:
+        <entity-chip
+          v-for="category in local.superCategories"
+          :key="category.id"
+          :entity-id="category.id"
+          @removeClicked="removeSuperCategory(category.id)"
+          @entityClicked="$emit('entityClicked', $event)"
+        />
+        <q-btn
+          v-show="!showSuperCategoryInput"
+          icon="add"
+          round
+          size="sm"
+          dense
+          :title="t('addThing', { thing: t('superCategory') })"
+          @click="showSuperCategoryInput = true"
+        />
+        <entity-search-input
+          v-show="showSuperCategoryInput"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          :label="t('selectThing', { thing: t('category') })"
+          :entity-types="[EntityType.Category]"
+          clear-on-select
+          @entitySelected="addSuperCategory"
+          @btnClicked="showSuperCategoryInput = false"
+        />
+      </q-toolbar>
+
       <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
       <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms && local.synonyms.length > 0" />
       <localized-text-input
@@ -169,12 +199,14 @@
 <script lang="ts">
 import { ref, computed, defineComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, Entity } from '@onto-med/top-api'
+import { EntityType, DataType, Entity, Category, Phenotype } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
+import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
+import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UcumCard from 'src/components/UcumCard.vue'
 import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
@@ -190,7 +222,9 @@ export default defineComponent({
     VersionHistoryDialog,
     UcumCard,
     FormulaInput,
-    CodeInput
+    CodeInput,
+    EntitySearchInput,
+    EntityChip
   },
   props: {
     entity: {
@@ -222,6 +256,7 @@ export default defineComponent({
     const showVersionHistory = ref(false)
     const showClearDialog    = ref(false)
     const restrictionKey     = ref(0)
+    const showSuperCategoryInput = ref(false)
 
     watch(
       () => props.entity,
@@ -234,6 +269,8 @@ export default defineComponent({
     return {
       t, d, getTitle, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,
 
+      showSuperCategoryInput,
+
       isNew: computed(() => !local.value.version),
 
       hasUnsavedChanges: computed(() => !equals(local.value, props.entity)),
@@ -243,6 +280,22 @@ export default defineComponent({
         local.value = clone(entity)
         local.value.version = version
         restrictionKey.value++
+      },
+
+      addSuperCategory (category: Category): void {
+        const casted = local.value as Category|Phenotype
+        if (!casted.superCategories) casted.superCategories = []
+        if (casted.superCategories.findIndex(c => c.id === category.id) === -1)
+          casted.superCategories.push(category)
+        showSuperCategoryInput.value = false
+      },
+
+      removeSuperCategory (id: string): void {
+        const casted = local.value as Category|Phenotype
+        if (!casted.superCategories) return
+        const index = casted.superCategories.findIndex(c => c.id === id)
+        if (index !== -1)
+          casted.superCategories.splice(index, 1)
       },
 
       reset: () => local.value = clone(props.entity),
