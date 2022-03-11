@@ -4,10 +4,21 @@
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           {{ getTitle(local) }}
-          <small v-if="!isNew">{{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})</small>
+          <small v-if="!isNew" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
+            {{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})
+          </small>
           <small v-else class="text-accent">{{ t('notSavedJet') }}</small>
         </q-toolbar-title>
         <q-btn
+          v-if="isOtherVersion"
+          color="accent"
+          dense
+          no-caps
+          :label="t('restore')"
+          @click.stop="$emit('restoreVersion', local)"
+        />
+        <q-btn
+          v-else
           dense
           no-caps
           color="primary"
@@ -16,6 +27,15 @@
           @click="save"
         />
         <q-btn
+          v-if="isOtherVersion"
+          dense
+          no-caps
+          color="grey-7"
+          :label="t('backToCurrentVersion')"
+          @click="reset()"
+        />
+        <q-btn
+          v-else
           dense
           no-caps
           color="grey-7"
@@ -90,7 +110,8 @@
       <version-history-dialog
         v-model:show="showVersionHistory"
         :entity-id="local.id"
-        :current-version="local.version"
+        :current-version="entity.version"
+        :selected-version="local.version"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         @prefill="prefillFromVersion"
@@ -277,12 +298,12 @@ export default defineComponent({
 
       isNew: computed(() => !local.value.version),
 
+      isOtherVersion: computed(() => local.value.version != props.entity.version),
+
       hasUnsavedChanges: computed(() => !equals(local.value, props.entity)),
 
       prefillFromVersion (entity: Entity): void {
-        const version = local.value.version
         local.value = clone(entity)
-        local.value.version = version
         restrictionKey.value++
       },
 

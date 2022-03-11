@@ -66,6 +66,7 @@ export default {
   unnamedCategory: 'Unbenannte Kategorie',
   unnamedPhenotype: 'Unbenannter Phänotyp',
   unnamedRestriction: 'Unbenannte Restriktion',
+  backToCurrentVersion: 'Zurück zur aktuellen Version',
   showThing: '{thing} anzeigen',
   createThing: '{thing} anlegen',
   thingSaved: '{thing} wurde gespeichert',
@@ -78,6 +79,7 @@ export default {
   noDataPresent: 'Keine Daten verfügbar',
   close: 'Schließen',
   author: 'Autor',
+  restore: 'Wiederherstellen',
   restoreThing: '{thing} wiederherstellen',
   thingRestored: '{thing} wurde wiederhergestellt',
   prefillWithThing: 'Mit {thing} vorbefüllen',
@@ -110,6 +112,7 @@ export default {
   unsaved: 'ungespeichert',
   encloseWithExpression: 'Mit Ausdruck umschließen',
   attributesMissing: 'Ein oder mehrere Attribute fehlen.',
+  displayingOtherVersion: 'Ihnen wird eine andere als die aktuelle Version angezeigt.',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

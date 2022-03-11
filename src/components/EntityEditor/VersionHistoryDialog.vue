@@ -11,8 +11,8 @@
       >
         <template #header="props">
           <q-tr :props="props">
-            <q-th>#</q-th>
             <q-th auto-width />
+            <q-th>#</q-th>
             <q-th
               v-for="col in props.cols"
               :key="col.name"
@@ -24,33 +24,31 @@
         </template>
 
         <template #body="props">
-          <q-tr :props="props" :title="t('prefillWithThing', { thing: t('version') })" class="cursor-pointer" :class="{ 'bg-blue-2': props.row.version === currentVersion }" @click="$emit('prefill', props.row)">
-            <q-td>{{ props.row.version }}</q-td>
+          <q-tr
+            v-close-popup
+            :props="props"
+            :title="t('showThing', { thing: t('version') })"
+            class="cursor-pointer"
+            :class="{ 'bg-blue-2': props.row.version === selectedVersion }"
+            @click="$emit('prefill', props.row)"
+          >
             <q-td auto-width>
-              <q-btn-group v-if="currentVersion && props.row.version !== currentVersion">
-                <q-btn
-                  size="sm"
-                  color="accent"
-                  round
-                  dense
-                  icon="fast_rewind"
-                  :title="t('restoreThing', { thing: t('version') })"
-                  @click.stop="$emit('restore', props.row)"
-                />
-                <q-btn
-                  size="sm"
-                  color="red"
-                  round
-                  dense
-                  icon="delete"
-                  :title="t('deleteThing', { thing: t('version') })"
-                  @click.stop="deleteVersion(props.row)"
-                />
-              </q-btn-group>
+              <q-btn
+                v-if="currentVersion && props.row.version !== currentVersion"
+                size="sm"
+                color="red"
+                round
+                dense
+                flat
+                icon="delete"
+                :title="t('deleteThing', { thing: t('version') })"
+                @click.stop="deleteVersion(props.row)"
+              />
               <b v-else-if="currentVersion">
                 {{ t('current') }}:
               </b>
             </q-td>
+            <q-td>{{ props.row.version }}</q-td>
             <q-td>{{ getTitle(props.row) }}</q-td>
             <q-td>{{ props.row.author ? props.row.author.username : '' }}</q-td>
             <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
@@ -100,18 +98,19 @@ export default defineComponent({
       type: String,
       required: true
     },
-    currentVersion: Number
+    currentVersion: Number,
+    selectedVersion: Number
   },
   emits: ['restore', 'update:show', 'prefill'],
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, d } = useI18n()
-    const entityApi = inject(EntityApiKey)
-    const entityStore = useEntity()
+    const { t, d }     = useI18n()
+    const entityApi    = inject(EntityApiKey)
+    const entityStore  = useEntity()
     const { getTitle } = useEntityFormatter()
-    const { alert }     = useAlert()
-    const versions = ref<Entity[]>([])
-    const loading = ref(false)
+    const { alert }    = useAlert()
+    const versions     = ref<Entity[]>([])
+    const loading      = ref(false)
 
     const reload = async () => {
       if (!entityApi) return
