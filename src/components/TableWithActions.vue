@@ -21,7 +21,6 @@
       </template>
       <template #header="props">
         <q-tr :props="props">
-          <q-th auto-width />
           <q-th
             v-for="col in props.cols"
             :key="col.name"
@@ -71,6 +70,7 @@ export default defineComponent({
       cols: computed(() => {
         if (props.columns) return props.columns
         return [
+          { name: 'actions', sortable: false },
           { name: 'name', field: 'name', label: t('name'), align: 'left', required: true, sortable: true },
           { name: 'description', field: 'description', label: t('description'), align: 'left', sortable: true },
           { name: 'createdAt', field: 'createdAt', label: t('createdAt'), align: 'left', sortable: true }
