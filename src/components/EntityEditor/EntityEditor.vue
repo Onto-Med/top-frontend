@@ -99,35 +99,39 @@
     </div>
 
     <div class="q-gutter-md q-mt-none q-px-md q-pb-xl col entity-editor-tab-content">
-      <q-toolbar v-if="!isRestricted(entity)" class="q-my-none">
-        {{ t('superCategory', 2) }}:
-        <entity-chip
-          v-for="category in local.superCategories"
-          :key="category.id"
-          :entity-id="category.id"
-          @removeClicked="removeSuperCategory(category.id)"
-          @entityClicked="$emit('entityClicked', $event)"
-        />
-        <q-btn
-          v-show="!showSuperCategoryInput"
-          icon="add"
-          round
-          size="sm"
-          dense
-          :title="t('addThing', { thing: t('superCategory') })"
-          @click="showSuperCategoryInput = true"
-        />
-        <entity-search-input
-          v-show="showSuperCategoryInput"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          :label="t('selectThing', { thing: t('category') })"
-          :entity-types="[EntityType.Category]"
-          clear-on-select
-          @entitySelected="addSuperCategory"
-          @btnClicked="showSuperCategoryInput = false"
-        />
-      </q-toolbar>
+      <q-card>
+        <q-toolbar v-if="!isRestricted(entity)" class="q-my-none">
+          <q-toolbar-title>
+            {{ t('superCategory', 2) }}:
+            <entity-chip
+              v-for="category in local.superCategories"
+              :key="category.id"
+              :entity-id="category.id"
+              @removeClicked="removeSuperCategory(category.id)"
+              @entityClicked="$emit('entityClicked', $event)"
+            />
+            <q-btn
+              v-show="!showSuperCategoryInput"
+              icon="add"
+              round
+              size="sm"
+              dense
+              :title="t('addThing', { thing: t('superCategory') })"
+              @click="showSuperCategoryInput = true"
+            />
+            <entity-search-input
+              v-show="showSuperCategoryInput"
+              :organisation-id="organisationId"
+              :repository-id="repositoryId"
+              :label="t('selectThing', { thing: t('category') })"
+              :entity-types="[EntityType.Category]"
+              clear-on-select
+              @entitySelected="addSuperCategory"
+              @btnClicked="showSuperCategoryInput = false"
+            />
+          </q-toolbar-title>
+        </q-toolbar>
+      </q-card>
 
       <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
 
