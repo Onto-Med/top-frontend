@@ -117,7 +117,7 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const state = reactive(JSON.parse(JSON.stringify(props.modelValue)) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction)
+    const state = reactive(JSON.parse(JSON.stringify(props.modelValue || {})) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction)
     if (!state.values) state.values = []
     const canHaveRange = computed(() => [DataType.Number, DataType.DateTime].includes(state.type))
     const hasRange = ref(
