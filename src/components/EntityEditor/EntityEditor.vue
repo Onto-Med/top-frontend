@@ -286,7 +286,7 @@ export default defineComponent({
         const casted = local.value as Category|Phenotype
         if (!casted.superCategories) casted.superCategories = []
         if (casted.superCategories.findIndex(c => c.id === category.id) === -1)
-          casted.superCategories.push(category)
+          if (casted.id !== category.id) casted.superCategories.push(category)
         showSuperCategoryInput.value = false
       },
 
