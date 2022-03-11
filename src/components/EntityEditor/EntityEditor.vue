@@ -265,6 +265,8 @@ import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
+import { useRouter } from 'vue-router'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -305,9 +307,11 @@ export default defineComponent({
 
     const { getTitle, isRestricted, isPhenotype } = useEntityFormatter()
     const { alert } = useAlert()
-    const local    = ref(clone(props.entity))
-    const showJson = ref(false)
-    const loading  = ref(false)
+    const router    = useRouter()
+    const local     = ref(clone(props.entity))
+    const entityStore = useEntity()
+    const showJson  = ref(false)
+    const loading   = ref(false)
     const showVersionHistory = ref(false)
     const showClearDialog    = ref(false)
     const restrictionKey     = ref(0)
@@ -337,6 +341,11 @@ export default defineComponent({
       prefillFromVersion (entity: Entity): void {
         local.value = clone(entity)
         restrictionKey.value++
+        void router.push({
+          name: 'editor',
+          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
+          query: { version: entity.version }
+        })
       },
 
       addSuperCategory (category: Category): void {
