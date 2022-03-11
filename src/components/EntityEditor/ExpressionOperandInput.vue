@@ -2,7 +2,7 @@
   <span class="expression-operand">
     <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
     <span
-      v-if="![ExpressionType.Restriction, ExpressionType.Class].includes(local.type)"
+      v-if="![ExpressionType.Restriction].includes(local.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
       class="cursor-pointer"
       :title="local.type ? t(local.type) : ''"
@@ -93,7 +93,7 @@
     </span>
 
     <span
-      v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(local.type)"
+      v-if="ExpressionType.Restriction != local.type"
       :class="{ 'text-weight-bolder text-primary': hover }"
     >
       <span v-show="expand"><br>{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
@@ -107,7 +107,7 @@ import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
-import { EntityType, Expression, ExpressionType, Entity } from '@onto-med/top-api'
+import { Expression, ExpressionType, Entity } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
@@ -162,7 +162,7 @@ export default defineComponent({
     })
     const showAddButton = computed((): boolean => {
       if (local.value.type == undefined) return false
-      if ([ExpressionType.Restriction, ExpressionType.Class].includes(local.value.type))
+      if (ExpressionType.Restriction == local.value.type)
         return false
       return [ExpressionType.Intersection, ExpressionType.Union].includes(local.value.type)
         || local.value.operands === undefined || local.value.operands.length === 0
@@ -172,7 +172,7 @@ export default defineComponent({
       ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Restriction
     ])
     const operands = computed(() => {
-      if ([ExpressionType.Complement, ExpressionType.Class, ExpressionType.Restriction].includes(local.value.type))
+      if ([ExpressionType.Complement, ExpressionType.Restriction].includes(local.value.type))
         return local.value.operands?.slice(0, 1) || []
       return local.value.operands || []
     })
@@ -188,7 +188,7 @@ export default defineComponent({
       setEntity (newEntity: Entity): void {
         const newModelValue = JSON.parse(JSON.stringify(local.value)) as Expression
         newModelValue.id = newEntity.id
-        newModelValue.type = newEntity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class
+        newModelValue.type = ExpressionType.Restriction
         entity.value = newEntity
         emit('update:modelValue', newModelValue)
       },
