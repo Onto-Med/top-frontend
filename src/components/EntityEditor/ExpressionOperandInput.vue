@@ -2,10 +2,10 @@
   <span class="expression-operand">
     <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
     <span
-      v-if="![ExpressionType.Restriction, ExpressionType.Class].includes(modelValue.type)"
+      v-if="![ExpressionType.Restriction, ExpressionType.Class].includes(local.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
       class="cursor-pointer"
-      :title="modelValue.type ? t(modelValue.type) : ''"
+      :title="local.type ? t(local.type) : ''"
       @mouseover="hover = true"
       @mouseleave="hover = false"
     >
@@ -33,16 +33,15 @@
     </span>
 
     <entity-chip
-      v-else-if="modelValue.id"
-      :entity-id="modelValue.id"
-      :entity="entity"
+      v-else-if="local.id"
+      :entity-id="local.id"
       @entity-clicked="$emit('entityClicked', $event)"
       @remove-clicked="$emit('removeClicked')"
     />
 
     <entity-search-input
       v-else
-      :label="t('selectThing', { thing: t(modelValue.type) })"
+      :label="t('selectThing', { thing: t(local.type) })"
       :entity-types="entityTypes"
       :organisation-id="organisationId"
       :repository-id="repositoryId"
@@ -94,7 +93,7 @@
     </span>
 
     <span
-      v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(modelValue.type)"
+      v-if="![ExpressionType.Class, ExpressionType.Restriction].includes(local.type)"
       :class="{ 'text-weight-bolder text-primary': hover }"
     >
       <span v-show="expand"><br>{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
@@ -148,8 +147,9 @@ export default defineComponent({
     const { restrictionEntityTypes } = useEntityFormatter()
     const hover = ref(false)
     const entity = ref(undefined as unknown as Entity)
+    const local = computed(() => props.modelValue || {})
     const operatorSymbol = computed(() => {
-      switch (props.modelValue.type) {
+      switch (local.value.type) {
         case ExpressionType.Union:
           return t('or').toUpperCase()
         case ExpressionType.Intersection:
@@ -161,45 +161,45 @@ export default defineComponent({
       }
     })
     const showAddButton = computed((): boolean => {
-      if (props.modelValue.type == undefined) return false
-      if ([ExpressionType.Restriction, ExpressionType.Class].includes(props.modelValue.type))
+      if (local.value.type == undefined) return false
+      if ([ExpressionType.Restriction, ExpressionType.Class].includes(local.value.type))
         return false
-      return [ExpressionType.Intersection, ExpressionType.Union].includes(props.modelValue.type)
-        || props.modelValue.operands === undefined || props.modelValue.operands.length === 0
+      return [ExpressionType.Intersection, ExpressionType.Union].includes(local.value.type)
+        || local.value.operands === undefined || local.value.operands.length === 0
     })
     const entityTypes = computed(() => restrictionEntityTypes())
     const selectableExpressionTypes = computed(() => [
       ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement, ExpressionType.Restriction
     ])
     const operands = computed(() => {
-      if ([ExpressionType.Complement, ExpressionType.Class, ExpressionType.Restriction].includes(props.modelValue.type))
-        return props.modelValue.operands?.slice(0, 1) || []
-      return props.modelValue.operands || []
+      if ([ExpressionType.Complement, ExpressionType.Class, ExpressionType.Restriction].includes(local.value.type))
+        return local.value.operands?.slice(0, 1) || []
+      return local.value.operands || []
     })
 
     return {
-      t, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypes, selectableExpressionTypes, operands,
+      t, local, entity, hover, operatorSymbol, ExpressionType, showAddButton, entityTypes, selectableExpressionTypes, operands,
 
       setType (type: ExpressionType): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        const newModelValue = JSON.parse(JSON.stringify(local.value)) as Expression
         newModelValue.type = type
         emit('update:modelValue', newModelValue)
       },
       setEntity (newEntity: Entity): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        const newModelValue = JSON.parse(JSON.stringify(local.value)) as Expression
         newModelValue.id = newEntity.id
         newModelValue.type = newEntity.entityType === EntityType.SingleRestriction ? ExpressionType.Restriction : ExpressionType.Class
         entity.value = newEntity
         emit('update:modelValue', newModelValue)
       },
       addOperand (type: ExpressionType): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        const newModelValue = JSON.parse(JSON.stringify(local.value)) as Expression
         if (!newModelValue.operands) newModelValue.operands = []
         newModelValue.operands.push({ type: type })
         emit('update:modelValue', newModelValue)
       },
       handleOperandUpdate (index: number, operand: Expression|null): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        const newModelValue = JSON.parse(JSON.stringify(local.value)) as Expression
         if (newModelValue.operands) {
           if (operand) newModelValue.operands[index] = operand
           else newModelValue.operands.splice(index, 1)
@@ -208,7 +208,7 @@ export default defineComponent({
       },
       enclose (): void {
         const newModelValue = {
-          operands: [ JSON.parse(JSON.stringify(props.modelValue)) ]
+          operands: [ JSON.parse(JSON.stringify(local.value)) ]
         } as Expression
         emit('update:modelValue', newModelValue)
       }
