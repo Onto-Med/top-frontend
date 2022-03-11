@@ -131,28 +131,10 @@
       </q-toolbar>
 
       <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
-      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms && local.synonyms.length > 0" />
-      <localized-text-input
-        v-model="local.descriptions"
-        text-area
-        rows="3"
-        :label="t('description', 2)"
-        :help-text="t('entityEditor.descriptionsHelp')"
-        :expanded="local.description && local.descriptions.length > 0"
-      />
-
-      <code-input v-model="local.codes" :expanded="local.codes && local.codes.length > 0" />
 
       <data-type-select
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
         v-model="local.dataType"
-      />
-
-      <q-input
-        v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
-        v-model="local.score"
-        type="number"
-        :label="t('score')"
       />
 
       <ucum-card
@@ -187,6 +169,25 @@
         expanded
         @entity-clicked="$emit('entityClicked', $event)"
       />
+
+      <q-input
+        v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
+        v-model="local.score"
+        type="number"
+        :label="t('score')"
+      />
+
+      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms && local.synonyms.length > 0" />
+      <localized-text-input
+        v-model="local.descriptions"
+        text-area
+        rows="3"
+        :label="t('description', 2)"
+        :help-text="t('entityEditor.descriptionsHelp')"
+        :expanded="local.description && local.descriptions.length > 0"
+      />
+
+      <code-input v-model="local.codes" :expanded="local.codes && local.codes.length > 0" />
     </div>
 
     <q-inner-loading
