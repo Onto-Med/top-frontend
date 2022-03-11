@@ -91,6 +91,7 @@ export default {
   collaborativeWork: 'Collaborative Work',
   formula: 'Formula|Formulas',
   closeAll: 'Close all',
+  closeOthers: 'Close others',
   code: 'Code|Codes',
   condition: 'Condition|Conditions',
   squareRoot: 'Square root',

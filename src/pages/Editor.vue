@@ -36,14 +36,17 @@
                   @click.prevent="closeTab(tab)"
                 />
               </span>
+              <q-menu context-menu>
+                <q-list>
+                  <q-item v-close-popup dense clickable @click="closeTab(undefined)">
+                    <q-item-section v-t="'closeAll'" />
+                  </q-item>
+                  <q-item v-close-popup dense clickable @click="closeOtherTabs(tab)">
+                    <q-item-section v-t="'closeOthers'" />
+                  </q-item>
+                </q-list>
+              </q-menu>
             </q-tab>
-            <q-menu context-menu>
-              <q-list>
-                <q-item v-close-popup dense clickable @click="closeTab(undefined)">
-                  <q-item-section v-t="'closeAll'" />
-                </q-item>
-              </q-list>
-            </q-menu>
           </q-tabs>
           <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
             <q-tab-panel v-for="(tab, index) in tabs" :key="tab.id" :name="tab.id" class="q-pa-none">
@@ -219,6 +222,11 @@ export default defineComponent({
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const entity = entityStore.addEntity(entityType, superClassId)
         if (entity) selectTabByKey(entity.id)
+      },
+
+      closeOtherTabs (tab: Entity): void {
+        tabs.value = [tab]
+        selected.value = tab
       }
     }
   }
