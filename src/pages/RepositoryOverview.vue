@@ -52,6 +52,7 @@ export default defineComponent({
     const repositoryApi = inject(RepositoryApiKey)
     const repositories  = ref<Repository[]>([])
     const columns = computed(() => [
+      { name: 'actions', sortable: false },
       { name: 'organisation', label: t('organisation'), align: 'left', sortable: true },
       { name: 'name', field: 'name', label: t('name'), align: 'left', required: true, sortable: true },
       { name: 'description', field: 'description', label: t('description'), align: 'left', sortable: true },
