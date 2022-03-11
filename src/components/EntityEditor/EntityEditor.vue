@@ -129,6 +129,7 @@
               v-for="category in local.superCategories"
               :key="category.id"
               :entity-id="category.id"
+              :disable="isOtherVersion"
               @removeClicked="removeSuperCategory(category.id)"
               @entityClicked="$emit('entityClicked', $event)"
             />
@@ -138,11 +139,12 @@
               round
               size="sm"
               dense
+              :disable="isOtherVersion"
               :title="t('addThing', { thing: t('superCategory') })"
               @click="showSuperCategoryInput = true"
             />
             <entity-search-input
-              v-show="showSuperCategoryInput"
+              v-show="!isOtherVersion && showSuperCategoryInput"
               :organisation-id="organisationId"
               :repository-id="repositoryId"
               :label="t('selectThing', { thing: t('category') })"
@@ -155,27 +157,37 @@
         </q-toolbar>
       </q-card>
 
-      <localized-text-input v-model="local.titles" unique-langs :label="t('title', 2)" :help-text="t('entityEditor.titlesHelp')" expanded />
+      <localized-text-input
+        v-model="local.titles"
+        unique-langs
+        expanded
+        :readonly="isOtherVersion"
+        :label="t('title', 2)"
+        :help-text="t('entityEditor.titlesHelp')"
+      />
 
       <data-type-select
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
         v-model="local.dataType"
+        :readonly="isOtherVersion"
       />
 
       <ucum-card
         v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
         v-model="local.units"
+        :readonly="isOtherVersion"
         :expanded="local.units && local.units.length > 0"
       />
 
       <formula-input
         v-if="local.entityType === EntityType.DerivedPhenotype"
         v-model="local.formula"
+        expanded
+        :readonly="isOtherVersion"
         :label="t('formula')"
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        expanded
       />
 
       <restriction-input
@@ -183,11 +195,13 @@
         :key="restrictionKey"
         v-model="local.restriction"
         expanded
+        :readonly="isOtherVersion"
       />
 
       <expression-input
         v-if="local.entityType === EntityType.CombinedRestriction"
         v-model="local.expression"
+        :readonly="isOtherVersion"
         :label="t('expression')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
@@ -199,20 +213,32 @@
         v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
         v-model="local.score"
         type="number"
+        :readonly="isOtherVersion"
         :label="t('score')"
       />
 
-      <localized-text-input v-model="local.synonyms" :label="t('synonym', 2)" :help-text="t('entityEditor.synonymsHelp')" :expanded="local.synonyms && local.synonyms.length > 0" />
+      <localized-text-input
+        v-model="local.synonyms"
+        :readonly="isOtherVersion"
+        :label="t('synonym', 2)"
+        :help-text="t('entityEditor.synonymsHelp')"
+        :expanded="local.synonyms && local.synonyms.length > 0"
+      />
       <localized-text-input
         v-model="local.descriptions"
         text-area
         rows="3"
+        :readonly="isOtherVersion"
         :label="t('description', 2)"
         :help-text="t('entityEditor.descriptionsHelp')"
         :expanded="local.description && local.descriptions.length > 0"
       />
 
-      <code-input v-model="local.codes" :expanded="local.codes && local.codes.length > 0" />
+      <code-input
+        v-model="local.codes"
+        :readonly="isOtherVersion"
+        :expanded="local.codes && local.codes.length > 0"
+      />
     </div>
 
     <q-inner-loading

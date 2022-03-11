@@ -19,7 +19,7 @@
           <q-item-section v-t="'show'" />
         </q-item>
         <q-separator />
-        <q-item v-close-popup clickable @click="$emit('removeClicked', state.id)">
+        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked', state.id)">
           <q-item-section v-t="'remove'" />
         </q-item>
       </q-list>
@@ -38,7 +38,8 @@ export default defineComponent({
   name: 'EntityChip',
   props: {
     entityId: String,
-    entity: Object as () => Entity
+    entity: Object as () => Entity,
+    disable: Boolean
   },
   emits: ['entityClicked', 'removeClicked'],
   setup(props) {

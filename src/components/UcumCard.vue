@@ -2,7 +2,7 @@
   <expandable-card :title="t('unit', 2)" :help-text="t('ucumCard.help')" :expanded="expanded" :show-help="showHelp">
     <template #default>
       <div v-for="(unit, index) in modelValue" :key="index" class="row">
-        <ucum-input :model-value="modelValue[index].unit" @update:modelValue="updateUnitByIndex({ unit: $event }, index)">
+        <ucum-input :model-value="modelValue[index].unit" :readonly="readonly" @update:modelValue="updateUnitByIndex({ unit: $event }, index)">
           <template #after>
             <q-btn icon="remove" class="remove-ucum-btn" :title="t('remove')" color="red" @click="removeUnitByIndex(index)" />
           </template>
@@ -12,7 +12,14 @@
 
     <template #append>
       <q-card-actions class="q-pa-md">
-        <q-btn icon="add" color="primary" class="add-ucum-btn" :label="t('addThing', { thing: t('unit') })" @click="addUnit" />
+        <q-btn
+          icon="add"
+          color="primary"
+          class="add-ucum-btn"
+          :disable="readonly"
+          :label="t('addThing', { thing: t('unit') })"
+          @click="addUnit"
+        />
       </q-card-actions>
     </template>
   </expandable-card>
@@ -37,7 +44,8 @@ export default defineComponent({
       default: () => []
     },
     expanded: Boolean,
-    showHelp: Boolean
+    showHelp: Boolean,
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {

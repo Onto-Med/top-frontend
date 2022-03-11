@@ -3,6 +3,7 @@
     <template #default>
       <expression-operand-input
         class="text-subtitle1"
+        :readonly="readonly"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
         :expand="expandExpression"
@@ -21,6 +22,7 @@
         round
         dense
         icon="clear"
+        :disable="readonly"
         :title="t('clearAll')"
         @click.stop="showClearDialog = true"
       />
@@ -58,6 +60,7 @@
               v-close-popup
               flat
               :label="t('ok')"
+              :disable="readonly"
               color="primary"
               @click="$emit('update:modelValue', {})"
             />
@@ -94,7 +97,8 @@ export default defineComponent({
     expanded: Boolean,
     showHelp: Boolean,
     organisationId: String,
-    repositoryId: String
+    repositoryId: String,
+    readonly: Boolean
   },
   emits: ['update:modelValue', 'entityClicked', 'removeClicked'],
   setup () {

@@ -4,11 +4,12 @@
       emit-value
       use-input
       input-debounce="200"
+      class="ucum-select-field"
+      :readonly="readonly"
       :model-value="modelValue"
       :options="options"
       :display-value="displayValue"
       :error="validation.status !== 'valid'"
-      class="ucum-select-field"
       @filter="filterFn"
       @update:model-value="$emit('update:modelValue', $event)"
     >
@@ -41,7 +42,8 @@ import { useI18n } from 'vue-i18n'
 export default defineComponent({
   name: 'UcumInput',
   props: {
-    modelValue: String
+    modelValue: String,
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   setup (props) {

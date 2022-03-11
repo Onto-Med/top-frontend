@@ -10,22 +10,23 @@
       @mouseleave="hover = false"
     >
       {{ operatorSymbol }} (<br v-show="expand">
-      <q-menu>
+      <q-menu v-if="!readonly">
         <q-list dense>
           <q-item
             v-for="type in [ExpressionType.Union, ExpressionType.Intersection, ExpressionType.Complement]"
             :key="type"
             v-close-popup
             clickable
+            :disable="readonly"
             @click="setType(type)"
           >
             <q-item-section v-t="type" />
           </q-item>
           <q-separator />
-          <q-item v-close-popup clickable @click="enclose">
+          <q-item v-close-popup clickable :disable="readonly" @click="enclose">
             <q-item-section v-t="'encloseWithExpression'" />
           </q-item>
-          <q-item v-if="!root" v-close-popup clickable @click="$emit('removeClicked')">
+          <q-item v-if="!root" v-close-popup clickable :disable="readonly" @click="$emit('removeClicked')">
             <q-item-section v-t="'remove'" />
           </q-item>
         </q-list>
@@ -35,12 +36,13 @@
     <entity-chip
       v-else-if="local.id"
       :entity-id="local.id"
+      :disable="readonly"
       @entity-clicked="$emit('entityClicked', $event)"
       @remove-clicked="$emit('removeClicked')"
     />
 
     <entity-search-input
-      v-else
+      v-else-if="!readonly"
       :label="t('selectThing', { thing: t(local.type) })"
       :entity-types="entityTypes"
       :organisation-id="organisationId"
@@ -57,6 +59,7 @@
 
       <expression-operand-input
         :model-value="operand"
+        :readonly="readonly"
         :expand="expand"
         :indent="indent"
         :indent-level="indentLevel + 1"
@@ -68,7 +71,7 @@
       />
     </span>
 
-    <span v-show="showAddButton" :class="{ 'text-weight-bolder text-primary': hover }">
+    <span v-show="showAddButton && !readonly" :class="{ 'text-weight-bolder text-primary': hover }">
       <span v-show="operands.length > 0">, <span v-show="expand"><br></span></span>
       <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
       <span
@@ -138,7 +141,8 @@ export default defineComponent({
       default: false
     },
     organisationId: String,
-    repositoryId: String
+    repositoryId: String,
+    readonly: Boolean
   },
   emits: ['update:modelValue', 'entityClicked', 'removeClicked'],
   setup (props, { emit }) {

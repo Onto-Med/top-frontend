@@ -4,6 +4,7 @@
       <div v-for="(entry, index) in modelValue" :key="index" class="row">
         <q-input
           :model-value="modelValue[index].code"
+          :readonly="readonly"
           type="text"
           debounce="200"
           class="col"
@@ -13,6 +14,7 @@
             <code-system-input
               :model-value="modelValue[index].codeSystem"
               :options="codeSystems"
+              :readonly="readonly"
               class="system-input"
               @selection-changed="updateEntryByIndex(index, modelValue[index].code, $event)"
             />
@@ -30,6 +32,7 @@
               color="red"
               icon="remove"
               class="remove-localized-text-btn"
+              :disable="readonly"
               :title="t('remove')"
               @click="removeEntryByIndex(index)"
             />
@@ -44,6 +47,7 @@
           color="primary"
           icon="add"
           class="add-localized-text-btn"
+          :disable="readonly"
           :label="t('addThing', { thing: t('code') })"
           @click="addEntry()"
         />
@@ -71,7 +75,8 @@ export default defineComponent({
       default: () => []
     },
     expanded: Boolean,
-    showHelp: Boolean
+    showHelp: Boolean,
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {

@@ -9,6 +9,7 @@
           map-options
           outlined
           hide-bottom-space
+          :readonly="readonly"
           :label="t('quantor')"
           :options="quantors || defaultQuantors"
         />
@@ -22,6 +23,7 @@
               v-model="hasRange"
               no-caps
               class="q-mb-md"
+              :disable="readonly"
               :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
               @update:model-value="handleHasRangeChanged"
             />
@@ -34,6 +36,7 @@
                 <q-select
                   v-model="state.minOperator"
                   :options="operators || defaultOperators"
+                  :readonly="readonly"
                   outlined
                   emit-value
                   map-options
@@ -49,6 +52,7 @@
                 <q-select
                   v-model="state.maxOperator"
                   :options="operators || defaultOperators"
+                  :readonly="readonly"
                   emit-value
                   map-options
                   outlined
@@ -59,7 +63,7 @@
           </div>
 
           <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
-            <q-input v-model="state.values[index]" outlined :type="state.type">
+            <q-input v-model="state.values[index]" outlined :readonly="readonly" :type="state.type">
               <template #after>
                 <q-btn
                   color="red"
@@ -81,6 +85,7 @@
           color="primary"
           icon="add"
           class="add-restriction-value-btn"
+          :disable="readonly"
           :label="t('addThing', { thing: name || t('value') })"
           @click="addValue()"
         />
@@ -111,7 +116,8 @@ export default defineComponent({
     quantors: Array,
     expanded: Boolean,
     showHelp: Boolean,
-    dataType: String as () => DataType
+    dataType: String as () => DataType,
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {

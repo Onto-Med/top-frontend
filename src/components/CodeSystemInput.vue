@@ -2,6 +2,7 @@
   <q-select
     :model-value="modelValue"
     :options="options"
+    :readonly="readonly"
     @update:modelValue="$emit('selectionChanged', $event)"
   >
     <template #selected-item="{ opt }">
@@ -31,7 +32,8 @@ export default defineComponent({
     options: {
       type: Array as () => CodeSystem[],
       required: true
-    }
+    },
+    readonly: Boolean
   },
   emits: ['selectionChanged'],
   setup () {

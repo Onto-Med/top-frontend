@@ -6,6 +6,7 @@
         :model-value="modelValue"
         :definitions="definitions"
         :toolbar="toolbar"
+        :readonly="readonly"
         debounce="200"
         type="textarea"
         @update:model-value="$emit('update:modelValue', $event)"
@@ -16,6 +17,7 @@
             dense
             no-wrap
             unelevated
+            :disable="readonly"
             :label="t('class')"
             size="sm"
             menu-anchor="bottom start"
@@ -65,7 +67,8 @@ export default defineComponent({
     expanded: Boolean,
     showHelp: Boolean,
     organisationId: String,
-    repositoryId: String
+    repositoryId: String,
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   setup () {

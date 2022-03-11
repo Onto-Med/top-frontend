@@ -7,6 +7,7 @@
           :type="textArea ? 'textarea' : 'text'"
           :rows="rows"
           :cols="cols"
+          :readonly="readonly"
           debounce="200"
           class="col"
           @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"
@@ -15,6 +16,7 @@
             <q-select
               :model-value="modelValue[index].lang"
               :options="supportedLangs"
+              :readonly="readonly"
               class="lang-input"
               @update:modelValue="updateEntryByIndex(index, modelValue[index].text, $event)"
             />
@@ -24,6 +26,7 @@
               color="red"
               icon="remove"
               class="remove-localized-text-btn"
+              :disable="readonly"
               :title="t('remove')"
               @click="removeEntryByIndex(index)"
             />
@@ -40,6 +43,7 @@
           color="primary"
           icon="add"
           class="add-localized-text-btn"
+          :disable="readonly"
           :label="t('addThing', { thing: name || t('entry') })"
           @click="addEntry()"
         />
@@ -75,7 +79,8 @@ export default defineComponent({
       default: () => ['de', 'en']
     },
     expanded: Boolean,
-    showHelp: Boolean
+    showHelp: Boolean,
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {

@@ -1,10 +1,11 @@
 <template>
   <q-select
     v-model="dataType"
-    :label="label || t('dataType')"
     stack-label
     emit-value
     map-options
+    :readonly="readonly"
+    :label="label || t('dataType')"
     :options="options || defaultOptions"
     :error="!dataType"
   />
@@ -20,7 +21,8 @@ export default defineComponent({
   props: {
     modelValue: String,
     label: String,
-    options: Array
+    options: Array,
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   setup (props: Record<string, unknown>, { emit }: SetupContext) {
