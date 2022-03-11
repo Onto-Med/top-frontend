@@ -109,6 +109,7 @@
       </q-dialog>
 
       <version-history-dialog
+        :key="versionHistoryDialogKey"
         v-model:show="showVersionHistory"
         :entity-id="local.id"
         :current-version="entity.version"
@@ -319,6 +320,7 @@ export default defineComponent({
     const showClearDialog    = ref(false)
     const restrictionKey     = ref(0)
     const showSuperCategoryInput = ref(false)
+    const versionHistoryDialogKey = ref(1)
 
     watch(
       () => props.entity,
@@ -351,7 +353,7 @@ export default defineComponent({
     const validate = (): boolean => !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
 
     return {
-      t, d, getTitle, isRestricted, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,
+      t, d, getTitle, isRestricted, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType, versionHistoryDialogKey,
 
       showSuperCategoryInput,
 
@@ -385,9 +387,10 @@ export default defineComponent({
       },
 
       save: () => {
-        if (validate())
+        if (validate()) {
           emit('update:entity', local.value)
-        else
+          versionHistoryDialogKey.value++
+        } else
           alert(t('pleaseCheckInput'))
       }
     }
