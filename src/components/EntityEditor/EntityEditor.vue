@@ -250,7 +250,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineComponent, watch, onMounted, inject } from 'vue'
+import { ref, computed, defineComponent, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, DataType, Entity, Category, Phenotype } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
@@ -267,7 +267,6 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
-import { EntityApiKey } from 'src/boot/axios'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -288,7 +287,6 @@ export default defineComponent({
       type: Object as () => Entity,
       required: true
     },
-    version: Number,
     repositoryId: {
       type: String,
       required: true
@@ -310,7 +308,6 @@ export default defineComponent({
     const { getTitle, isRestricted, isPhenotype } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
-    const entityApi = inject(EntityApiKey)
     const local     = ref(clone(props.entity))
     const entityStore = useEntity()
     const showJson  = ref(false)
@@ -329,15 +326,6 @@ export default defineComponent({
     )
 
     const validate = (): boolean => !isPhenotype(props.entity) || !!(local.value as Phenotype).dataType
-
-    onMounted(() => {
-      if (!entityApi || !props.entity.id || !props.version || props.version == props.entity.version) return
-      loading.value = true
-      entityApi.getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
-        .then(r => local.value = r.data)
-        .catch((e: Error) => alert(e.message))
-        .finally(() => loading.value = false)
-    })
 
     return {
       t, d, getTitle, isRestricted, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,
@@ -376,14 +364,7 @@ export default defineComponent({
           casted.superCategories.splice(index, 1)
       },
 
-      reset: () => {
-        local.value = clone(props.entity)
-        void router.push({
-          name: 'editor',
-          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: local.value.id },
-          query: { version: local.value.version }
-        })
-      },
+      reset: () => local.value = clone(props.entity),
 
       save: () => {
         if (validate())
