@@ -113,6 +113,7 @@ export default {
   encloseWithExpression: 'Mit Ausdruck umschließen',
   attributesMissing: 'Ein oder mehrere Attribute fehlen.',
   displayingOtherVersion: 'Ihnen wird eine andere als die aktuelle Version angezeigt.',
+  pleaseCheckInput: 'Bitte überprüfen Sie Ihre Eingabe!',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

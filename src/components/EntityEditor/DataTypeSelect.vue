@@ -6,6 +6,7 @@
     emit-value
     map-options
     :options="options || defaultOptions"
+    :error="!dataType"
   />
 </template>
 

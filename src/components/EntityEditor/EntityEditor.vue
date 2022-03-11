@@ -237,6 +237,7 @@ import UcumCard from 'src/components/UcumCard.vue'
 import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import useAlert from 'src/mixins/useAlert'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -275,7 +276,8 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean => 
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted } = useEntityFormatter()
+    const { getTitle, isRestricted, isPhenotype } = useEntityFormatter()
+    const { alert } = useAlert()
     const local    = ref(clone(props.entity))
     const showJson = ref(false)
     const loading  = ref(false)
@@ -291,6 +293,8 @@ export default defineComponent({
       },
       { deep: true }
     )
+
+    const validate = (): boolean => !isPhenotype(props.entity) || !!(local.value as Phenotype).dataType
 
     return {
       t, d, getTitle, isRestricted, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,
@@ -326,7 +330,12 @@ export default defineComponent({
 
       reset: () => local.value = clone(props.entity),
 
-      save: () => emit('update:entity', local.value)
+      save: () => {
+        if (validate())
+          emit('update:entity', local.value)
+        else
+          alert(t('pleaseCheckInput'))
+      }
     }
   }
 })
