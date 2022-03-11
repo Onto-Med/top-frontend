@@ -79,7 +79,7 @@ import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
 import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { Entity, EntityType, Phenotype } from '@onto-med/top-api'
+import { Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
@@ -92,7 +92,7 @@ export default defineComponent({
   },
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t }         = useI18n()
+    const { t, locale }         = useI18n()
     const { getIcon, getTitle, isRestricted, isPhenotype } = useEntityFormatter()
     const router        = useRouter()
     const entityStore   = useEntity()
@@ -219,6 +219,7 @@ export default defineComponent({
 
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const entity = entityStore.addEntity(entityType, superClassId)
+        entity.titles = [ { lang: locale.value } as LocalisableText ]
         if (entity) selectTabByKey(entity.id)
       },
 
