@@ -25,9 +25,10 @@ const datetimeFormats = {
 }
 
 export default boot(({ app }) => {
+  const language = navigator.language.split('-')[0]
   const i18n = createI18n({
     legacy: false,
-    locale: navigator.language,
+    locale: language,
     messages,
     datetimeFormats
   })
