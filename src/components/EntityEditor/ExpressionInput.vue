@@ -59,7 +59,7 @@
               flat
               :label="t('ok')"
               color="primary"
-              @click="$emit('update:modelValue', { type: ExpressionType.Union })"
+              @click="$emit('update:modelValue', {})"
             />
           </q-card-actions>
         </q-card>
