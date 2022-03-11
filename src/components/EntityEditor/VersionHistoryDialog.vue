@@ -101,8 +101,8 @@ export default defineComponent({
     currentVersion: Number,
     selectedVersion: Number
   },
-  emits: ['restore', 'update:show', 'prefill'],
-  setup (props) {
+  emits: ['restore', 'update:show', 'prefill', 'deleted'],
+  setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d }     = useI18n()
     const entityApi    = inject(EntityApiKey)
@@ -147,6 +147,7 @@ export default defineComponent({
           .then(() => {
             alert(t('thingDeleted', { thing: t('version') }), 'positive')
           })
+          .then(() => emit('deleted'))
           .then(() => reload())
           .catch((e: Error) => alert(e.message))
       }

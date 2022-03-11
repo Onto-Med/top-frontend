@@ -116,6 +116,7 @@
         :repository-id="repositoryId"
         @prefill="prefillFromVersion"
         @restore="$emit('restoreVersion', $event)"
+        @deleted="reset()"
       />
     </div>
 
