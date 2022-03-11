@@ -250,7 +250,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineComponent, watch } from 'vue'
+import { ref, computed, defineComponent, watch, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, DataType, Entity, Category, Phenotype } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
@@ -267,6 +267,7 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
+import { EntityApiKey } from 'src/boot/axios'
 
 export default defineComponent({
   name: 'EntityEditor',
@@ -287,6 +288,7 @@ export default defineComponent({
       type: Object as () => Entity,
       required: true
     },
+    version: Number,
     repositoryId: {
       type: String,
       required: true
@@ -296,7 +298,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['entityClicked', 'update:entity', 'restoreVersion'],
+  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
@@ -309,6 +311,7 @@ export default defineComponent({
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
+    const entityApi = inject(EntityApiKey)
     const entityStore = useEntity()
     const showJson  = ref(false)
     const loading   = ref(false)
@@ -325,6 +328,26 @@ export default defineComponent({
       { deep: true }
     )
 
+    const prefillFromVersion = (entity: Entity): void => {
+      local.value = clone(entity)
+      restrictionKey.value++
+      void router.push({
+        name: 'editor',
+        params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
+        query: { version: entity.version }
+      })
+      emit('changeVersion', entity.version)
+    }
+
+    onMounted(() => {
+      if (!entityApi || !props.entity.id || !props.version) return
+      loading.value = true
+      entityApi.getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
+        .then((r) => prefillFromVersion(r.data))
+        .catch((e: Error) => alert(e.message))
+        .finally(() => loading.value = false)
+    })
+
     const validate = (): boolean => !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
 
     return {
@@ -338,15 +361,7 @@ export default defineComponent({
 
       hasUnsavedChanges: computed(() => !equals(local.value, props.entity)),
 
-      prefillFromVersion (entity: Entity): void {
-        local.value = clone(entity)
-        restrictionKey.value++
-        void router.push({
-          name: 'editor',
-          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
-          query: { version: entity.version }
-        })
-      },
+      prefillFromVersion,
 
       addSuperCategory (category: Category): void {
         const casted = local.value as Category|Phenotype
@@ -364,7 +379,10 @@ export default defineComponent({
           casted.superCategories.splice(index, 1)
       },
 
-      reset: () => local.value = clone(props.entity),
+      reset: () => {
+        local.value = clone(props.entity)
+        emit('changeVersion', local.value.version)
+      },
 
       save: () => {
         if (validate())
