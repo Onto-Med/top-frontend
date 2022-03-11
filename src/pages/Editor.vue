@@ -236,6 +236,7 @@ export default defineComponent({
 <style lang="sass" scoped>
 .entity-editor-tabs-bar
   width: 100%
+  height: 36px
 .entity-editor-tab
   height: 100%
   width: 100%
