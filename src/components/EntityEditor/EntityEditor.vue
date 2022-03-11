@@ -305,7 +305,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean => 
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted, isPhenotype } = useEntityFormatter()
+    const { getTitle, isRestricted, hasDataType } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -325,7 +325,7 @@ export default defineComponent({
       { deep: true }
     )
 
-    const validate = (): boolean => !isPhenotype(props.entity) || !!(local.value as Phenotype).dataType
+    const validate = (): boolean => !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
 
     return {
       t, d, getTitle, isRestricted, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,

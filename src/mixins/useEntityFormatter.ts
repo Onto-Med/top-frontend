@@ -33,6 +33,10 @@ export default function (this: void) {
     isPhenotype,
     isCategory,
 
+    hasDataType: (entity: Entity) => {
+      return entity.entityType == EntityType.SinglePhenotype
+    },
+
     /**
      * Get an appropriate material icon name for the provided entity.
      * When building an icon, you should make restrictions visually distinguishable from phenotypes.
