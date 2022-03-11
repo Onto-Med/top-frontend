@@ -55,6 +55,7 @@
                 :entity="tabs[index]"
                 :repository-id="repositoryId"
                 :organisation-id="organisationId"
+                :version="version"
                 @update:entity="saveEntity"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"
@@ -85,7 +86,8 @@ export default defineComponent({
   name: 'Editor',
   components: { EntityEditor, EntityTree },
   props: {
-    entityId: String
+    entityId: String,
+    version: Number
   },
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -135,14 +137,17 @@ export default defineComponent({
       selected as Ref<Entity|undefined>,
       (entity: Entity|undefined) => {
         let id = undefined
+        let version = undefined
         if (entity) {
           id = entity.id
+          version = entity.version
           if (!tabs.value.map(t => t.id).includes(entity.id))
             tabs.value.push(entity)
         }
         void router.push({
           name: 'editor',
-          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: id }
+          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: id },
+          query: { version: props.version || version }
         })
       }
     )
