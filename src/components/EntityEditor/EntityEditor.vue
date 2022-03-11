@@ -100,7 +100,7 @@
     </div>
 
     <div class="q-gutter-md q-mt-none q-px-md q-pb-xl col entity-editor-tab-content">
-      <q-toolbar class="q-my-none">
+      <q-toolbar v-if="!isRestricted(entity)" class="q-my-none">
         {{ t('superCategory', 2) }}:
         <entity-chip
           v-for="category in local.superCategories"
@@ -249,7 +249,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean => 
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle } = useEntityFormatter()
+    const { getTitle, isRestricted } = useEntityFormatter()
     const local    = ref(clone(props.entity))
     const showJson = ref(false)
     const loading  = ref(false)
@@ -267,7 +267,7 @@ export default defineComponent({
     )
 
     return {
-      t, d, getTitle, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,
+      t, d, getTitle, isRestricted, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType,
 
       showSuperCategoryInput,
 
