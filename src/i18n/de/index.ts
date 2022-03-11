@@ -114,6 +114,7 @@ export default {
   attributesMissing: 'Ein oder mehrere Attribute fehlen.',
   displayingOtherVersion: 'Ihnen wird eine andere als die aktuelle Version angezeigt.',
   pleaseCheckInput: 'Bitte überprüfen Sie Ihre Eingabe!',
+  versionRestoreDescription: 'Dies wird die Entität auf den angezeigten Status zurücksetzen.',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

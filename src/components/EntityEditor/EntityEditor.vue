@@ -15,6 +15,7 @@
           dense
           no-caps
           :label="t('restore')"
+          :title="t('versionRestoreDescription')"
           @click.stop="$emit('restoreVersion', local)"
         />
         <q-btn
