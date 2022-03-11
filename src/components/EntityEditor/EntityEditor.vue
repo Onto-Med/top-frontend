@@ -94,7 +94,6 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         @prefill="prefillFromVersion"
-        @delete="$emit('deleteVersion', $event)"
         @restore="$emit('restoreVersion', $event)"
       />
     </div>
@@ -241,7 +240,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'deleteVersion'],
+  emits: ['entityClicked', 'update:entity', 'restoreVersion'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()

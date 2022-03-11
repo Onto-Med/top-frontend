@@ -38,14 +38,13 @@
                   @click.stop="$emit('restore', props.row)"
                 />
                 <q-btn
-                  v-close-popup
                   size="sm"
                   color="red"
                   round
                   dense
                   icon="delete"
                   :title="t('deleteThing', { thing: t('version') })"
-                  @click.stop="$emit('delete', props.row)"
+                  @click.stop="deleteVersion(props.row)"
                 />
               </q-btn-group>
               <b v-else-if="currentVersion">
@@ -79,6 +78,8 @@ import { useI18n } from 'vue-i18n'
 import { EntityApiKey } from 'src/boot/axios'
 import { Entity } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import useAlert from 'src/mixins/useAlert'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   name: 'VersionHistoryDialog',
@@ -101,12 +102,14 @@ export default defineComponent({
     },
     currentVersion: Number
   },
-  emits: ['restore', 'update:show', 'prefill', 'delete'],
+  emits: ['restore', 'update:show', 'prefill'],
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
     const entityApi = inject(EntityApiKey)
+    const entityStore = useEntity()
     const { getTitle } = useEntityFormatter()
+    const { alert }     = useAlert()
     const versions = ref<Entity[]>([])
     const loading = ref(false)
 
@@ -138,7 +141,16 @@ export default defineComponent({
       ]),
       versions,
       loading,
-      reload
+      reload,
+
+      deleteVersion (version: Entity) {
+        entityStore.deleteVersion(version)
+          .then(() => {
+            alert(t('thingDeleted', { thing: t('version') }), 'positive')
+          })
+          .then(() => reload())
+          .catch((e: Error) => alert(e.message))
+      }
     }
   }
 })

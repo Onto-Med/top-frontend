@@ -58,7 +58,6 @@
                 @update:entity="saveEntity"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab); alert($event.message)"
-                @delete-version="deleteVersion"
                 @restore-version="restoreVersion"
               />
             </q-tab-panel>
@@ -199,14 +198,6 @@ export default defineComponent({
             if (index != -1) tabs.value[index] = r
           })
           .catch((e: Error) => alert(t(e.message)))
-      },
-
-      deleteVersion (entity: Entity) {
-        entityStore.deleteVersion(entity)
-          .then(() => {
-            alert(t('thingDeleted', { thing: t('version') }), 'positive')
-          })
-          .catch((e: Error) => alert(e.message))
       },
 
       restoreVersion (entity: Entity) {
