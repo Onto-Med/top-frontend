@@ -94,11 +94,12 @@ export default defineComponent({
     })
 
     const unusedSupportedLangs = computed((): (string|undefined)[] => {
-      return props.supportedLangs.filter(l => !duplicatedLangs.value.includes(l))
+      return props.supportedLangs.filter(l => !props.modelValue.map(x => x.lang).includes(l))
     })
 
     return {
-      t, duplicatedLangs,
+      t,
+      duplicatedLangs,
       
       removeEntryByIndex (index: number) {
         let newModelValue = props.modelValue.slice()
