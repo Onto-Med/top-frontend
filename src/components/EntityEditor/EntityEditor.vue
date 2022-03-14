@@ -309,7 +309,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean => 
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted, hasDataType } = useEntityFormatter()
+    const { getTitle, isRestricted, hasDataType, hasFormula, hasExpression } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -359,6 +359,8 @@ export default defineComponent({
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
       result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined
+      result &&= !hasFormula(local.value) || local.value.formula !== undefined
+      result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
       return result
     }

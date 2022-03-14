@@ -1,5 +1,11 @@
 <template>
-  <expandable-card :title="label" :help-text="t('entityEditor.expressionHelp')" :expanded="expanded" :show-help="showHelp">
+  <expandable-card
+    :title="label"
+    :error="modelValue === undefined || modelValue.type === undefined"
+    :help-text="t('entityEditor.expressionHelp')"
+    :expanded="expanded"
+    :show-help="showHelp"
+  >
     <template #default>
       <expression-operand-input
         class="text-subtitle1"

@@ -128,6 +128,14 @@ export default function (this: void) {
       return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)
     },
 
+    hasFormula (this: void, entity: Entity): entity is Phenotype {
+      return entity.entityType === EntityType.DerivedPhenotype
+    },
+
+    hasExpression (this: void, entity: Entity): entity is Phenotype {
+      return entity.entityType === EntityType.CombinedRestriction
+    },
+
     restrictionEntityTypes (this: void): EntityType[] {
       return [
         EntityType.CombinedRestriction,

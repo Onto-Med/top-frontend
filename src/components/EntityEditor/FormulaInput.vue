@@ -1,5 +1,11 @@
 <template>
-  <expandable-card :title="label" :help-text="helpText" :expanded="expanded" :show-help="showHelp">
+  <expandable-card
+    :title="label"
+    :error="modelValue === undefined"
+    :help-text="helpText"
+    :expanded="expanded"
+    :show-help="showHelp"
+  >
     <template #default>
       <q-editor
         ref="editorRef"
