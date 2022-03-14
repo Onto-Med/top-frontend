@@ -350,11 +350,30 @@ export default defineComponent({
         .finally(() => loading.value = false)
     })
 
-    const validate = (): boolean => !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
+    const validate = (): boolean => {
+      var result = true
+
+      result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
+      result &&= local.value.titles != undefined && local.value.titles.filter(t => t.lang && t.text).length > 0
+
+      return result
+    }
 
     return {
-      t, d, getTitle, isRestricted, local, showJson, showVersionHistory, loading, showClearDialog, restrictionKey, EntityType, DataType, versionHistoryDialogKey,
+      t,
+      d,
+      getTitle,
+      isRestricted,
 
+      local,
+      showJson,
+      showVersionHistory,
+      loading,
+      showClearDialog,
+      restrictionKey,
+      EntityType,
+      DataType,
+      versionHistoryDialogKey,
       showSuperCategoryInput,
 
       isNew: computed(() => !local.value.version),
