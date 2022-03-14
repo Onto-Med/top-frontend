@@ -115,6 +115,7 @@ export default {
   displayingOtherVersion: 'Ihnen wird eine andere als die aktuelle Version angezeigt.',
   pleaseCheckInput: 'Bitte überprüfen Sie Ihre Eingabe!',
   versionRestoreDescription: 'Dies wird die Entität auf den angezeigten Status zurücksetzen.',
+  mandatoryListField: 'Mindestens ein Eintrag ist erforderlich!',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

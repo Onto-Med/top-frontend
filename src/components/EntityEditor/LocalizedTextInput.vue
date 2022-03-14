@@ -1,5 +1,5 @@
 <template>
-  <expandable-card :title="label" :help-text="helpText" :expanded="expanded" :show-help="showHelp">
+  <expandable-card :title="label" :error="hasError" :help-text="helpText" :expanded="expanded" :show-help="showHelp">
     <template #default>
       <div v-for="(entry, index) in modelValue" :key="index" class="row">
         <q-input
@@ -8,6 +8,7 @@
           :rows="rows"
           :cols="cols"
           :readonly="readonly"
+          :error="!modelValue[index].text"
           debounce="200"
           class="col"
           @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"
@@ -17,6 +18,7 @@
               :model-value="modelValue[index].lang"
               :options="supportedLangs"
               :readonly="readonly"
+              :error="!modelValue[index].lang"
               class="lang-input"
               @update:modelValue="updateEntryByIndex(index, modelValue[index].text, $event)"
             />
@@ -33,6 +35,7 @@
           </template>
         </q-input>
       </div>
+      <div v-show="required && empty" v-t="'mandatoryListField'" class="text-negative" />
       <div v-show="uniqueLangs && duplicatedLangs.length > 0">
         {{ t('oneThingPerThing', { thing1: name || t('entry'), thing2: t('language') }) }}
       </div>
@@ -80,7 +83,8 @@ export default defineComponent({
     },
     expanded: Boolean,
     showHelp: Boolean,
-    readonly: Boolean
+    readonly: Boolean,
+    required: Boolean
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {
@@ -97,21 +101,31 @@ export default defineComponent({
       return props.supportedLangs.filter(l => !props.modelValue.map(x => x.lang).includes(l))
     })
 
+    const empty = computed(() => !props.modelValue || props.modelValue.length < 1)
+
     return {
       t,
       duplicatedLangs,
-      
+      empty,
+
+      hasError: computed(() =>
+        (props.required && empty.value)
+        || props.modelValue.findIndex(x => !x.lang || !x.text) !== -1
+      ),
+
       removeEntryByIndex (index: number) {
         let newModelValue = props.modelValue.slice()
         newModelValue.splice(index, 1)
         emit('update:modelValue', newModelValue)
       },
+
       updateEntryByIndex (index: number, text?: string, lang?: string) {
         let newModelValue = props.modelValue.slice()
         newModelValue[index].text = text
         newModelValue[index].lang = lang
         emit('update:modelValue', newModelValue)
       },
+
       addEntry () {
         let newModelValue = props.modelValue.slice()
         newModelValue.push({ lang: unusedSupportedLangs.value[0] })

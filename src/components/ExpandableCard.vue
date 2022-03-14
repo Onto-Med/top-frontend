@@ -3,8 +3,9 @@
     <q-card-section class="q-pa-sm cursor-pointer" @click="isExpanded = !isExpanded">
       <q-toolbar>
         <q-btn color="grey" round flat dense :icon="isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
-        <q-toolbar-title v-if="title">
-          {{ title }}
+        <q-toolbar-title class="row items-center">
+          <span v-if="title">{{ title }}</span>
+          <q-icon v-show="error" name="error" color="negative" class="q-pl-sm" />
         </q-toolbar-title>
         <slot name="toolbar" />
         <q-btn
@@ -56,7 +57,8 @@ export default defineComponent({
     title: String,
     helpText: String,
     expanded: Boolean,
-    showHelp: Boolean
+    showHelp: Boolean,
+    error: Boolean
   },
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method

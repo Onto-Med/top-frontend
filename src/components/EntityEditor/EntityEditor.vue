@@ -164,6 +164,7 @@
         unique-langs
         expanded
         :readonly="isOtherVersion"
+        :required="true"
         :label="t('title', 2)"
         :help-text="t('entityEditor.titlesHelp')"
       />
@@ -355,6 +356,8 @@ export default defineComponent({
 
       result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
       result &&= local.value.titles != undefined && local.value.titles.filter(t => t.lang && t.text).length > 0
+      result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
+      result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
 
       return result
     }
