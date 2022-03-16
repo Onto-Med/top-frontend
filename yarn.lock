@@ -1325,10 +1325,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@onto-med/top-api@^0.2.2":
-  version "0.2.2"
-  resolved "https://npm.pkg.github.com/download/@onto-med/top-api/0.2.2/0f0812ce19972ff88457f08c5e2cf389471f019de3432f21fb1d97bde20eb3de#1507cfe76dfe4d248aa6bfd3eed2684bd09f47b3"
-  integrity sha512-oSyPDg/R4U8VTfrg+b9eFQ0MG3fe9lcThfE7sPoO2Wi/Um2p64nidVEVK7aR13DHSXwxeB+r/r+rKdhwxOOn5Q==
+"@onto-med/top-api@^0.3.0":
+  version "0.3.0"
+  resolved "https://npm.pkg.github.com/download/@onto-med/top-api/0.3.0/a12d4b9f83f634474f8b5a2e897c4d900a184dc97bc8e3648c94a842aefff349#bfda75d968843d5e56f339184230d44507b6ac58"
+  integrity sha512-5vl+g+M658+daVRR51zkFRCf/s1mRgQuU7BBXE3N8e8Z5mGgsha2tTtywMTTGtnEuCd0k8+g2wSUo19uB/yDdw==
   dependencies:
     axios "^0.21.4"
 
