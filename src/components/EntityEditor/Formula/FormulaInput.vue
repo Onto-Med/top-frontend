@@ -9,6 +9,7 @@
     <template #default>
       <formula-operand-input
         class="text-subtitle1"
+        :operators="operators"
         :readonly="readonly"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
@@ -82,7 +83,7 @@ import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import FormulaOperandInput from 'src/components/EntityEditor/Formula/FormulaOperandInput.vue'
-import { Formula } from '@onto-med/top-api'
+import { Formula, FormulaMultaryOperator, FormulaOperator, RepresentationEnum, TypeEnum } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'FormulaInput',
@@ -115,7 +116,58 @@ export default defineComponent({
       t,
       expandExpression: ref(false),
       indent: ref(2),
-      showClearDialog: ref(false)
+      showClearDialog: ref(false),
+      operators: [
+        {
+          id: 'addition',
+          title: '+',
+          representation: RepresentationEnum.Infix,
+          type: TypeEnum.Binary,
+        } as FormulaOperator,
+        {
+          id: 'substraction',
+          title: '-',
+          representation: RepresentationEnum.Infix,
+          type: TypeEnum.Binary,
+        } as FormulaOperator,
+        {
+          id: 'multiplication',
+          title: '*',
+          representation: RepresentationEnum.Infix,
+          type: TypeEnum.Binary,
+        } as FormulaOperator,
+        {
+          id: 'division',
+          title: '/',
+          representation: RepresentationEnum.Infix,
+          type: TypeEnum.Binary,
+        } as FormulaOperator,
+        {
+          id: 'exponentiation',
+          title: '^',
+          representation: RepresentationEnum.Infix,
+          type: TypeEnum.Binary,
+        } as FormulaOperator,
+        {
+          id: 'minimum',
+          title: 'min',
+          representation: RepresentationEnum.Prefix,
+          type: TypeEnum.Multary,
+          required: 0,
+        } as FormulaMultaryOperator,
+        {
+          id: 'entity',
+          title: 'entity',
+          representation: RepresentationEnum.Prefix,
+          type: TypeEnum.Unary,
+        } as FormulaOperator,
+        {
+          id: 'constant',
+          title: 'constant',
+          representation: RepresentationEnum.Prefix,
+          type: TypeEnum.Unary,
+        } as FormulaOperator,
+      ]
     }
   }
 })

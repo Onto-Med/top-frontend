@@ -1,5 +1,6 @@
 <template>
   <span class="formula-input">
+    <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel) * indent) }}</span>
     <span v-if="operator">
       <span v-if="operator.id === 'entity'">
         <entity-search-input
@@ -73,6 +74,10 @@
             @mouseover="hover = true"
             @mouseleave="hover = false"
           >
+            <span v-show="expand">
+              <br>
+              {{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}
+            </span>
             {{ operator.title }}
             <formula-context-menu
               v-if="!readonly"
@@ -88,12 +93,24 @@
             @mouseover="hover = true"
             @mouseleave="hover = false"
           >,</span>
+          <br v-show="expand">
           <formula-operand-input
             :model-value="modelValue.operands[index]"
+            :readonly="readonly"
+            :operators="operators"
+            :expand="expand"
+            :indent="indent"
+            :indent-level="indentLevel + 1"
+            :organisation-id="organisationId"
+            :repository-id="repositoryId"
             @update:model-value="handleOperandUpdate(index, $event)"
           />
         </span>
 
+        <span v-show="expand">
+          <br>
+          {{ '&nbsp;'.repeat((indentLevel) * indent) }}
+        </span>
         <span
           :class="{ hover: hover }"
           @mouseover="hover = true"
@@ -135,7 +152,6 @@ import {
   Entity,
   EntityType,
   Formula,
-  FormulaMultaryOperator,
   FormulaOperator,
   RepresentationEnum,
   TypeEnum,
@@ -158,10 +174,18 @@ export default defineComponent({
         return {};
       },
     },
-    expanded: Boolean,
     readonly: Boolean,
     root: Boolean,
     expand: Boolean,
+    operators: Array as () => FormulaOperator[],
+    indent: {
+      type: Number,
+      default: 2
+    },
+    indentLevel: {
+      type: Number,
+      default: 0
+    },
     organisationId: String,
     repositoryId: String,
   },
@@ -169,65 +193,13 @@ export default defineComponent({
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
-    const operators = [
-      {
-        id: 'addition',
-        title: '+',
-        representation: RepresentationEnum.Infix,
-        type: TypeEnum.Binary,
-      } as FormulaOperator,
-      {
-        id: 'substraction',
-        title: '-',
-        representation: RepresentationEnum.Infix,
-        type: TypeEnum.Binary,
-      } as FormulaOperator,
-      {
-        id: 'multiplication',
-        title: '*',
-        representation: RepresentationEnum.Infix,
-        type: TypeEnum.Binary,
-      } as FormulaOperator,
-      {
-        id: 'division',
-        title: '/',
-        representation: RepresentationEnum.Infix,
-        type: TypeEnum.Binary,
-      } as FormulaOperator,
-      {
-        id: 'exponentiation',
-        title: '^',
-        representation: RepresentationEnum.Infix,
-        type: TypeEnum.Binary,
-      } as FormulaOperator,
-      {
-        id: 'minimum',
-        title: 'min',
-        representation: RepresentationEnum.Prefix,
-        type: TypeEnum.Multary,
-        required: 0,
-      } as FormulaMultaryOperator,
-      {
-        id: 'entity',
-        title: 'entity',
-        representation: RepresentationEnum.Prefix,
-        type: TypeEnum.Unary,
-      } as FormulaOperator,
-      {
-        id: 'constant',
-        title: 'constant',
-        representation: RepresentationEnum.Prefix,
-        type: TypeEnum.Unary,
-      } as FormulaOperator,
-    ];
     const operator = computed(() =>
-      operators.find((o) => o.id === props.modelValue.operator)
+      props.operators?.find((o) => o.id === props.modelValue.operator)
     );
 
     return {
       t,
       operator,
-      operators,
       hover: ref(false),
 
       entityTypes: [EntityType.SinglePhenotype, EntityType.DerivedPhenotype],
