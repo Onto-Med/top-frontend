@@ -1,7 +1,7 @@
 <template>
   <expandable-card
     :title="label"
-    :error="modelValue === undefined || modelValue.type === undefined"
+    :error="modelValue === undefined || modelValue.operator === undefined"
     :help-text="t('entityEditor.formulaHelp')"
     :expanded="expanded"
     :show-help="showHelp"
@@ -12,7 +12,7 @@
         :readonly="readonly"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
-        :expand="expand"
+        :expand="expandExpression"
         :indent="indent || 2"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
@@ -23,7 +23,56 @@
     </template>
 
     <template #toolbar>
-      TOOLBAR
+      <q-btn
+        flat
+        round
+        dense
+        icon="clear"
+        :disable="readonly"
+        :title="t('clearAll')"
+        @click.stop="showClearDialog = true"
+      />
+      <q-btn
+        flat
+        round
+        dense
+        icon="settings"
+        :title="t('setting', 2)"
+        @click.stop
+      >
+        <q-menu class="q-pa-sm">
+          <div class="text-h6 q-mb-sm">
+            {{ t('setting', 2) }}
+          </div>
+          <q-toggle v-model="expandExpression" :label="t('expand')" />
+          <q-input v-model.number="indent" type="number" :label="t('indentWithSpaces')" />
+        </q-menu>
+      </q-btn>
+    </template>
+
+    <template #append>
+      <q-dialog v-model="showClearDialog">
+        <q-card>
+          <q-card-section class="row items-center">
+            <q-avatar icon="warning_amber" color="warning" text-color="white" />
+            <span v-t="'confirmClearExpression'" class="q-ml-sm" />
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
+            <q-btn
+              v-close-popup
+              flat
+              :label="t('ok')"
+              :disable="readonly"
+              color="primary"
+              @click="$emit('update:modelValue', {})"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </template>
   </expandable-card>
 </template>
@@ -61,10 +110,13 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const expand = ref(false)
-    const indent = ref(2)
 
-    return { t, expand, indent }
+    return {
+      t,
+      expandExpression: ref(false),
+      indent: ref(2),
+      showClearDialog: ref(false)
+    }
   }
 })
 </script>
