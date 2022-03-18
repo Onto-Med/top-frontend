@@ -264,7 +264,7 @@ import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UcumCard from 'src/components/UcumCard.vue'
-import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
+import FormulaInput from 'src/components/EntityEditor/Formula/FormulaInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
