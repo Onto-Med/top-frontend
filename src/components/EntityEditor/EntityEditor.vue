@@ -191,6 +191,7 @@
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        @entity-clicked="$emit('entityClicked', $event)"
       />
 
       <restriction-input
