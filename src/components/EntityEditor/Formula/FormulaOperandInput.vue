@@ -30,7 +30,7 @@
           {{ modelValue.constant }}
         </span>
         <span v-show="!modelValue.constant" v-t="'enterValue'" class="clickable" />
-        <q-popup-edit v-if="!readonly" v-model="modelValue.constant" auto-save v-slot="scope">
+        <q-popup-edit v-if="!readonly" v-slot="scope" :model-value="modelValue.constant" auto-save @update:model-value="setConstant($event)">
           <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
           <q-list dense>
             <q-item clickable @click="enclose()">
@@ -286,6 +286,12 @@ export default defineComponent({
       setEntity (entity: Entity): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Formula
         newModelValue.id = entity.id
+        emit('update:modelValue', newModelValue)
+      },
+
+      setConstant (constant: number|undefined): void {
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Formula
+        newModelValue.constant = constant
         emit('update:modelValue', newModelValue)
       },
 
