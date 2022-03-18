@@ -19,6 +19,7 @@
           <q-item-section v-t="'show'" />
         </q-item>
         <q-separator />
+        <slot name="additionalOptions" />
         <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked', state.id)">
           <q-item-section v-t="'remove'" />
         </q-item>
