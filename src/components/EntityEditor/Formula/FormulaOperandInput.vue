@@ -191,7 +191,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
     const operator = computed(() =>
-      props.operators?.find((o) => o.id === props.modelValue.operator)
+      props.operators?.find((o) => o.id === props.modelValue?.operator)
     );
 
     return {
