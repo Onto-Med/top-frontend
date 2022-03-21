@@ -29,8 +29,19 @@
       <div class="clickable">
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue.constant ? modelValue.constant : t('constant') }}
       </div>
-      <q-popup-edit v-if="!readonly" v-slot="scope" :model-value="modelValue.constant" auto-save @update:model-value="setConstant($event)">
-        <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
+      <q-popup-edit
+        v-if="!readonly"
+        v-slot="scope"
+        :model-value="modelValue.constant"
+        :cover="false"
+        auto-save
+        @update:model-value="setConstant($event)"
+      >
+        <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set">
+          <template #append>
+            <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
+          </template>
+        </q-input>
         <q-list dense>
           <q-item clickable @click="enclose()">
             <q-item-section v-t="'encloseWithExpression'" />
