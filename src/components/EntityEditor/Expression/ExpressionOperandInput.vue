@@ -109,6 +109,7 @@
           :repository-id="repositoryId"
           :entity-types="entityTypes"
           @update:model-value="handleOperandUpdate(index, $event)"
+          @entity-clicked="$emit('entityClicked', $event)"
         />
       </template>
 
