@@ -8,6 +8,7 @@
     hide-dropdown-icon
     use-input
     emit-value
+    :autofocus="autofocus"
     class="inline entity-search-input-field"
     :placeholder="selection ? '' : label || t('selectThing', { thing: t('entity') })"
     :options="options"
@@ -85,6 +86,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    autofocus: Boolean,
     organisationId: String,
     repositoryId: String
   },

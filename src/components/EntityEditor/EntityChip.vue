@@ -14,6 +14,7 @@
     <q-menu>
       <entity-search-input
         v-if="!disable"
+        autofocus
         :label="label"
         :entity-types="entityTypes"
         :organisation-id="organisationId"
