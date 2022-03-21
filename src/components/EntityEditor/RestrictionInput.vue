@@ -170,7 +170,7 @@ export default defineComponent({
     return { t, defaultOperators, defaultQuantors, state, hasRange, canHaveRange, handleHasRangeChanged, Quantor,
       addValue () {
         if (!state.values) state.values = []
-        state.values.push()
+        state.values.push(null as never)
       }
     }
   }
