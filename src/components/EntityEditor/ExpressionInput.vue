@@ -1,7 +1,7 @@
 <template>
   <expandable-card
     :title="label"
-    :error="modelValue === undefined || modelValue.type === undefined"
+    :error="modelValue === undefined || modelValue.operator === undefined"
     :help-text="t('entityEditor.expressionHelp')"
     :expanded="expanded"
     :show-help="showHelp"

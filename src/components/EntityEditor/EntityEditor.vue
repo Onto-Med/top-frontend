@@ -362,7 +362,7 @@ export default defineComponent({
       result &&= local.value.titles != undefined && local.value.titles.filter(t => t.lang && t.text).length > 0
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
-      result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined
+      result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined || local.value.entityType === EntityType.CombinedRestriction
       result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
       return result
