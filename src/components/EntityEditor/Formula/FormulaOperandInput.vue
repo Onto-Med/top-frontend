@@ -1,5 +1,5 @@
 <template>
-  <div class="formula-input" :class="{ row: !expand }">
+  <div class="formula-input" :class="{ row: !expand, 'text-primary': flash }">
     <div v-if="operator && operator.id === 'entity'">
       <entity-search-input
         v-if="!readonly && !modelValue.id"
@@ -190,14 +190,21 @@ export default defineComponent({
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
+    const flash = ref(false)
     const operator = computed(() =>
       props.operators?.find((o) => o.id === props.modelValue?.operator)
     );
+
+    const blink = () => {
+      flash.value = true
+      setTimeout(() => flash.value = false, 500)
+    }
 
     return {
       t,
       operator,
       hover: ref(false),
+      flash,
 
       entityTypes: [EntityType.SinglePhenotype, EntityType.DerivedPhenotype],
 
@@ -248,8 +255,9 @@ export default defineComponent({
           JSON.stringify(props.modelValue)
         ) || {}) as Formula;
         newModelValue.operator = operatorId;
-        if (!newModelValue.operands) newModelValue.operands = [];
-        emit('update:modelValue', newModelValue);
+        if (!newModelValue.operands) newModelValue.operands = []
+        emit('update:modelValue', newModelValue)
+        blink()
       },
 
       setEntity (entity: Entity): void {
