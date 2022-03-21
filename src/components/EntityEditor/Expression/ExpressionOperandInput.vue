@@ -13,7 +13,7 @@
         @entity-set="setEntity($event)"
         @remove-clicked="$emit('update:modelValue', undefined)"
       >
-        <template #additionalOptions>
+        <template v-if="!readonly" #additionalOptions>
           <q-item v-close-popup clickable @click="enclose()">
             <q-item-section v-t="'encloseWithExpression'" />
           </q-item>
