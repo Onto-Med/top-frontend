@@ -244,9 +244,9 @@ export default defineComponent({
       },
 
       setOperator(operatorId: string) {
-        const newModelValue = JSON.parse(
+        const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
-        ) as Formula;
+        ) || {}) as Formula;
         newModelValue.operator = operatorId;
         if (!newModelValue.operands) newModelValue.operands = [];
         emit('update:modelValue', newModelValue);
