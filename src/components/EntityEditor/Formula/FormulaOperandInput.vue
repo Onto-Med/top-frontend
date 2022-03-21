@@ -1,57 +1,81 @@
 <template>
-  <span class="formula-input">
-    <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel) * indent) }}</span>
-    <span v-if="operator">
-      <span v-if="operator.id === 'entity'">
-        <entity-search-input
-          v-if="!readonly && !modelValue.id"
-          :label="t('selectThing', { thing: t(operator.title) })"
-          :entity-types="entityTypes"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          @btn-Clicked="$emit('update:modelValue', undefined)"
-          @entity-selected="setEntity($event)"
+  <div class="formula-input" :class="{ row: !expand }">
+    <div v-if="operator && operator.id === 'entity'">
+      <entity-search-input
+        v-if="!readonly && !modelValue.id"
+        :label="t('selectThing', { thing: t(operator.title) })"
+        :entity-types="entityTypes"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
+        @btn-Clicked="$emit('update:modelValue', undefined)"
+        @entity-selected="setEntity($event)"
+      />
+      <entity-chip
+        v-if="modelValue.id"
+        :entity-id="modelValue.id"
+        :disable="readonly"
+        @entity-clicked="$emit('entityClicked', $event)"
+        @remove-clicked="$emit('update:modelValue', undefined)"
+      >
+        <template #additionalOptions>
+          <q-item v-close-popup clickable @click="enclose()">
+            <q-item-section v-t="'encloseWithExpression'" />
+          </q-item>
+        </template>
+      </entity-chip>
+    </div>
+    <div v-else-if="operator && operator.id === 'constant'">
+      <div v-show="modelValue.constant" class="clickable">
+        {{ modelValue.constant }}
+      </div>
+      <div v-show="!modelValue.constant" v-t="'enterValue'" class="clickable" />
+      <q-popup-edit v-if="!readonly" v-slot="scope" :model-value="modelValue.constant" auto-save @update:model-value="setConstant($event)">
+        <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
+        <q-list dense>
+          <q-item clickable @click="enclose()">
+            <q-item-section v-t="'encloseWithExpression'" />
+          </q-item>
+          <q-item clickable @click="$emit('update:modelValue', undefined)">
+            <q-item-section v-t="'remove'" />
+          </q-item>
+        </q-list>
+      </q-popup-edit>
+    </div>
+    <template v-else-if="operator">
+      <div
+        v-if="prefix"
+        :class="{ hover: hover }"
+        class="clickable"
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+      >
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ operator.title }} (
+        <formula-context-menu
+          v-if="!readonly"
+          :operators="operators"
+          @enclose="enclose()"
+          @remove="$emit('update:modelValue', undefined)"
+          @select="setOperator($event)"
         />
-        <entity-chip
-          v-if="modelValue.id"
-          :entity-id="modelValue.id"
-          :disable="readonly"
-          @entity-clicked="$emit('entityClicked', $event)"
-          @remove-clicked="$emit('update:modelValue', undefined)"
-        >
-          <template #additionalOptions>
-            <q-item v-close-popup clickable @click="enclose()">
-              <q-item-section v-t="'encloseWithExpression'" />
-            </q-item>
-          </template>
-        </entity-chip>
-      </span>
-      <span v-else-if="operator.id === 'constant'">
-        <span v-show="modelValue.constant" class="clickable">
-          {{ modelValue.constant }}
-        </span>
-        <span v-show="!modelValue.constant" v-t="'enterValue'" class="clickable" />
-        <q-popup-edit v-if="!readonly" v-slot="scope" :model-value="modelValue.constant" auto-save @update:model-value="setConstant($event)">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
-          <q-list dense>
-            <q-item clickable @click="enclose()">
-              <q-item-section v-t="'encloseWithExpression'" />
-            </q-item>
-            <q-item clickable @click="$emit('update:modelValue', undefined)">
-              <q-item-section v-t="'remove'" />
-            </q-item>
-          </q-list>
-        </q-popup-edit>
-      </span>
-      <span v-else>
-        <span
-          v-show="prefix"
+      </div>
+      <div
+        v-else
+        :class="{ hover: hover }"
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+      >
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}(
+      </div>
+
+      <template v-for="(n, index) in operandCount" :key="index">
+        <div
+          v-if="index != 0 && infix"
           :class="{ hover: hover }"
           class="clickable"
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          {{ operator.title }}
+          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}{{ operator.title }}{{ !expand ? '&nbsp;' : '' }}
           <formula-context-menu
             v-if="!readonly"
             :operators="operators"
@@ -59,81 +83,54 @@
             @remove="$emit('update:modelValue', undefined)"
             @select="setOperator($event)"
           />
-        </span>
-        <span
+        </div>
+        <div
+          v-else-if="index != 0"
           :class="{ hover: hover }"
-          @mouseover="hover = true"
-          @mouseleave="hover = false"
-        >(</span>
-
-        <span v-for="(n, index) in operandCount" :key="index">
-          <span
-            v-if="index != 0 && infix"
-            :class="{ hover: hover }"
-            class="clickable"
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-          >
-            <span v-show="expand">
-              <br>
-              {{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}
-            </span>
-            {{ operator.title }}
-            <formula-context-menu
-              v-if="!readonly"
-              :operators="operators"
-              @enclose="enclose()"
-              @remove="$emit('update:modelValue', undefined)"
-              @select="setOperator($event)"
-            />
-          </span>
-          <span
-            v-else-if="index != 0"
-            :class="{ hover: hover }"
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-          >,</span>
-          <br v-show="expand">
-          <formula-operand-input
-            :model-value="modelValue.operands[index]"
-            :readonly="readonly"
-            :operators="operators"
-            :expand="expand"
-            :indent="indent"
-            :indent-level="indentLevel + 1"
-            :organisation-id="organisationId"
-            :repository-id="repositoryId"
-            @update:model-value="handleOperandUpdate(index, $event)"
-          />
-        </span>
-
-        <span v-show="expand">
-          <br>
-          {{ '&nbsp;'.repeat((indentLevel) * indent) }}
-        </span>
-        <span
-          :class="{ hover: hover }"
-          @mouseover="hover = true"
-          @mouseleave="hover = false"
-        >)</span>
-        <span
-          v-show="postfix"
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          {{ operator.title }}
-          <formula-context-menu
-            v-if="!readonly"
-            :operators="operators"
-            @enclose="enclose()"
-            @remove="$emit('update:modelValue', undefined)"
-            @select="setOperator($event)"
-          />
-        </span>
-      </span>
-    </span>
-    <span v-else class="clickable">
-      [...]
+          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '' }},{{ !expand ? '&nbsp;' : '' }}
+        </div>
+        <formula-operand-input
+          :model-value="modelValue.operands[index]"
+          :readonly="readonly"
+          :operators="operators"
+          :expand="expand"
+          :indent="indent"
+          :indent-level="indentLevel + 1"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          @update:model-value="handleOperandUpdate(index, $event)"
+        />
+      </template>
+
+      <div
+        v-if="postfix"
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+      >
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
+        {{ operator.title }}
+        <formula-context-menu
+          v-if="!readonly"
+          :operators="operators"
+          @enclose="enclose()"
+          @remove="$emit('update:modelValue', undefined)"
+          @select="setOperator($event)"
+        />
+      </div>
+      <div
+        v-else
+        :class="{ hover: hover }"
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+      >
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
+      </div>
+    </template>
+    <div v-else class="clickable">
+      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[...]
       <formula-context-menu
         v-if="!readonly"
         :enclosable="false"
@@ -141,8 +138,8 @@
         :removable="false"
         @select="setOperator($event)"
       />
-    </span>
-  </span>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
