@@ -55,7 +55,7 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ operator.title }}</b> (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ operatorTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
           :operators="operators"
@@ -81,7 +81,7 @@
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ operator.title }}</b>{{ !expand ? '&nbsp;' : '' }}
+          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ operatorTitle }}</b>{{ !expand ? '&nbsp;' : '' }}
           <expression-context-menu
             v-if="!readonly"
             :operators="operators"
@@ -122,7 +122,7 @@
         @mouseleave="hover = false"
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-        <b>{{ operator.title }}</b>
+        <b>{{ operatorTitle }}</b>
         <expression-context-menu
           v-if="!readonly"
           :operators="operators"
@@ -200,7 +200,7 @@ export default defineComponent({
   emits: ['update:modelValue', 'entityClicked'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n();
+    const { t, te } = useI18n();
     const flash = ref(false)
     const operator = computed(() =>
       props.operators?.find((o) => o.id === props.modelValue?.operator)
@@ -217,6 +217,11 @@ export default defineComponent({
       operator,
       hover: ref(false),
       flash,
+
+      operatorTitle: computed(() => {
+        if (!operator.value || !operator.value.title) return ''
+        return te(operator.value.title) ? t(operator.value.title) : operator.value.title
+      }),
 
       prefix: computed(
         () =>
