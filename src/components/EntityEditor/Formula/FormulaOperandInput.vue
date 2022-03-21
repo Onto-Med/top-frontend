@@ -28,7 +28,7 @@
       <div v-show="modelValue.constant" class="clickable">
         {{ modelValue.constant }}
       </div>
-      <div v-show="!modelValue.constant" v-t="'enterValue'" class="clickable" />
+      <div v-show="!modelValue.constant" v-t="'constant'" class="clickable" />
       <q-popup-edit v-if="!readonly" v-slot="scope" :model-value="modelValue.constant" auto-save @update:model-value="setConstant($event)">
         <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
         <q-list dense>

@@ -8,7 +8,7 @@
         clickable
         @click="$emit('select', operator.id)"
       >
-        <q-item-section v-t="operator.title" />
+        <q-item-section>{{ te(operator.title) ? t(operator.title) : operator.title }}</q-item-section>
       </q-item>
       <q-separator />
       <q-item v-if="enclosable" v-close-popup clickable @click="$emit('enclose')">
@@ -50,9 +50,9 @@ export default defineComponent({
   emits: ['enclose', 'remove', 'select'],
   setup() {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n();
+    const { t, te } = useI18n();
 
-    return { t };
+    return { t, te };
   },
 });
 </script>

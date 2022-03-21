@@ -116,6 +116,7 @@ export default {
   pleaseCheckInput: 'Please check your input!',
   versionRestoreDescription: 'This will reset the entity to the displayed status.',
   mandatoryListField: 'At least one entry is required!',
+  constant: 'Constant',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
