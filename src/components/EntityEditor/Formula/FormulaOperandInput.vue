@@ -27,7 +27,7 @@
     </div>
     <div v-else-if="operator && operator.id === 'constant'">
       <div class="clickable">
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue.constant ? modelValue.constant : t('constant') }}
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue.constant ? modelValue.constant : '[' + t('constant') + ']' }}
       </div>
       <q-popup-edit
         v-if="!readonly"
