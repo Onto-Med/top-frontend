@@ -111,6 +111,10 @@
         />
       </template>
 
+      <template v-if="!readonly && operator && operator.type === TypeEnum.Multary">
+        {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<q-chip icon="add" clickable :label="t('more')" :title="t('addMoreOperands')" @click="handleOperandUpdate(operandCount, {})" />
+      </template>
+
       <div
         v-if="postfix"
         @mouseover="hover = true"
@@ -141,8 +145,8 @@
         v-if="!readonly"
         :enclosable="false"
         :operators="operators"
-        :removable="false"
         @select="setOperator($event)"
+        @remove="$emit('update:modelValue', null)"
       />
     </div>
   </div>
@@ -206,6 +210,7 @@ export default defineComponent({
 
     return {
       t,
+      TypeEnum,
       operator,
       hover: ref(false),
       flash,
@@ -240,25 +245,26 @@ export default defineComponent({
           case TypeEnum.Binary:
             return 2;
           default:
-            return 3;
+            return Math.max(3, props.modelValue.operands?.length || 0);
         }
       }),
 
-      handleOperandUpdate(index: number, operand: Formula | null): void {
+      handleOperandUpdate(index: number, operand: Formula | undefined | null): void {
         const newModelValue = JSON.parse(
           JSON.stringify(props.modelValue)
-        ) as Formula;
-        if (!newModelValue.operands) newModelValue.operands = [];
-        if (operand) newModelValue.operands[index] = operand;
-        else delete newModelValue.operands[index];
-        emit('update:modelValue', newModelValue);
+        ) as Formula
+        if (!newModelValue.operands) newModelValue.operands = []
+        if (operand) newModelValue.operands[index] = operand
+        else if (operand === undefined) delete newModelValue.operands[index]
+        else newModelValue.operands.splice(index, 1)
+        emit('update:modelValue', newModelValue)
       },
 
       setOperator(operatorId: string) {
         const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
-        ) || {}) as Formula;
-        newModelValue.operator = operatorId;
+        ) || {}) as Formula
+        newModelValue.operator = operatorId
         if (!newModelValue.operands) newModelValue.operands = []
         emit('update:modelValue', newModelValue)
         blink()

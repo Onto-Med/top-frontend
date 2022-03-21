@@ -117,6 +117,8 @@ export default {
   versionRestoreDescription: 'This will reset the entity to the displayed status.',
   mandatoryListField: 'At least one entry is required!',
   constant: 'Constant',
+  more: 'More',
+  addMoreOperands: 'Add more operands',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
