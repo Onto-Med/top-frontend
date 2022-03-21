@@ -11,10 +11,11 @@
     icon="create"
     class="truncate"
   >
-    <q-menu>
+    <q-popup-edit :cover="false">
       <entity-search-input
         v-if="!disable"
         autofocus
+        dense
         :label="label"
         :entity-types="entityTypes"
         :organisation-id="organisationId"
@@ -28,7 +29,7 @@
           <q-item-section v-t="'remove'" />
         </q-item>
       </q-list>
-    </q-menu>
+    </q-popup-edit>
   </q-chip>
 
   <q-chip
