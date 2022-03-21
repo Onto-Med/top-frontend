@@ -1,7 +1,8 @@
 <template>
   <div class="formula-input" :class="{ row: !expand, 'text-primary': flash }">
     <div v-if="operator && operator.id === 'entity'">
-      <entity-search-input
+      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
+   --><entity-search-input
         v-if="!readonly && !modelValue.id"
         :label="t('selectThing', { thing: t(operator.title) })"
         :entity-types="entityTypes"
@@ -25,10 +26,9 @@
       </entity-chip>
     </div>
     <div v-else-if="operator && operator.id === 'constant'">
-      <div v-show="modelValue.constant" class="clickable">
-        {{ modelValue.constant }}
+      <div class="clickable">
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue.constant ? modelValue.constant : t('constant') }}
       </div>
-      <div v-show="!modelValue.constant" v-t="'constant'" class="clickable" />
       <q-popup-edit v-if="!readonly" v-slot="scope" :model-value="modelValue.constant" auto-save @update:model-value="setConstant($event)">
         <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
         <q-list dense>
