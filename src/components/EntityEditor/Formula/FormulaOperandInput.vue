@@ -49,7 +49,7 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ operator.title }} (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ operator.title }}</b> (
         <formula-context-menu
           v-if="!readonly"
           :operators="operators"
@@ -75,7 +75,7 @@
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}{{ operator.title }}{{ !expand ? '&nbsp;' : '' }}
+          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ operator.title }}</b>{{ !expand ? '&nbsp;' : '' }}
           <formula-context-menu
             v-if="!readonly"
             :operators="operators"
@@ -111,7 +111,7 @@
         @mouseleave="hover = false"
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-        {{ operator.title }}
+        <b>{{ operator.title }}</b>
         <formula-context-menu
           v-if="!readonly"
           :operators="operators"
