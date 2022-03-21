@@ -152,6 +152,9 @@
               :label="t('selectThing', { thing: t('category') })"
               :entity-types="[EntityType.Category]"
               clear-on-select
+              rounded
+              outlined
+              dense
               @entitySelected="addSuperCategory"
               @btnClicked="showSuperCategoryInput = false"
             />

@@ -1,9 +1,9 @@
 <template>
   <q-select
     v-model="selection"
-    rounded
-    outlined
-    dense
+    :rounded="rounded"
+    :outlined="outlined"
+    :dense="dense"
     hide-bottom-space
     hide-dropdown-icon
     use-input
@@ -86,6 +86,9 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    rounded: Boolean,
+    outlined: Boolean,
+    dense: Boolean,
     autofocus: Boolean,
     organisationId: String,
     repositoryId: String
