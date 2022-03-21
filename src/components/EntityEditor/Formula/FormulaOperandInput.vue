@@ -250,7 +250,7 @@ export default defineComponent({
         ) as Formula;
         if (!newModelValue.operands) newModelValue.operands = [];
         if (operand) newModelValue.operands[index] = operand;
-        else newModelValue.operands.splice(index, 1);
+        else delete newModelValue.operands[index];
         emit('update:modelValue', newModelValue);
       },
 
