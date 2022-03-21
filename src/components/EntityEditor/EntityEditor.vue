@@ -152,6 +152,9 @@
               :label="t('selectThing', { thing: t('category') })"
               :entity-types="[EntityType.Category]"
               clear-on-select
+              rounded
+              outlined
+              dense
               @entitySelected="addSuperCategory"
               @btnClicked="showSuperCategoryInput = false"
             />
@@ -184,13 +187,14 @@
 
       <formula-input
         v-if="local.entityType === EntityType.DerivedPhenotype"
-        v-model="local.formula"
+        v-model="local.expression"
         expanded
         :readonly="isOtherVersion"
         :label="t('formula')"
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        @entity-clicked="$emit('entityClicked', $event)"
       />
 
       <restriction-input
@@ -204,11 +208,11 @@
       <expression-input
         v-if="local.entityType === EntityType.CombinedRestriction"
         v-model="local.expression"
+        expanded
         :readonly="isOtherVersion"
         :label="t('expression')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        expanded
         @entity-clicked="$emit('entityClicked', $event)"
       />
 
@@ -309,7 +313,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean => 
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted, hasDataType, hasFormula, hasExpression } = useEntityFormatter()
+    const { getTitle, isRestricted, hasDataType, hasExpression } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -359,7 +363,6 @@ export default defineComponent({
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
       result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined
-      result &&= !hasFormula(local.value) || local.value.formula !== undefined
       result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
       return result

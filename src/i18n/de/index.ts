@@ -116,6 +116,9 @@ export default {
   pleaseCheckInput: 'Bitte überprüfen Sie Ihre Eingabe!',
   versionRestoreDescription: 'Dies wird die Entität auf den angezeigten Status zurücksetzen.',
   mandatoryListField: 'Mindestens ein Eintrag ist erforderlich!',
+  constant: 'Konstante',
+  more: 'Mehr',
+  addMoreOperands: 'Weitere Operatoren hinzufügen',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

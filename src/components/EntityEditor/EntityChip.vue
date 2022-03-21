@@ -1,8 +1,36 @@
 <template>
   <q-chip
-    v-if="loading || !state"
+    v-if="loading"
     :label="t('loading') + '...'"
   />
+
+  <q-chip
+    v-else-if="!state || !entityId"
+    clickable
+    :label="label"
+    icon="create"
+    class="truncate"
+  >
+    <q-popup-edit :model-value="null" :cover="false">
+      <entity-search-input
+        v-if="!disable"
+        autofocus
+        dense
+        :label="label"
+        :entity-types="entityTypes"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
+        @entity-selected="setEntity($event)"
+        @btn-clicked="$emit('removeClicked')"
+      />
+      <q-list dense>
+        <slot name="additionalOptions" />
+        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked')">
+          <q-item-section v-t="'remove'" />
+        </q-item>
+      </q-list>
+    </q-popup-edit>
+  </q-chip>
 
   <q-chip
     v-else
@@ -19,7 +47,8 @@
           <q-item-section v-t="'show'" />
         </q-item>
         <q-separator />
-        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked', state.id)">
+        <slot name="additionalOptions" />
+        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked')">
           <q-item-section v-t="'remove'" />
         </q-item>
       </q-list>
@@ -30,19 +59,27 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Entity } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity';
-import useEntityFormatter from 'src/mixins/useEntityFormatter';
+import { Entity, EntityType } from '@onto-med/top-api'
+import { useEntity } from 'src/pinia/entity'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 
 export default defineComponent({
   name: 'EntityChip',
+  components: {
+    EntitySearchInput
+  },
   props: {
     entityId: String,
+    label: String,
     entity: Object as () => Entity,
+    entityTypes: Array as () => EntityType[],
+    organisationId: String,
+    repositoryId: String,
     disable: Boolean
   },
-  emits: ['entityClicked', 'removeClicked'],
-  setup(props) {
+  emits: ['entityClicked', 'entitySet', 'removeClicked'],
+  setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n();
     const loading = ref(false)
@@ -51,6 +88,7 @@ export default defineComponent({
     const state = ref(undefined as unknown as Entity)
 
     const reload = () => {
+      if (!props.entityId) return
       loading.value = true
       if (props.entityId) {
         const entity = entityStore.getEntity(props.entityId)
@@ -65,7 +103,20 @@ export default defineComponent({
       else reload()
     })
 
-    return { t, getIcon, getTitle, getDescriptions, isRestricted, state, loading };
+    return {
+      t,
+      getIcon,
+      getTitle,
+      getDescriptions,
+      isRestricted,
+      state,
+      loading,
+
+      setEntity: (entity: Entity) => {
+        state.value = entity
+        emit('entitySet', entity)
+      }
+    };
   },
 });
 </script>

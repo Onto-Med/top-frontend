@@ -18,6 +18,9 @@
         <entity-search-input
           :label="t('searchThing', { thing: t('entity') }) + '...'"
           icon="search"
+          rounded
+          outlined
+          dense
           clear-on-select
           dark
           class="q-mr-sm"
