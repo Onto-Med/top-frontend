@@ -130,7 +130,7 @@
       </div>
     </template>
     <div v-else class="clickable">
-      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[...]
+      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[{{ modelValue?.operands ? '...' : t('selectThing', { thing: t('operator') }) }}]
       <formula-context-menu
         v-if="!readonly"
         :enclosable="false"
