@@ -11,7 +11,7 @@
     icon="create"
     class="truncate"
   >
-    <q-popup-edit :cover="false">
+    <q-popup-edit :model-value="null" :cover="false">
       <entity-search-input
         v-if="!disable"
         autofocus
