@@ -9,6 +9,7 @@
     <template #default>
       <expression-operand-input
         class="text-subtitle1"
+        :operators="operators"
         :readonly="readonly"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
@@ -16,6 +17,7 @@
         :indent="indent || 2"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        :entity-types="entityTypes"
         root
         @update:model-value="$emit('update:modelValue', $event)"
         @entity-clicked="$emit('entityClicked', $event)"
@@ -78,11 +80,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import ExpressionOperandInput from 'src/components/EntityEditor/ExpressionOperandInput.vue'
+import ExpressionOperandInput from 'src/components/EntityEditor/Expression/ExpressionOperandInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import { Expression, ExpressionType } from '@onto-med/top-api'
+import { Expression, ExpressionMultaryOperator, ExpressionOperator, RepresentationEnum, TypeEnum } from '@onto-med/top-api'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'ExpressionInput',
@@ -110,12 +113,43 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const hover = ref(false)
-    const expandExpression = ref(false)
-    const indent = ref(2)
-    const showClearDialog = ref(false)
+    const { restrictionEntityTypes } = useEntityFormatter()
 
-    return { t, hover, expandExpression, showClearDialog, indent, ExpressionType }
+    return {
+      t,
+      expandExpression: ref(false),
+      indent: ref(2),
+      showClearDialog: ref(false),
+      entityTypes: computed(() => restrictionEntityTypes()),
+      operators: [
+        {
+          id: 'union',
+          title: 'or',
+          representation: RepresentationEnum.Prefix,
+          type: TypeEnum.Multary,
+          required: 2
+        } as ExpressionMultaryOperator,
+        {
+          id: 'intersection',
+          title: 'and',
+          representation: RepresentationEnum.Prefix,
+          type: TypeEnum.Multary,
+          required: 2
+        } as ExpressionMultaryOperator,
+        {
+          id: 'complement',
+          title: 'not',
+          representation: RepresentationEnum.Prefix,
+          type: TypeEnum.Unary
+        } as ExpressionOperator,
+        {
+          id: 'entity',
+          title: 'entity',
+          representation: RepresentationEnum.Prefix,
+          type: TypeEnum.Unary
+        } as ExpressionOperator
+      ]
+    }
   }
 })
 </script>

@@ -7,7 +7,7 @@
     :show-help="showHelp"
   >
     <template #default>
-      <formula-operand-input
+      <expression-operand-input
         class="text-subtitle1"
         :operators="operators"
         :readonly="readonly"
@@ -17,6 +17,7 @@
         :indent="indent || 2"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        :entity-types="entityTypes"
         root
         @update:model-value="$emit('update:modelValue', $event)"
         @entity-clicked="$emit('entityClicked', $event)"
@@ -82,18 +83,18 @@
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import FormulaOperandInput from 'src/components/EntityEditor/Formula/FormulaOperandInput.vue'
-import { Formula, FormulaMultaryOperator, FormulaOperator, RepresentationEnum, TypeEnum } from '@onto-med/top-api'
+import ExpressionOperandInput from 'src/components/EntityEditor/Expression/ExpressionOperandInput.vue'
+import { EntityType, Expression, ExpressionMultaryOperator, ExpressionOperator, RepresentationEnum, TypeEnum } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'FormulaInput',
   components: {
-    FormulaOperandInput,
+    ExpressionOperandInput,
     ExpandableCard
   },
   props: {
     modelValue: {
-      type: Object as () => Formula,
+      type: Object as () => Expression,
       default: () => { return {} }
     },
     label: String,
@@ -117,56 +118,57 @@ export default defineComponent({
       expandExpression: ref(false),
       indent: ref(2),
       showClearDialog: ref(false),
+      entityTypes: [EntityType.SinglePhenotype, EntityType.DerivedPhenotype],
       operators: [
         {
           id: 'addition',
           title: '+',
           representation: RepresentationEnum.Infix,
           type: TypeEnum.Binary,
-        } as FormulaOperator,
+        } as ExpressionOperator,
         {
           id: 'substraction',
           title: '-',
           representation: RepresentationEnum.Infix,
           type: TypeEnum.Binary,
-        } as FormulaOperator,
+        } as ExpressionOperator,
         {
           id: 'multiplication',
           title: '*',
           representation: RepresentationEnum.Infix,
           type: TypeEnum.Binary,
-        } as FormulaOperator,
+        } as ExpressionOperator,
         {
           id: 'division',
           title: '/',
           representation: RepresentationEnum.Infix,
           type: TypeEnum.Binary,
-        } as FormulaOperator,
+        } as ExpressionOperator,
         {
           id: 'exponentiation',
           title: '^',
           representation: RepresentationEnum.Infix,
           type: TypeEnum.Binary,
-        } as FormulaOperator,
+        } as ExpressionOperator,
         {
           id: 'minimum',
           title: 'min',
           representation: RepresentationEnum.Prefix,
           type: TypeEnum.Multary,
-          required: 0,
-        } as FormulaMultaryOperator,
+          required: 2,
+        } as ExpressionMultaryOperator,
         {
           id: 'entity',
           title: 'entity',
           representation: RepresentationEnum.Prefix,
           type: TypeEnum.Unary,
-        } as FormulaOperator,
+        } as ExpressionOperator,
         {
           id: 'constant',
           title: 'constant',
           representation: RepresentationEnum.Prefix,
           type: TypeEnum.Unary,
-        } as FormulaOperator,
+        } as ExpressionOperator,
       ]
     }
   }

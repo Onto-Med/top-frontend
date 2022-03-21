@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@lhncbc/ucum-lhc": "^4.1.4",
-    "@onto-med/top-api": "^0.3.1",
+    "@onto-med/top-api": "^0.3.2",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",

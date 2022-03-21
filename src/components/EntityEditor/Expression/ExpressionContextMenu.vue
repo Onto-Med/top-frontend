@@ -29,10 +29,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { FormulaOperator } from '@onto-med/top-api';
+import { ExpressionOperator } from '@onto-med/top-api';
 
 export default defineComponent({
-  name: 'FormulaContextMenu',
+  name: 'ExpressionContextMenu',
   props: {
     enclosable: {
       type: Boolean,
@@ -43,7 +43,7 @@ export default defineComponent({
       default: true
     },
     operators: {
-      type: Array as () => FormulaOperator[],
+      type: Array as () => ExpressionOperator[],
       required: true
     }
   },

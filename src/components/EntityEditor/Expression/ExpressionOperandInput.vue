@@ -1,5 +1,5 @@
 <template>
-  <div class="formula-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
+  <div class="expression-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
     <div v-if="operator && operator.id === 'entity'">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
    --><entity-chip
@@ -56,7 +56,7 @@
         @mouseleave="hover = false"
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ operator.title }}</b> (
-        <formula-context-menu
+        <expression-context-menu
           v-if="!readonly"
           :operators="operators"
           @enclose="enclose()"
@@ -82,7 +82,7 @@
           @mouseleave="hover = false"
         >
           {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ operator.title }}</b>{{ !expand ? '&nbsp;' : '' }}
-          <formula-context-menu
+          <expression-context-menu
             v-if="!readonly"
             :operators="operators"
             @enclose="enclose()"
@@ -98,7 +98,7 @@
         >
           {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '' }},{{ !expand ? '&nbsp;' : '' }}
         </div>
-        <formula-operand-input
+        <expression-operand-input
           :model-value="modelValue.operands[index]"
           :readonly="readonly"
           :operators="operators"
@@ -107,6 +107,7 @@
           :indent-level="indentLevel + 1"
           :organisation-id="organisationId"
           :repository-id="repositoryId"
+          :entity-types="entityTypes"
           @update:model-value="handleOperandUpdate(index, $event)"
         />
       </template>
@@ -122,7 +123,7 @@
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
         <b>{{ operator.title }}</b>
-        <formula-context-menu
+        <expression-context-menu
           v-if="!readonly"
           :operators="operators"
           @enclose="enclose()"
@@ -141,7 +142,7 @@
     </template>
     <div v-else class="clickable">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[{{ modelValue?.operands ? '...' : t('selectThing', { thing: t('operator') }) }}]
-      <formula-context-menu
+      <expression-context-menu
         v-if="!readonly"
         :enclosable="false"
         :operators="operators"
@@ -158,23 +159,24 @@ import { useI18n } from 'vue-i18n';
 import {
   Entity,
   EntityType,
-  Formula,
-  FormulaOperator,
+  Expression,
+  ExpressionMultaryOperator,
+  ExpressionOperator,
   RepresentationEnum,
   TypeEnum,
 } from '@onto-med/top-api';
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
-import FormulaContextMenu from 'src/components/EntityEditor/Formula/FormulaContextMenu.vue'
+import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 
 export default defineComponent({
   name: 'FormulaOperandInput',
   components: {
     EntityChip,
-    FormulaContextMenu
+    ExpressionContextMenu
   },
   props: {
     modelValue: {
-      type: Object as () => Formula,
+      type: Object as () => Expression,
       default: () => {
         return {};
       },
@@ -182,7 +184,7 @@ export default defineComponent({
     readonly: Boolean,
     root: Boolean,
     expand: Boolean,
-    operators: Array as () => FormulaOperator[],
+    operators: Array as () => ExpressionOperator[],
     indent: {
       type: Number,
       default: 2
@@ -193,6 +195,7 @@ export default defineComponent({
     },
     organisationId: String,
     repositoryId: String,
+    entityTypes: Array as () => EntityType[]
   },
   emits: ['update:modelValue', 'entityClicked'],
   setup(props, { emit }) {
@@ -214,8 +217,6 @@ export default defineComponent({
       operator,
       hover: ref(false),
       flash,
-
-      entityTypes: [EntityType.SinglePhenotype, EntityType.DerivedPhenotype],
 
       prefix: computed(
         () =>
@@ -245,14 +246,14 @@ export default defineComponent({
           case TypeEnum.Binary:
             return 2;
           default:
-            return Math.max(3, props.modelValue.operands?.length || 0);
+            return Math.max(props.modelValue.operands?.length || 0, (operator.value as ExpressionMultaryOperator).required);
         }
       }),
 
-      handleOperandUpdate(index: number, operand: Formula | undefined | null): void {
+      handleOperandUpdate(index: number, operand: Expression | undefined | null): void {
         const newModelValue = JSON.parse(
           JSON.stringify(props.modelValue)
-        ) as Formula
+        ) as Expression
         if (!newModelValue.operands) newModelValue.operands = []
         if (operand) newModelValue.operands[index] = operand
         else if (operand === undefined) delete newModelValue.operands[index]
@@ -263,7 +264,7 @@ export default defineComponent({
       setOperator(operatorId: string) {
         const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
-        ) || {}) as Formula
+        ) || {}) as Expression
         newModelValue.operator = operatorId
         if (!newModelValue.operands) newModelValue.operands = []
         emit('update:modelValue', newModelValue)
@@ -271,13 +272,13 @@ export default defineComponent({
       },
 
       setEntity (entity: Entity): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Formula
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.id = entity.id
         emit('update:modelValue', newModelValue)
       },
 
       setConstant (constant: number|undefined): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Formula
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.constant = constant
         emit('update:modelValue', newModelValue)
       },
@@ -285,7 +286,7 @@ export default defineComponent({
       enclose (): void {
         const newModelValue = {
           operands: [ JSON.parse(JSON.stringify(props.modelValue)) ]
-        } as Formula
+        } as Expression
         emit('update:modelValue', newModelValue)
       }
     };
@@ -302,7 +303,7 @@ export default defineComponent({
   cursor: pointer
   @extend .hover
 
-.formula-input .entity-search-input-field
+.expression-input .entity-search-input-field
   width: 200px
   margin: 4px
   vertical-align: middle

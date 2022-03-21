@@ -187,7 +187,7 @@
 
       <formula-input
         v-if="local.entityType === EntityType.DerivedPhenotype"
-        v-model="local.formula"
+        v-model="local.expression"
         expanded
         :readonly="isOtherVersion"
         :label="t('formula')"
@@ -208,11 +208,11 @@
       <expression-input
         v-if="local.entityType === EntityType.CombinedRestriction"
         v-model="local.expression"
+        expanded
         :readonly="isOtherVersion"
         :label="t('expression')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        expanded
         @entity-clicked="$emit('entityClicked', $event)"
       />
 
@@ -267,7 +267,7 @@ import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UcumCard from 'src/components/UcumCard.vue'
-import FormulaInput from 'src/components/EntityEditor/Formula/FormulaInput.vue'
+import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
@@ -313,7 +313,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean => 
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted, hasDataType, hasFormula, hasExpression } = useEntityFormatter()
+    const { getTitle, isRestricted, hasDataType, hasExpression } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -363,7 +363,6 @@ export default defineComponent({
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
       result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined
-      result &&= !hasFormula(local.value) || local.value.formula !== undefined
       result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
       return result
