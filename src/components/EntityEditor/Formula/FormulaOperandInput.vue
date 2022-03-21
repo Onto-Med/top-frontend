@@ -32,7 +32,7 @@
         auto-save
         @update:model-value="setConstant($event)"
       >
-        <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set">
+        <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set">
           <template #append>
             <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
           </template>
