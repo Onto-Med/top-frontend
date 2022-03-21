@@ -20,6 +20,7 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         @entity-selected="setEntity($event)"
+        @btn-clicked="$emit('removeClicked')"
       />
       <q-list dense>
         <slot name="additionalOptions" />
