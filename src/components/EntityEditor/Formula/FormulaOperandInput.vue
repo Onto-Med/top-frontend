@@ -1,21 +1,16 @@
 <template>
-  <div class="formula-input" :class="{ row: !expand, 'text-primary': flash }">
+  <div class="formula-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
     <div v-if="operator && operator.id === 'entity'">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
-   --><entity-search-input
-        v-if="!readonly && !modelValue.id"
-        :label="t('selectThing', { thing: t(operator.title) })"
+   --><entity-chip
+        :entity-id="modelValue.id"
         :entity-types="entityTypes"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        @btn-Clicked="$emit('update:modelValue', undefined)"
-        @entity-selected="setEntity($event)"
-      />
-      <entity-chip
-        v-if="modelValue.id"
-        :entity-id="modelValue.id"
+        :label="t('selectThing', { thing: t(operator.title) }) + '...'"
         :disable="readonly"
         @entity-clicked="$emit('entityClicked', $event)"
+        @entity-set="setEntity($event)"
         @remove-clicked="$emit('update:modelValue', undefined)"
       >
         <template #additionalOptions>
@@ -164,14 +159,12 @@ import {
   RepresentationEnum,
   TypeEnum,
 } from '@onto-med/top-api';
-import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import FormulaContextMenu from 'src/components/EntityEditor/Formula/FormulaContextMenu.vue'
 
 export default defineComponent({
   name: 'FormulaOperandInput',
   components: {
-    EntitySearchInput,
     EntityChip,
     FormulaContextMenu
   },
