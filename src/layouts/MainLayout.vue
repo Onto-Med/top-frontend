@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          TOP Framework
+          {{ productName }}
         </q-toolbar-title>
 
         <entity-search-input
@@ -59,7 +59,7 @@ import { useRouter } from 'vue-router'
 import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
-
+import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
 import { Entity } from '@onto-med/top-api'
 
@@ -99,6 +99,7 @@ export default defineComponent({
 
     return {
       t,
+      productName: packageInfo.productName,
       links: linksList,
       leftDrawerOpen,
       toggleLeftDrawer () {

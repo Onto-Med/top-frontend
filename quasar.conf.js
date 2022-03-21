@@ -147,8 +147,8 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: 'Quasar App',
-        short_name: 'Quasar App',
+        name: 'TOP Framework',
+        short_name: 'TOP Framework',
         description: 'A Quasar Framework app',
         display: 'standalone',
         orientation: 'portrait',

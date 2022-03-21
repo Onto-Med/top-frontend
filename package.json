@@ -1,8 +1,8 @@
 {
   "name": "top-frontend",
-  "version": "0.0.1",
-  "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "version": "0.1.0",
+  "description": "An app for ontological modelling and managing of phenotypes.",
+  "productName": "TOP Framework",
   "author": "Christoph Beger <ChristophB@users.noreply.github.com>",
   "private": true,
   "scripts": {
