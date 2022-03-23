@@ -19,6 +19,7 @@
             :model-value="selected ? selected.id : undefined"
             dense
             no-caps
+            outside-arrows
             align="left"
             class="bg-primary text-white shadow-2 entity-editor-tabs-bar"
             @update:model-value="selectTabByKey($event)"
@@ -71,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted, Ref, inject } from 'vue'
+import { defineComponent, ref, watch, onMounted, Ref, inject, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
@@ -143,8 +144,11 @@ export default defineComponent({
         let id = undefined
         if (entity) {
           id = entity.id
-          if (!tabs.value.map(t => t.entity.id).includes(entity.id))
+          if (!tabs.value.map(t => t.entity.id).includes(entity.id)) {
+            selected.value = undefined
             tabs.value.push({ selectedVersion: entity.version, entity: entity })
+            void nextTick(() => selected.value = entity)
+          }
         }
         void router.push({
           name: 'editor',
