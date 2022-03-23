@@ -178,13 +178,6 @@
         :readonly="isOtherVersion"
       />
 
-      <ucum-card
-        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
-        v-model="local.units"
-        :readonly="isOtherVersion"
-        :expanded="local.units && local.units.length > 0"
-      />
-
       <formula-input
         v-if="local.entityType === EntityType.DerivedPhenotype"
         v-model="local.expression"
@@ -222,6 +215,13 @@
         type="number"
         :readonly="isOtherVersion"
         :label="t('score')"
+      />
+
+      <ucum-card
+        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
+        v-model="local.units"
+        :readonly="isOtherVersion"
+        :expanded="local.units && local.units.length > 0"
       />
 
       <localized-text-input
