@@ -164,7 +164,7 @@
 
       <localized-text-input
         v-model="local.titles"
-        unique-langs
+        unique
         expanded
         :readonly="isOtherVersion"
         :required="true"

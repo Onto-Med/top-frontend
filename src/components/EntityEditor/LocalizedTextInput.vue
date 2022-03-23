@@ -35,8 +35,10 @@
           </template>
         </q-input>
       </div>
+    </template>
+    <template #error>
       <div v-show="required && empty" v-t="'mandatoryListField'" class="text-negative" />
-      <div v-show="uniqueLangs && duplicatedLangs.length > 0">
+      <div v-show="unique && duplicatedLangs.length > 0" class="text-negative">
         {{ t('oneThingPerThing', { thing1: name || t('entry'), thing2: t('language') }) }}
       </div>
     </template>
@@ -71,7 +73,7 @@ export default defineComponent({
       default: () => []
     },
     helpText: String,
-    uniqueLangs: Boolean,
+    unique: Boolean,
     textArea: Boolean,
     rows: [Number, String],
     cols: [Number, String],
@@ -110,6 +112,7 @@ export default defineComponent({
 
       hasError: computed(() =>
         (props.required && empty.value)
+        || props.unique && duplicatedLangs.value.length > 0
         || props.modelValue.findIndex(x => !x.lang || !x.text) !== -1
       ),
 
