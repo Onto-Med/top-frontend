@@ -30,9 +30,9 @@
             <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
           </div>
 
-          <div v-show="hasRange" class="row">
+          <div v-show="hasRange" class="row items-center">
             <q-input v-model="state.values[0]" outlined :type="state.type">
-              <template #before>
+              <template #after>
                 <q-select
                   v-model="state.minOperator"
                   :options="operators || defaultOperators"
@@ -44,9 +44,13 @@
                 />
               </template>
             </q-input>
+            <q-field borderless>
+              <template #control>
+                <div class="self-center full-width no-outline q-px-sm" tabindex="0">
+                  {{ t('value', 2) }}
           </div>
-
-          <div v-show="hasRange" class="row">
+              </template>
+            </q-field>
             <q-input v-model="state.values[1]" outlined :type="state.type">
               <template #before>
                 <q-select
