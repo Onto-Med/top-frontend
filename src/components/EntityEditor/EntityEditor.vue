@@ -304,7 +304,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion'],
+  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'change'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
@@ -326,6 +326,7 @@ export default defineComponent({
     const restrictionKey     = ref(0)
     const showSuperCategoryInput = ref(false)
     const versionHistoryDialogKey = ref(1)
+    const isNew = computed(() => !local.value.version)
 
     watch(
       () => props.entity,
@@ -384,12 +385,15 @@ export default defineComponent({
       DataType,
       versionHistoryDialogKey,
       showSuperCategoryInput,
-
-      isNew: computed(() => !local.value.version),
+      isNew,
 
       isOtherVersion: computed(() => local.value.version != props.entity.version),
 
-      hasUnsavedChanges: computed(() => !equals(local.value, props.entity)),
+      hasUnsavedChanges: computed(() => {
+        const unsavedChanges = !equals(local.value, props.entity)
+        emit('change', unsavedChanges || isNew.value)
+        return unsavedChanges
+      }),
 
       prefillFromVersion,
 

@@ -110,6 +110,7 @@ export default {
   name: 'Name',
   notSavedJet: 'Noch nicht gespeichert!',
   unsaved: 'ungespeichert',
+  unsavedChanges: 'Ungespeicherte Änderungen',
   encloseWithExpression: 'Mit Ausdruck umschließen',
   attributesMissing: 'Ein oder mehrere Attribute fehlen.',
   displayingOtherVersion: 'Ihnen wird eine andere als die aktuelle Version angezeigt.',

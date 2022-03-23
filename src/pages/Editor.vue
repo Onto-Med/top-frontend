@@ -28,6 +28,7 @@
               <span class="no-wrap">
                 <q-icon :name="getIcon(tab.entity)" :class="{ restriction: isRestricted(tab.entity) }" />
                 {{ getTitle(tab.entity) }}
+                <span v-show="tab.dirty" class="text-accent" :title="t('unsavedChanges')">*</span>
                 <q-btn
                   flat
                   dense
@@ -57,6 +58,7 @@
                 :entity="tab.entity"
                 :repository-id="repositoryId"
                 :organisation-id="organisationId"
+                @change="tab.dirty = $event"
                 @update:entity="saveEntity"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab.entity); alert($event.message)"
@@ -146,7 +148,7 @@ export default defineComponent({
           id = entity.id
           if (!tabs.value.map(t => t.entity.id).includes(entity.id)) {
             selected.value = undefined
-            tabs.value.push({ selectedVersion: entity.version, entity: entity })
+            tabs.value.push({ selectedVersion: entity.version, entity: entity, dirty: false })
             void nextTick(() => selected.value = entity)
           }
         }
@@ -174,7 +176,7 @@ export default defineComponent({
         if (!props.entityId) return
         const entity = entityStore.getEntity(props.entityId)
         if (entity) {
-          tabs.value = [ { selectedVersion: props.version, entity: entity }]
+          tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
           selected.value = entity
         }
       })
@@ -240,7 +242,8 @@ export default defineComponent({
 
 interface EditorTab {
   entity: Entity,
-  selectedVersion?: number
+  selectedVersion?: number,
+  dirty: boolean
 }
 </script>
 

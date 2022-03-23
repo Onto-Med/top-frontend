@@ -110,6 +110,7 @@ export default {
   name: 'Name',
   notSavedJet: 'Not saved jet!',
   unsaved: 'unsaved',
+  unsavedChanges: 'Unsaved changes',
   encloseWithExpression: 'Enclose with expression',
   attributesMissing: 'One or more attributes are missing.',
   displayingOtherVersion: 'You are shown a version other than the current one.',
