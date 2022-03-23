@@ -84,7 +84,8 @@ import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import ExpressionOperandInput from 'src/components/EntityEditor/Expression/ExpressionOperandInput.vue'
-import { EntityType, Expression, ExpressionMultaryOperator, ExpressionOperator, RepresentationEnum, TypeEnum } from '@onto-med/top-api'
+import { EntityType, Expression } from '@onto-med/top-api'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   name: 'FormulaInput',
@@ -112,6 +113,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const entityStore = useEntity()
 
     return {
       t,
@@ -119,57 +121,7 @@ export default defineComponent({
       indent: ref(2),
       showClearDialog: ref(false),
       entityTypes: [EntityType.SinglePhenotype, EntityType.DerivedPhenotype],
-      operators: [
-        {
-          id: 'addition',
-          title: '+',
-          representation: RepresentationEnum.Infix,
-          type: TypeEnum.Binary,
-        } as ExpressionOperator,
-        {
-          id: 'substraction',
-          title: '-',
-          representation: RepresentationEnum.Infix,
-          type: TypeEnum.Binary,
-        } as ExpressionOperator,
-        {
-          id: 'multiplication',
-          title: '*',
-          representation: RepresentationEnum.Infix,
-          type: TypeEnum.Binary,
-        } as ExpressionOperator,
-        {
-          id: 'division',
-          title: '/',
-          representation: RepresentationEnum.Infix,
-          type: TypeEnum.Binary,
-        } as ExpressionOperator,
-        {
-          id: 'exponentiation',
-          title: '^',
-          representation: RepresentationEnum.Infix,
-          type: TypeEnum.Binary,
-        } as ExpressionOperator,
-        {
-          id: 'minimum',
-          title: 'min',
-          representation: RepresentationEnum.Prefix,
-          type: TypeEnum.Multary,
-          required: 2,
-        } as ExpressionMultaryOperator,
-        {
-          id: 'entity',
-          title: 'entity',
-          representation: RepresentationEnum.Prefix,
-          type: TypeEnum.Unary,
-        } as ExpressionOperator,
-        {
-          id: 'constant',
-          title: 'constant',
-          representation: RepresentationEnum.Prefix,
-          type: TypeEnum.Unary,
-        } as ExpressionOperator,
-      ]
+      operators: entityStore.getOperators('math')
     }
   }
 })

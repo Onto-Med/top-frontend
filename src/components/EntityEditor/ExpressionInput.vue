@@ -84,8 +84,9 @@ import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpressionOperandInput from 'src/components/EntityEditor/Expression/ExpressionOperandInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import { Expression, ExpressionMultaryOperator, ExpressionOperator, RepresentationEnum, TypeEnum } from '@onto-med/top-api'
+import { Expression } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   name: 'ExpressionInput',
@@ -114,6 +115,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const { restrictionEntityTypes } = useEntityFormatter()
+    const entityStore = useEntity()
 
     return {
       t,
@@ -121,34 +123,7 @@ export default defineComponent({
       indent: ref(2),
       showClearDialog: ref(false),
       entityTypes: computed(() => restrictionEntityTypes()),
-      operators: [
-        {
-          id: 'union',
-          title: 'or',
-          representation: RepresentationEnum.Prefix,
-          type: TypeEnum.Multary,
-          required: 2
-        } as ExpressionMultaryOperator,
-        {
-          id: 'intersection',
-          title: 'and',
-          representation: RepresentationEnum.Prefix,
-          type: TypeEnum.Multary,
-          required: 2
-        } as ExpressionMultaryOperator,
-        {
-          id: 'complement',
-          title: 'not',
-          representation: RepresentationEnum.Prefix,
-          type: TypeEnum.Unary
-        } as ExpressionOperator,
-        {
-          id: 'entity',
-          title: 'entity',
-          representation: RepresentationEnum.Prefix,
-          type: TypeEnum.Unary
-        } as ExpressionOperator
-      ]
+      operators: entityStore.getOperators('boolean')
     }
   }
 })

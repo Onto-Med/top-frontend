@@ -1,9 +1,10 @@
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, NumberRestriction, Phenotype, StringRestriction } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, NumberRestriction, Phenotype, StringRestriction } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 
 const entityApi = new EntityApi()
+const expressionOperatorApi = new ExpressionOperatorApi()
 
 export const useEntity = defineStore('entity', {
   state: () => {
@@ -11,6 +12,7 @@ export const useEntity = defineStore('entity', {
       organisationId: undefined as string|undefined,
       repositoryId: undefined as string|undefined,
       entities: [] as Entity[],
+      operators: new Map<string, ExpressionOperator[]>()
     }
   },
   actions: {
@@ -22,6 +24,20 @@ export const useEntity = defineStore('entity', {
         }
       await entityApi.getEntitiesByRepositoryId(this.organisationId, this.repositoryId)
         .then((r) => this.entities = r.data)
+    },
+
+    async reloadOperatorsByType (type: string) {
+      await expressionOperatorApi?.getExpressionOperators(type)
+        .then((r) => this.operators.set(type, r.data))
+    },
+
+    async reloadOperators () {
+      await this.reloadOperatorsByType('math')
+      await this.reloadOperatorsByType('boolean')
+    },
+
+    getOperators (type: string): ExpressionOperator[] {
+      return this.operators.get(type) || []
     },
 
     getEntity (id: string|undefined): Entity|undefined {
