@@ -48,7 +48,7 @@
               <template #control>
                 <div class="self-center full-width no-outline q-px-sm" tabindex="0">
                   {{ t('value', 2) }}
-          </div>
+                </div>
               </template>
             </q-field>
             <q-input v-model="state.values[1]" outlined :type="state.type">
@@ -128,7 +128,6 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const state = reactive(JSON.parse(JSON.stringify(props.modelValue || {})) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction)
-    if (!state.values) state.values = []
     const canHaveRange = computed(() => [DataType.Number, DataType.DateTime].includes(state.type))
     const hasRange = ref(
       canHaveRange.value
@@ -142,6 +141,14 @@ export default defineComponent({
     const defaultQuantors = computed(() =>
       Object.values(Quantor).map(d => { return { label: t('quantorType.' + d), value: d } })
     )
+
+    if (!state.values) {
+      state.values = []
+      hasRange.value = canHaveRange.value
+    }
+    if (state.negated === undefined) state.negated = false
+    if (!state.quantor) state.quantor = Quantor.Some
+    
 
     watch(
       () => state,
