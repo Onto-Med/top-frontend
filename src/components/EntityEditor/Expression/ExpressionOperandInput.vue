@@ -212,6 +212,20 @@ export default defineComponent({
       setTimeout(() => flash.value = false, 500)
     }
 
+    const operandCount = computed(() => {
+      if (!operator.value) return 0;
+      switch (operator.value.type) {
+        case TypeEnum.Nullary:
+          return 0;
+        case TypeEnum.Unary:
+          return 1;
+        case TypeEnum.Binary:
+          return 2;
+        default:
+          return Math.max(props.modelValue.operands?.length || 0, (operator.value as ExpressionMultaryOperator).required);
+      }
+    })
+
     return {
       t,
       TypeEnum,
@@ -242,19 +256,7 @@ export default defineComponent({
           operator.value.representation === RepresentationEnum.Postfix
       ),
 
-      operandCount: computed(() => {
-        if (!operator.value) return 0;
-        switch (operator.value.type) {
-          case TypeEnum.Nullary:
-            return 0;
-          case TypeEnum.Unary:
-            return 1;
-          case TypeEnum.Binary:
-            return 2;
-          default:
-            return Math.max(props.modelValue.operands?.length || 0, (operator.value as ExpressionMultaryOperator).required);
-        }
-      }),
+      operandCount,
 
       handleOperandUpdate(index: number, operand: Expression | undefined | null): void {
         const newModelValue = JSON.parse(
@@ -273,6 +275,7 @@ export default defineComponent({
         ) || {}) as Expression
         newModelValue.operator = operatorId
         if (!newModelValue.operands) newModelValue.operands = []
+        newModelValue.operands.splice(operandCount.value, newModelValue.operands.length - operandCount.value)
         emit('update:modelValue', newModelValue)
         blink()
       },
