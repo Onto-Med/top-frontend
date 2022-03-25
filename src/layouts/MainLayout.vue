@@ -1,6 +1,6 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh lpR fFf" class="bg-grey-1">
+    <q-header elevated class="bg-white text-grey-8 q-py-xs" height-hint="58">
       <q-toolbar>
         <q-btn
           flat
@@ -11,21 +11,31 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
+        <q-icon name="hub" class="q-ml-sm" color="primary" size="28px" />
+        <q-toolbar-title shrink class="text-weight-bold">
           {{ productName }}
         </q-toolbar-title>
 
-        <entity-search-input
-          :label="t('searchThing', { thing: t('entity') }) + '...'"
-          icon="search"
-          rounded
-          outlined
-          dense
-          clear-on-select
-          dark
-          class="q-mr-sm"
-          @entity-selected="routeToEntity"
-        />
+        <q-space />
+
+        <div class="toolbar-input-container row no-wrap">
+          <entity-search-input
+            :label="t('searchThing', { thing: t('entity') }) + '...'"
+            outlined
+            dense
+            square
+            clear-on-select
+            show-details
+            class="q-mr-sm fit"
+            @entity-selected="routeToEntity"
+          >
+            <template #append>
+              <q-btn dense flat icon="search" :title="t('search')" />
+            </template>
+          </entity-search-input>
+        </div>
+
+        <q-space />
 
         <language-switch />
       </q-toolbar>
@@ -35,16 +45,20 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
+      class="bg-grey-2"
+      :width="240"
     >
-      <q-list>
-        <q-item-label v-t="'navigation'" header />
+      <q-scroll-area class="fit">
+        <q-list padding>
+          <q-item-label v-t="'navigation'" header />
 
-        <NavbarLink
-          v-for="link in links"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+          <NavbarLink
+            v-for="link in links"
+            :key="link.title"
+            v-bind="link"
+          />
+        </q-list>
+      </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
@@ -113,3 +127,9 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="sass" scoped>
+.toolbar-input-container
+  min-width: 100px
+  width: 55%
+</style>

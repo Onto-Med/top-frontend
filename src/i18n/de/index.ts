@@ -104,6 +104,7 @@ export default {
   subtraction: 'Subtraktion|Subtraktionen',
   multiplication: 'Multiplikation|Multiplikationen',
   division: 'Division|Divisionen',
+  search: 'Suchen',
   searchThing: '{thing} suchen',
   home: 'Startseite',
   navigation: 'Navigation',

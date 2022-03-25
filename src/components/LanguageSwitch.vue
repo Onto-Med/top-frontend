@@ -9,7 +9,6 @@
     map-options
     options-dense
     style="min-width: 150px"
-    dark
   />
 </template>
 

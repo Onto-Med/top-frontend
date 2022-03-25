@@ -104,6 +104,7 @@ export default {
   subtraction: 'Subtraction|Subtractions',
   multiplication: 'Multiplication|Multiplications',
   division: 'Division|Divisions',
+  search: 'Search',
   searchThing: 'Search {thing}',
   home: 'Home',
   navigation: 'Navigation',
