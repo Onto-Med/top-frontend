@@ -19,6 +19,7 @@
               :options="supportedLangs"
               :readonly="readonly"
               :error="!modelValue[index].lang"
+              hide-bottom-space
               class="lang-input"
               @update:modelValue="updateEntryByIndex(index, modelValue[index].text, $event)"
             />
