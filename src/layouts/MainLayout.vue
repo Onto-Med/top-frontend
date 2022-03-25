@@ -125,7 +125,8 @@ export default defineComponent({
     const linksList = computed(() => [
       {
         title: t('home'),
-        icon: 'house'
+        icon: 'house',
+        routeName: 'home'
       },
       {
         title: t('organisation', 2),
