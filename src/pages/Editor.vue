@@ -51,9 +51,8 @@
             </q-tab>
           </q-tabs>
           <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
-            <q-tab-panel v-for="(tab, index) in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
+            <q-tab-panel v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
               <entity-editor
-                v-if="tabs[index]"
                 :version="tab.selectedVersion"
                 :entity="tab.entity"
                 :repository-id="repositoryId"
@@ -144,19 +143,25 @@ export default defineComponent({
     watch(
       selected as Ref<Entity|undefined>,
       (entity: Entity|undefined) => {
-        let id = undefined
         if (entity) {
-          id = entity.id
-          if (!tabs.value.map(t => t.entity.id).includes(entity.id)) {
+          const tab = tabs.value.find(t => t.entity.id === entity.id)
+          if (!tab) {
             selected.value = undefined
             tabs.value.push({ selectedVersion: entity.version, entity: entity, dirty: false })
             void nextTick(() => selected.value = entity)
+          } else {
+            void router.push({
+              name: 'editor',
+              params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
+              query: tab.selectedVersion ? { version: tab.selectedVersion } : {}
+            })
           }
+        } else {
+          void router.push({
+            name: 'editor',
+            params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: undefined }
+          })
         }
-        void router.push({
-          name: 'editor',
-          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: id }
-        })
       }
     )
 

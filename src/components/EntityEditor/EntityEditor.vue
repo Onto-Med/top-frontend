@@ -339,7 +339,7 @@ export default defineComponent({
     const prefillFromVersion = (entity: Entity): void => {
       local.value = clone(entity)
       restrictionKey.value++
-      void router.push({
+      void router.replace({
         name: 'editor',
         params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
         query: { version: entity.version }
@@ -415,6 +415,11 @@ export default defineComponent({
 
       reset: () => {
         local.value = clone(props.entity)
+        void router.replace({
+          name: 'editor',
+          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: local.value.id },
+          query: { version: local.value.version }
+        })
         emit('changeVersion', local.value.version)
       },
 
