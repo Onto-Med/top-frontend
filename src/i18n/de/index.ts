@@ -119,6 +119,7 @@ export default {
   mandatoryListField: 'Mindestens ein Eintrag ist erforderlich!',
   constant: 'Konstante',
   more: 'Mehr',
+  new: 'Neu',
   addMoreOperands: 'Weitere Operatoren hinzufügen',
   entityEditor: {
     rawBtn: {

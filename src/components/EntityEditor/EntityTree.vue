@@ -40,12 +40,10 @@
               :class="{ restriction: isRestricted(node) }"
               class="q-mr-sm"
             />
-            <div :title="getDescriptions(node).join('\n')" :class="{ unsaved: !node.createdAt }">
+            <div :title="getDescriptions(node).join('\n')" :class="{ 'text-italic': !node.createdAt }">
               {{ getTitle(node) }}
-              <small v-show="!node.createdAt" class="text-accent">
-                ({{ t('unsaved') }})
-              </small>
             </div>
+            <q-badge v-show="!node.createdAt" v-t="'new'" color="accent" class="q-ml-sm" />
             <entity-tree-context-menu
               :entity="node"
               @delete-entity-clicked="$emit('deleteEntity', $event)"
@@ -134,7 +132,7 @@ export default defineComponent({
       (entity: Entity|undefined) => expand(entity)
     )
 
-    const unsavedNodes = computed((): boolean => {
+    const uewNodes = computed((): boolean => {
       return props.nodes?.findIndex(n => !n.createdAt) !== -1
     })
 
@@ -191,7 +189,7 @@ export default defineComponent({
       }),
 
       handleRefreshClick (): void {
-        if (unsavedNodes.value)
+        if (uewNodes.value)
           showRefreshDialog.value = true
         else
           emit('refreshClicked')
@@ -222,8 +220,3 @@ interface TreeNode extends Entity {
   children: TreeNode[]
 }
 </script>
-
-<style lang="sass" scoped>
-.unsaved
-  font-style: italic
-</style>
