@@ -18,15 +18,17 @@
     @update:model-value="handleSelectionChanged"
   >
     <template #append>
-      <q-btn
-        v-show="!loading"
-        round
-        dense
-        flat
-        :icon="icon"
-        :title="t('remove')"
-        @click="$emit('btnClicked')"
-      />
+      <slot name="append">
+        <q-btn
+          v-show="!loading"
+          round
+          dense
+          flat
+          :icon="icon"
+          :title="t('remove')"
+          @click="$emit('btnClicked')"
+        />
+      </slot>
     </template>
     <template #selected>
       <span v-if="selection">
