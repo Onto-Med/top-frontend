@@ -124,6 +124,7 @@ export default {
   new: 'Neu',
   addMoreOperands: 'Weitere Operatoren hinzufügen',
   toggleDarkMode: 'Dunkelmodus umschalten',
+  sourceCode: 'Quellcode',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

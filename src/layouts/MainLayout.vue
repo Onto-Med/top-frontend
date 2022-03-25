@@ -67,6 +67,23 @@
             :key="link.title"
             v-bind="link"
           />
+
+          <q-separator class="q-mt-md q-mb-lg" />
+
+          <div class="q-px-md text-grey">
+            <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
+              <q-btn
+                flat
+                dense
+                no-caps
+                size="sm"
+                :icon="fabGithub"
+                :href="repositoryUrl"
+                target="_blank"
+                :label="t('sourceCode')"
+              />
+            </div>
+          </div>
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -87,6 +104,7 @@ import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
 import { Entity } from '@onto-med/top-api'
 import { useQuasar } from 'quasar'
+import { fabGithub } from '@quasar/extras/fontawesome-v5'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -126,8 +144,10 @@ export default defineComponent({
     return {
       t,
       productName: packageInfo.productName,
+      repositoryUrl: packageInfo.repository ? (packageInfo.repository as Record<string, unknown>).url as string : undefined,
       links: linksList,
       leftDrawerOpen,
+      fabGithub,
 
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
