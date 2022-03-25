@@ -7,6 +7,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
+        name: 'home',
+        path: '/',
+        component: () => import('pages/Home.vue')
+      },
+      {
         name: 'editor',
         path: '/:organisationId/:repositoryId/:entityId?',
         props: route => {

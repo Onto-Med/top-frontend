@@ -2,6 +2,7 @@ export default {
   category: 'Category|Categories',
   superCategory: 'Super category|Super categories',
   missing_value: 'Missing value|Missing values',
+  phenotype: 'Phenotype|Phenotypes',
   phenotype_group: 'Phenotype group|Phenotype groups',
   single_phenotype: 'Single phenotype|Single phenotypes',
   combined_phenotype: 'Combined phenotype|Combined phenotypes',
