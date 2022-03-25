@@ -46,9 +46,11 @@
             {{ scope.opt.repository.name }}
           </q-item-label>
           <q-item-label>{{ getTitle(scope.opt) }}</q-item-label>
-          <q-item-label v-for="(description, index) in getDescriptions(scope.opt)" :key="index" caption>
-            {{ description }}
-          </q-item-label>
+          <template v-if="showDetails">
+            <q-item-label v-for="(description, index) in getDescriptions(scope.opt)" :key="index" caption class="ellipsis">
+              {{ description }}
+            </q-item-label>
+          </template>
         </q-item-section>
       </q-item>
     </template>
@@ -88,6 +90,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    showDetails: Boolean,
     rounded: Boolean,
     outlined: Boolean,
     dense: Boolean,
