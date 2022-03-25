@@ -29,7 +29,7 @@
             :props="props"
             :title="t('showThing', { thing: t('version') })"
             class="cursor-pointer"
-            :class="{ 'bg-blue-2': props.row.version === selectedVersion }"
+            :class="{ 'bg-secondary': props.row.version === selectedVersion }"
             @click="$emit('prefill', props.row)"
           >
             <q-td auto-width>

@@ -123,6 +123,7 @@ export default {
   more: 'Mehr',
   new: 'Neu',
   addMoreOperands: 'Weitere Operatoren hinzufügen',
+  toggleDarkMode: 'Dunkelmodus umschalten',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

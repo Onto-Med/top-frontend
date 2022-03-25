@@ -35,6 +35,7 @@
   <q-chip
     v-else
     clickable
+    color="grey"
     :label="getTitle(state)"
     :icon="getIcon(state)"
     :title="getDescriptions(state).join('\n')"

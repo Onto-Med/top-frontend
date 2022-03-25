@@ -1,6 +1,6 @@
 <template>
-  <q-layout view="hHh lpR fFf" class="bg-grey-1">
-    <q-header elevated class="bg-white text-grey-8 q-py-xs" height-hint="58">
+  <q-layout view="hHh lpR fFf" :class="{ 'bg-grey-1': !isDarkModeActive }">
+    <q-header elevated :class="{ 'bg-white text-grey-8': !isDarkModeActive, 'bg-dark text-grey-2': isDarkModeActive }" class="q-py-xs" height-hint="58">
       <q-toolbar>
         <q-btn
           flat
@@ -37,6 +37,16 @@
 
         <q-space />
 
+        <q-btn
+          flat
+          dense
+          round
+          :title="t('toggleDarkMode')"
+          :icon="isDarkModeActive ? 'light_mode' : 'dark_mode'"
+          class="q-mr-sm"
+          @click="toggleDarkMode()"
+        />
+
         <language-switch />
       </q-toolbar>
     </q-header>
@@ -45,7 +55,7 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
-      class="bg-grey-2"
+      :class="{ 'bg-grey-2': !isDarkModeActive }"
       :width="240"
     >
       <q-scroll-area class="fit">
@@ -76,6 +86,7 @@ import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue
 import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
 import { Entity } from '@onto-med/top-api'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -91,6 +102,7 @@ export default defineComponent({
     const { t } = useI18n()
     const router = useRouter()
     const leftDrawerOpen = ref(false)
+    const $q = useQuasar()
 
     const linksList = computed(() => [
       {
@@ -116,13 +128,19 @@ export default defineComponent({
       productName: packageInfo.productName,
       links: linksList,
       leftDrawerOpen,
+
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       },
+
       routeToEntity (entity: Entity) {
         if (!entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
-      }
+      },
+
+      toggleDarkMode: $q.dark.toggle,
+
+      isDarkModeActive: computed(() => $q.dark.isActive)
     }
   }
 })

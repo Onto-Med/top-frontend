@@ -123,6 +123,7 @@ export default {
   more: 'More',
   new: 'New',
   addMoreOperands: 'Add more operands',
+  toggleDarkModel: 'Toggle dark mode',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
