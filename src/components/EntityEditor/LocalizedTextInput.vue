@@ -10,7 +10,7 @@
           :readonly="readonly"
           :error="!modelValue[index].text"
           debounce="200"
-          class="col"
+          class="col q-pb-none"
           @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"
         >
           <template #before>
