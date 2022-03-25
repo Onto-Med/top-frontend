@@ -348,7 +348,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      if (!entityApi || !props.entity.id || !props.version) return
+      if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
       loading.value = true
       entityApi.getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
         .then((r) => prefillFromVersion(r.data))
