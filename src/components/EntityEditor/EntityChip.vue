@@ -35,12 +35,12 @@
   <q-chip
     v-else
     clickable
-    color="grey"
+    color="grey-4"
     :label="getTitle(state)"
     :icon="getIcon(state)"
     :title="getDescriptions(state).join('\n')"
     :class="{ restriction: isRestricted(state) }"
-    class="truncate"
+    class="truncate text-dark"
   >
     <q-menu>
       <q-list dense>
