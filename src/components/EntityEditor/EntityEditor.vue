@@ -125,8 +125,8 @@
     <div class="q-gutter-md q-mt-none q-px-md q-pb-xl col entity-editor-tab-content">
       <q-card>
         <q-toolbar v-if="!isRestricted(entity)" class="q-my-none">
-          <q-toolbar-title>
-            {{ t('superCategory', 2) }}:
+          <q-toolbar-title class="row items-center">
+            <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
             <entity-chip
               v-for="category in local.superCategories"
               :key="category.id"
