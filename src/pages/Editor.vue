@@ -46,6 +46,9 @@
                   <q-item v-close-popup dense clickable @click="closeOtherTabs(tab)">
                     <q-item-section v-t="'closeOthers'" />
                   </q-item>
+                  <q-item v-close-popup dense clickable @click="closeSavedTabs()">
+                    <q-item-section v-t="'closeSaved'" />
+                  </q-item>
                 </q-list>
               </q-menu>
             </q-tab>
@@ -241,6 +244,10 @@ export default defineComponent({
       closeOtherTabs (tab: EditorTab): void {
         tabs.value = [tab]
         selected.value = tab.entity
+      },
+
+      closeSavedTabs (): void {
+        tabs.value.filter(t => !t.dirty).forEach(t => closeTab(t.entity))
       }
     }
   }

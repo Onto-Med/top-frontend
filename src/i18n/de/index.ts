@@ -95,6 +95,7 @@ export default {
   formula: 'Formel|Formeln',
   closeAll: 'Alle schließen',
   closeOthers: 'Andere schließen',
+  closeSaved: 'Gespeicherte schließen',
   code: 'Code|Codes',
   condition: 'Bedingung|Bedingungen',
   squareRoot: 'Quadratwurzel',

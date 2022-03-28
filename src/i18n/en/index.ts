@@ -95,6 +95,7 @@ export default {
   formula: 'Formula|Formulas',
   closeAll: 'Close all',
   closeOthers: 'Close others',
+  closeSaved: 'Close saved',
   code: 'Code|Codes',
   condition: 'Condition|Conditions',
   squareRoot: 'Square root',
