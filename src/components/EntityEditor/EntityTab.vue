@@ -276,7 +276,7 @@ import { useEntity } from 'src/pinia/entity'
 import { EntityApiKey } from 'src/boot/axios'
 
 export default defineComponent({
-  name: 'EntityEditor',
+  name: 'EntityTab',
   components: {
     LocalizedTextInput,
     DataTypeSelect,

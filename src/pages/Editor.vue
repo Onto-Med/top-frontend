@@ -55,7 +55,7 @@
           </q-tabs>
           <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
-              <entity-editor
+              <entity-tab
                 :version="tab.selectedVersion"
                 :entity="tab.entity"
                 :repository-id="repositoryId"
@@ -82,7 +82,7 @@ import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
 import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
-import EntityEditor from 'src/components/EntityEditor/EntityEditor.vue'
+import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
@@ -90,7 +90,7 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'Editor',
-  components: { EntityEditor, EntityTree },
+  components: { EntityTab, EntityTree },
   props: {
     entityId: String,
     version: Number
