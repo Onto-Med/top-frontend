@@ -1,6 +1,6 @@
 <template>
   <div class="column fit">
-    <div class="col-auto entity-editor-tab-header">
+    <div class="col-auto entity-tab-header">
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           {{ getTitle(local) }}
@@ -122,131 +122,133 @@
       />
     </div>
 
-    <div class="q-gutter-md q-mt-none q-px-md q-pb-xl col entity-editor-tab-content">
-      <q-card>
-        <q-toolbar v-if="!isRestricted(entity)" class="q-my-none">
-          <q-toolbar-title class="row items-center">
-            <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
-            <entity-chip
-              v-for="category in local.superCategories"
-              :key="category.id"
-              :entity-id="category.id"
-              :disable="isOtherVersion"
-              @removeClicked="removeSuperCategory(category.id)"
-              @entityClicked="$emit('entityClicked', $event)"
-            />
-            <q-btn
-              v-show="!showSuperCategoryInput"
-              icon="add"
-              round
-              size="sm"
-              dense
-              :disable="isOtherVersion"
-              :title="t('addThing', { thing: t('superCategory') })"
-              @click="showSuperCategoryInput = true"
-            />
-            <entity-search-input
-              v-show="!isOtherVersion && showSuperCategoryInput"
-              :organisation-id="organisationId"
-              :repository-id="repositoryId"
-              :label="t('selectThing', { thing: t('category') })"
-              :entity-types="[EntityType.Category]"
-              clear-on-select
-              rounded
-              outlined
-              dense
-              @entitySelected="addSuperCategory"
-              @btnClicked="showSuperCategoryInput = false"
-            />
-          </q-toolbar-title>
-        </q-toolbar>
-      </q-card>
+    <q-scroll-area class="col entity-tab-content">
+      <div class="q-gutter-md q-mt-none q-px-md q-pb-xl">
+        <q-card>
+          <q-toolbar v-if="!isRestricted(entity)" class="q-my-none">
+            <q-toolbar-title class="row items-center">
+              <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
+              <entity-chip
+                v-for="category in local.superCategories"
+                :key="category.id"
+                :entity-id="category.id"
+                :disable="isOtherVersion"
+                @removeClicked="removeSuperCategory(category.id)"
+                @entityClicked="$emit('entityClicked', $event)"
+              />
+              <q-btn
+                v-show="!showSuperCategoryInput"
+                icon="add"
+                round
+                size="sm"
+                dense
+                :disable="isOtherVersion"
+                :title="t('addThing', { thing: t('superCategory') })"
+                @click="showSuperCategoryInput = true"
+              />
+              <entity-search-input
+                v-show="!isOtherVersion && showSuperCategoryInput"
+                :organisation-id="organisationId"
+                :repository-id="repositoryId"
+                :label="t('selectThing', { thing: t('category') })"
+                :entity-types="[EntityType.Category]"
+                clear-on-select
+                rounded
+                outlined
+                dense
+                @entitySelected="addSuperCategory"
+                @btnClicked="showSuperCategoryInput = false"
+              />
+            </q-toolbar-title>
+          </q-toolbar>
+        </q-card>
 
-      <localized-text-input
-        v-model="local.titles"
-        unique
-        expanded
-        :readonly="isOtherVersion"
-        :required="true"
-        :label="t('title', 2)"
-        :help-text="t('entityEditor.titlesHelp')"
-      />
+        <localized-text-input
+          v-model="local.titles"
+          unique
+          expanded
+          :readonly="isOtherVersion"
+          :required="true"
+          :label="t('title', 2)"
+          :help-text="t('entityEditor.titlesHelp')"
+        />
 
-      <data-type-select
-        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
-        v-model="local.dataType"
-        :readonly="isOtherVersion"
-      />
+        <data-type-select
+          v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
+          v-model="local.dataType"
+          :readonly="isOtherVersion"
+        />
 
-      <formula-input
-        v-if="local.entityType === EntityType.DerivedPhenotype"
-        v-model="local.expression"
-        expanded
-        :readonly="isOtherVersion"
-        :label="t('formula')"
-        :help-text="t('entityEditor.formulaHelp')"
-        :organisation-id="organisationId"
-        :repository-id="repositoryId"
-        @entity-clicked="$emit('entityClicked', $event)"
-      />
+        <formula-input
+          v-if="local.entityType === EntityType.DerivedPhenotype"
+          v-model="local.expression"
+          expanded
+          :readonly="isOtherVersion"
+          :label="t('formula')"
+          :help-text="t('entityEditor.formulaHelp')"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          @entity-clicked="$emit('entityClicked', $event)"
+        />
 
-      <restriction-input
-        v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
-        :key="restrictionKey"
-        v-model="local.restriction"
-        expanded
-        :readonly="isOtherVersion"
-      />
+        <restriction-input
+          v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
+          :key="restrictionKey"
+          v-model="local.restriction"
+          expanded
+          :readonly="isOtherVersion"
+        />
 
-      <expression-input
-        v-if="local.entityType === EntityType.CombinedRestriction"
-        v-model="local.expression"
-        expanded
-        :readonly="isOtherVersion"
-        :label="t('expression')"
-        :organisation-id="organisationId"
-        :repository-id="repositoryId"
-        @entity-clicked="$emit('entityClicked', $event)"
-      />
+        <expression-input
+          v-if="local.entityType === EntityType.CombinedRestriction"
+          v-model="local.expression"
+          expanded
+          :readonly="isOtherVersion"
+          :label="t('expression')"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          @entity-clicked="$emit('entityClicked', $event)"
+        />
 
-      <q-input
-        v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
-        v-model="local.score"
-        type="number"
-        :readonly="isOtherVersion"
-        :label="t('score')"
-      />
+        <q-input
+          v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
+          v-model="local.score"
+          type="number"
+          :readonly="isOtherVersion"
+          :label="t('score')"
+        />
 
-      <ucum-card
-        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
-        v-model="local.units"
-        :readonly="isOtherVersion"
-        :expanded="local.units && local.units.length > 0"
-      />
+        <ucum-card
+          v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
+          v-model="local.units"
+          :readonly="isOtherVersion"
+          :expanded="local.units && local.units.length > 0"
+        />
 
-      <localized-text-input
-        v-model="local.synonyms"
-        :readonly="isOtherVersion"
-        :label="t('synonym', 2)"
-        :help-text="t('entityEditor.synonymsHelp')"
-        :expanded="local.synonyms && local.synonyms.length > 0"
-      />
-      <localized-text-input
-        v-model="local.descriptions"
-        text-area
-        rows="3"
-        :readonly="isOtherVersion"
-        :label="t('description', 2)"
-        :help-text="t('entityEditor.descriptionsHelp')"
-        :expanded="local.description && local.descriptions.length > 0"
-      />
+        <localized-text-input
+          v-model="local.synonyms"
+          :readonly="isOtherVersion"
+          :label="t('synonym', 2)"
+          :help-text="t('entityEditor.synonymsHelp')"
+          :expanded="local.synonyms && local.synonyms.length > 0"
+        />
+        <localized-text-input
+          v-model="local.descriptions"
+          text-area
+          rows="3"
+          :readonly="isOtherVersion"
+          :label="t('description', 2)"
+          :help-text="t('entityEditor.descriptionsHelp')"
+          :expanded="local.description && local.descriptions.length > 0"
+        />
 
-      <code-input
-        v-model="local.codes"
-        :readonly="isOtherVersion"
-        :expanded="local.codes && local.codes.length > 0"
-      />
-    </div>
+        <code-input
+          v-model="local.codes"
+          :readonly="isOtherVersion"
+          :expanded="local.codes && local.codes.length > 0"
+        />
+      </div>
+    </q-scroll-area>
 
     <q-inner-loading
       :showing="loading"
@@ -436,10 +438,10 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
-.entity-editor-tab-header
+.entity-tab-header
   width: 100%
-.entity-editor-tab-content
-  overflow-y: scroll
+.entity-tab-content
+  height: 100%
 .json-section
   max-height: 80vh
 </style>
