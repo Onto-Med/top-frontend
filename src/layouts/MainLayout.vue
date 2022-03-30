@@ -12,8 +12,10 @@
         />
 
         <q-icon name="hub" class="q-ml-sm" color="primary" size="28px" />
-        <q-toolbar-title shrink class="text-weight-bold">
-          {{ productName }}
+        <q-toolbar-title to="/" shrink class="text-weight-bold">
+          <router-link class="brand-link" to="/">
+            {{ productName }}
+          </router-link>
         </q-toolbar-title>
 
         <q-space />
@@ -171,4 +173,7 @@ export default defineComponent({
 .toolbar-input-container
   min-width: 100px
   width: 55%
+.brand-link
+  text-decoration: none
+  color: inherit
 </style>
