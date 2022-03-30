@@ -4,13 +4,6 @@
       <q-card-section>
         <div class="text-h6">
           {{ t('organisation', 2) }}
-          <q-btn
-            class="float-right"
-            color="primary"
-            icon="add"
-            :title="t('createThing', { thing: t('organisation') })"
-            @click="organisation = newOrganisation(); showForm = true"
-          />
         </div>
       </q-card-section>
       <q-card-section>
@@ -19,10 +12,13 @@
     </q-card>
 
     <table-with-actions
+      :name="t('organisation')"
       :rows="organisations"
       :loading="loading"
+      create
       @row-clicked="routeToOrganisation($event)"
       @reload-clicked="reload()"
+      @create-clicked="organisation = newOrganisation(); showForm = true"
     >
       <template #actions="{ row }">
         <q-btn

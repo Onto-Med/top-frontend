@@ -11,13 +11,23 @@
       row-key="id"
     >
       <template #top>
-        <q-btn color="primary" :disabled="loading" :label="t('reload')" icon="refresh" @click="$emit('reload-clicked')" />
-        <q-space />
         <q-input v-model="filter" dense debounce="300" color="primary">
           <template #append>
             <q-icon name="search" />
           </template>
         </q-input>
+        <q-space />
+        <q-btn-group>
+          <q-btn
+            v-if="create"
+            color="primary"
+            :disabled="loading"
+            :label="t('createThing', { thing: name })"
+            icon="add"
+            @click="$emit('create-clicked')"
+          />
+          <q-btn color="secondary" :disabled="loading" :label="t('reload')" icon="refresh" @click="$emit('reload-clicked')" />
+        </q-btn-group>
       </template>
       <template #header="props">
         <q-tr :props="props">
@@ -53,11 +63,13 @@ import { useI18n } from 'vue-i18n'
 export default defineComponent({
   name: 'TableWithActions',
   props: {
+    name: String,
     rows: Array,
     columns: Array,
-    loading: Boolean
+    loading: Boolean,
+    create: Boolean
   },
-  emits: ['row-clicked', 'reload-clicked'],
+  emits: ['row-clicked', 'reload-clicked', 'create-clicked'],
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
