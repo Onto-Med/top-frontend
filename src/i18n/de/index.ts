@@ -142,7 +142,7 @@ export default {
       + 'sodass der Phänotyp auf die Standards gemappt ist und mit anderen IT-Systemen verbunden werden kann. '
       + 'Auf diese Weise können zum einen Daten aus anderen Quellen eingelesen und zur Phänotypisierung verwendet werden. '
       + 'Auf der anderen Seite können Ergebnisse an externe IT-Systeme zurückgespielt werden.',
-    formulaHelp: 'Hier können mathematische Formeln eingegeben werden, mit denen die Werte des Phänotypes berechnet werden. '
+    formulaHelp: 'Hier können mathematische Formeln eingegeben werden, mit denen die Werte des Phänotyps berechnet werden. '
       + 'Formeln können sowohl andere Phänotypen als auch Konstanten enthalten.',
     restrictionHelp: 'Spezifizieren Sie die Einschränkungen, die auf Werte des Phänotyps angewendet werden sollen. Wählen Sie dafür bitte zunächst einen passenden Quantor aus. '
       + 'Anschließend müssen Sie für den Typ der Restriktion zwischen Wertebereich (mit Minimum und/oder Maximum) oder Aufzählung (beliebige Anzahl von vordefinierten Werten) wählen. '
