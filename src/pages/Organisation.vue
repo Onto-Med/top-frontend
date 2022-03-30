@@ -4,13 +4,6 @@
       <q-card-section>
         <div class="text-h6">
           {{ organisation.name }}
-          <q-btn
-            class="float-right"
-            color="primary"
-            icon="add"
-            :title="t('createThing', { thing: t('repository') })"
-            @click="repository = newRepository(); showForm = true"
-          />
         </div>
         <small>{{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}</small>
       </q-card-section>
@@ -20,9 +13,12 @@
     </q-card>
 
     <table-with-actions
+      :name="t('repository')"
       :rows="repositories"
       :loading="repositoriesLoading"
+      create
       @row-clicked="routeToEditor($event)"
+      @create-clicked="repository = newRepository(); showForm = true"
     >
       <template #actions="{ row }">
         <q-btn
