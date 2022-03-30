@@ -52,6 +52,16 @@
             </q-item-label>
           </template>
         </q-item-section>
+        <q-item-section v-show="fork && (!repositoryId || repositoryId !== scope.opt.repository.id)" avatar>
+          <q-btn
+            v-close-popup
+            flat
+            round
+            icon="content_copy"
+            :title="t('forkToCurrentRepository')"
+            @click.stop="$emit('forkClicked', scope.opt)"
+          />
+        </q-item-section>
       </q-item>
     </template>
     <template #no-option>
@@ -96,9 +106,10 @@ export default defineComponent({
     dense: Boolean,
     autofocus: Boolean,
     organisationId: String,
-    repositoryId: String
+    repositoryId: String,
+    fork: Boolean
   },
-  emits: ['btnClicked', 'entitySelected'],
+  emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()

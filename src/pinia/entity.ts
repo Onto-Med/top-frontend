@@ -67,6 +67,15 @@ export const useEntity = defineStore('entity', {
       return entity
     },
 
+    forkEntity (entity: Entity) {
+      alert('not implemented!')
+      // TODO: check if entity has already been forked in current repository
+      // TODO: perform fork request
+      // TODO: add entity to entities array
+      this.entities.push(entity)
+      // TODO: there mey be additional entities that must be pushed to the tree (e.g. referenced entities in expressions or subclasses)
+    },
+
     async saveEntity (entity: Entity) {
       if (!entity || !entityApi || !this.organisationId || !this.repositoryId)
         throw {

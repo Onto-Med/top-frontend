@@ -127,6 +127,7 @@ export default {
   addMoreOperands: 'Weitere Operatoren hinzufügen',
   toggleDarkMode: 'Dunkelmodus umschalten',
   sourceCode: 'Quellcode',
+  forkToCurrentRepository: 'Entität in das aktuelle Repositorium übernehmen.',
   entityEditor: {
     rawBtn: {
       label: 'Zeige Entität-Daten als JSON'

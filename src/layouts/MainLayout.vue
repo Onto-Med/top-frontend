@@ -23,13 +23,16 @@
         <div class="toolbar-input-container row no-wrap">
           <entity-search-input
             :label="t('searchThing', { thing: t('entity') }) + '...'"
+            :repository-id="repositoryId"
             outlined
             dense
             square
             clear-on-select
             show-details
+            fork
             class="q-mr-sm fit"
             @entity-selected="routeToEntity"
+            @fork-clicked="forkEntity"
           >
             <template #append>
               <q-btn dense flat icon="search" :title="t('search')" />
@@ -99,6 +102,7 @@
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { useEntity } from 'src/pinia/entity'
 import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
@@ -121,6 +125,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const router = useRouter()
+    const entityStore = useEntity()
     const leftDrawerOpen = ref(false)
     const $q = useQuasar()
 
@@ -152,6 +157,12 @@ export default defineComponent({
       leftDrawerOpen,
       fabGithub,
 
+      repositoryId: computed(() => {
+        const route = router.currentRoute.value
+        if (!route || route.name !== 'editor') return undefined
+        return route.params.repositoryId
+      }),
+
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       },
@@ -159,6 +170,10 @@ export default defineComponent({
       routeToEntity (entity: Entity) {
         if (!entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
+      },
+
+      forkEntity (entity: Entity) {
+        entityStore.forkEntity(entity)
       },
 
       toggleDarkMode: $q.dark.toggle,

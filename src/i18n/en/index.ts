@@ -127,6 +127,7 @@ export default {
   addMoreOperands: 'Add more operands',
   toggleDarkModel: 'Toggle dark mode',
   sourceCode: 'Source code',
+  forkToCurrentRepository: 'Fork entity into current repository.',
   entityEditor: {
     rawBtn: {
       label: 'Show entity data as JSON'
