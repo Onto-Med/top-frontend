@@ -11,7 +11,7 @@
             icon="delete"
             class="float-right"
             :title="t('deleteThing', { thing: t('organisation') })"
-            @click="showDeleteDialog"
+            @click="showDeleteDialog = true"
           />
         </div>
         <div v-else class="text-h6">
