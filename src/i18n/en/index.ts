@@ -10,6 +10,7 @@ export default {
   single_restriction: 'Single restriction|Single restrictions',
   combined_restriction: 'Combined restriction|Combined restrictions',
   derived_restriction: 'Derived restriction|Derived restrictions',
+  id: 'ID',
   dataType: 'Data Type|Data Types',
   number: 'Number|Numbers',
   boolean: 'Boolean',

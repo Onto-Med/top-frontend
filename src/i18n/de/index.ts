@@ -10,6 +10,7 @@ export default {
   single_restriction: 'Einzelne Restriktion|Einzelne Restriktionen',
   combined_restriction: 'Kombinierte Restriktion|Kombinierte Restriktionen',
   derived_restriction: 'Abgeleitete Restriktion|Abgeleitete Restriktionen',
+  id: 'ID',
   dataType: 'Datentyp|Datentypen',
   number: 'Zahl|Zahlen',
   boolean: 'Boolesch',
