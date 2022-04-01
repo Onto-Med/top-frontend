@@ -53,7 +53,7 @@
               </q-menu>
             </q-tab>
           </q-tabs>
-          <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
+          <q-tab-panels v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
               <entity-tab
                 :version="tab.selectedVersion"
@@ -69,6 +69,21 @@
               />
             </q-tab-panel>
           </q-tab-panels>
+          <div v-show="tabs.length === 0" class="col column entity-editor-tab text-grey">
+            <div class="col-3 row q-pa-md">
+              <q-icon name="arrow_back_ios" size="xl" />
+              <p>
+                {{ t('entityEditor.emptyTab.tree.selection') }}
+                <br>
+                {{ t('entityEditor.emptyTab.tree.actions') }}
+              </p>
+            </div>
+
+            <div class="col-6 column justify-center items-center q-gutter-md">
+              <q-icon name="hub" size="xl" />
+              <p v-t="'entityEditor.emptyTab.tab.description'" />
+            </div>
+          </div>
         </div>
       </template>
     </q-splitter>

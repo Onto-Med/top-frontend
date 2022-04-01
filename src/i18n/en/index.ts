@@ -151,7 +151,16 @@ export default {
       + 'The expression can contain unions (OR), intersections (AND) and complements (NOT) of phenotypes. '
       + 'Click the plus button to add components to the expression. You can also click on already added components to modify or remove them.',
     confirmDelete: 'Do you really want to delete the entity irrevocably? All saved versions and restrictions will also be deleted.',
-    confirmRefreshTree: 'Do you really want to reload the entities? All unsaved entities will be lost.'
+    confirmRefreshTree: 'Do you really want to reload the entities? All unsaved entities will be lost.',
+    emptyTab: {
+      tree: {
+        selection: 'Select one or more entities in the tree on the left side.',
+        actions: 'Right-click to create new entities or delete existing ones.'
+      },
+      tab: {
+        description: 'The properties of the selected entities are displayed here.'
+      }
+    }
   },
   organisationPage: {
     description: 'Manage your organisations or create new ones.'
