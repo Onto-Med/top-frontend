@@ -1,10 +1,11 @@
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, NumberRestriction, Phenotype, StringRestriction } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 
 const entityApi = new EntityApi()
 const expressionOperatorApi = new ExpressionOperatorApi()
+const forkApi = new ForkApi()
 
 export const useEntity = defineStore('entity', {
   state: () => {
@@ -67,13 +68,25 @@ export const useEntity = defineStore('entity', {
       return entity
     },
 
-    forkEntity (entity: Entity) {
-      alert('not implemented!')
-      // TODO: check if entity has already been forked in current repository
-      // TODO: perform fork request
-      // TODO: add entity to entities array
+    async forkEntity (entity: Entity) {
+      if (!forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return
+
+      return forkApi.createFork(
+        entity.repository.organisation.id,
+        entity.repository.id,
+        entity.id,
+        {
+          organisationId: this.organisationId,
+          repositoryId: this.repositoryId
+        } as ForkCreateInstruction,
+        entity.version
+      ).then(r => r.data.forEach(e => this.addOrReplaceEntity(e)))
+    },
+
+    addOrReplaceEntity (entity: Entity): void {
+      const index = this.entities.findIndex(e => e.id === entity.id)
+      if (index !== -1) this.entities.splice(index, 1)
       this.entities.push(entity)
-      // TODO: there mey be additional entities that must be pushed to the tree (e.g. referenced entities in expressions or subclasses)
     },
 
     async saveEntity (entity: Entity) {

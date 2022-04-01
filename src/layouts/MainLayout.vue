@@ -111,6 +111,7 @@ import { defineComponent, ref, computed } from 'vue'
 import { Entity } from '@onto-med/top-api'
 import { useQuasar } from 'quasar'
 import { fabGithub } from '@quasar/extras/fontawesome-v5'
+import useAlert from 'src/mixins/useAlert'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -128,6 +129,7 @@ export default defineComponent({
     const entityStore = useEntity()
     const leftDrawerOpen = ref(false)
     const $q = useQuasar()
+    const { alert } = useAlert()
 
     const linksList = computed(() => [
       {
@@ -174,6 +176,7 @@ export default defineComponent({
 
       forkEntity (entity: Entity) {
         entityStore.forkEntity(entity)
+          .catch((e: Error) => alert(t(e.message)))
       },
 
       toggleDarkMode: $q.dark.toggle,
