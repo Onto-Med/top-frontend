@@ -71,6 +71,7 @@ export default {
   backToCurrentVersion: 'Back to current version',
   showThing: 'Show {thing}',
   createThing: 'Create {thing}',
+  thingCreated: '{thing} has been created',
   thingSaved: '{thing} has been saved',
   deleteThing: 'Delete {thing}',
   thingDeleted: '{thing} has been deleted',
@@ -127,6 +128,7 @@ export default {
   addMoreOperands: 'Add more operands',
   toggleDarkModel: 'Toggle dark mode',
   sourceCode: 'Source code',
+  fork: 'Fork',
   forkToCurrentRepository: 'Fork entity into current repository.',
   entityEditor: {
     rawBtn: {

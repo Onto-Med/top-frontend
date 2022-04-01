@@ -176,6 +176,7 @@ export default defineComponent({
 
       forkEntity (entity: Entity) {
         entityStore.forkEntity(entity)
+          .then(() => alert(t('thingCreated', { thing: t('fork') }), 'positive'))
           .catch((e: Error) => alert(t(e.message)))
       },
 

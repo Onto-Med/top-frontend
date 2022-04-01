@@ -71,6 +71,7 @@ export default {
   backToCurrentVersion: 'Zurück zur aktuellen Version',
   showThing: '{thing} anzeigen',
   createThing: '{thing} anlegen',
+  thingCreated: '{thing} wurde erzeugt',
   thingSaved: '{thing} wurde gespeichert',
   deleteThing: '{thing} löschen',
   thingDeleted: '{thing} wurde gelöscht',
@@ -127,6 +128,7 @@ export default {
   addMoreOperands: 'Weitere Operatoren hinzufügen',
   toggleDarkMode: 'Dunkelmodus umschalten',
   sourceCode: 'Quellcode',
+  fork: 'Fork',
   forkToCurrentRepository: 'Entität in das aktuelle Repositorium übernehmen.',
   entityEditor: {
     rawBtn: {
