@@ -21,7 +21,7 @@
         </div>
       </div>
       <div class="col">
-        <q-avatar icon="folder" size="8rem" />
+        <q-avatar icon="tab" size="8rem" />
         <div class="text-h6">
           {{ t('repository', 2) }}
           <q-badge label="xx" />
