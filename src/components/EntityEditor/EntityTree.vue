@@ -53,11 +53,11 @@
         </template>
       </q-tree>
       <entity-tree-context-menu @create-entity-clicked="handleCreateEntityClicked" />
-      <q-inner-loading
-        :showing="loading"
-        :label="t('pleaseWait') + '...'"
-      />
     </q-scroll-area>
+    <q-inner-loading
+      :showing="loading"
+      :label="t('pleaseWait') + '...'"
+    />
 
     <q-dialog v-model="showRefreshDialog">
       <q-card>
