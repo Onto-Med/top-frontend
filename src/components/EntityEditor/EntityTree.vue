@@ -1,7 +1,7 @@
 <template>
   <div>
-    <q-toolbar class="q-pr-none">
-      <q-toolbar-title>
+    <q-toolbar class="q-px-none q-gutter-y-sm">
+      <q-toolbar-title class="q-px-none">
         <q-input v-model="filter" dense filled :label="t('filter')">
           <template #append>
             <q-icon v-show="filter !== ''" name="clear" class="cursor-pointer" @click="filter = ''" />
