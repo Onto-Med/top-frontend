@@ -1,4 +1,4 @@
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -6,12 +6,14 @@ import { v4 as uuidv4 } from 'uuid'
 const entityApi = new EntityApi()
 const expressionOperatorApi = new ExpressionOperatorApi()
 const forkApi = new ForkApi()
+const repositoryApi = new RepositoryApi()
 
 export const useEntity = defineStore('entity', {
   state: () => {
     return {
       organisationId: undefined as string|undefined,
       repositoryId: undefined as string|undefined,
+      repository: undefined as Repository|undefined,
       entities: [] as Entity[],
       operators: new Map<string, ExpressionOperator[]>()
     }
@@ -35,6 +37,17 @@ export const useEntity = defineStore('entity', {
     async reloadOperators () {
       await this.reloadOperatorsByType('math')
       await this.reloadOperatorsByType('boolean')
+    },
+
+    async setRepository (repositoryId: string|undefined) {
+      this.repositoryId = repositoryId
+      if (!repositoryId) {
+        this.repository = undefined
+        return
+      }
+      if (!this.organisationId) return
+      await repositoryApi.getRepositoryById(this.organisationId, repositoryId, undefined)
+        .then(r => this.repository = r.data)
     },
 
     getOperators (type: string): ExpressionOperator[] {
