@@ -57,7 +57,7 @@
     </q-header>
 
     <q-drawer
-      v-model="leftDrawerOpen"
+      :mini="!leftDrawerOpen"
       show-if-above
       bordered
       :class="{ 'bg-grey-2': !isDarkModeActive }"
@@ -65,17 +65,15 @@
     >
       <q-scroll-area class="fit">
         <q-list padding>
-          <q-item-label v-t="'navigation'" header />
-
           <NavbarLink
             v-for="link in links"
             :key="link.title"
             v-bind="link"
           />
 
-          <q-separator class="q-mt-md q-mb-lg" />
+          <q-separator v-show="leftDrawerOpen" class="q-mt-md q-mb-lg" />
 
-          <div class="q-px-md text-grey">
+          <div v-show="leftDrawerOpen" class="q-px-md text-grey">
             <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
               <q-btn
                 flat

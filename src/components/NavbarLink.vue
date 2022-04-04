@@ -8,6 +8,7 @@
     <q-item-section
       v-if="icon"
       avatar
+      :title="title"
     >
       <q-icon :name="icon" />
     </q-item-section>
