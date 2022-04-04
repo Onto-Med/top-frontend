@@ -125,7 +125,7 @@ export default defineComponent({
     const { t } = useI18n()
     const router = useRouter()
     const entityStore = useEntity()
-    const leftDrawerOpen = ref(false)
+    const leftDrawerOpen = ref(true)
     const $q = useQuasar()
     const { alert } = useAlert()
 
