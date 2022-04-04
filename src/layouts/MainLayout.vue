@@ -143,7 +143,7 @@ export default defineComponent({
       },
       {
         title: t('repository', 2),
-        icon: 'folder',
+        icon: 'tab',
         caption: t('developPhenotype', 2),
         routeName: 'repositories'
       }
