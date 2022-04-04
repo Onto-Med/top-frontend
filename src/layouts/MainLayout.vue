@@ -30,6 +30,7 @@
             clear-on-select
             show-details
             fork
+            repository-filter
             class="q-mr-sm fit"
             @entity-selected="routeToEntity"
             @fork-clicked="forkEntity"
