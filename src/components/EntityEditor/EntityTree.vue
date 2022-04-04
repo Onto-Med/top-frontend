@@ -17,7 +17,7 @@
 
     <q-separator />
 
-    <div class="col">
+    <q-scroll-area class="col">
       <q-tree
         v-model:expanded="expansion"
         :selected="selected ? selected.id : ''"
@@ -53,11 +53,11 @@
         </template>
       </q-tree>
       <entity-tree-context-menu @create-entity-clicked="handleCreateEntityClicked" />
-    </div>
-    <q-inner-loading
-      :showing="loading"
-      :label="t('pleaseWait') + '...'"
-    />
+      <q-inner-loading
+        :showing="loading"
+        :label="t('pleaseWait') + '...'"
+      />
+    </q-scroll-area>
 
     <q-dialog v-model="showRefreshDialog">
       <q-card>
