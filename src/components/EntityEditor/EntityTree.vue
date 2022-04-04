@@ -132,7 +132,7 @@ export default defineComponent({
       (entity: Entity|undefined) => expand(entity)
     )
 
-    const uewNodes = computed((): boolean => {
+    const newNodes = computed((): boolean => {
       return props.nodes?.findIndex(n => !n.createdAt) !== -1
     })
 
@@ -189,7 +189,7 @@ export default defineComponent({
       }),
 
       handleRefreshClick (): void {
-        if (uewNodes.value)
+        if (newNodes.value)
           showRefreshDialog.value = true
         else
           emit('refreshClicked')
