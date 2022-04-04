@@ -220,3 +220,8 @@ interface TreeNode extends Entity {
   children: TreeNode[]
 }
 </script>
+
+<style lang="sass">
+.q-splitter__separator-area
+  left: 0px !important
+</style>
