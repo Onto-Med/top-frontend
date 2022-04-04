@@ -62,9 +62,10 @@
               </q-menu>
             </q-tab>
           </q-tabs>
-          <q-tab-panels v-if="repository" v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
+          <q-tab-panels v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
               <entity-tab
+                v-if="repository"
                 :version="tab.selectedVersion"
                 :entity="tab.entity"
                 :repository-id="repository.id"
