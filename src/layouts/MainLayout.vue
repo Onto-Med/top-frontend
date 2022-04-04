@@ -93,7 +93,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view :key="repositoryId" />
     </q-page-container>
   </q-layout>
 </template>
