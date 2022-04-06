@@ -40,7 +40,7 @@
       @delete-clicked="deleteRepository($event)"
     />
   </q-page>
-  <q-page else>
+  <q-page v-else>
     <q-inner-loading showing :label="t('pleaseWait') + '...'" />
   </q-page>
 </template>
