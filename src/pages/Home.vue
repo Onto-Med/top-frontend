@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <div class="row justify-between">
-      <q-parallax src="https://cdn.quasar.dev/img/parallax2.jpg">
+      <q-parallax src="https://cdn.quasar.dev/img/image-src.png">
         <div class="text-h3 text-white text-center">
           {{ productName }}
         </div>
