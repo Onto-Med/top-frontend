@@ -92,6 +92,7 @@ export const useEntity = defineStore('entity', {
           organisationId: this.organisationId,
           repositoryId: this.repositoryId
         } as ForkCreateInstruction,
+        undefined,
         entity.version
       ).then(r => r.data.forEach(e => this.addOrReplaceEntity(e)))
     },
