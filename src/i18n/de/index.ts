@@ -71,6 +71,7 @@ export default {
   backToCurrentVersion: 'Zurück zur aktuellen Version',
   showThing: '{thing} anzeigen',
   createThing: '{thing} anlegen',
+  thingCreated: '{thing} wurde erzeugt',
   thingSaved: '{thing} wurde gespeichert',
   deleteThing: '{thing} löschen',
   thingDeleted: '{thing} wurde gelöscht',
@@ -127,6 +128,7 @@ export default {
   addMoreOperands: 'Weitere Operatoren hinzufügen',
   toggleDarkMode: 'Dunkelmodus umschalten',
   sourceCode: 'Quellcode',
+  fork: 'Fork',
   forkToCurrentRepository: 'Entität in das aktuelle Repositorium übernehmen.',
   entityEditor: {
     rawBtn: {
@@ -154,7 +156,16 @@ export default {
       + 'Klicken Sie auf die Plus-Schaltfläche um Komponenten zum Ausdruck hinzuzufügen. '
       + 'Außerdem können Sie auf bereits hinzugefügte Komponenten klicken, um diese zu verändern oder zu entfernen.',
     confirmDelete: 'Möchten Sie die Entität wirklich unwiderruflich löschen? Alle gespeicherten Versionen und Restriktionen werden ebenfalls gelöscht.',
-    confirmRefreshTree: 'Möchten Sie die Entitäten wirklich neu laden? Alle ungespeicherten Entitäten gehen dabei verloren.'
+    confirmRefreshTree: 'Möchten Sie die Entitäten wirklich neu laden? Alle ungespeicherten Entitäten gehen dabei verloren.',
+    emptyTab: {
+      tree: {
+        selection: 'Wählen Sie eine oder mehrere Entitäten im Baum auf der linken Seite aus.',
+        actions: 'Mit Rechtsklick können Sie neue Entitäten anlegen oder Bestehende löschen.'
+      },
+      tab: {
+        description: 'Hier werden Ihnen die Eigenschaften der gewählten Entitäten angezeigt.'
+      }
+    }
   },
   organisationPage: {
     description: 'Verwalten Sie Ihre Organisationen oder erstellen Sie neue.'

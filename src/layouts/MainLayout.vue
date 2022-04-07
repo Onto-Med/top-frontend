@@ -30,6 +30,7 @@
             clear-on-select
             show-details
             fork
+            repository-filter
             class="q-mr-sm fit"
             @entity-selected="routeToEntity"
             @fork-clicked="forkEntity"
@@ -57,7 +58,7 @@
     </q-header>
 
     <q-drawer
-      v-model="leftDrawerOpen"
+      :mini="!leftDrawerOpen"
       show-if-above
       bordered
       :class="{ 'bg-grey-2': !isDarkModeActive }"
@@ -65,17 +66,15 @@
     >
       <q-scroll-area class="fit">
         <q-list padding>
-          <q-item-label v-t="'navigation'" header />
-
           <NavbarLink
             v-for="link in links"
             :key="link.title"
             v-bind="link"
           />
 
-          <q-separator class="q-mt-md q-mb-lg" />
+          <q-separator v-show="leftDrawerOpen" class="q-mt-md q-mb-lg" />
 
-          <div class="q-px-md text-grey">
+          <div v-show="leftDrawerOpen" class="q-px-md text-grey">
             <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
               <q-btn
                 flat
@@ -94,7 +93,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view :key="repositoryId" />
     </q-page-container>
   </q-layout>
 </template>
@@ -111,6 +110,7 @@ import { defineComponent, ref, computed } from 'vue'
 import { Entity } from '@onto-med/top-api'
 import { useQuasar } from 'quasar'
 import { fabGithub } from '@quasar/extras/fontawesome-v5'
+import useAlert from 'src/mixins/useAlert'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -126,8 +126,9 @@ export default defineComponent({
     const { t } = useI18n()
     const router = useRouter()
     const entityStore = useEntity()
-    const leftDrawerOpen = ref(false)
+    const leftDrawerOpen = ref(true)
     const $q = useQuasar()
+    const { alert } = useAlert()
 
     const linksList = computed(() => [
       {
@@ -143,7 +144,7 @@ export default defineComponent({
       },
       {
         title: t('repository', 2),
-        icon: 'folder',
+        icon: 'tab',
         caption: t('developPhenotype', 2),
         routeName: 'repositories'
       }
@@ -174,6 +175,8 @@ export default defineComponent({
 
       forkEntity (entity: Entity) {
         entityStore.forkEntity(entity)
+          .then(() => alert(t('thingCreated', { thing: t('fork') }), 'positive'))
+          .catch((e: Error) => alert(t(e.message)))
       },
 
       toggleDarkMode: $q.dark.toggle,

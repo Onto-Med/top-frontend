@@ -2,15 +2,24 @@
   <q-page>
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
-        <entity-tree
-          v-model:selected="selected"
-          :nodes="entities"
-          :loading="treeLoading"
-          class="column fit"
-          @refresh-clicked="reloadEntities"
-          @delete-entity="deleteEntity"
-          @create-entity="handleEntityCreation"
-        />
+        <div class="column fit">
+          <div class="row items-center q-pl-sm bg-primary text-white shadow-2 entity-editor-tabs-bar">
+            <q-icon name="tab" class="q-mr-sm q-tree__icon" />
+            <div v-if="repository">
+              {{ repository.name || repository.id }}
+            </div>
+          </div>
+
+          <entity-tree
+            v-model:selected="selected"
+            :nodes="entities"
+            :loading="treeLoading"
+            class="col column"
+            @refresh-clicked="reloadEntities"
+            @delete-entity="deleteEntity"
+            @create-entity="handleEntityCreation"
+          />
+        </div>
       </template>
 
       <template #after>
@@ -53,12 +62,13 @@
               </q-menu>
             </q-tab>
           </q-tabs>
-          <q-tab-panels :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
+          <q-tab-panels v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
               <entity-tab
+                v-if="repository"
                 :version="tab.selectedVersion"
                 :entity="tab.entity"
-                :repository-id="repositoryId"
+                :repository-id="repository.id"
                 :organisation-id="organisationId"
                 @change="tab.dirty = $event"
                 @update:entity="saveEntity"
@@ -69,6 +79,21 @@
               />
             </q-tab-panel>
           </q-tab-panels>
+          <div v-show="tabs.length === 0" class="col column entity-editor-tab text-grey">
+            <div class="col-3 row q-pa-md">
+              <q-icon name="arrow_back_ios" size="xl" />
+              <p>
+                {{ t('entityEditor.emptyTab.tree.selection') }}
+                <br>
+                {{ t('entityEditor.emptyTab.tree.actions') }}
+              </p>
+            </div>
+
+            <div class="col-6 column justify-center items-center q-gutter-md">
+              <q-icon name="hub" size="xl" />
+              <p v-t="'entityEditor.emptyTab.tab.description'" />
+            </div>
+          </div>
         </div>
       </template>
     </q-splitter>
@@ -105,7 +130,7 @@ export default defineComponent({
     const entityApi     = inject(EntityApiKey)
     const showJson      = ref(false)
     const splitterModel = ref(25)
-    const { entities }  = storeToRefs(entityStore)
+    const { entities, repository, organisationId } = storeToRefs(entityStore)
     const selected      = ref<Entity|undefined>(undefined)
     const tabs          = ref([] as EditorTab[])
     const treeLoading   = ref(false)
@@ -155,14 +180,14 @@ export default defineComponent({
           } else {
             void router.push({
               name: 'editor',
-              params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
+              params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: entity.id },
               query: tab.selectedVersion ? { version: tab.selectedVersion } : {}
             })
           }
         } else {
           void router.push({
             name: 'editor',
-            params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: undefined }
+            params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: undefined }
           })
         }
       }
@@ -195,8 +220,8 @@ export default defineComponent({
       t, showJson, splitterModel, entities, selected, tabs, treeLoading,
       isRestricted, getTitle, getIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
-      organisationId: entityStore.organisationId,
-      repositoryId: entityStore.repositoryId,
+      organisationId,
+      repository,
 
       deleteEntity (entity: Entity): void {
         if (!entity || !entityApi) return

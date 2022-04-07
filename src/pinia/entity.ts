@@ -1,16 +1,19 @@
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, NumberRestriction, Phenotype, StringRestriction } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 
 const entityApi = new EntityApi()
 const expressionOperatorApi = new ExpressionOperatorApi()
+const forkApi = new ForkApi()
+const repositoryApi = new RepositoryApi()
 
 export const useEntity = defineStore('entity', {
   state: () => {
     return {
       organisationId: undefined as string|undefined,
       repositoryId: undefined as string|undefined,
+      repository: undefined as Repository|undefined,
       entities: [] as Entity[],
       operators: new Map<string, ExpressionOperator[]>()
     }
@@ -34,6 +37,17 @@ export const useEntity = defineStore('entity', {
     async reloadOperators () {
       await this.reloadOperatorsByType('math')
       await this.reloadOperatorsByType('boolean')
+    },
+
+    async setRepository (repositoryId: string|undefined) {
+      this.repositoryId = repositoryId
+      if (!repositoryId) {
+        this.repository = undefined
+        return
+      }
+      if (!this.organisationId) return
+      await repositoryApi.getRepositoryById(this.organisationId, repositoryId, undefined)
+        .then(r => this.repository = r.data)
     },
 
     getOperators (type: string): ExpressionOperator[] {
@@ -67,13 +81,26 @@ export const useEntity = defineStore('entity', {
       return entity
     },
 
-    forkEntity (entity: Entity) {
-      alert('not implemented!')
-      // TODO: check if entity has already been forked in current repository
-      // TODO: perform fork request
-      // TODO: add entity to entities array
+    async forkEntity (entity: Entity) {
+      if (!forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return
+
+      return forkApi.createFork(
+        entity.repository.organisation.id,
+        entity.repository.id,
+        entity.id,
+        {
+          organisationId: this.organisationId,
+          repositoryId: this.repositoryId
+        } as ForkCreateInstruction,
+        undefined,
+        entity.version
+      ).then(r => r.data.forEach(e => this.addOrReplaceEntity(e)))
+    },
+
+    addOrReplaceEntity (entity: Entity): void {
+      const index = this.entities.findIndex(e => e.id === entity.id)
+      if (index !== -1) this.entities.splice(index, 1)
       this.entities.push(entity)
-      // TODO: there mey be additional entities that must be pushed to the tree (e.g. referenced entities in expressions or subclasses)
     },
 
     async saveEntity (entity: Entity) {

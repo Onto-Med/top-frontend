@@ -1,7 +1,7 @@
 <template>
   <div>
-    <q-toolbar class="q-pr-none">
-      <q-toolbar-title>
+    <q-toolbar class="q-px-none q-gutter-y-sm">
+      <q-toolbar-title class="q-px-none">
         <q-input v-model="filter" dense filled :label="t('filter')">
           <template #append>
             <q-icon v-show="filter !== ''" name="clear" class="cursor-pointer" @click="filter = ''" />
@@ -17,7 +17,7 @@
 
     <q-separator />
 
-    <div class="col">
+    <q-scroll-area class="col">
       <q-tree
         v-model:expanded="expansion"
         :selected="selected ? selected.id : ''"
@@ -53,7 +53,7 @@
         </template>
       </q-tree>
       <entity-tree-context-menu @create-entity-clicked="handleCreateEntityClicked" />
-    </div>
+    </q-scroll-area>
     <q-inner-loading
       :showing="loading"
       :label="t('pleaseWait') + '...'"
@@ -132,7 +132,7 @@ export default defineComponent({
       (entity: Entity|undefined) => expand(entity)
     )
 
-    const uewNodes = computed((): boolean => {
+    const newNodes = computed((): boolean => {
       return props.nodes?.findIndex(n => !n.createdAt) !== -1
     })
 
@@ -189,7 +189,7 @@ export default defineComponent({
       }),
 
       handleRefreshClick (): void {
-        if (uewNodes.value)
+        if (newNodes.value)
           showRefreshDialog.value = true
         else
           emit('refreshClicked')
@@ -220,3 +220,8 @@ interface TreeNode extends Entity {
   children: TreeNode[]
 }
 </script>
+
+<style lang="sass">
+.q-splitter__separator-area
+  left: 0px !important
+</style>

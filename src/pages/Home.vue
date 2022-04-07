@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <div class="row justify-between">
-      <q-parallax src="https://cdn.quasar.dev/img/parallax2.jpg">
+      <q-parallax src="https://cdn.quasar.dev/img/image-src.png">
         <div class="text-h3 text-white text-center">
           {{ productName }}
         </div>
@@ -17,21 +17,28 @@
         <q-avatar icon="groups" size="8rem" />
         <div class="text-h6">
           {{ t('organisation', 2) }}
-          <q-badge label="xx" />
+          <q-badge v-if="statistic" :label="statistic.organisations" />
+        </div>
+      </div>
+      <div class="col">
+        <q-avatar icon="tab" size="8rem" />
+        <div class="text-h6">
+          {{ t('repository', 2) }}
+          <q-badge v-if="statistic" :label="statistic.repositories" />
         </div>
       </div>
       <div class="col">
         <q-avatar icon="folder" size="8rem" />
         <div class="text-h6">
-          {{ t('repository', 2) }}
-          <q-badge label="xx" />
+          {{ t('category', 2) }}
+          <q-badge v-if="statistic" :label="statistic.categories" />
         </div>
       </div>
       <div class="col">
         <q-avatar icon="category" size="8rem" />
         <div class="text-h6">
           {{ t('phenotype', 2) }}
-          <q-badge label="xx" />
+          <q-badge v-if="statistic" :label="statistic.phenotypes" />
         </div>
       </div>
     </div>
@@ -39,22 +46,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { Statistic } from '@onto-med/top-api'
+import { DefaultApiKey } from 'src/boot/axios'
+import { defineComponent, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import packageInfo from '../../package.json'
 
 export default defineComponent({
   name: 'Home',
-  components: {
-  },
-  props: {
-  },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const defaultApi = inject(DefaultApiKey)
+    const statistic = ref(undefined as Statistic|undefined)
+
+    onMounted(() => defaultApi?.getStatistics().then(r => statistic.value = r.data))
 
     return {
       t,
+      statistic,
       productName: packageInfo.productName,
       version: packageInfo.version
     }

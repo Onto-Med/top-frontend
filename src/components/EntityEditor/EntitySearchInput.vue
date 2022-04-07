@@ -1,90 +1,107 @@
 <template>
-  <q-select
-    v-model="selection"
-    :rounded="rounded"
-    :outlined="outlined"
-    :dense="dense"
-    hide-bottom-space
-    hide-dropdown-icon
-    use-input
-    emit-value
-    :autofocus="autofocus"
-    class="inline entity-search-input-field"
-    :placeholder="selection ? '' : label || t('selectThing', { thing: t('entity') })"
-    :options="options"
-    :loading="loading"
-    :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
-    @filter="filterFn"
-    @update:model-value="handleSelectionChanged"
-  >
-    <template #append>
-      <slot name="append">
-        <q-btn
-          v-show="!loading"
-          round
-          dense
-          flat
-          :icon="icon"
-          :title="t('remove')"
-          @click="$emit('btnClicked')"
-        />
-      </slot>
-    </template>
-    <template #selected>
-      <span v-if="selection">
-        <q-icon :name="getIcon(selection)" />
-        {{ getTitle(selection) }}
-      </span>
-    </template>
-    <template #option="scope">
-      <q-item v-bind="scope.itemProps">
-        <q-item-section avatar>
-          <q-icon :name="getIcon(scope.opt)" :title="getIconTooltip(scope.opt)" :class="{ restriction: isRestricted(scope.opt) }" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
-            {{ scope.opt.repository.name }}
-          </q-item-label>
-          <q-item-label>{{ getTitle(scope.opt) }}</q-item-label>
-          <template v-if="showDetails">
-            <q-item-label v-for="(description, index) in getDescriptions(scope.opt)" :key="index" caption class="ellipsis">
-              {{ description }}
-            </q-item-label>
-          </template>
-        </q-item-section>
-        <q-item-section v-show="fork && (!repositoryId || repositoryId !== scope.opt.repository.id)" avatar>
+  <div class="row">
+    <repository-select-field
+      v-if="repositoryFilter"
+      v-model="repository"
+      :show-details="showDetails"
+      :rounded="rounded"
+      :outlined="outlined"
+      :dense="dense"
+      :organisation-id="organisationId"
+      :label="t('repository')"
+      class="inline col-3 q-mr-xs"
+    />
+    <q-select
+      v-model="selection"
+      :rounded="rounded"
+      :outlined="outlined"
+      :dense="dense"
+      hide-bottom-space
+      hide-dropdown-icon
+      use-input
+      emit-value
+      :autofocus="autofocus"
+      class="inline entity-search-input-field col"
+      :placeholder="selection ? '' : label || t('selectThing', { thing: t('entity') })"
+      :options="options"
+      :loading="loading"
+      :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
+      @filter="filterFn"
+      @update:model-value="handleSelectionChanged"
+    >
+      <template #append>
+        <slot name="append">
           <q-btn
-            v-close-popup
-            flat
+            v-show="!loading"
             round
-            icon="content_copy"
-            :title="t('forkToCurrentRepository')"
-            @click.stop="$emit('forkClicked', scope.opt)"
+            dense
+            flat
+            :icon="icon"
+            :title="t('remove')"
+            @click="$emit('btnClicked')"
           />
-        </q-item-section>
-      </q-item>
-    </template>
-    <template #no-option>
-      <q-item>
-        <q-item-section>
-          {{ t('entitySearchInput.emptyResult', { types: t('entity', 2) }) }}
-        </q-item-section>
-      </q-item>
-    </template>
-  </q-select>
+        </slot>
+      </template>
+      <template #selected>
+        <span v-if="selection">
+          <q-icon :name="getIcon(selection)" />
+          {{ getTitle(selection) }}
+        </span>
+      </template>
+      <template #option="scope">
+        <q-item v-bind="scope.itemProps">
+          <q-item-section avatar>
+            <q-icon :name="getIcon(scope.opt)" :title="getIconTooltip(scope.opt)" :class="{ restriction: isRestricted(scope.opt) }" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
+              {{ scope.opt.repository.name }}
+            </q-item-label>
+            <q-item-label>{{ getTitle(scope.opt) }}</q-item-label>
+            <template v-if="showDetails">
+              <q-item-label v-for="(description, index) in getDescriptions(scope.opt)" :key="index" caption class="ellipsis">
+                {{ description }}
+              </q-item-label>
+            </template>
+          </q-item-section>
+          <q-item-section v-show="fork && repositoryId && repositoryId !== scope.opt.repository.id" avatar>
+            <q-btn
+              v-close-popup
+              flat
+              round
+              icon="content_copy"
+              :title="t('forkToCurrentRepository')"
+              @click.stop="$emit('forkClicked', scope.opt)"
+            />
+          </q-item-section>
+        </q-item>
+      </template>
+      <template #no-option>
+        <q-item>
+          <q-item-section>
+            {{ t('entitySearchInput.emptyResult', { types: t('entity', 2) }) }}
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useAlert from 'src/mixins/useAlert'
-import { EntityType, Entity } from '@onto-med/top-api'
+import { EntityType, Entity, Repository } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 
 export default defineComponent({
   name: 'EntitySearchInput',
+  components: {
+    RepositorySelectField
+  },
   props: {
     label: String,
     minLength: {
@@ -107,7 +124,8 @@ export default defineComponent({
     autofocus: Boolean,
     organisationId: String,
     repositoryId: String,
-    fork: Boolean
+    fork: Boolean,
+    repositoryFilter: Boolean
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {
@@ -119,10 +137,11 @@ export default defineComponent({
     const options = ref([] as Entity[])
     const selection = ref(null)
     const loading = ref(false)
+    const repository = ref(undefined as (Repository|undefined))
 
     return {
       t, getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted,
-      options, selection, loading,
+      repository, options, selection, loading,
       async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
         if (val.length < props.minLength || !entityApi) {
           abort()
@@ -133,6 +152,8 @@ export default defineComponent({
         let promise: Promise<AxiosResponse<Entity[]>>
         if (props.organisationId && props.repositoryId) {
           promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, val, props.entityTypes)
+        } else if (repository.value && repository.value.organisation) {
+          promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, val, props.entityTypes)
         } else {
           promise = entityApi.getEntities(undefined, val, props.entityTypes)
         }
@@ -142,7 +163,10 @@ export default defineComponent({
           .finally(() => loading.value = false)
       },
       handleSelectionChanged (entity: Entity) {
-        if (props.clearOnSelect) selection.value = null
+        if (props.clearOnSelect) {
+          selection.value = null
+          repository.value = undefined
+        }
         emit('entitySelected', entity)
       }
     }

@@ -1,59 +1,57 @@
 <template>
-  <q-page>
-    <q-table
-      class="sticky-header-table"
-      :rows="rows"
-      :columns="cols"
-      :loading="loading"
-      :pagination="initialPagination"
-      :filter="filter"
-      :no-data-label="t('noDataPresent')"
-      row-key="id"
-    >
-      <template #top>
-        <q-input v-model="filter" dense debounce="300" color="primary">
-          <template #append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-        <q-space />
-        <q-btn-group>
-          <q-btn
-            v-if="create"
-            color="primary"
-            :disabled="loading"
-            :label="t('createThing', { thing: name })"
-            icon="add"
-            @click="$emit('create-clicked')"
-          />
-          <q-btn color="secondary" :disabled="loading" :label="t('reload')" icon="refresh" @click="$emit('reload-clicked')" />
-        </q-btn-group>
-      </template>
-      <template #header="props">
-        <q-tr :props="props">
-          <q-th
-            v-for="col in props.cols"
-            :key="col.name"
-            :props="props"
-          >
-            {{ col.label }}
-          </q-th>
-        </q-tr>
-      </template>
-      <template #body="props">
-        <q-tr class="cursor-pointer" :props="props" @click="$emit('row-clicked', props.row)">
-          <q-td auto-width>
-            <slot name="actions" :row="props.row" />
-          </q-td>
-          <slot name="row-cells" :row="props.row">
-            <q-td>{{ props.row.name || props.row.id }}</q-td>
-            <q-td>{{ props.row.description }}</q-td>
-            <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
-          </slot>
-        </q-tr>
-      </template>
-    </q-table>
-  </q-page>
+  <q-table
+    class="sticky-header-table"
+    :rows="rows"
+    :columns="cols"
+    :loading="loading"
+    :pagination="initialPagination"
+    :filter="filter"
+    :no-data-label="t('noDataPresent')"
+    row-key="id"
+  >
+    <template #top>
+      <q-input v-model="filter" dense debounce="300" color="primary">
+        <template #append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-space />
+      <q-btn-group>
+        <q-btn
+          v-if="create"
+          color="primary"
+          :disabled="loading"
+          :label="t('createThing', { thing: name })"
+          icon="add"
+          @click="$emit('create-clicked')"
+        />
+        <q-btn color="secondary" :disabled="loading" :label="t('reload')" icon="refresh" @click="$emit('reload-clicked')" />
+      </q-btn-group>
+    </template>
+    <template #header="props">
+      <q-tr :props="props">
+        <q-th
+          v-for="col in props.cols"
+          :key="col.name"
+          :props="props"
+        >
+          {{ col.label }}
+        </q-th>
+      </q-tr>
+    </template>
+    <template #body="props">
+      <q-tr class="cursor-pointer" :props="props" @click="$emit('row-clicked', props.row)">
+        <q-td auto-width>
+          <slot name="actions" :row="props.row" />
+        </q-td>
+        <slot name="row-cells" :row="props.row">
+          <q-td>{{ props.row.name || props.row.id }}</q-td>
+          <q-td>{{ props.row.description }}</q-td>
+          <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
+        </slot>
+      </q-tr>
+    </template>
+  </q-table>
 </template>
 
 <script lang="ts">
