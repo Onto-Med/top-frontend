@@ -11,7 +11,7 @@
     icon="create"
     class="truncate"
   >
-    <q-popup-edit :model-value="null" :cover="false">
+    <q-popup-edit ref="popup" :model-value="null" :cover="false">
       <entity-search-input
         v-if="!disable"
         autofocus
@@ -64,6 +64,7 @@ import { Entity, EntityType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
+import { QPopupEdit } from 'quasar'
 
 export default defineComponent({
   name: 'EntityChip',
@@ -82,7 +83,8 @@ export default defineComponent({
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n();
+    const { t } = useI18n()
+    const popup = ref(null as unknown as QPopupEdit)
     const loading = ref(false)
     const entityStore = useEntity()
     const { getIcon, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
@@ -102,6 +104,7 @@ export default defineComponent({
       if (props.entity)
         state.value = props.entity
       else reload()
+      if (!state.value) popup.value.show()
     })
 
     return {
@@ -110,6 +113,7 @@ export default defineComponent({
       getTitle,
       getDescriptions,
       isRestricted,
+      popup,
       state,
       loading,
 
