@@ -76,7 +76,7 @@
 
           <q-separator />
 
-          <q-card-section class="q-pt-none text-caption">
+          <q-card-section class="q-pt-none q-pr-none q-pb-none text-caption">
             <q-scroll-area class="json-section">
               <pre>{{ local }}</pre>
             </q-scroll-area>
