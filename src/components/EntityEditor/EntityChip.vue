@@ -5,7 +5,7 @@
   />
 
   <q-chip
-    v-else-if="!state || !entityId"
+    v-else-if="!state"
     clickable
     :label="label"
     icon="create"
