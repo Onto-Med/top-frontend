@@ -129,35 +129,26 @@
             <q-toolbar-title class="row items-center">
               <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
               <entity-chip
-                v-for="category in local.superCategories"
-                :key="category.id"
-                :entity-id="category.id"
-                :disable="isOtherVersion"
-                @removeClicked="removeSuperCategory(category.id)"
-                @entityClicked="$emit('entityClicked', $event)"
-              />
-              <q-btn
-                v-show="!showSuperCategoryInput"
-                icon="add"
-                round
-                size="sm"
-                dense
-                :disable="isOtherVersion"
-                :title="t('addThing', { thing: t('superCategory') })"
-                @click="showSuperCategoryInput = true"
-              />
-              <entity-search-input
-                v-show="!isOtherVersion && showSuperCategoryInput"
+                v-for="(category, index) in local.superCategories"
+                :key="index"
                 :organisation-id="organisationId"
                 :repository-id="repositoryId"
-                :label="t('selectThing', { thing: t('category') })"
                 :entity-types="[EntityType.Category]"
-                clear-on-select
-                rounded
-                outlined
-                dense
-                @entitySelected="addSuperCategory"
-                @btnClicked="showSuperCategoryInput = false"
+                :entity-id="category ? category.id : undefined"
+                :disable="isOtherVersion"
+                :label="t('selectThing', { thing: t('category') }) + '...'"
+                @removeClicked="removeSuperCategory(index)"
+                @entity-set="addSuperCategory(index, $event)"
+                @entityClicked="$emit('entityClicked', $event)"
+              />
+              <q-chip
+                icon="add"
+                round
+                clickable
+                :disable="isOtherVersion"
+                :label="t('more')"
+                :title="t('addThing', { thing: t('superCategory') })"
+                @click="local.superCategories.push(undefined)"
               />
             </q-toolbar-title>
           </q-toolbar>
@@ -265,7 +256,6 @@ import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.v
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
-import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UcumCard from 'src/components/UcumCard.vue'
@@ -288,7 +278,6 @@ export default defineComponent({
     UcumCard,
     FormulaInput,
     CodeInput,
-    EntitySearchInput,
     EntityChip
   },
   props: {
@@ -399,20 +388,17 @@ export default defineComponent({
 
       prefillFromVersion,
 
-      addSuperCategory (category: Category): void {
+      addSuperCategory (index: number, category: Category): void {
         const casted = local.value as Category|Phenotype
         if (!casted.superCategories) casted.superCategories = []
-        if (casted.superCategories.findIndex(c => c.id === category.id) === -1)
-          if (casted.id !== category.id) casted.superCategories.push(category)
-        showSuperCategoryInput.value = false
+        if (casted.superCategories.findIndex(c => c && c.id === category.id) === -1)
+          if (casted.id !== category.id) casted.superCategories[index] = category
       },
 
-      removeSuperCategory (id: string): void {
+      removeSuperCategory (index: number): void {
         const casted = local.value as Category|Phenotype
         if (!casted.superCategories) return
-        const index = casted.superCategories.findIndex(c => c.id === id)
-        if (index !== -1)
-          casted.superCategories.splice(index, 1)
+        casted.superCategories.splice(index, 1)
       },
 
       reset: () => {
