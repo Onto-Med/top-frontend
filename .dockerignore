@@ -1,6 +1,6 @@
 .devcontainer
 .quasar
 .vscode
-node_modules
-public
 .env
+node_modules
+Dockerfile
