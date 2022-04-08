@@ -12,7 +12,7 @@
         />
 
         <q-avatar>
-          <img src="/images/logo.svg">
+          <img src="images/logo.svg">
         </q-avatar>
         <q-toolbar-title to="/" shrink class="text-weight-bold">
           <router-link class="brand-link" to="/">
