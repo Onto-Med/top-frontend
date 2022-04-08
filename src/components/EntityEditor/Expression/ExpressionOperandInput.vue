@@ -20,33 +20,17 @@
         </template>
       </entity-chip>
     </div>
-    <div v-else-if="operator && operator.id === 'constant'">
-      <div class="clickable">
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue.constant ? modelValue.constant : '[' + t('constant') + ']' }}
-      </div>
-      <q-popup-edit
-        v-if="!readonly"
-        v-slot="scope"
-        :model-value="modelValue.constant"
-        :cover="false"
-        auto-save
-        @update:model-value="setConstant($event)"
-      >
-        <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set">
-          <template #append>
-            <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
-          </template>
-        </q-input>
-        <q-list dense>
-          <q-item clickable @click="enclose()">
-            <q-item-section v-t="'encloseWithExpression'" />
-          </q-item>
-          <q-item clickable @click="$emit('update:modelValue', undefined)">
-            <q-item-section v-t="'remove'" />
-          </q-item>
-        </q-list>
-      </q-popup-edit>
-    </div>
+    <constant-input
+      v-else-if="operator && operator.id === 'constant'"
+      :model-value="modelValue.constant"
+      :readonly="readonly"
+      :indent-level="indentLevel"
+      :indent="indent"
+      :expand="expand"
+      @update:modelValue="setConstant($event)"
+      @enclose="enclose()"
+      @remove="$emit('update:modelValue', undefined)"
+    />
     <template v-else-if="operator">
       <div
         v-if="prefix"
@@ -155,7 +139,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   Entity,
@@ -168,12 +152,15 @@ import {
 } from '@onto-med/top-api';
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
+import ConstantInput from 'src/components/EntityEditor/Expression/ConstantInput.vue'
+import { QPopupEdit } from 'quasar';
 
 export default defineComponent({
   name: 'FormulaOperandInput',
   components: {
     EntityChip,
-    ExpressionContextMenu
+    ExpressionContextMenu,
+    ConstantInput
   },
   props: {
     modelValue: {
@@ -201,7 +188,7 @@ export default defineComponent({
   emits: ['update:modelValue', 'entityClicked'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, te } = useI18n();
+    const { t, te } = useI18n()
     const flash = ref(false)
     const operator = computed(() =>
       props.operators?.find((o) => o.id === props.modelValue?.operator)
