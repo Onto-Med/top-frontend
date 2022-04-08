@@ -139,7 +139,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch } from 'vue';
+import { defineComponent, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   Entity,
@@ -153,7 +153,6 @@ import {
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 import ConstantInput from 'src/components/EntityEditor/Expression/ConstantInput.vue'
-import { QPopupEdit } from 'quasar';
 
 export default defineComponent({
   name: 'FormulaOperandInput',
