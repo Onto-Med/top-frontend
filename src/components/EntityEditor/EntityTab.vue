@@ -69,15 +69,17 @@
       <q-separator />
 
       <q-dialog v-model="showJson">
-        <q-card>
+        <q-card class="full-width">
           <q-card-section>
             <div v-t="'entityEditor.rawDialog.content'" class="text-h6" />
           </q-card-section>
 
           <q-separator />
 
-          <q-card-section class="q-pt-none scroll json-section text-caption">
-            <pre>{{ local }}</pre>
+          <q-card-section class="q-pt-none text-caption">
+            <q-scroll-area class="json-section">
+              <pre>{{ local }}</pre>
+            </q-scroll-area>
           </q-card-section>
 
           <q-separator />
@@ -429,5 +431,6 @@ export default defineComponent({
 .entity-tab-content
   height: 100%
 .json-section
-  max-height: 80vh
+  height: 60vh
+  width: 100%
 </style>
