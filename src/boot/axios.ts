@@ -19,12 +19,15 @@ export const ExpressionOperatorApiKey: InjectionKey<ExpressionOperatorApi> = Sym
 export const ForkApiKey: InjectionKey<ForkApi> = Symbol('forkApi')
 
 export default boot(({ app }) => {
+  const axiosInstance = axios.create({
+    baseURL: 'http://localhost:8080'
+  })
   app.provide(AxiosKey, axios)
-  app.provide(DefaultApiKey, new DefaultApi())
-  app.provide(EntityApiKey, new EntityApi())
-  app.provide(OrganisationApiKey, new OrganisationApi())
-  app.provide(RepositoryApiKey, new RepositoryApi())
-  app.provide(ExpressionOperatorApiKey, new ExpressionOperatorApi())
-  app.provide(ForkApiKey, new ForkApi())
+  app.provide(DefaultApiKey, new DefaultApi(undefined, '', axiosInstance))
+  app.provide(EntityApiKey, new EntityApi(undefined, '', axiosInstance))
+  app.provide(OrganisationApiKey, new OrganisationApi(undefined, '', axiosInstance))
+  app.provide(RepositoryApiKey, new RepositoryApi(undefined, '', axiosInstance))
+  app.provide(ExpressionOperatorApiKey, new ExpressionOperatorApi(undefined, '', axiosInstance))
+  app.provide(ForkApiKey, new ForkApi(undefined, '', axiosInstance))
 });
 

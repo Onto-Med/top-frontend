@@ -2,5 +2,6 @@
 .quasar
 .vscode
 .env
+.git
 node_modules
 Dockerfile
