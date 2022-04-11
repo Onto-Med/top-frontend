@@ -11,7 +11,7 @@ RUN quasar build
 
 FROM nginx:alpine as production-stage
 COPY --from=build-stage /app/dist/spa /opt/top-frontend
-RUN echo "cp -r /opt/top-frontend/* /usr/share/nginx/html; if [[ ! -z \"\${API_URL}\" ]]; then sed -i \"s|http://localhost:8080|\${API_URL}|g\" /usr/share/nginx/html/js/app.*.js; fi" \
+RUN echo "cp -r /opt/top-frontend/* /usr/share/nginx/html; if [[ ! -z \"\${API_URL}\" ]]; then sed -i \"s|http\\://localhost\\:8080|\${API_URL}|g\" /usr/share/nginx/html/js/app.*.js; fi" \
   >> /docker-entrypoint.d/set_api_url.sh && \
   chmod u+x /docker-entrypoint.d/set_api_url.sh
 
