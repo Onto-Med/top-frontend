@@ -82,7 +82,7 @@ export default {
   noDataPresent: 'No data present',
   close: 'Close',
   author: 'Author',
-  restore: 'Wiederherstellen',
+  restore: 'Restore',
   restoreThing: 'Restore {thing}',
   thingRestored: '{thing} has been restored',
   prefillWithThing: 'Prefill with {thing}',
