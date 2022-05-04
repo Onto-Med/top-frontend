@@ -156,21 +156,36 @@
           </q-toolbar>
         </q-card>
 
-        <localized-text-input
-          v-model="local.titles"
-          unique
-          expanded
-          :readonly="isOtherVersion"
-          :required="true"
-          :label="t('title', 2)"
-          :help-text="t('entityEditor.titlesHelp')"
-        />
+        <div class="row q-gutter-x-md q-mx-none">
+          <localized-text-input
+            v-model="local.titles"
+            unique
+            expanded
+            :readonly="isOtherVersion"
+            :required="true"
+            :label="t('title', 2)"
+            :help-text="t('entityEditor.titlesHelp')"
+            class="col"
+          />
 
-        <data-type-select
-          v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType)"
-          v-model="local.dataType"
-          :readonly="isOtherVersion"
-        />
+          <q-card v-show="isRestricted(local) || hasDataType(local)" class="col-4">
+            <q-card-section>
+              <q-input
+                v-if="isRestricted(local)"
+                v-model="local.score"
+                type="number"
+                :readonly="isOtherVersion"
+                :label="t('score')"
+              />
+
+              <data-type-select
+                v-if="hasDataType(local)"
+                v-model="local.dataType"
+                :readonly="isOtherVersion"
+              />
+            </q-card-section>
+          </q-card>
+        </div>
 
         <formula-input
           v-if="local.entityType === EntityType.DerivedPhenotype"
@@ -201,14 +216,6 @@
           :organisation-id="organisationId"
           :repository-id="repositoryId"
           @entity-clicked="$emit('entityClicked', $event)"
-        />
-
-        <q-input
-          v-if="[EntityType.SingleRestriction, EntityType.CombinedRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
-          v-model="local.score"
-          type="number"
-          :readonly="isOtherVersion"
-          :label="t('score')"
         />
 
         <ucum-card
@@ -367,6 +374,7 @@ export default defineComponent({
       d,
       getTitle,
       isRestricted,
+      hasDataType,
 
       local,
       showJson,
