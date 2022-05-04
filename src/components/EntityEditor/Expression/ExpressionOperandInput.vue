@@ -98,6 +98,14 @@
       </template>
 
       <template v-if="!readonly && operator && operator.type === TypeEnum.Multary">
+        <div
+          v-if="operandCount != 0 && !infix"
+          :class="{ hover: hover }"
+          @mouseover="hover = true"
+          @mouseleave="hover = false"
+        >
+          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '' }},
+        </div>
         {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<q-chip icon="add" clickable :label="t('more')" :title="t('addMoreOperands')" @click="handleOperandUpdate(operandCount, {})" />
       </template>
 
