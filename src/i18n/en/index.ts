@@ -65,6 +65,7 @@ export default {
   negated: 'Negated',
   quantor: 'Quantor|Quantors',
   loading: 'Loading',
+  logOut: 'Log out',
   unnamedCategory: 'Unnamed category',
   unnamedPhenotype: 'Unnamed phenotype',
   unnamedRestriction: 'Unnamed restriction',
