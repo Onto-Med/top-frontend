@@ -20,8 +20,10 @@ export default boot(async ({ app }) => {
   return new Promise(resolve => {
     app.use(VueKeyCloak, {
       init: {
-        onLoad: 'login-required',
-        checkLoginIframe: false
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+        checkLoginIframe: false,
+        'public-client': true
       },
       config: {
         url: 'http://127.0.0.1:8080/',
