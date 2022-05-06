@@ -62,7 +62,7 @@
             v-if="keycloak.authenticated"
             :label="t('logOut')"
             class="q-ml-sm"
-            @click="keycloak.logout()"
+            @click="keycloak.logout({ redirectUri: 'http://127.0.0.1/' })"
           />
           <q-btn
             v-else
