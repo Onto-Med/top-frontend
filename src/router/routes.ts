@@ -9,7 +9,10 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'home',
         path: '/',
-        component: () => import('pages/Home.vue')
+        component: () => import('pages/Home.vue'),
+        meta: {
+          allowAnonymous: true
+        }
       },
       {
         name: 'editor',
@@ -31,6 +34,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/Error404.vue'),
+    meta: {
+      allowAnonymous: true
+    }
   },
 ];
 
