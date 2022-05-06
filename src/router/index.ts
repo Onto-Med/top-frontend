@@ -37,6 +37,10 @@ export default route(function (/* { store, ssrContext } */) {
 
   Router.beforeEach((to) => {
     const entityStore = useEntity()
+    if (!to.meta.allowAnonymous) {
+      if (entityStore.keycloak && !entityStore.keycloak.authenticated)
+        void entityStore.keycloak.login()
+    }
     entityStore.organisationId = to.params.organisationId as string | undefined
     entityStore.setRepository(to.params.repositoryId as string | undefined)
       .catch((e: AxiosError) => console.log(e.message))

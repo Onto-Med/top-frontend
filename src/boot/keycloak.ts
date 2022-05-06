@@ -1,10 +1,8 @@
 import { boot } from 'quasar/wrappers'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import axios from 'axios'
-import { InjectionKey } from 'vue'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-
-export const KeycloakKey: InjectionKey<KeycloakInstance> = Symbol('keycloak')
+import { useEntity } from 'src/pinia/entity'
 
 export default boot(async ({ app }) => {
   function tokenInterceptor () {
@@ -32,7 +30,8 @@ export default boot(async ({ app }) => {
       },
       onReady: (keycloak: KeycloakInstance) => {
         void tokenInterceptor()
-        app.provide(KeycloakKey, keycloak)
+        const entityStore = useEntity()
+        entityStore.keycloak = keycloak
         resolve()
       }
     })

@@ -1,3 +1,4 @@
+import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
@@ -15,7 +16,8 @@ export const useEntity = defineStore('entity', {
       repositoryId: undefined as string|undefined,
       repository: undefined as Repository|undefined,
       entities: [] as Entity[],
-      operators: new Map<string, ExpressionOperator[]>()
+      operators: new Map<string, ExpressionOperator[]>(),
+      keycloak: undefined as KeycloakInstance|undefined
     }
   },
   actions: {
