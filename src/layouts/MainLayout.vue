@@ -84,7 +84,7 @@
       <q-scroll-area class="fit">
         <q-list padding>
           <NavbarLink
-            v-for="link in links"
+            v-for="link in links.filter(l => !l.isHidden)"
             :key="link.title"
             v-bind="link"
           />
@@ -146,6 +146,7 @@ export default defineComponent({
     const leftDrawerOpen = ref(true)
     const $q = useQuasar()
     const { alert } = useAlert()
+    const keycloak = entityStore.keycloak
 
     const linksList = computed(() => [
       {
@@ -157,13 +158,15 @@ export default defineComponent({
         title: t('organisation', 2),
         icon: 'groups',
         caption: t('collaborativeWork'),
-        routeName: 'organisations'
+        routeName: 'organisations',
+        isHidden: !keycloak?.authenticated
       },
       {
         title: t('repository', 2),
         icon: 'tab',
         caption: t('developPhenotype', 2),
-        routeName: 'repositories'
+        routeName: 'repositories',
+        isHidden: !keycloak?.authenticated
       }
     ])
 
@@ -174,7 +177,7 @@ export default defineComponent({
       links: linksList,
       leftDrawerOpen,
       fabGithub,
-      keycloak: entityStore.keycloak,
+      keycloak,
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value
