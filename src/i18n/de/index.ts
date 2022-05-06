@@ -29,6 +29,7 @@ export default {
   oneThingPerThing: 'Es kann nur ein {thing1} pro {thing2} existieren!',
   language: 'Sprache|Sprachen',
   logOut: 'Abmelden',
+  logIn: 'Anmelden',
   remove: 'Entfernen',
   delete: 'Löschen',
   score: 'Ergebnis',
