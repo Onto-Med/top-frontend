@@ -123,12 +123,11 @@ import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import packageInfo from '../../package.json'
-import { defineComponent, ref, computed, inject } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { Entity } from '@onto-med/top-api'
 import { useQuasar } from 'quasar'
 import { fabGithub } from '@quasar/extras/fontawesome-v5'
 import useAlert from 'src/mixins/useAlert'
-import { KeycloakKey } from 'src/boot/keycloak'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -175,7 +174,7 @@ export default defineComponent({
       links: linksList,
       leftDrawerOpen,
       fabGithub,
-      keycloak: inject(KeycloakKey),
+      keycloak: entityStore.keycloak,
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value
