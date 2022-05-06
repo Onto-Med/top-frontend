@@ -57,12 +57,20 @@
 
         <language-switch />
 
-        <q-btn
-          v-if="keycloak && keycloak.authenticated"
-          :label="t('logOut')"
-          class="q-ml-sm"
-          @click="keycloak.logout()"
-        />
+        <div v-if="keycloak">
+          <q-btn
+            v-if="keycloak.authenticated"
+            :label="t('logOut')"
+            class="q-ml-sm"
+            @click="keycloak.logout()"
+          />
+          <q-btn
+            v-else
+            :label="t('logIn')"
+            class="q-ml-sm"
+            @click="keycloak.login()"
+          />
+        </div>
       </q-toolbar>
     </q-header>
 
