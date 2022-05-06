@@ -28,6 +28,7 @@ export default {
   addThing: '{thing} hinzufügen',
   oneThingPerThing: 'Es kann nur ein {thing1} pro {thing2} existieren!',
   language: 'Sprache|Sprachen',
+  logOut: 'Abmelden',
   remove: 'Entfernen',
   delete: 'Löschen',
   score: 'Ergebnis',
