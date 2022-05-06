@@ -4,7 +4,7 @@ import axios from 'axios'
 import { InjectionKey } from 'vue'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 
-export const KeycloakKey: InjectionKey<unknown> = Symbol('keycloak')
+export const KeycloakKey: InjectionKey<KeycloakInstance> = Symbol('keycloak')
 
 export default boot(async ({ app }) => {
   function tokenInterceptor () {
