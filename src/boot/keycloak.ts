@@ -1,20 +1,9 @@
 import { boot } from 'quasar/wrappers'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
-import axios from 'axios'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 import { useEntity } from 'src/pinia/entity'
 
 export default boot(async ({ app }) => {
-  function tokenInterceptor () {
-    axios.interceptors.request.use(config => {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access
-      config.headers.Authorization = `Bearer ${app.config.globalProperties.$keycloak.token}`
-      return config
-    }, error => {
-      return Promise.reject(error)
-    })
-  }
-
   return new Promise(resolve => {
     app.use(VueKeyCloak, {
       init: {
@@ -24,12 +13,11 @@ export default boot(async ({ app }) => {
         'public-client': true
       },
       config: {
-        url: 'http://127.0.0.1:8080/',
+        url: 'http://127.0.0.1:8081/',
         realm: 'myrealm',
         clientId: 'app-vue'
       },
       onReady: (keycloak: KeycloakInstance) => {
-        void tokenInterceptor()
         const entityStore = useEntity()
         entityStore.keycloak = keycloak
         resolve()
