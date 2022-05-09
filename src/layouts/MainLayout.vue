@@ -60,13 +60,46 @@
         <div v-if="keycloak">
           <q-btn
             v-if="keycloak.authenticated"
-            :label="t('logOut')"
+            flat
+            dense
+            rounded
+            no-caps
+            :title="t('account')"
+            icon="account_circle"
             class="q-ml-sm"
-            @click="keycloak.logout({ redirectUri: 'http://127.0.0.1/' })"
-          />
+          >
+            <q-menu>
+              <div class="row no-wrap q-pa-md">
+                <div class="column">
+                  <div class="text-h6 q-mb-md">
+                    {{ t('setting', 2) }}
+                  </div>
+                </div>
+                <q-separator vertical inset class="q-mx-lg" />
+                <div class="column items-center">
+                  <q-avatar icon="person" size="72px" />
+                  <div class="text-subtitle1 q-mt-md q-mb-xs">
+                    {{ keycloak.tokenParsed.preferred_username }}
+                  </div>
+                  <q-btn
+                    v-close-popup
+                    color="primary"
+                    :label="t('logOut')"
+                    push
+                    size="sm"
+                    @click="keycloak.logout({ redirectUri: 'http://127.0.0.1/' })"
+                  />
+                </div>
+              </div>
+            </q-menu>
+          </q-btn>
           <q-btn
             v-else
-            :label="t('logIn')"
+            flat
+            dense
+            round
+            icon="login"
+            :title="t('logIn')"
             class="q-ml-sm"
             @click="keycloak.login()"
           />

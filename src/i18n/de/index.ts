@@ -11,6 +11,7 @@ export default {
   combined_restriction: 'Kombinierte Restriktion|Kombinierte Restriktionen',
   derived_restriction: 'Abgeleitete Restriktion|Abgeleitete Restriktionen',
   id: 'ID',
+  account: 'Nutzerkonto',
   dataType: 'Datentyp|Datentypen',
   number: 'Zahl|Zahlen',
   boolean: 'Boolesch',
