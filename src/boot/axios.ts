@@ -31,6 +31,8 @@ export default boot(({ app }) => {
     return Promise.reject(error)
   })
 
+  app.config.globalProperties.$axios = axiosInstance
+
   app.provide(AxiosKey, axios)
   app.provide(DefaultApiKey, new DefaultApi(undefined, '', axiosInstance))
   app.provide(EntityApiKey, new EntityApi(undefined, '', axiosInstance))
