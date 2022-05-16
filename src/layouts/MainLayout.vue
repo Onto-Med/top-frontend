@@ -80,7 +80,7 @@
                 <q-separator vertical inset class="q-mx-lg" />
                 <div class="column items-center">
                   <q-avatar icon="person" size="72px" />
-                  <div class="text-subtitle1 q-mt-md q-mb-xs">
+                  <div class="text-subtitle1 q-mb-xs">
                     {{ keycloak.tokenParsed.preferred_username }}
                   </div>
                   <q-btn
