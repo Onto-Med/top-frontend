@@ -25,7 +25,7 @@
           color="primary"
           :label="t('save')"
           :disabled="!hasUnsavedChanges && !isNew"
-          @click="save"
+          @click="save()"
         />
         <q-btn
           v-if="isOtherVersion"
@@ -124,131 +124,26 @@
       />
     </div>
 
-    <q-scroll-area class="col entity-tab-content">
-      <div class="q-gutter-md q-mt-none q-px-md q-pb-xl">
-        <q-card>
-          <q-toolbar v-if="!isRestricted(entity)" class="q-my-none">
-            <q-toolbar-title class="row items-center">
-              <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
-              <entity-chip
-                v-for="(category, index) in local.superCategories"
-                :key="index"
-                :organisation-id="organisationId"
-                :repository-id="repositoryId"
-                :entity-types="[EntityType.Category]"
-                :entity-id="category ? category.id : undefined"
-                :disable="isOtherVersion"
-                :label="t('selectThing', { thing: t('category') }) + '...'"
-                @removeClicked="removeSuperCategory(index)"
-                @entity-set="addSuperCategory(index, $event)"
-                @entityClicked="$emit('entityClicked', $event)"
-              />
-              <q-chip
-                icon="add"
-                round
-                clickable
-                :disable="isOtherVersion"
-                :label="t('more')"
-                :title="t('addThing', { thing: t('superCategory') })"
-                @click="local.superCategories.push(undefined)"
-              />
-            </q-toolbar-title>
-          </q-toolbar>
-        </q-card>
-
-        <div class="row q-gutter-x-md q-mx-none">
-          <localized-text-input
-            v-model="local.titles"
-            unique
-            expanded
-            :readonly="isOtherVersion"
-            :required="true"
-            :label="t('title', 2)"
-            :help-text="t('entityEditor.titlesHelp')"
-            class="col"
-          />
-
-          <q-card v-show="isRestricted(local) || hasDataType(local)" class="col-4">
-            <q-card-section>
-              <q-input
-                v-if="isRestricted(local)"
-                v-model="local.score"
-                type="number"
-                :readonly="isOtherVersion"
-                :label="t('score')"
-              />
-
-              <data-type-select
-                v-if="hasDataType(local)"
-                v-model="local.dataType"
-                :readonly="isOtherVersion"
-              />
-            </q-card-section>
-          </q-card>
-        </div>
-
-        <formula-input
-          v-if="local.entityType === EntityType.DerivedPhenotype"
-          v-model="local.expression"
-          expanded
-          :readonly="isOtherVersion"
-          :label="t('formula')"
-          :help-text="t('entityEditor.formulaHelp')"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          @entity-clicked="$emit('entityClicked', $event)"
-        />
-
-        <restriction-input
-          v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(local.entityType)"
-          :key="restrictionKey"
-          v-model="local.restriction"
-          expanded
-          :readonly="isOtherVersion"
-        />
-
-        <expression-input
-          v-if="local.entityType === EntityType.CombinedRestriction"
-          v-model="local.expression"
-          expanded
-          :readonly="isOtherVersion"
-          :label="t('expression')"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          @entity-clicked="$emit('entityClicked', $event)"
-        />
-
-        <ucum-card
-          v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(local.entityType) && local.dataType === DataType.Number"
-          v-model="local.units"
-          :readonly="isOtherVersion"
-          :expanded="local.units && local.units.length > 0"
-        />
-
-        <localized-text-input
-          v-model="local.synonyms"
-          :readonly="isOtherVersion"
-          :label="t('synonym', 2)"
-          :help-text="t('entityEditor.synonymsHelp')"
-          :expanded="local.synonyms && local.synonyms.length > 0"
-        />
-        <localized-text-input
-          v-model="local.descriptions"
-          text-area
-          rows="3"
-          :readonly="isOtherVersion"
-          :label="t('description', 2)"
-          :help-text="t('entityEditor.descriptionsHelp')"
-          :expanded="local.description && local.descriptions.length > 0"
-        />
-
-        <code-input
-          v-model="local.codes"
-          :readonly="isOtherVersion"
-          :expanded="local.codes && local.codes.length > 0"
-        />
-      </div>
-    </q-scroll-area>
+    <entity-form
+      v-model:titles="local.titles"
+      v-model:synonyms="local.synonyms"
+      v-model:descriptions="local.descriptions"
+      v-model:data-type="local.dataType"
+      v-model:expression="local.expression"
+      v-model:units="local.units"
+      v-model:score="local.score"
+      v-model:superCategories="local.superCategories"
+      :entity-id="local.id"
+      :entity-type="local.entityType"
+      :version="version"
+      :repository-id="repositoryId"
+      :organisation-id="organisationId"
+      :readonly="isOtherVersion"
+      @entity-clicked="$emit('entityClicked', $event)"
+      @add-super-category="local.superCategories.push(undefined)"
+      @set-super-category="setSuperCategory"
+      @remove-super-category="removeSuperCategory"
+    />
 
     <q-inner-loading
       :showing="loading"
@@ -260,16 +155,9 @@
 <script lang="ts">
 import { ref, computed, defineComponent, watch, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, Entity, Category, Phenotype } from '@onto-med/top-api'
-import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
-import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
-import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
-import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
+import { EntityType, DataType, Category, Phenotype } from '@onto-med/top-api'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
-import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
-import UcumCard from 'src/components/UcumCard.vue'
-import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
-import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
+import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
@@ -279,19 +167,12 @@ import { EntityApiKey } from 'src/boot/axios'
 export default defineComponent({
   name: 'EntityTab',
   components: {
-    LocalizedTextInput,
-    DataTypeSelect,
-    RestrictionInput,
-    ExpressionInput,
     VersionHistoryDialog,
-    UcumCard,
-    FormulaInput,
-    CodeInput,
-    EntityChip
+    EntityForm
   },
   props: {
     entity: {
-      type: Object as () => Entity,
+      type: Object as () => Category|Phenotype,
       required: true
     },
     version: Number,
@@ -308,8 +189,8 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
-    const clone = (value: Entity) =>
-      JSON.parse(JSON.stringify(value)) as Entity
+    const clone = (value: Category|Phenotype) =>
+      JSON.parse(JSON.stringify(value)) as Category|Phenotype
     const equals = (expected: unknown, actual: unknown): boolean => 
       JSON.stringify(expected) === JSON.stringify(actual)
 
@@ -330,13 +211,13 @@ export default defineComponent({
 
     watch(
       () => props.entity,
-      (value: Entity) => {
+      (value: Category|Phenotype) => {
         local.value = clone(value)
       },
       { deep: true }
     )
 
-    const prefillFromVersion = (entity: Entity): void => {
+    const prefillFromVersion = (entity: Category|Phenotype): void => {
       local.value = clone(entity)
       restrictionKey.value++
       void router.replace({
@@ -347,6 +228,26 @@ export default defineComponent({
       emit('changeVersion', entity.version)
     }
 
+    const hasUnsavedChanges = computed(() => {
+      const unsavedChanges = !equals(local.value, props.entity)
+      emit('change', unsavedChanges || isNew.value)
+      return unsavedChanges
+    })
+
+    const isValid = computed((): boolean => {
+      var result = true
+
+      result &&= local.value.titles != undefined && local.value.titles.filter(t => t.lang && t.text).length > 0
+      result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
+      result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
+      
+      result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
+      result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined || local.value.entityType === EntityType.CombinedRestriction
+      result &&= !hasExpression(local.value) || local.value.expression !== undefined
+
+      return result
+    })
+
     onMounted(() => {
       if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
       loading.value = true
@@ -355,19 +256,6 @@ export default defineComponent({
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
     })
-
-    const validate = (): boolean => {
-      var result = true
-
-      result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
-      result &&= local.value.titles != undefined && local.value.titles.filter(t => t.lang && t.text).length > 0
-      result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
-      result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
-      result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined || local.value.entityType === EntityType.CombinedRestriction
-      result &&= !hasExpression(local.value) || local.value.expression !== undefined
-
-      return result
-    }
 
     return {
       t,
@@ -390,15 +278,11 @@ export default defineComponent({
 
       isOtherVersion: computed(() => local.value.version != props.entity.version),
 
-      hasUnsavedChanges: computed(() => {
-        const unsavedChanges = !equals(local.value, props.entity)
-        emit('change', unsavedChanges || isNew.value)
-        return unsavedChanges
-      }),
+      hasUnsavedChanges,
 
       prefillFromVersion,
 
-      addSuperCategory (index: number, category: Category): void {
+      setSuperCategory (index: number, category: Category): void {
         const casted = local.value as Category|Phenotype
         if (!casted.superCategories) casted.superCategories = []
         if (casted.superCategories.findIndex(c => c && c.id === category.id) === -1)
@@ -422,7 +306,7 @@ export default defineComponent({
       },
 
       save: () => {
-        if (validate()) {
+        if (hasUnsavedChanges.value && isValid.value) {
           emit('update:entity', local.value)
           versionHistoryDialogKey.value++
         } else
@@ -433,11 +317,14 @@ export default defineComponent({
 })
 </script>
 
+<style lang="sass">
+.entity-tab-content
+  height: 100%
+</style>
+
 <style lang="sass" scoped>
 .entity-tab-header
   width: 100%
-.entity-tab-content
-  height: 100%
 .json-section
   height: 60vh
   width: 100%
