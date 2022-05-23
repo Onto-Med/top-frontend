@@ -64,7 +64,7 @@
               </q-item-label>
             </template>
           </q-item-section>
-          <q-item-section v-show="fork && repositoryId && repositoryId !== scope.opt.repository.id" avatar>
+          <q-item-section v-show="fork && repositoryId && repositoryId !== scope.opt.repository.id && scope.opt.repository.primary" avatar>
             <q-btn
               v-close-popup
               flat
