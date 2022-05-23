@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         name: 'editor',
-        path: '/:organisationId/:repositoryId/editor/:entityId?',
+        path: '/:organisationId/:repositoryId/:entityId?',
         props: route => {
           const version = Number.parseInt(route.query.version as string, 10)
           return { entityId: route.params.entityId, version: version }
