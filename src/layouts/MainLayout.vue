@@ -32,7 +32,6 @@
             clear-on-select
             show-details
             fork
-            :repository-filter="keycloak.authenticated"
             class="q-mr-sm fit"
             @entity-selected="routeToEntity"
             @fork-clicked="forkEntity"
