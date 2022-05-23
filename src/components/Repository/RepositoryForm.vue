@@ -2,10 +2,9 @@
   <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
     <q-card>
       <q-card-section>
-        <div v-if="state.createdAt" class="text-h6">
+        <div v-if="!isNew" class="text-h6">
           {{ t('editThing', { thing: t('repository') }) }}
           <q-btn
-            v-show="state.createdAt"
             dense
             color="red"
             icon="delete"
@@ -19,11 +18,29 @@
         </div>
       </q-card-section>
 
+      <q-separator />
+
       <q-card-section>
-        <q-input :model-value="state.id" :readonly="state.createdAt != null" type="text" :label="t('id')" @update:model-value="state.id = $event" />
-        <q-input :model-value="state.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
-        <q-input :model-value="state.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
+        <q-input v-model="state.id" :readonly="!isNew" type="text" :label="t('id')" />
+        <q-item :v-ripple="isNew" :tag="isNew ? 'label' : 'div'" class="q-pl-none">
+          <q-item-section avatar>
+            <q-toggle v-model="state.primary" :disable="!isNew" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label v-t="'primary'" />
+            <q-item-label v-t="'primaryRepositoryDescription'" caption />
+          </q-item-section>
+        </q-item>
       </q-card-section>
+
+      <q-separator />
+
+      <q-card-section>
+        <q-input v-model="state.name" type="text" :label="t('name')" />
+        <q-input v-model="state.description" type="textarea" :label="t('description')" />
+      </q-card-section>
+
+      <q-separator />
 
       <q-card-actions align="right">
         <q-btn flat :label="t('save')" color="primary" @click="$emit('update:model-value', state)" />
@@ -55,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue'
+import { defineComponent, ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Repository } from '@onto-med/top-api'
 
@@ -86,6 +103,7 @@ export default defineComponent({
     return {
       t,
       state,
+      isNew: computed(() => state.value.createdAt == null),
       showDeleteDialog: showDeleteDialog
     }
   }

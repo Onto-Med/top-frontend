@@ -62,6 +62,8 @@ export default {
   enumeration: 'Enumeration|Enumerations',
   valueRange: 'Value range|Value ranges',
   pleaseWait: 'Please wait',
+  primary: 'Primary',
+  primaryRepositoryDescription: 'Primary repositories are public. Their content can be forked into private repositories and they support pull requests.',
   reload: 'Reload',
   dismiss: 'Dismiss',
   notFound: 'Not found',

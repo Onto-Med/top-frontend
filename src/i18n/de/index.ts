@@ -64,6 +64,8 @@ export default {
   enumeration: 'Aufzählung|Aufzählungen',
   valueRange: 'Wertebereich|Wertebereiche',
   pleaseWait: 'Bitte warten',
+  primary: 'Primär',
+  primaryRepositoryDescription: 'Primäre Repositorien sind öffentlich. Ihr Inhalt kann in private Repositorien geforkt werden und sie unterstützen Pull-Requests.',
   reload: 'Neu laden',
   dismiss: 'Verwerfen',
   notFound: 'Nicht gefunden',
