@@ -135,9 +135,7 @@
 
       <forking-dialog
         v-model:show="showForking"
-        :entity-id="local.id"
-        :organisation-id="organisationId"
-        :repository-id="repositoryId"
+        :entity="entity"
         @entity-clicked="$emit('entityClicked', $event)"
       />
     </div>

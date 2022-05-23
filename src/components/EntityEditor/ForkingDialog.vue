@@ -58,16 +58,8 @@ export default defineComponent({
       type: Boolean,
       required: true
     },
-    entityId: {
-      type: String,
-      required: true
-    },
-    organisationId: {
-      type: String,
-      required: true
-    },
-    repositoryId: {
-      type: String,
+    entity: {
+      type: Object as () => Entity,
       required: true
     }
   },
@@ -82,10 +74,10 @@ export default defineComponent({
     const forks     = ref([] as Entity[])
 
     const reload = async () => {
-      if (!forkApi) return
+      if (!forkApi || !props.entity || !props.entity.repository || !props.entity.repository.organisation) return
       loading.value = true
 
-      await forkApi.getForks(props.organisationId, props.repositoryId, props.entityId)
+      await forkApi.getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
         .then(r => forks.value = r.data)
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
