@@ -56,6 +56,16 @@
           @click="showVersionHistory = true"
         />
         <q-btn
+          v-show="isForking"
+          flat
+          round
+          dense
+          icon="fork_right"
+          color="primary"
+          :title="t('forkingState')"
+          @click="showForking = true"
+        />
+        <q-btn
           flat
           round
           dense
@@ -122,6 +132,14 @@
         @restore="$emit('restoreVersion', $event)"
         @deleted="reset()"
       />
+
+      <forking-dialog
+        v-model:show="showForking"
+        :entity-id="local.id"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
+        @entity-clicked="$emit('entityClicked', $event)"
+      />
     </div>
 
     <entity-form
@@ -157,6 +175,7 @@ import { ref, computed, defineComponent, watch, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, DataType, Category, Phenotype } from '@onto-med/top-api'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
+import ForkingDialog from 'src/components/EntityEditor/ForkingDialog.vue'
 import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
@@ -168,6 +187,7 @@ export default defineComponent({
   name: 'EntityTab',
   components: {
     VersionHistoryDialog,
+    ForkingDialog,
     EntityForm
   },
   props: {
@@ -267,6 +287,7 @@ export default defineComponent({
       local,
       showJson,
       showVersionHistory,
+      showForking: ref(false),
       loading,
       showClearDialog,
       restrictionKey,
@@ -277,6 +298,7 @@ export default defineComponent({
       isNew,
 
       isOtherVersion: computed(() => local.value.version != props.entity.version),
+      isForking: true,
 
       hasUnsavedChanges,
 

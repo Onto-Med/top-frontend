@@ -135,7 +135,8 @@ export default {
   addMoreOperands: 'Add more operands',
   toggleDarkModel: 'Toggle dark mode',
   sourceCode: 'Source code',
-  fork: 'Fork',
+  fork: 'Fork|Forks',
+  forkingState: 'Forking status',
   forkToCurrentRepository: 'Fork entity into current repository.',
   entityEditor: {
     rawBtn: {

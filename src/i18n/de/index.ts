@@ -135,7 +135,8 @@ export default {
   addMoreOperands: 'Weitere Operatoren hinzufügen',
   toggleDarkMode: 'Dunkelmodus umschalten',
   sourceCode: 'Quellcode',
-  fork: 'Fork',
+  fork: 'Fork|Forks',
+  forkingState: 'Forking Status',
   forkToCurrentRepository: 'Entität in das aktuelle Repositorium übernehmen.',
   entityEditor: {
     rawBtn: {
