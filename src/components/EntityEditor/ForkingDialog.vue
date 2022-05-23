@@ -74,7 +74,7 @@ export default defineComponent({
     const forks     = ref([] as Entity[])
 
     const reload = async () => {
-      if (!forkApi || !props.entity || !props.entity.repository || !props.entity.repository.organisation) return
+      if (!forkApi || !props.entity || !props.entity.id || !props.entity.repository || !props.entity.repository.organisation) return
       loading.value = true
 
       await forkApi.getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
