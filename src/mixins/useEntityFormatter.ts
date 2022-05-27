@@ -33,8 +33,8 @@ export default function (this: void) {
     isPhenotype,
     isCategory,
 
-    hasDataType: (entity: Entity) => {
-      return entity.entityType == EntityType.SinglePhenotype
+    hasDataType: (entity: Entity|DataType) => {
+      return (entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity) === EntityType.SinglePhenotype
     },
 
     /**
@@ -124,12 +124,15 @@ export default function (this: void) {
      * @param entity the entity
      * @returns true if entity is restricted
      */
-    isRestricted (this: void, entity: Entity): entity is Phenotype {
-      return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)
+    isRestricted (this: void, entity: Entity|EntityType): entity is Phenotype {
+      return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(
+        entity.hasOwnProperty('id') ? (entity as Entity).entityType : (entity as EntityType)
+      )
     },
 
-    hasExpression (this: void, entity: Entity): entity is Phenotype {
-      return entity.entityType === EntityType.CombinedRestriction || entity.entityType === EntityType.DerivedPhenotype
+    hasExpression (this: void, entity: Entity|EntityType): entity is Phenotype {
+      const entityType = entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity
+      return entityType === EntityType.CombinedRestriction || entityType === EntityType.DerivedPhenotype
     },
 
     restrictionEntityTypes (this: void): EntityType[] {

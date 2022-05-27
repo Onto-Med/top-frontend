@@ -1,12 +1,8 @@
+import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
-
-const entityApi = new EntityApi()
-const expressionOperatorApi = new ExpressionOperatorApi()
-const forkApi = new ForkApi()
-const repositoryApi = new RepositoryApi()
 
 export const useEntity = defineStore('entity', {
   state: () => {
@@ -15,7 +11,12 @@ export const useEntity = defineStore('entity', {
       repositoryId: undefined as string|undefined,
       repository: undefined as Repository|undefined,
       entities: [] as Entity[],
-      operators: new Map<string, ExpressionOperator[]>()
+      operators: new Map<string, ExpressionOperator[]>(),
+      keycloak: undefined as KeycloakInstance|undefined,
+      entityApi: undefined as EntityApi|undefined,
+      expressionOperatorApi: undefined as ExpressionOperatorApi|undefined,
+      repositoryApi: undefined as RepositoryApi|undefined,
+      forkApi: undefined as ForkApi|undefined
     }
   },
   actions: {
@@ -25,12 +26,12 @@ export const useEntity = defineStore('entity', {
           name: 'MissingParametersException',
           message: 'organisationId or repositoryId missing'
         }
-      await entityApi.getEntitiesByRepositoryId(this.organisationId, this.repositoryId)
+      await this.entityApi?.getEntitiesByRepositoryId(this.organisationId, this.repositoryId)
         .then((r) => this.entities = r.data)
     },
 
     async reloadOperatorsByType (type: string) {
-      await expressionOperatorApi?.getExpressionOperators(type)
+      await this.expressionOperatorApi?.getExpressionOperators(type)
         .then((r) => this.operators.set(type, r.data))
     },
 
@@ -46,7 +47,7 @@ export const useEntity = defineStore('entity', {
         return
       }
       if (!this.organisationId) return
-      await repositoryApi.getRepositoryById(this.organisationId, repositoryId, undefined)
+      await this.repositoryApi?.getRepositoryById(this.organisationId, repositoryId, undefined)
         .then(r => this.repository = r.data)
     },
 
@@ -82,9 +83,9 @@ export const useEntity = defineStore('entity', {
     },
 
     async forkEntity (entity: Entity) {
-      if (!forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return
+      if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return
 
-      return forkApi.createFork(
+      return this.forkApi.createFork(
         entity.repository.organisation.id,
         entity.repository.id,
         entity.id,
@@ -104,7 +105,7 @@ export const useEntity = defineStore('entity', {
     },
 
     async saveEntity (entity: Entity) {
-      if (!entity || !entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
@@ -112,9 +113,9 @@ export const useEntity = defineStore('entity', {
 
       let promise: Promise<AxiosResponse<Entity>>
       if (!entity.createdAt) {
-        promise = entityApi.createEntity(this.organisationId, this.repositoryId, entity)
+        promise = this.entityApi.createEntity(this.organisationId, this.repositoryId, entity)
       } else {
-        promise = entityApi.updateEntityById(this.organisationId, this.repositoryId, entity.id as string, entity)
+        promise = this.entityApi.updateEntityById(this.organisationId, this.repositoryId, entity.id as string, entity)
       }
 
       return promise
@@ -139,7 +140,7 @@ export const useEntity = defineStore('entity', {
             name: 'MissingAttributesException',
             message: 'attributesMissing'
           }
-        await entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id)
+        await this.entityApi?.deleteEntityById(this.organisationId, this.repositoryId, entity.id)
           .then(() => this.entities.splice(index, 1))
       } else {
         this.entities.splice(index, 1)
@@ -156,23 +157,23 @@ export const useEntity = defineStore('entity', {
     },
 
     async deleteVersion (entity: Entity) {
-      if (!entity || !entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
     },
 
     async restoreVersion (entity: Entity) {
-      if (!entity || !entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
         .then(() => Object.assign(this.entities.find(e => e.id == entity.id), entity))
     },
 

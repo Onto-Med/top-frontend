@@ -84,7 +84,7 @@ export default defineComponent({
     const organisation = ref<Organisation|undefined>(undefined)
     const repositories = ref<Repository[]>([])
     const newRepository = () => {
-      return { id: (uuidv4 as () => string)() } as Repository
+      return { id: (uuidv4 as () => string)(), primary: false } as Repository
     }
     const repository = ref(newRepository())
 

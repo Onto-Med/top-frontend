@@ -32,7 +32,6 @@
             clear-on-select
             show-details
             fork
-            repository-filter
             class="q-mr-sm fit"
             @entity-selected="routeToEntity"
             @fork-clicked="forkEntity"
@@ -45,17 +44,67 @@
 
         <q-space />
 
-        <q-btn
-          flat
-          dense
-          round
-          :title="t('toggleDarkMode')"
-          :icon="isDarkModeActive ? 'light_mode' : 'dark_mode'"
-          class="q-mr-sm"
-          @click="toggleDarkMode()"
-        />
-
         <language-switch />
+
+        <div v-if="keycloak">
+          <q-btn
+            v-if="keycloak.authenticated"
+            flat
+            dense
+            rounded
+            no-caps
+            :title="t('account')"
+            icon="account_circle"
+            class="q-ml-sm"
+          >
+            <q-menu>
+              <div class="row no-wrap q-pa-md">
+                <div class="column">
+                  <div class="text-h6 q-mb-md">
+                    {{ t('setting', 2) }}
+                  </div>
+                  <q-btn
+                    flat
+                    dense
+                    rounded
+                    no-caps
+                    no-wrap
+                    :title="t('toggleDarkMode')"
+                    :icon="isDarkModeActive ? 'light_mode' : 'dark_mode'"
+                    :label="isDarkModeActive ? t('lightMode') : t('darkMode')"
+                    class="q-mr-sm"
+                    @click="toggleDarkMode()"
+                  />
+                </div>
+                <q-separator vertical inset class="q-mx-lg" />
+                <div class="column items-center">
+                  <q-avatar icon="person" size="72px" />
+                  <div class="text-subtitle1 q-mb-xs">
+                    {{ keycloak.tokenParsed.preferred_username }}
+                  </div>
+                  <q-btn
+                    v-close-popup
+                    color="primary"
+                    :label="t('logOut')"
+                    push
+                    size="sm"
+                    @click="keycloak.logout({ redirectUri: 'http://127.0.0.1/' })"
+                  />
+                </div>
+              </div>
+            </q-menu>
+          </q-btn>
+          <q-btn
+            v-else
+            flat
+            dense
+            round
+            icon="login"
+            :title="t('logIn')"
+            class="q-ml-sm"
+            @click="keycloak.login()"
+          />
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -69,7 +118,7 @@
       <q-scroll-area class="fit">
         <q-list padding>
           <NavbarLink
-            v-for="link in links"
+            v-for="link in links.filter(l => !l.isHidden)"
             :key="link.title"
             v-bind="link"
           />
@@ -131,6 +180,7 @@ export default defineComponent({
     const leftDrawerOpen = ref(true)
     const $q = useQuasar()
     const { alert } = useAlert()
+    const keycloak = entityStore.keycloak
 
     const linksList = computed(() => [
       {
@@ -142,13 +192,15 @@ export default defineComponent({
         title: t('organisation', 2),
         icon: 'groups',
         caption: t('collaborativeWork'),
-        routeName: 'organisations'
+        routeName: 'organisations',
+        isHidden: !keycloak?.authenticated
       },
       {
         title: t('repository', 2),
         icon: 'tab',
         caption: t('developPhenotype', 2),
-        routeName: 'repositories'
+        routeName: 'repositories',
+        isHidden: !keycloak?.authenticated
       }
     ])
 
@@ -159,6 +211,7 @@ export default defineComponent({
       links: linksList,
       leftDrawerOpen,
       fabGithub,
+      keycloak,
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value

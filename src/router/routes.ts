@@ -9,11 +9,14 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'home',
         path: '/',
-        component: () => import('pages/Home.vue')
+        component: () => import('pages/Home.vue'),
+        meta: {
+          allowAnonymous: true
+        }
       },
       {
         name: 'editor',
-        path: '/:organisationId/:repositoryId/editor/:entityId?',
+        path: '/:organisationId/:repositoryId/:entityId?',
         props: route => {
           const version = Number.parseInt(route.query.version as string, 10)
           return { entityId: route.params.entityId, version: version }
@@ -31,6 +34,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/Error404.vue'),
+    meta: {
+      allowAnonymous: true
+    }
   },
 ];
 
