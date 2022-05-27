@@ -13,6 +13,10 @@
 		}
 	},
 
+	"remoteEnv": {
+		"NPM_AUTH_TOKEN": "${NPM_AUTH_TOKEN}"
+	},
+
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"vetur.validation.template": false,
