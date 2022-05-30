@@ -145,6 +145,7 @@
       v-model:synonyms="local.synonyms"
       v-model:descriptions="local.descriptions"
       v-model:data-type="local.dataType"
+      v-model:restriction="local.restriction"
       v-model:expression="local.expression"
       v-model:units="local.units"
       v-model:score="local.score"

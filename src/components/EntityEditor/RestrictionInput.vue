@@ -120,7 +120,6 @@ export default defineComponent({
     quantors: Array,
     expanded: Boolean,
     showHelp: Boolean,
-    dataType: String as () => DataType,
     readonly: Boolean
   },
   emits: ['update:modelValue'],
