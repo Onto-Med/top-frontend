@@ -23,9 +23,9 @@ export default boot(({ app }) => {
     baseURL: 'http://localhost:8080'
   })
   axiosInstance.interceptors.request.use(config => {
-    const token = (app.config.globalProperties.$keycloak as KeycloakInstance).token
-    if (token)
-      (config.headers as Record<string, unknown>).Authorization = `Bearer ${token}`
+    const keycloak = (app.config.globalProperties.$keycloak as KeycloakInstance)
+    if (keycloak && keycloak.token)
+      (config.headers as Record<string, unknown>).Authorization = `Bearer ${keycloak.token}`
     return config
   }, error => {
     return Promise.reject(error)
