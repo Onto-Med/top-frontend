@@ -12,6 +12,7 @@ RUN yarn
 RUN quasar build
 
 FROM nginx:alpine as production-stage
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /app/dist/spa /opt/top-frontend
 RUN echo "cp -r /opt/top-frontend/* /usr/share/nginx/html;" >> /docker-entrypoint.d/top-01-copy-files.sh && \
   echo "if [[ ! -z \"\${API_URL}\" ]]; then sed -i \"s|http\\://127.0.0.1\\:8080|\${API_URL}|g\" /usr/share/nginx/html/js/app.*.js; fi" >> /docker-entrypoint.d/top-02-set-api-url.sh && \
