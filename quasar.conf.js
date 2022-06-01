@@ -58,6 +58,10 @@ module.exports = configure(function (ctx) {
     build: {
       vueRouterMode: 'history', // available values: 'hash', 'history'
 
+      env: {
+        AUTH_ENABLED: process.env.AUTH_ENABLED == 'false' ? false : true
+      },
+
       // transpile: false,
       // publicPath: '/',
 
