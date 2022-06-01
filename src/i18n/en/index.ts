@@ -100,6 +100,7 @@ export default {
   developPhenotype: 'Develop Phenotype|Develop Phenotypes',
   repository: 'Repository|Repositories',
   organisation: 'Organisation|Organisations',
+  superOrganisation: 'Super organisation|Super organisations',
   collaborativeWork: 'Collaborative Work',
   formula: 'Formula|Formulas',
   closeAll: 'Close all',
@@ -173,7 +174,11 @@ export default {
     }
   },
   organisationPage: {
-    description: 'Manage your organisations or create new ones.'
+    description: 'Manage your organisations or create new ones.',
+    confirmDelete: 'Do you really want to delete this organisation?',
+  },
+  repositoryPage: {
+    confirmDelete: 'Do you really want to delete this repository?'
   },
   entityTree: {
     listDescription: 'Switch between the tree view with categories and the list view without categories.',

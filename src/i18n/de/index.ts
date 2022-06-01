@@ -100,6 +100,7 @@ export default {
   developPhenotype: 'Phänotyp entwickeln|Phänotypen entwickeln',
   repository: 'Repositorium|Repositorien',
   organisation: 'Organisation|Organisationen',
+  superOrganisation: 'Super Organisation|Super Organisationen',
   collaborativeWork: 'Kollaborative Arbeit',
   formula: 'Formel|Formeln',
   closeAll: 'Alle schließen',
@@ -176,7 +177,11 @@ export default {
     }
   },
   organisationPage: {
-    description: 'Verwalten Sie Ihre Organisationen oder erstellen Sie neue.'
+    description: 'Verwalten Sie Ihre Organisationen oder erstellen Sie neue.',
+    confirmDelete: 'Möchten Sie diese Organisation wirklich löschen?',
+  },
+  repositoryPage: {
+    confirmDelete: 'Möchten Sie dieses Repositorium wirklich löschen?'
   },
   entityTree: {
     listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und der Listenansicht ohne Kategorien.',

@@ -41,7 +41,7 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="warning_amber" color="red" text-color="white" />
-          <span v-t="'confirmDelete'" class="q-ml-sm" />
+          <span v-t="'organisationPage.confirmDelete'" class="q-ml-sm" />
         </q-card-section>
 
         <q-separator />
