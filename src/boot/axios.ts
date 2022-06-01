@@ -20,7 +20,7 @@ export const ForkApiKey: InjectionKey<ForkApi> = Symbol('forkApi')
 
 export default boot(({ app }) => {
   const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://127.0.0.1:8080'
   })
   axiosInstance.interceptors.request.use(config => {
     const keycloak = (app.config.globalProperties.$keycloak as KeycloakInstance)

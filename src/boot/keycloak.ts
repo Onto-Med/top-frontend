@@ -15,8 +15,8 @@ export default boot(async ({ app }) => {
         },
         config: {
           url: 'http://127.0.0.1:8081/',
-          realm: 'myrealm',
-          clientId: 'app-vue'
+          realm: 'top-realm',
+          clientId: 'top-frontend'
         },
         onReady: (keycloak: KeycloakInstance) => {
           const entityStore = useEntity()
