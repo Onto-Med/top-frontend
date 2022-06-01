@@ -44,6 +44,18 @@
 
         <q-space />
 
+        <q-btn
+          flat
+          dense
+          rounded
+          no-caps
+          no-wrap
+          :icon="isDarkModeActive ? 'light_mode' : 'dark_mode'"
+          :title="isDarkModeActive ? t('lightMode') : t('darkMode')"
+          class="q-mr-sm"
+          @click="toggleDarkMode()"
+        />
+
         <language-switch />
 
         <div v-if="keycloak">
@@ -63,18 +75,6 @@
                   <div class="text-h6 q-mb-md">
                     {{ t('setting', 2) }}
                   </div>
-                  <q-btn
-                    flat
-                    dense
-                    rounded
-                    no-caps
-                    no-wrap
-                    :title="t('toggleDarkMode')"
-                    :icon="isDarkModeActive ? 'light_mode' : 'dark_mode'"
-                    :label="isDarkModeActive ? t('lightMode') : t('darkMode')"
-                    class="q-mr-sm"
-                    @click="toggleDarkMode()"
-                  />
                 </div>
                 <q-separator vertical inset class="q-mx-lg" />
                 <div class="column items-center">
