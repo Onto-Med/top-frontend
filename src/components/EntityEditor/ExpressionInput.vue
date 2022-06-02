@@ -8,6 +8,7 @@
   >
     <template #default>
       <expression-operand-input
+        v-if="operators"
         class="text-subtitle1"
         :operators="operators"
         :readonly="readonly"
@@ -84,7 +85,7 @@ import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpressionOperandInput from 'src/components/EntityEditor/Expression/ExpressionOperandInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import { Expression } from '@onto-med/top-api'
+import { Expression, ExpressionOperator } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
 
@@ -116,6 +117,8 @@ export default defineComponent({
     const { t } = useI18n()
     const { restrictionEntityTypes } = useEntityFormatter()
     const entityStore = useEntity()
+    const operators = ref(undefined as ExpressionOperator[]|undefined)
+    void entityStore.getOperators('boolean').then(o => operators.value = o)
 
     return {
       t,
@@ -123,7 +126,7 @@ export default defineComponent({
       indent: ref(2),
       showClearDialog: ref(false),
       entityTypes: computed(() => restrictionEntityTypes()),
-      operators: entityStore.getOperators('boolean')
+      operators
     }
   }
 })
