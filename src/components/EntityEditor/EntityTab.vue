@@ -150,6 +150,7 @@
       v-model:units="local.units"
       v-model:score="local.score"
       v-model:superCategories="local.superCategories"
+      v-model:codes="local.codes"
       :entity-id="local.id"
       :entity-type="local.entityType"
       :version="version"
