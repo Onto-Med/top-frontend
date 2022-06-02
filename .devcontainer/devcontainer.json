@@ -40,7 +40,8 @@
 		"hollowtree.vue-snippets",
 		"dariofuzinato.vue-peek",
 		"mhutchie.git-graph",
-		"syler.sass-indented"
+		"syler.sass-indented",
+		"HookyQR.minify"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
