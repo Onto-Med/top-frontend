@@ -14,7 +14,7 @@
 	},
 
 	"remoteEnv": {
-		"NPM_AUTH_TOKEN": "${NPM_AUTH_TOKEN}"
+		"NPM_AUTH_TOKEN": "${localEnv:NPM_AUTH_TOKEN}"
 	},
 
 	// Set *default* container specific settings.json values on container create.
