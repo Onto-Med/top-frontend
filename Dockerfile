@@ -3,9 +3,9 @@ WORKDIR /app
 RUN yarn global add @quasar/cli
 COPY . .
 
+FROM develop-stage as build-stage
 ARG NPM_AUTH_TOKEN
 ARG AUTH_ENABLED
-FROM develop-stage as build-stage
 ENV NPM_AUTH_TOKEN=$NPM_AUTH_TOKEN
 ENV AUTH_ENABLED=$AUTH_ENABLED
 RUN yarn
