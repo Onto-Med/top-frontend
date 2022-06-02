@@ -197,28 +197,28 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
     const flash = ref(false)
-    const operator = computed(() =>
-      props.operators?.find((o) => o.id === props.modelValue?.operator)
-    );
+
+    const getOperator = (operator: string|undefined) => props.operators?.find((o) => o.id === operator)
+    const operator = computed(() => getOperator(props.modelValue?.operator))
 
     const blink = () => {
       flash.value = true
       setTimeout(() => flash.value = false, 500)
     }
 
-    const operandCount = computed(() => {
-      if (!operator.value) return 0;
-      switch (operator.value.type) {
+    const countOperands = (expression: Expression, operator: ExpressionOperator|undefined) => {
+      if (!operator) return 0;
+      switch (operator.type) {
         case TypeEnum.Nullary:
-          return 0;
+          return 0
         case TypeEnum.Unary:
-          return 1;
+          return 1
         case TypeEnum.Binary:
-          return 2;
+          return 2
         default:
-          return Math.max(props.modelValue.operands?.length || 0, (operator.value as ExpressionMultaryOperator).required);
+          return Math.max(expression.operands?.length || 0, (operator as ExpressionMultaryOperator).required)
       }
-    })
+    }
 
     return {
       t,
@@ -250,7 +250,7 @@ export default defineComponent({
           operator.value.representation === RepresentationEnum.Postfix
       ),
 
-      operandCount,
+      operandCount: computed(() => countOperands(props.modelValue, operator.value)),
 
       handleOperandUpdate(index: number, operand: Expression | undefined | null): void {
         const newModelValue = JSON.parse(
@@ -269,7 +269,8 @@ export default defineComponent({
         ) || {}) as Expression
         newModelValue.operator = operatorId
         if (!newModelValue.operands) newModelValue.operands = []
-        newModelValue.operands.splice(operandCount.value, newModelValue.operands.length - operandCount.value)
+        const count = countOperands(newModelValue, getOperator(newModelValue.operator))
+        newModelValue.operands.splice(count, newModelValue.operands.length - count)
         emit('update:modelValue', newModelValue)
         blink()
       },
