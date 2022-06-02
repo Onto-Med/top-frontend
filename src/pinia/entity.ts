@@ -51,7 +51,9 @@ export const useEntity = defineStore('entity', {
         .then(r => this.repository = r.data)
     },
 
-    getOperators (type: string): ExpressionOperator[] {
+    async getOperators (type: string): Promise<ExpressionOperator[]> {
+      if (!this.operators.get(type))
+        await this.reloadOperatorsByType(type)
       return this.operators.get(type) || []
     },
 
