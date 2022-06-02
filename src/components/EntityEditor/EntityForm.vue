@@ -65,7 +65,7 @@
         </q-card>
       </div>
 
-      <formula-input
+      <expression-input
         v-if="entityType === EntityType.DerivedPhenotype"
         :model-value="expression"
         expanded
@@ -74,6 +74,8 @@
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        :entity-types="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype]"
+        operator-type="math"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />
@@ -95,6 +97,9 @@
         :label="t('expression')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        :help-text="t('entityEditor.expressionHelp')"
+        :entity-types="restrictionEntityTypes()"
+        operator-type="boolean"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />
@@ -143,10 +148,9 @@ import { EntityType, DataType, LocalisableText, Unit, Code, Expression, Restrict
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
-import ExpressionInput from 'src/components/EntityEditor/ExpressionInput.vue'
+import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UcumCard from 'src/components/UcumCard.vue'
-import FormulaInput from 'src/components/EntityEditor/FormulaInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
@@ -157,7 +161,6 @@ export default defineComponent({
     RestrictionInput,
     ExpressionInput,
     UcumCard,
-    FormulaInput,
     CodeInput,
     EntityChip
   },
@@ -226,7 +229,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const { isRestricted, hasDataType } = useEntityFormatter()
+    const { isRestricted, hasDataType, restrictionEntityTypes } = useEntityFormatter()
     const restrictionKey = ref(0)
     const showSuperCategoryInput = ref(false)
 
@@ -234,6 +237,7 @@ export default defineComponent({
       t,
       isRestricted,
       hasDataType,
+      restrictionEntityTypes,
 
       restrictionKey,
       EntityType,

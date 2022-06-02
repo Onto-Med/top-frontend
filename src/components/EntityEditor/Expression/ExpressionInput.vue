@@ -2,7 +2,7 @@
   <expandable-card
     :title="label"
     :error="modelValue === undefined || modelValue.operator === undefined"
-    :help-text="t('entityEditor.formulaHelp')"
+    :help-text="helpText"
     :expanded="expanded"
     :show-help="showHelp"
   >
@@ -89,7 +89,6 @@ import { EntityType, Expression, ExpressionOperator } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
-  name: 'FormulaInput',
   components: {
     ExpressionOperandInput,
     ExpandableCard
@@ -105,25 +104,36 @@ export default defineComponent({
       default: true
     },
     expanded: Boolean,
+    helpText: String,
     showHelp: Boolean,
     organisationId: String,
     repositoryId: String,
-    readonly: Boolean
+    readonly: Boolean,
+    entityTypes: {
+      type: Array as () => EntityType[],
+      default: () => []
+    },
+    operatorType: {
+      type: String,
+      required: true,
+      validator: (value: string) => ['math', 'boolean'].includes(value)
+    }
   },
   emits: ['update:modelValue', 'entityClicked'],
-  setup () {
+  setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const entityStore = useEntity()
     const operators = ref(undefined as ExpressionOperator[]|undefined)
-    void entityStore.getOperators('math').then(o => operators.value = o)
+
+    void entityStore.getOperators(props.operatorType)
+      .then(o => operators.value = o)
 
     return {
       t,
       expandExpression: ref(false),
       indent: ref(2),
       showClearDialog: ref(false),
-      entityTypes: [EntityType.SinglePhenotype, EntityType.DerivedPhenotype],
       operators
     }
   }
