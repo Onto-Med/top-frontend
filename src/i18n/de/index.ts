@@ -121,7 +121,7 @@ export default {
   navigation: 'Navigation',
   createdAt: 'Erzeugt am',
   name: 'Name',
-  notSavedJet: 'Noch nicht gespeichert!',
+  notSavedYet: 'Noch nicht gespeichert!',
   unsaved: 'ungespeichert',
   unsavedChanges: 'Ungespeicherte Änderungen',
   encloseWithExpression: 'Mit Ausdruck umschließen',

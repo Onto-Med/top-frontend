@@ -7,7 +7,7 @@
           <small v-if="!isNew" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
             {{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})
           </small>
-          <small v-else class="text-accent">{{ t('notSavedJet') }}</small>
+          <small v-else class="text-accent">{{ t('notSavedYet') }}</small>
         </q-toolbar-title>
         <q-btn
           v-if="isOtherVersion"

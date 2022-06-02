@@ -121,7 +121,7 @@ export default {
   navigation: 'Navigation',
   createdAt: 'Created at',
   name: 'Name',
-  notSavedJet: 'Not saved jet!',
+  notSavedYet: 'Not saved yet!',
   unsaved: 'unsaved',
   unsavedChanges: 'Unsaved changes',
   encloseWithExpression: 'Enclose with expression',
