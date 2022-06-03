@@ -84,6 +84,16 @@ export const useEntity = defineStore('entity', {
       return entity
     },
 
+    addDuplicate (entity: Entity): Entity {
+      const duplicate = JSON.parse(JSON.stringify(entity)) as Entity
+      duplicate.id = (uuidv4 as () => string)()
+      duplicate.version = undefined
+      duplicate.createdAt = undefined
+      duplicate.author = undefined
+      this.entities.push(duplicate)
+      return duplicate
+    },
+
     async forkEntity (entity: Entity) {
       if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return
 

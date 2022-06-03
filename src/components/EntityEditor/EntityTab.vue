@@ -329,7 +329,7 @@ export default defineComponent({
       },
 
       save: () => {
-        if (hasUnsavedChanges.value && isValid.value) {
+        if ((isNew.value || hasUnsavedChanges.value) && isValid.value) {
           emit('update:entity', local.value)
           versionHistoryDialogKey.value++
         } else
