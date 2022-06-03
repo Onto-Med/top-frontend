@@ -9,6 +9,7 @@
           :cols="cols"
           :readonly="readonly"
           :error="!modelValue[index].text"
+          :autofocus="autofocus && index === 0 && !modelValue[index].text"
           debounce="200"
           class="col q-pb-none"
           @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"
@@ -87,7 +88,8 @@ export default defineComponent({
     expanded: Boolean,
     showHelp: Boolean,
     readonly: Boolean,
-    required: Boolean
+    required: Boolean,
+    autofocus: Boolean
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {
