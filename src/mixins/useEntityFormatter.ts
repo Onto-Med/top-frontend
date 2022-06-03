@@ -137,6 +137,7 @@ export default function (this: void) {
 
     restrictionEntityTypes (this: void): EntityType[] {
       return [
+        EntityType.SinglePhenotype,
         EntityType.CombinedRestriction,
         EntityType.DerivedRestriction,
         EntityType.SingleRestriction
