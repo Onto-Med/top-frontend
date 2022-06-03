@@ -18,6 +18,7 @@
             @refresh-clicked="reloadEntities"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
+            @duplicate-entity="handleEntityDuplication"
           />
         </div>
       </template>
@@ -264,6 +265,11 @@ export default defineComponent({
         const entity = entityStore.addEntity(entityType, superClassId)
         entity.titles = [ { lang: locale.value } as LocalisableText ]
         if (entity) selectTabByKey(entity.id)
+      },
+
+      handleEntityDuplication (entity: Entity): void {
+        const duplicate = entityStore.addDuplicate(entity)
+        if (duplicate) selectTabByKey(duplicate.id)
       },
 
       closeOtherTabs (tab: EditorTab): void {

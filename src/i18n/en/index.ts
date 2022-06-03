@@ -1,5 +1,6 @@
 export default {
   category: 'Category|Categories',
+  duplicate: 'Duplicate',
   superCategory: 'Super category|Super categories',
   missing_value: 'Missing value|Missing values',
   phenotype: 'Phenotype|Phenotypes',

@@ -23,6 +23,15 @@
         </q-item>
       </template>
     </q-list>
+    <q-list v-if="entity && entity.createdAt" dense>
+      <q-item
+        v-close-popup
+        clickable
+        @click="emitDuplicateEntity(entity)"
+      >
+        <q-item-section>{{ t('duplicate') }}</q-item-section>
+      </q-item>
+    </q-list>
     <q-separator />
     <q-list v-if="entity" dense>
       <q-item clickable @click="showDeleteDialog = true">
@@ -62,7 +71,7 @@ export default defineComponent({
   props: {
     entity: Object as () => Entity
   },
-  emits: ['deleteEntityClicked', 'createEntityClicked'],
+  emits: ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
@@ -82,6 +91,10 @@ export default defineComponent({
 
       emitCreateEntity: (entityType: EntityType, entityId: string|undefined) => {
         void setTimeout(() => emit('createEntityClicked', entityType, entityId), 50)
+      },
+
+      emitDuplicateEntity: (entity: Entity) => {
+        emit('duplicateEntityClicked', entity)
       }
     }
   }
