@@ -84,7 +84,10 @@ export default defineComponent({
     const { t } = useI18n()
     const codeSystems = [
       { uri: 'http://snomed.info/id', name: 'SNOMED CT' },
-      { uri: 'http://loinc.org', name: 'LOINC' }
+      { uri: 'http://loinc.org', name: 'LOINC' },
+      { uri: 'http://fhir.de/CodeSystem/bfarm/icd-10-gm', name: 'ICD-10-GM' },
+      { uri: 'http://fhir.de/CodeSystem/bfarm/ops', name: 'OPS' },
+      { uri: 'http://fhir.de/CodeSystem/bfarm/atc', name: 'ATC' }
     ] as CodeSystem[]
 
     return {
