@@ -6,7 +6,7 @@
         :key="entityType"
         v-close-popup
         clickable
-        @click="$emit('createEntityClicked', entityType, entity ? entity.id : null)"
+        @click="emitCreateEntity(entityType, entity ? entity.id : undefined)"
       >
         <q-item-section>{{ t('addThing', { thing: t(entityType) }) }}</q-item-section>
       </q-item>
@@ -17,7 +17,7 @@
           v-if="entity.entityType === entry.phenotype"
           v-close-popup
           clickable
-          @click="$emit('createEntityClicked',entry.restriction, entity.id)"
+          @click="emitCreateEntity(entry.restriction, entity.id)"
         >
           <q-item-section>{{ t('addThing', { thing: t(entry.restriction) }) }}</q-item-section>
         </q-item>
@@ -63,7 +63,7 @@ export default defineComponent({
     entity: Object as () => Entity
   },
   emits: ['deleteEntityClicked', 'createEntityClicked'],
-  setup () {
+  setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
 
@@ -78,7 +78,11 @@ export default defineComponent({
 
       EntityType,
 
-      showDeleteDialog: ref(false)
+      showDeleteDialog: ref(false),
+
+      emitCreateEntity: (entityType: EntityType, entityId: string|undefined) => {
+        void setTimeout(() => emit('createEntityClicked', entityType, entityId), 50)
+      }
     }
   }
 })
