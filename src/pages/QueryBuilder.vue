@@ -126,8 +126,22 @@
                   <q-item v-for="(select, index) in query.projection.select" :key="index">
                     <q-item-section avatar>
                       <q-btn-group flat class="column">
-                        <q-btn :disable="index == 0" icon="keyboard_arrow_up" size="sm" @click="moveSelectEntry(index, index - 1)" />
-                        <q-btn :disable="index == query.projection.select.length - 1" icon="keyboard_arrow_down" size="sm" @click="moveSelectEntry(index, index + 1)" />
+                        <q-btn
+                          dense
+                          :disable="index == 0"
+                          icon="keyboard_arrow_up"
+                          size="sm"
+                          class="q-pa-none"
+                          @click="moveSelectEntry(index, index - 1)"
+                        />
+                        <q-btn
+                          dense
+                          :disable="index == query.projection.select.length - 1"
+                          icon="keyboard_arrow_down"
+                          size="sm"
+                          class="q-pa-none"
+                          @click="moveSelectEntry(index, index + 1)"
+                        />
                       </q-btn-group>
                     </q-item-section>
                     <q-item-section :title="getSynonyms(select.subject)">
