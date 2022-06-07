@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md q-gutter-md">
+  <q-page v-if="organisation && repository" class="q-pa-md q-gutter-md">
     <h5 class="row">
       <b>{{ t('buildQueryFor') }}:</b>
       <q-breadcrumbs class="q-ml-sm">
@@ -29,44 +29,44 @@
         icon="rule"
         :title="t('selectThing', { thing: t('phenotype', 2) })"
         :done="step > 2"
+        class="phenotype-step"
       >
-        <q-card>
-          <q-card-section>
-            <q-list dense>
-              <q-item v-for="(Criterion, index) in criteria" :key="index">
-                <q-item-section avatar>
-                  <q-toggle v-model="Criterion.exclusion" icon="block" color="red" />
-                </q-item-section>
-                <q-item-section>
-                  {{ getTitle(Criterion.phenotype) }}
-                </q-item-section>
-                <q-item-section side>
-                  <q-btn-group flat>
-                    <q-btn icon="settings" :title="t('setting', 2)" />
-                    <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="criteria.splice(index, 1)" />
-                  </q-btn-group>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-card-section>
-          <q-separator />
-          <q-card-actions>
-            <entity-search-input
-              dense
-              :entity-types="entityTypes"
-              :organisation-id="organisation.id"
-              :repository-id="repository.id"
-              @entity-selected="criteria.push({ exclusion: false, phenotype: $event })"
-            />
-          </q-card-actions>
-        </q-card>
+        <q-splitter v-model="splitterModel" style="height: 50vh">
+          <template #before>
+            <div class="column fit">
+              <entity-tree
+                :nodes="entities"
+                :loading="treeLoading"
+                class="col column"
+                @refresh-clicked="reloadEntities"
+                @update:selected="addCriterion"
+              />
+            </div>
+          </template>
 
-        <ul>
-          <li>List of phenotypes</li>
-          <li>Option to add more phenotypes</li>
-          <li>Time ranges</li>
-          <li>Exclusions</li>
-        </ul>
+          <template #after>
+            <q-card>
+              <q-card-section>
+                <q-list dense>
+                  <q-item v-for="(criterion, index) in query.criteria" :key="index">
+                    <q-item-section avatar>
+                      <q-toggle v-model="criterion.exclusion" icon="block" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
+                    </q-item-section>
+                    <q-item-section>
+                      {{ getTitle(criterion.subject) }}
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn-group flat>
+                        <q-btn icon="settings" :title="t('setting', 2)" />
+                        <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="query.criteria.splice(index, 1)" />
+                      </q-btn-group>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card-section>
+            </q-card>
+          </template>
+        </q-splitter>
       </q-step>
 
       <q-step
@@ -82,6 +82,7 @@
       </q-step>
 
       <template #navigation>
+        <q-separator class="q-mb-md" />
         <q-stepper-navigation>
           <q-btn color="primary" :label="step === 3 ? t('execute') : t('continue')" @click="$refs.stepper.next()" />
           <q-btn
@@ -96,6 +97,13 @@
       </template>
     </q-stepper>
 
+    <ul>
+      <li>List of phenotypes</li>
+      <li>Option to add more phenotypes</li>
+      <li>Time ranges</li>
+      <li>Exclusions</li>
+    </ul>
+
     <q-card v-if="result">
       ...
     </q-card>
@@ -104,37 +112,67 @@
 
 <script lang="ts">
 import { Phenotype } from '@onto-med/top-api'
-import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
+import { storeToRefs } from 'pinia'
+import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-interface Criterion {
+interface Query {
+  criteria: QueryCriterion[]
+}
+
+interface QueryCriterion {
   exclusion: boolean,
-  phenotype: Phenotype
+  subject: Phenotype
 }
 
 export default defineComponent({
-  components: { EntitySearchInput },
+  components: { EntityTree },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const { getTitle } = useEntityFormatter()
+    const { getTitle, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
-    const entityFormatter = useEntityFormatter()
-    const criteria = ref([] as Criterion[])
+    const { entities, repository, organisation } = storeToRefs(entityStore)
+    const query = ref({ criteria: [] } as Query)
+    const treeLoading = ref(false)
+
+    const reloadEntities = async () => {
+      treeLoading.value = true
+      await entityStore.reloadEntities()
+        .then(() => query.value.criteria = query.value.criteria.filter(c => entities.value.findIndex(e => e.id === c.subject.id) !== -1))
+        .catch((e: Error) => alert(e.message))
+        .finally(() => treeLoading.value = false)
+    }
+
+    onMounted(() => reloadEntities())
 
     return {
       t,
-      entityTypes: entityFormatter.phenotypeEntityTypes(),
       getTitle,
       step: ref(1),
-      criteria,
-      organisation: entityStore.organisation,
-      repository: entityStore.repository,
-      result: ref(undefined)
+      query,
+      organisation: organisation,
+      repository: repository,
+      entities: entities,
+      result: ref(undefined),
+      splitterModel: ref(25),
+      reloadEntities,
+      treeLoading,
+      addCriterion: (subject: Phenotype) => {
+        if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return
+        query.value.criteria.push({ exclusion: false, subject: subject })
+      }
     }
   }
 })
 </script>
+
+<style lang="sass">
+.phenotype-step
+  min-height: 200px
+  .q-stepper__step-inner
+    padding: 0 !important
+</style>
