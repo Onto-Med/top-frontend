@@ -361,7 +361,7 @@ export default defineComponent({
       importFile,
 
       projectionEntities: computed(() =>
-        entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))
+        entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(e.entityType))
       ),
 
       configurationComplete: computed(() =>
@@ -386,7 +386,7 @@ export default defineComponent({
         if (!query.value.projection.select) query.value.projection.select = []
         if (
           !subject
-          || EntityType.SinglePhenotype !== subject.entityType
+          || ![EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(subject.entityType)
           || query.value.projection.select.findIndex(r => r.subject.id === subject.id) !== -1
         ) return
         query.value.projection.select.push({ subject: subject, sorting: Sorting.Asc })
