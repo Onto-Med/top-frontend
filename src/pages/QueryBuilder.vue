@@ -124,6 +124,12 @@
               <q-card-section>
                 <q-list v-if="query.projection && query.projection.requestedData.length" dense separator>
                   <q-item v-for="(requestedData, index) in query.projection.requestedData" :key="index">
+                    <q-item-section avatar>
+                      <q-btn-group flat class="column">
+                        <q-btn :disable="index == 0" icon="keyboard_arrow_up" size="sm" @click="moveRequestedData(index, index - 1)" />
+                        <q-btn :disable="index == query.projection.requestedData.length - 1" icon="keyboard_arrow_down" size="sm" @click="moveRequestedData(index, index + 1)" />
+                      </q-btn-group>
+                    </q-item-section>
                     <q-item-section :title="getSynonyms(requestedData.subject)">
                       <div class="row items-center fit">
                         <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(requestedData.subject)" />
@@ -260,7 +266,12 @@ export default defineComponent({
           || query.value.projection.requestedData.findIndex(r => r.subject.id === subject.id) !== -1
         ) return
         query.value.projection.requestedData.push({ subject: subject, sort: Sort.ASC })
-      }
+      },
+
+      moveRequestedData: (oldIndex: number, newIndex: number) => {
+        if (!query.value.projection || newIndex < 0 || newIndex >= query.value.projection.requestedData.length) return
+        query.value.projection.requestedData.splice(newIndex, 0, query.value.projection.requestedData.splice(oldIndex, 1)[0])
+      },
     }
   }
 })
