@@ -52,7 +52,7 @@
                     <q-item-section avatar>
                       <q-toggle v-model="criterion.exclusion" icon="block" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
                     </q-item-section>
-                    <q-item-section>
+                    <q-item-section :title="getSynonyms(criterion.subject)">
                       {{ getTitle(criterion.subject) }}
                     </q-item-section>
                     <q-item-section side>
@@ -133,7 +133,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const { getTitle, isPhenotype, isRestricted } = useEntityFormatter()
+    const { getTitle, getSynonyms, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({ criteria: [] } as Query)
@@ -152,6 +152,7 @@ export default defineComponent({
     return {
       t,
       getTitle,
+      getSynonyms,
       step: ref(1),
       query,
       organisation: organisation,
