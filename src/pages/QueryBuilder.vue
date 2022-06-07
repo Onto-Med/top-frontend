@@ -12,6 +12,7 @@
       ref="stepper"
       v-model="step"
       color="primary"
+      done-color="positive"
       animated
       header-nav
       keep-alive
