@@ -8,6 +8,13 @@
         <small class="col-auto text-grey" :title="t('elapsedTime')">
           {{ elapsedTime }}
         </small>
+        <q-btn
+          flat
+          round
+          icon="clear"
+          :title="t('removeThing', { thing: t('queryResult') })"
+          @click="$emit('removeClicked')"
+        />
       </div>
     </q-card-section>
     <q-separator />
@@ -50,7 +57,7 @@ export default defineComponent({
       type: String
     }
   },
-  emits: ['update:show', 'update:model-value', 'delete-clicked'],
+  emits: ['removeClicked'],
   setup(props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()

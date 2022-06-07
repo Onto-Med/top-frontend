@@ -277,9 +277,16 @@
       </template>
     </q-stepper>
 
-    <template v-for="run in runs.slice().reverse()" :key="run.id">
-      <query-result show-timer :running="run.running" :result="run.result" :label="t('queryResult') + ' #' + run.id" :title="run.title" />
-    </template>
+    <query-result
+      v-for="run in runs.slice().reverse()"
+      :key="run.id"
+      show-timer
+      :running="run.running"
+      :result="run.result"
+      :label="t('queryResult') + ' #' + run.id"
+      :title="run.title"
+      @remove-clicked="removeRun(run.id)"
+    />
   </q-page>
 </template>
 
@@ -329,6 +336,8 @@ export default defineComponent({
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
+
+    const getRunIndex = (id: number) => runs.value.findIndex(r => r.id === id)
 
     onMounted(() => reloadEntities())
 
@@ -389,14 +398,21 @@ export default defineComponent({
       },
 
       execute: () => {
-        const index = runs.value.push({
-          id: runId.value++,
+        const id = runId.value++
+        runs.value.push({
+          id: id,
           running: true,
           title: query.value.name
-        }) - 1
+        })
         new Promise((r) => setTimeout(r, 5000))
-          .then(() => runs.value[index].result = { message: 'result' })
-          .finally(() => runs.value[index].running = false)
+          .then(() => {
+            const index = getRunIndex(id)
+            if (index !== -1) runs.value[index].result = { message: 'result' }
+          })
+          .finally(() => {
+            const index = getRunIndex(id)
+            if (index !== -1) runs.value[index].running = false
+          })
       },
 
       exportQuery: () => {
@@ -407,6 +423,11 @@ export default defineComponent({
         if (!importFile.value) return
         fileReader.readAsText(importFile.value)
         importFile.value = undefined
+      },
+
+      removeRun: (id: number) => {
+        const index = getRunIndex(id)
+        if (index !== -1) runs.value.splice(index, 1)
       },
 
       running: computed(() => runs.value.findIndex(r => r.running) !== -1)
