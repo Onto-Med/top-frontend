@@ -108,6 +108,8 @@
                   <template v-for="(criterion, index) in query.criteria" :key="index">
                     <criterion
                       v-model:exclusion="criterion.exclusion"
+                      v-model:age-restrictions="criterion.ageRestrictions"
+                      v-model:time-restrictions="criterion.timeRestrictions"
                       :subject="criterion.subject"
                       @remove-clicked="query.criteria.splice(index, 1)"
                     />

@@ -17,7 +17,7 @@
     </q-item-section>
     <q-item-section side>
       <q-btn-group flat>
-        <!-- <q-btn icon="settings" :title="t('setting', 2)" /> -->
+        <criterion-configuration v-model:age-restrictions="ageRestrictions" v-model:time-restrictions="timeRestrictions" />
         <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="$emit('removeClicked')" />
       </q-btn-group>
     </q-item-section>
@@ -27,14 +27,22 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Phenotype } from '@onto-med/top-api'
+import { Phenotype, NumberRestriction, DateTimeRestriction } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import CriterionConfiguration from './CriterionConfiguration.vue'
 
 export default defineComponent({
+  components: { CriterionConfiguration },
   props: {
     exclusion: {
       type: Boolean,
       default: false
+    },
+    ageRestrictions: {
+      type: Array as () => NumberRestriction[]
+    },
+    timeRestrictions: {
+      type: Array as () => DateTimeRestriction[]
     },
     subject: {
       type: Object as () => Phenotype,
