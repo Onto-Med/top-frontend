@@ -26,6 +26,7 @@
             :nodes="entities"
             :loading="treeLoading"
             class="col column"
+            show-context-menu
             @refresh-clicked="reloadEntities"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"

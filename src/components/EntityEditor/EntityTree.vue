@@ -45,6 +45,7 @@
             </div>
             <q-badge v-show="!node.createdAt" v-t="'new'" color="accent" class="q-ml-sm" />
             <entity-tree-context-menu
+              v-if="showContextMenu"
               :entity="node"
               @delete-entity-clicked="$emit('deleteEntity', $event)"
               @create-entity-clicked="handleCreateEntityClicked"
@@ -53,7 +54,7 @@
           </div>
         </template>
       </q-tree>
-      <entity-tree-context-menu @create-entity-clicked="handleCreateEntityClicked" />
+      <entity-tree-context-menu v-if="showContextMenu" @create-entity-clicked="handleCreateEntityClicked" />
     </q-scroll-area>
     <q-inner-loading
       :showing="loading"
@@ -96,6 +97,10 @@ export default defineComponent({
     nodes: Array as () => Entity[],
     selected: Object as () => Entity,
     loading: {
+      type: Boolean,
+      default: false
+    },
+    showContextMenu: {
       type: Boolean,
       default: false
     }
