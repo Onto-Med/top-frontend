@@ -21,17 +21,27 @@
         :name="1"
         icon="settings"
         :title="t('configureThing', { thing: t('source', 2) })"
-        :done="step > 1"
+        :error="!configurationComplete && step > 1"
+        :done="configurationComplete"
       >
-        <p v-t="'dataSourceDescription'" />
-        <q-select v-model="query.configuration.sources" :options="sources" :label="t('dataSource', 2)" multiple />
+        <q-input v-model="query.configuration.name" :label="t('queryName')" type="text" />
+        <q-select
+          v-model="query.configuration.sources"
+          :options="sources"
+          :label="t('dataSource', 2)"
+          :hint="t('dataSourceDescription')"
+          :error="query.configuration.sources.length == 0"
+          multiple
+          counter
+        />
       </q-step>
 
       <q-step
         :name="2"
         icon="rule"
-        :title="t('selectThing', { thing: t('phenotype', 2) })"
-        :done="step > 2"
+        :title="t('selectThing', { thing: t('criterion', 2) })"
+        :error="query.criteria.length == 0 && step > 2"
+        :done="query.criteria.length > 0"
         class="phenotype-step"
       >
         <q-splitter v-model="splitterModel" style="height: 50vh">
@@ -93,7 +103,8 @@
         :name="3"
         icon="checklist"
         :title="t('defineThing', { thing: t('resultSet') })"
-        :done="step > 3"
+        :error="!projectionComplete && step > 3"
+        :done="projectionComplete"
         class="projection-step"
       >
         <q-splitter v-model="splitterModel" style="height: 50vh">
@@ -243,7 +254,17 @@ export default defineComponent({
       Sorting,
       sources: [ 'source1', 'source2' ],
 
-      projectionEntities: computed(() => entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))),
+      projectionEntities: computed(() =>
+        entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))
+      ),
+
+      configurationComplete: computed(() =>
+        query.value.configuration && query.value.configuration.sources.length > 0
+      ),
+
+      projectionComplete: computed(() =>
+        query.value.projection && query.value.projection.select && query.value.projection.select.length > 0
+      ),
 
       addCriterion: (subject: Phenotype) => {
         if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return

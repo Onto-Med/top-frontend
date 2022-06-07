@@ -20,6 +20,7 @@ export default {
   nothingSelectedYet: 'Nothing has been selected yet.',
   projection: 'Projection|Projections',
   projectionSelection: 'Click on phenotypes in the left tree to add them to the projection.',
+  queryName: 'Query name|Query names',
   removeThing: 'Remove {thing}',
   resultSet: 'Result set|Result sets',
   selection: 'Selection|Selections',

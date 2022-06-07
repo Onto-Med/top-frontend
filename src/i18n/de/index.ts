@@ -20,6 +20,7 @@ export default {
   nothingSelectedYet: 'Es wurde noch nichts ausgewählt.',
   projection: 'Projektion|Projektionen',
   projectionSelection: 'Klicken Sie auf einfache Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.',
+  queryName: 'Abfragename|Abfragenamen',
   removeThing: '{thing} entfernen',
   resultSet: 'Ergebnismenge|Ergebnismengen',
   selection: 'Selektion|Selektionen',
