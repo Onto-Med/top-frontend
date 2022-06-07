@@ -13,6 +13,7 @@ export default {
   defineThing: 'Define {thing}',
   desc: 'Descending',
   duplicate: 'Duplicate',
+  elapsedTime: 'Elapsed time',
   eligibilityCriterion: 'Eligibility criterion|Eligibility criteria',
   eligibilityCriterionSelection: 'Click on phenotypes in the left tree to add them to the list.',
   exclusion: 'Exclusion|Exclusions',

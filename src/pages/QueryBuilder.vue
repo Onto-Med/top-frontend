@@ -279,7 +279,12 @@
 
     <q-card v-if="result || running" class="relative-position">
       <q-card-section>
-        <div v-t="'queryResult'" class="text-h6" />
+        <div class="row items-center no-wrap">
+          <div v-t="'queryResult'" class="text-h6 col" />
+          <small class="col-auto text-grey" :title="'elapsedTime'">
+            {{ elapsedTime }}
+          </small>
+        </div>
       </q-card-section>
       <q-separator />
       <q-card-section>
@@ -333,6 +338,8 @@ export default defineComponent({
         .finally(() => treeLoading.value = false)
     }
 
+    const elapsedTime = ref(undefined as undefined|string)
+
     onMounted(() => reloadEntities())
 
     return {
@@ -354,6 +361,7 @@ export default defineComponent({
       sources: [ 'source1', 'source2' ],
       running,
       importFile,
+      elapsedTime,
 
       projectionEntities: computed(() =>
         entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))
@@ -395,9 +403,18 @@ export default defineComponent({
       execute: () => {
         running.value = true
         result.value = undefined
+        const startTime = new Date()
+        const timer = window.setInterval(() => {
+          if (!startTime) return
+          elapsedTime.value = new Date(new Date().getTime() - startTime.getTime())
+            .toISOString().slice(11, 19)
+        }, 10)
         new Promise((r) => setTimeout(r, 5000))
           .then(() => result.value = [{ message: 'result' }])
-          .finally(() => running.value = false)
+          .finally(() => {
+            clearInterval(timer)
+            running.value = false
+          })
       },
 
       exportQuery: () => {

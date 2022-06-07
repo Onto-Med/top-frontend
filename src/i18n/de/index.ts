@@ -13,6 +13,7 @@ export default {
   defineThing: '{thing} definieren',
   desc: 'Absteigend',
   duplicate: 'Duplizieren',
+  elapsedTime: 'Verstrichene Zeit',
   eligibilityCriterion: 'Auswahlkriterium|Auswahlkriterien',
   eligibilityCriterionSelection: 'Klicken Sie auf Phänotypen im linken Baum, um sie der Liste hinzuzufügen.',
   exclusion: 'Ausschluss|Ausschlüsse',
