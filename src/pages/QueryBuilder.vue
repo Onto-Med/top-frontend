@@ -201,7 +201,8 @@
           icon="play_arrow"
           color="secondary"
           :label="t('execute')"
-          @click="result = true"
+          :disable="running"
+          @click="execute()"
         />
         <q-btn
           v-else
@@ -229,14 +230,19 @@
       </template>
     </q-stepper>
 
-    <q-card v-if="result">
+    <q-card v-if="result || running" class="relative-position">
       <q-card-section>
         <div v-t="'queryResult'" class="text-h6" />
       </q-card-section>
       <q-separator />
       <q-card-section>
-        {{ result }}
+        <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+          <div v-show="result">
+            {{ result }}
+          </div>
+        </transition>
       </q-card-section>
+      <q-inner-loading :showing="running" :label="t('thingIsRunning', { thing: t('query') }) + '...'" />
     </q-card>
   </q-page>
 </template>
@@ -250,6 +256,10 @@ import { useEntity } from 'src/pinia/entity'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+interface Result {
+  message: string
+}
+
 export default defineComponent({
   components: { EntityTree },
   setup () {
@@ -260,6 +270,8 @@ export default defineComponent({
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({ configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
     const treeLoading = ref(false)
+    const running = ref(false)
+    const result = ref(undefined as Result[]|undefined)
 
     const reloadEntities = async () => {
       treeLoading.value = true
@@ -282,12 +294,13 @@ export default defineComponent({
       organisation,
       repository,
       entities,
-      result: ref(undefined),
+      result,
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
       Sorting,
       sources: [ 'source1', 'source2' ],
+      running,
 
       projectionEntities: computed(() =>
         entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))
@@ -325,6 +338,14 @@ export default defineComponent({
         if (!query.value.projection || !query.value.projection.select || newIndex < 0 || newIndex >= query.value.projection.select.length) return
         query.value.projection.select.splice(newIndex, 0, query.value.projection.select.splice(oldIndex, 1)[0])
       },
+
+      execute: () => {
+        running.value = true
+        result.value = undefined
+        new Promise((r) => setTimeout(r, 5000))
+          .then(() => result.value = [{ message: 'result' }])
+          .finally(() => running.value = false)
+      }
     }
   }
 })
