@@ -35,15 +35,15 @@
             <q-list dense>
               <q-item v-for="(Criterion, index) in criteria" :key="index">
                 <q-item-section avatar>
-                  <q-toggle v-model="Criterion.exclusion" icon="block" />
+                  <q-toggle v-model="Criterion.exclusion" icon="block" color="red" />
                 </q-item-section>
                 <q-item-section>
                   {{ getTitle(Criterion.phenotype) }}
                 </q-item-section>
                 <q-item-section side>
                   <q-btn-group flat>
-                    <q-btn icon="settings" :title="t('settings')" />
-                    <q-btn icon="remove" :title="t('removeThing', { thing: t('Criterion') })" @click="criteria.splice(index, 1)" />
+                    <q-btn icon="settings" :title="t('setting', 2)" />
+                    <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="criteria.splice(index, 1)" />
                   </q-btn-group>
                 </q-item-section>
               </q-item>
@@ -52,7 +52,6 @@
           <q-separator />
           <q-card-actions>
             <entity-search-input
-              autofocus
               dense
               :entity-types="entityTypes"
               :organisation-id="organisation.id"
