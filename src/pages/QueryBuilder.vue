@@ -96,7 +96,7 @@
           <template #before>
             <div class="column fit">
               <entity-tree
-                :nodes="singlePhenotypes"
+                :nodes="projectionEntities"
                 :loading="treeLoading"
                 class="col column"
                 @refresh-clicked="reloadEntities"
@@ -225,7 +225,7 @@ export default defineComponent({
       reloadEntities,
       treeLoading,
 
-      singlePhenotypes: computed(() => entities.value.filter(e => e.entityType === EntityType.SinglePhenotype)),
+      projectionEntities: computed(() => entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))),
 
       addCriterion: (subject: Phenotype) => {
         if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return
