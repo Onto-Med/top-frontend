@@ -17,7 +17,12 @@
     </q-item-section>
     <q-item-section side>
       <q-btn-group flat>
-        <criterion-configuration v-model:age-restrictions="ageRestrictions" v-model:time-restrictions="timeRestrictions" />
+        <criterion-configuration
+          :age-restrictions="ageRestrictions"
+          :time-restrictions="timeRestrictions"
+          @update:age-restrictions="$emit('update:ageRestrictions', $event)"
+          @update:time-restrictions="$emit('update:timeRestrictions', $event)"
+        />
         <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="$emit('removeClicked')" />
       </q-btn-group>
     </q-item-section>
@@ -49,7 +54,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['removeClicked', 'update:exclusion'],
+  emits: ['removeClicked', 'update:exclusion', 'update:ageRestrictions', 'update:timeRestrictions'],
   setup() {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()

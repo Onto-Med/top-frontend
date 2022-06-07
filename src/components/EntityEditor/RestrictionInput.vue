@@ -30,41 +30,16 @@
             <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
           </div>
 
-          <div v-show="hasRange" class="row items-center">
-            <q-input v-model="state.values[0]" outlined :type="state.type">
-              <template #after>
-                <q-select
-                  v-model="state.minOperator"
-                  :options="operators || defaultOperators"
-                  :readonly="readonly"
-                  outlined
-                  emit-value
-                  map-options
-                  class="operator-input"
-                />
-              </template>
-            </q-input>
-            <q-field borderless>
-              <template #control>
-                <div class="self-center full-width no-outline q-px-sm" tabindex="0">
-                  {{ t('value', 2) }}
-                </div>
-              </template>
-            </q-field>
-            <q-input v-model="state.values[1]" outlined :type="state.type">
-              <template #before>
-                <q-select
-                  v-model="state.maxOperator"
-                  :options="operators || defaultOperators"
-                  :readonly="readonly"
-                  emit-value
-                  map-options
-                  outlined
-                  class="operator-input"
-                />
-              </template>
-            </q-input>
-          </div>
+          <range-input
+            v-show="hasRange"
+            v-model:minimum="state.values[0]"
+            v-model:maximum="state.values[1]"
+            v-model:min-operator="state.minOperator"
+            v-model:max-operator="state.maxOperator"
+            :readonly="readonly"
+            :operators="operators"
+            :type="state.type"
+          />
 
           <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
             <q-input v-model="state.values[index]" outlined :readonly="readonly" :type="state.type">
@@ -99,15 +74,17 @@
 </template>
 
 <script lang="ts">
-import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantor, Restriction, RestrictionOperator, StringRestriction } from '@onto-med/top-api'
+import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantor, Restriction, StringRestriction } from '@onto-med/top-api'
 import { defineComponent, ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
+import RangeInput from 'src/components/EntityEditor/RangeInput.vue'
 
 export default defineComponent({
   name: 'RestrictionInput',
   components: {
-    ExpandableCard
+    ExpandableCard,
+    RangeInput
   },
   props: {
     modelValue: {
@@ -135,7 +112,6 @@ export default defineComponent({
         || (props.modelValue as NumberRestriction|DateTimeRestriction).maxOperator !== undefined
       )
     )
-    const defaultOperators = ([ null ] as Array<RestrictionOperator|null>).concat(Object.values(RestrictionOperator))
 
     const defaultQuantors = computed(() =>
       Object.values(Quantor).map(d => { return { label: t('quantorType.' + d), value: d } })
@@ -177,7 +153,7 @@ export default defineComponent({
       emit('update:modelValue', newState)
     }
 
-    return { t, defaultOperators, defaultQuantors, state, hasRange, canHaveRange, handleHasRangeChanged, Quantor,
+    return { t, defaultQuantors, state, hasRange, canHaveRange, handleHasRangeChanged, Quantor,
       addValue () {
         if (!state.values) state.values = []
         state.values.push(null as never)
@@ -186,8 +162,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style lang="sass" scoped>
-.operator-input
-  width: 80px
-</style>
