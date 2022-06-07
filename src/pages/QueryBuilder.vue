@@ -106,23 +106,11 @@
                 </div>
                 <q-list v-show="query.criteria.length" dense>
                   <template v-for="(criterion, index) in query.criteria" :key="index">
-                    <q-item>
-                      <q-item-section avatar>
-                        <q-toggle v-model="criterion.exclusion" :icon="criterion.exclusion ? 'block' : 'check'" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
-                      </q-item-section>
-                      <q-item-section :title="getSynonyms(criterion.subject)">
-                        <div class="row items-center fit non-selectable">
-                          <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(criterion.subject) }" :name="getIcon(criterion.subject)" />
-                          {{ getTitle(criterion.subject) }}
-                        </div>
-                      </q-item-section>
-                      <q-item-section side>
-                        <q-btn-group flat>
-                          <!-- <q-btn icon="settings" :title="t('setting', 2)" /> -->
-                          <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="query.criteria.splice(index, 1)" />
-                        </q-btn-group>
-                      </q-item-section>
-                    </q-item>
+                    <criterion
+                      v-model:exclusion="criterion.exclusion"
+                      :subject="criterion.subject"
+                      @remove-clicked="query.criteria.splice(index, 1)"
+                    />
                     <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
                       <q-separator class="col" />
                       <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable" />
@@ -296,6 +284,7 @@
 import { EntityType, Phenotype, Query, Sorting } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
+import Criterion from 'src/components/Query/Criterion.vue'
 import QueryResult from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
@@ -316,7 +305,7 @@ interface Run {
 }
 
 export default defineComponent({
-  components: { EntityTree, QueryResult },
+  components: { EntityTree, Criterion, QueryResult },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
