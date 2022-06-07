@@ -307,9 +307,9 @@ interface QueryResult {
 
 interface Run {
   id: number,
-  title: string,
+  title?: string,
   running: boolean,
-  result: QueryResult
+  result?: QueryResult
 }
 
 export default defineComponent({
