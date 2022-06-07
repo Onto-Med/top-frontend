@@ -40,8 +40,8 @@
         :name="2"
         icon="rule"
         :title="t('selectThing', { thing: t('criterion', 2) })"
-        :error="query.criteria.length == 0 && step > 2"
-        :done="query.criteria.length > 0"
+        :error="!criteriaComplete && step > 2"
+        :done="criteriaComplete"
         class="phenotype-step"
       >
         <q-splitter v-model="splitterModel" style="height: 50vh">
@@ -191,12 +191,34 @@
         </q-splitter>
       </q-step>
 
+      <q-step
+        :name="4"
+        icon="flag"
+        :title="t('closure')"
+      >
+        <q-btn
+          v-if="configurationComplete && criteriaComplete && projectionComplete"
+          icon="play_arrow"
+          color="secondary"
+          :label="t('execute')"
+          @click="result = true"
+        />
+        <q-btn
+          v-else
+          icon="play_arrow"
+          color="secondary"
+          :label="t('execute')"
+          :title="t('finishPreviousStep', 2)"
+          disable
+        />
+      </q-step>
+
       <template #navigation>
         <q-separator class="q-mb-md" />
         <q-stepper-navigation>
-          <q-btn color="primary" :label="step === 3 ? t('execute') : t('continue')" @click="$refs.stepper.next()" />
+          <q-btn v-show="step < 4" color="primary" :label="t('continue')" @click="$refs.stepper.next()" />
           <q-btn
-            v-if="step > 1"
+            v-show="step > 1"
             flat
             color="primary"
             :label="t('back')"
@@ -208,7 +230,13 @@
     </q-stepper>
 
     <q-card v-if="result">
-      ...
+      <q-card-section>
+        <div v-t="'queryResult'" class="text-h6" />
+      </q-card-section>
+      <q-separator />
+      <q-card-section>
+        {{ result }}
+      </q-card-section>
     </q-card>
   </q-page>
 </template>
@@ -267,6 +295,9 @@ export default defineComponent({
 
       configurationComplete: computed(() =>
         query.value.configuration && query.value.configuration.sources.length > 0
+      ),
+      criteriaComplete: computed(() =>
+        query.value.criteria && query.value.criteria.length > 0
       ),
 
       projectionComplete: computed(() =>
