@@ -92,10 +92,55 @@
         :title="t('defineThing', { thing: t('resultSet') })"
         :done="step > 3"
       >
-        <ul>
-          <li>Projections</li>
-          <li>Aggregations</li>
-        </ul>
+        <q-splitter v-model="splitterModel" style="height: 50vh">
+          <template #before>
+            <div class="column fit">
+              <entity-tree
+                :nodes="entities"
+                :loading="treeLoading"
+                class="col column"
+                @refresh-clicked="reloadEntities"
+                @update:selected="addSelection"
+              />
+            </div>
+          </template>
+
+          <template #after>
+            <q-card class="q-ma-lg">
+              <q-item>
+                <q-item-section>
+                  <q-item-label class="text-h6">
+                    {{ t('projection') }}
+                  </q-item-label>
+                  <q-item-label v-t="'projectionSelection'" caption />
+                </q-item-section>
+              </q-item>
+
+              <q-separator />
+
+              <q-card-section>
+                <q-list v-if="query.projection && query.projection.requestedData.length" dense>
+                  <q-item v-for="(selection, index) in query.projection.requestedData" :key="index">
+                    <q-item-section :title="getSynonyms(selection)">
+                      <div class="row items-center fit">
+                        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(selection)" />
+                        {{ getTitle(selection) }}
+                      </div>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn-group flat>
+                        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.requestedData.splice(index, 1)" />
+                      </q-btn-group>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+                <div v-else>
+                  {{ t('nothingSelectedYet') }}
+                </div>
+              </q-card-section>
+            </q-card>
+          </template>
+        </q-splitter>
       </q-step>
 
       <template #navigation>
@@ -121,7 +166,7 @@
 </template>
 
 <script lang="ts">
-import { Phenotype } from '@onto-med/top-api'
+import { EntityType, Phenotype } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -131,11 +176,16 @@ import { useI18n } from 'vue-i18n'
 
 interface Query {
   criteria: QueryCriterion[]
+  projection?: Projection
 }
 
 interface QueryCriterion {
   exclusion: boolean,
   subject: Phenotype
+}
+
+interface Projection {
+  requestedData: Phenotype[]
 }
 
 export default defineComponent({
@@ -174,9 +224,20 @@ export default defineComponent({
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
+      
       addCriterion: (subject: Phenotype) => {
         if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return
         query.value.criteria.push({ exclusion: false, subject: subject })
+      },
+
+      addSelection: (subject: Phenotype) => {
+        if (!query.value.projection) query.value.projection = { requestedData: [] }
+        if (
+          !subject
+          || EntityType.SinglePhenotype !== subject.entityType
+          || query.value.projection.requestedData.findIndex(r => r.id === subject.id) !== -1
+        ) return
+        query.value.projection.requestedData.push(subject)
       }
     }
   }
