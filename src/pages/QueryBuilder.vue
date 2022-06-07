@@ -67,11 +67,14 @@
                       <q-toggle v-model="criterion.exclusion" :icon="criterion.exclusion ? 'block' : 'check'" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
                     </q-item-section>
                     <q-item-section :title="getSynonyms(criterion.subject)">
-                      {{ getTitle(criterion.subject) }}
+                      <div class="row items-center fit">
+                        <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(criterion.subject) }" :name="getIcon(criterion.subject)" />
+                        {{ getTitle(criterion.subject) }}
+                      </div>
                     </q-item-section>
                     <q-item-section side>
                       <q-btn-group flat>
-                        <q-btn icon="settings" :title="t('setting', 2)" />
+                        <!-- <q-btn icon="settings" :title="t('setting', 2)" /> -->
                         <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="query.criteria.splice(index, 1)" />
                       </q-btn-group>
                     </q-item-section>
@@ -111,13 +114,6 @@
       </template>
     </q-stepper>
 
-    <ul>
-      <li>List of phenotypes</li>
-      <li>Option to add more phenotypes</li>
-      <li>Time ranges</li>
-      <li>Exclusions</li>
-    </ul>
-
     <q-card v-if="result">
       ...
     </q-card>
@@ -147,7 +143,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const { getTitle, getSynonyms, isPhenotype, isRestricted } = useEntityFormatter()
+    const { getTitle, getSynonyms, getIcon, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({ criteria: [] } as Query)
@@ -167,6 +163,8 @@ export default defineComponent({
       t,
       getTitle,
       getSynonyms,
+      getIcon,
+      isRestricted,
       step: ref(1),
       query,
       organisation: organisation,
