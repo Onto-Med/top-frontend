@@ -387,7 +387,7 @@ export default defineComponent({
       ),
 
       addCriterion: (subject: Phenotype) => {
-        if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return
+        if (!subject || (!isPhenotype(subject) && !isRestricted(subject)) || subject.entityType === EntityType.CombinedPhenotype) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({ exclusion: false, subject: subject })
       },
