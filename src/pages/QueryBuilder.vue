@@ -74,24 +74,31 @@
                 <div v-show="!query.criteria.length">
                   {{ t('nothingSelectedYet') }}
                 </div>
-                <q-list v-show="query.criteria.length" dense separator>
-                  <q-item v-for="(criterion, index) in query.criteria" :key="index">
-                    <q-item-section avatar>
-                      <q-toggle v-model="criterion.exclusion" :icon="criterion.exclusion ? 'block' : 'check'" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
-                    </q-item-section>
-                    <q-item-section :title="getSynonyms(criterion.subject)">
-                      <div class="row items-center fit">
-                        <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(criterion.subject) }" :name="getIcon(criterion.subject)" />
-                        {{ getTitle(criterion.subject) }}
-                      </div>
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-btn-group flat>
-                        <!-- <q-btn icon="settings" :title="t('setting', 2)" /> -->
-                        <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="query.criteria.splice(index, 1)" />
-                      </q-btn-group>
-                    </q-item-section>
-                  </q-item>
+                <q-list v-show="query.criteria.length" dense>
+                  <template v-for="(criterion, index) in query.criteria" :key="index">
+                    <q-item>
+                      <q-item-section avatar>
+                        <q-toggle v-model="criterion.exclusion" :icon="criterion.exclusion ? 'block' : 'check'" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
+                      </q-item-section>
+                      <q-item-section :title="getSynonyms(criterion.subject)">
+                        <div class="row items-center fit">
+                          <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(criterion.subject) }" :name="getIcon(criterion.subject)" />
+                          {{ getTitle(criterion.subject) }}
+                        </div>
+                      </q-item-section>
+                      <q-item-section side>
+                        <q-btn-group flat>
+                          <!-- <q-btn icon="settings" :title="t('setting', 2)" /> -->
+                          <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="query.criteria.splice(index, 1)" />
+                        </q-btn-group>
+                      </q-item-section>
+                    </q-item>
+                    <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
+                      <q-separator class="col" />
+                      <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase" />
+                      <q-separator class="col" />
+                    </div>
+                  </template>
                 </q-list>
               </q-card-section>
             </q-card>
