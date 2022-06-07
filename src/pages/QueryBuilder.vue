@@ -171,7 +171,7 @@ import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface Query {
@@ -217,9 +217,9 @@ export default defineComponent({
       isRestricted,
       step: ref(1),
       query,
-      organisation: organisation,
-      repository: repository,
-      entities: entities,
+      organisation,
+      repository,
+      entities,
       result: ref(undefined),
       splitterModel: ref(25),
       reloadEntities,
