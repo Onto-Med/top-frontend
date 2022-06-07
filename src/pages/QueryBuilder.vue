@@ -304,7 +304,8 @@ import { useI18n } from 'vue-i18n'
 import useFile from 'src/mixins/useFile'
 
 interface QueryResult {
-  message: string
+  message?: string,
+  rows?: Record<string, unknown>[]
 }
 
 interface Run {
@@ -342,6 +343,13 @@ export default defineComponent({
     const getRunIndex = (id: number) => runs.value.findIndex(r => r.id === id)
 
     onMounted(() => reloadEntities())
+
+    const dummyResult = {
+      message: 'result',
+      rows: [
+        { sex: 'female', bmi: 15 }
+      ]
+    }
 
     return {
       t,
@@ -410,7 +418,7 @@ export default defineComponent({
         new Promise((r) => setTimeout(r, 5000))
           .then(() => {
             const index = getRunIndex(id)
-            if (index !== -1) runs.value[index].result = { message: 'result' }
+            if (index !== -1) runs.value[index].result = dummyResult
           })
           .finally(() => {
             const index = getRunIndex(id)
