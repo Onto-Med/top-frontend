@@ -277,25 +277,9 @@
       </template>
     </q-stepper>
 
-    <q-card v-if="result || running" class="relative-position">
-      <q-card-section>
-        <div class="row items-center no-wrap">
-          <div v-t="'queryResult'" class="text-h6 col" />
-          <small class="col-auto text-grey" :title="'elapsedTime'">
-            {{ elapsedTime }}
-          </small>
-        </div>
-      </q-card-section>
-      <q-separator />
-      <q-card-section>
-        <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-          <div v-show="result">
-            {{ result }}
-          </div>
-        </transition>
-      </q-card-section>
-      <q-inner-loading :showing="running" :label="t('thingIsRunning', { thing: t('query') }) + '...'" />
-    </q-card>
+    <template v-for="run in runs.slice().reverse()" :key="run.id">
+      <query-result show-timer :running="run.running" :result="run.result" :label="t('queryResult') + ' #' + run.id" :title="run.title" />
+    </template>
   </q-page>
 </template>
 
@@ -303,18 +287,26 @@
 import { EntityType, Phenotype, Query, Sorting } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
+import QueryResult from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useFile from 'src/mixins/useFile'
 
-interface Result {
+interface QueryResult {
   message: string
 }
 
+interface Run {
+  id: number,
+  title: string,
+  running: boolean,
+  result: QueryResult
+}
+
 export default defineComponent({
-  components: { EntityTree },
+  components: { EntityTree, QueryResult },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
@@ -324,8 +316,8 @@ export default defineComponent({
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({ configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
     const treeLoading = ref(false)
-    const running = ref(false)
-    const result = ref(undefined as Result[]|undefined)
+    const runs = ref([] as Run[])
+    const runId = ref(1)
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
     fileReader.onload = (e) => query.value = JSON.parse(e.target?.result as string) as Query
@@ -337,8 +329,6 @@ export default defineComponent({
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
-
-    const elapsedTime = ref(undefined as undefined|string)
 
     onMounted(() => reloadEntities())
 
@@ -353,15 +343,13 @@ export default defineComponent({
       organisation,
       repository,
       entities,
-      result,
+      runs,
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
       Sorting,
       sources: [ 'source1', 'source2' ],
-      running,
       importFile,
-      elapsedTime,
 
       projectionEntities: computed(() =>
         entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))
@@ -401,20 +389,14 @@ export default defineComponent({
       },
 
       execute: () => {
-        running.value = true
-        result.value = undefined
-        const startTime = new Date()
-        const timer = window.setInterval(() => {
-          if (!startTime) return
-          elapsedTime.value = new Date(new Date().getTime() - startTime.getTime())
-            .toISOString().slice(11, 19)
-        }, 10)
+        const index = runs.value.push({
+          id: runId.value++,
+          running: true,
+          title: query.value.name
+        }) - 1
         new Promise((r) => setTimeout(r, 5000))
-          .then(() => result.value = [{ message: 'result' }])
-          .finally(() => {
-            clearInterval(timer)
-            running.value = false
-          })
+          .then(() => runs.value[index].result = { message: 'result' })
+          .finally(() => runs.value[index].running = false)
       },
 
       exportQuery: () => {
@@ -425,7 +407,9 @@ export default defineComponent({
         if (!importFile.value) return
         fileReader.readAsText(importFile.value)
         importFile.value = undefined
-      }
+      },
+
+      running: computed(() => runs.value.findIndex(r => r.running) !== -1)
     }
   }
 })
