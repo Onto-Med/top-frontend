@@ -7,6 +7,8 @@ export default {
   configureThing: 'Configure {thing}',
   continue: 'Continue',
   criterion: 'Criterion|Criteria',
+  dataSource: 'Data source|Data sources',
+  dataSourceDescription: 'Select at least one data source on which the query shall be executed.',
   defineThing: 'Define {thing}',
   desc: 'Descending',
   duplicate: 'Duplicate',

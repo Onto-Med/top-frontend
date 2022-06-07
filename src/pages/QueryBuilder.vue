@@ -23,7 +23,8 @@
         :title="t('configureThing', { thing: t('source', 2) })"
         :done="step > 1"
       >
-        Select data source and other configurations...
+        <p v-t="'dataSourceDescription'" />
+        <q-select v-model="query.configuration.sources" :options="sources" :label="t('dataSource', 2)" multiple />
       </q-step>
 
       <q-step
@@ -211,7 +212,7 @@ export default defineComponent({
     const { getTitle, getSynonyms, getIcon, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
     const { entities, repository, organisation } = storeToRefs(entityStore)
-    const query = ref({ criteria: [] } as Query)
+    const query = ref({ configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
     const treeLoading = ref(false)
 
     const reloadEntities = async () => {
@@ -240,6 +241,7 @@ export default defineComponent({
       reloadEntities,
       treeLoading,
       Sorting,
+      sources: [ 'source1', 'source2' ],
 
       projectionEntities: computed(() => entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))),
 
