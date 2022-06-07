@@ -3,7 +3,7 @@
     <q-card-section>
       <div class="row items-center no-wrap">
         <div class="text-h6 col">
-          {{ label || t('queryResult') }}{{ title ? ': ' + title : '' }}
+          {{ label || t('queryResult') }}: {{ title || t('unnamedQuery') }}
         </div>
         <small class="col-auto text-grey" :title="t('elapsedTime')">
           {{ elapsedTime }}

@@ -39,6 +39,7 @@ export default {
   source: 'Quelle|Quellen',
   superCategory: 'Super-Kategorie|Super-Kategorien',
   thingIsRunning: '{thing} läuft',
+  unnamedQuery: 'Unbenannte Abfrage|Unbenannte Abfragen',
   missing_value: 'Fehlender Wert|Fehlende Werte',
   phenotype: 'Phänotyp|Phänotypen',
   phenotype_group: 'Phänotypgruppe|Phänotypgruppen',
