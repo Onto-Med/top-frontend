@@ -139,10 +139,10 @@
                     <q-item-section side>
                       <q-btn-group flat>
                         <q-btn
-                          :icon="requestedData.sort === Sort.DESC ? 'arrow_downward' : 'arrow_upward'"
-                          :label="t(requestedData.sort)"
+                          :icon="requestedData.sorting === Sorting.DESC ? 'arrow_downward' : 'arrow_upward'"
+                          :label="t(requestedData.sorting)"
                           :title="t('sorting')"
-                          @click="requestedData.sort = requestedData.sort === Sort.ASC ? Sort.DESC : Sort.ASC"
+                          @click="requestedData.sorting = requestedData.sorting === Sorting.ASC ? Sorting.DESC : Sorting.ASC"
                         />
                         <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.requestedData.splice(index, 1)" />
                       </q-btn-group>
@@ -205,10 +205,10 @@ interface Projection {
 
 interface RequestedData {
   subject: Phenotype,
-  sort: Sort
+  sorting: Sorting
 }
 
-enum Sort {
+enum Sorting {
   ASC = 'asc',
   DESC = 'desc'
 }
@@ -249,7 +249,7 @@ export default defineComponent({
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
-      Sort,
+      Sorting,
 
       projectionEntities: computed(() => entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))),
 
@@ -265,7 +265,7 @@ export default defineComponent({
           || EntityType.SinglePhenotype !== subject.entityType
           || query.value.projection.requestedData.findIndex(r => r.subject.id === subject.id) !== -1
         ) return
-        query.value.projection.requestedData.push({ subject: subject, sort: Sort.ASC })
+        query.value.projection.requestedData.push({ subject: subject, sorting: Sorting.ASC })
       },
 
       moveRequestedData: (oldIndex: number, newIndex: number) => {
