@@ -80,6 +80,7 @@
                 :nodes="entities"
                 :loading="treeLoading"
                 class="col column"
+                :exclude-type-if-empty="[EntityType.Category, EntityType.CombinedPhenotype]"
                 @refresh-clicked="reloadEntities"
                 @update:selected="addCriterion"
               />
@@ -149,6 +150,7 @@
               <entity-tree
                 :nodes="projectionEntities"
                 :loading="treeLoading"
+                :exclude-type-if-empty="[EntityType.Category]"
                 class="col column"
                 @refresh-clicked="reloadEntities"
                 @update:selected="addSelection"
@@ -347,6 +349,7 @@ export default defineComponent({
       getSynonyms,
       getIcon,
       isRestricted,
+      EntityType,
       step: ref(1),
       query,
       organisation,
