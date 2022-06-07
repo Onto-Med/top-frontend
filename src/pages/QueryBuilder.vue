@@ -35,6 +35,7 @@
               :error="query.configuration.sources.length == 0"
               multiple
               counter
+              use-chips
             />
           </div>
 
