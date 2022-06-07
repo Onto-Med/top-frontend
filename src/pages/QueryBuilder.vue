@@ -14,6 +14,7 @@
       color="primary"
       animated
       header-nav
+      keep-alive
     >
       <q-step
         :name="1"
