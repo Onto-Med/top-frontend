@@ -111,7 +111,7 @@
                         <q-toggle v-model="criterion.exclusion" :icon="criterion.exclusion ? 'block' : 'check'" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
                       </q-item-section>
                       <q-item-section :title="getSynonyms(criterion.subject)">
-                        <div class="row items-center fit">
+                        <div class="row items-center fit non-selectable">
                           <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(criterion.subject) }" :name="getIcon(criterion.subject)" />
                           {{ getTitle(criterion.subject) }}
                         </div>
@@ -125,7 +125,7 @@
                     </q-item>
                     <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
                       <q-separator class="col" />
-                      <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase" />
+                      <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable" />
                       <q-separator class="col" />
                     </div>
                   </template>
@@ -195,7 +195,7 @@
                       </q-btn-group>
                     </q-item-section>
                     <q-item-section :title="getSynonyms(select.subject)">
-                      <div class="row items-center fit">
+                      <div class="row items-center fit non-selectable">
                         <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(select.subject)" />
                         {{ getTitle(select.subject) }}
                       </div>
