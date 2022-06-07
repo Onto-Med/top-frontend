@@ -1,4 +1,6 @@
 export default {
+  ageRestriction: 'Age restriction|Age restrictions',
+  ageRestrictionDescription: 'Set one ore more age restrictions for this phenotype. Values are in years.',
   asc: 'Ascending',
   back: 'Back',
   buildQuery: 'Build query|Build queries',
@@ -39,6 +41,8 @@ export default {
   source: 'Source|Sources',
   superCategory: 'Super category|Super categories',
   thingIsRunning: '{thing} is running',
+  timeRestriction: 'Time restriction|Time restrictions',
+  timeRestrictionDescription: 'Restrict the time range, when this phenotype must have been observed.',
   unnamedQuery: 'Unnamed query|Unnamed queries',
   missing_value: 'Missing value|Missing values',
   phenotype: 'Phenotype|Phenotypes',

@@ -1,4 +1,6 @@
 export default {
+  ageRestriction: 'Altersbegrenzung|Altersbegrenzungen',
+  ageRestrictionDescription: 'Legen Sie eine oder mehrere Altersbegrenzungen fest. Altersangaben werden in Jahren angegeben.',
   asc: 'Aufsteigend',
   back: 'Zurück',
   buildQuery: 'Abfrage erstellen|Abfragen erstellen',
@@ -39,6 +41,8 @@ export default {
   source: 'Quelle|Quellen',
   superCategory: 'Super-Kategorie|Super-Kategorien',
   thingIsRunning: '{thing} läuft',
+  timeRestriction: 'Zeitbegrenzung|Zeitbegrenzungen',
+  timeRestrictionDescription: 'Begrenzen Sie den Zeitraum, in dem dieser Phänotyp beobachtet werden musste.',
   unnamedQuery: 'Unbenannte Abfrage|Unbenannte Abfragen',
   missing_value: 'Fehlender Wert|Fehlende Werte',
   phenotype: 'Phänotyp|Phänotypen',
