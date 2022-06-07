@@ -103,6 +103,10 @@ export default defineComponent({
     showContextMenu: {
       type: Boolean,
       default: false
+    },
+    excludeTypeIfEmpty: {
+      type: Array as () => EntityType[],
+      default: () => []
     }
   },
   emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity'],
@@ -142,7 +146,15 @@ export default defineComponent({
       return props.nodes?.findIndex(n => !n.createdAt) !== -1
     })
 
-    const toTree = (list: Entity[]): TreeNode[] => {
+    const removeEmptyNodes = (nodes: TreeNode[], types: EntityType[]): TreeNode[] => {
+      const result = JSON.parse(JSON.stringify(nodes)) as TreeNode[]
+      return result.map(n => {
+        if (n.children) n.children = removeEmptyNodes(n.children, types)
+        return n
+      }).filter(n => !types.includes(n.entityType) || n.children && n.children.length !== 0)
+    }
+
+    const toTree = (list: Entity[], excludeTypeIfEmpty: EntityType[] = []): TreeNode[] => {
       const map: Map<string, TreeNode> = new Map<string, TreeNode>()
       const treeNodes: TreeNode[] = []
 
@@ -174,7 +186,7 @@ export default defineComponent({
           }
         })
 
-      return treeNodes
+      return excludeTypeIfEmpty.length !== 0 ? removeEmptyNodes(treeNodes, excludeTypeIfEmpty) : treeNodes
     }
 
     return {
@@ -191,7 +203,7 @@ export default defineComponent({
       isRestricted,
 
       treeNodes: computed((): TreeNode[] => {
-        return toTree(visibleNodes.value)
+        return toTree(visibleNodes.value, props.excludeTypeIfEmpty)
       }),
 
       handleRefreshClick (): void {
