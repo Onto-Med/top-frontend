@@ -1,4 +1,5 @@
 export default {
+  asc: 'Ascending',
   back: 'Back',
   buildQuery: 'Build query@Build queries',
   buildQueryFor: 'Build query for|Build queries for',
@@ -7,6 +8,7 @@ export default {
   continue: 'Continue',
   criterion: 'Criterion|Criteria',
   defineThing: 'Define {thing}',
+  desc: 'Descending',
   duplicate: 'Duplicate',
   eligibilityCriterion: 'Eligibility criterion|Eligibility criteria',
   eligibilityCriterionSelection: 'Click on phenotypes in the left tree to add them to the list.',
@@ -19,6 +21,7 @@ export default {
   removeThing: 'Remove {thing}',
   resultSet: 'Result set|Result sets',
   selection: 'Selection|Selections',
+  sorting: 'Sorting|Sortings',
   source: 'Source|Sources',
   superCategory: 'Super category|Super categories',
   missing_value: 'Missing value|Missing values',

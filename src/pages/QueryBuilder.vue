@@ -123,15 +123,21 @@
 
               <q-card-section>
                 <q-list v-if="query.projection && query.projection.requestedData.length" dense>
-                  <q-item v-for="(selection, index) in query.projection.requestedData" :key="index">
-                    <q-item-section :title="getSynonyms(selection)">
+                  <q-item v-for="(requestedData, index) in query.projection.requestedData" :key="index">
+                    <q-item-section :title="getSynonyms(requestedData.subject)">
                       <div class="row items-center fit">
-                        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(selection)" />
-                        {{ getTitle(selection) }}
+                        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(requestedData.subject)" />
+                        {{ getTitle(requestedData.subject) }}
                       </div>
                     </q-item-section>
                     <q-item-section side>
                       <q-btn-group flat>
+                        <q-btn
+                          :icon="requestedData.sort === Sort.DESC ? 'arrow_upward' : 'arrow_downward'"
+                          :label="t(requestedData.sort)"
+                          :title="t('sorting')"
+                          @click="requestedData.sort = requestedData.sort === Sort.ASC ? Sort.DESC : Sort.ASC"
+                        />
                         <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.requestedData.splice(index, 1)" />
                       </q-btn-group>
                     </q-item-section>
@@ -188,7 +194,17 @@ interface QueryCriterion {
 }
 
 interface Projection {
-  requestedData: Phenotype[]
+  requestedData: RequestedData[]
+}
+
+interface RequestedData {
+  subject: Phenotype,
+  sort: Sort
+}
+
+enum Sort {
+  ASC = 'asc',
+  DESC = 'desc'
 }
 
 export default defineComponent({
@@ -227,6 +243,7 @@ export default defineComponent({
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
+      Sort,
 
       projectionEntities: computed(() => entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))),
 
@@ -240,9 +257,9 @@ export default defineComponent({
         if (
           !subject
           || EntityType.SinglePhenotype !== subject.entityType
-          || query.value.projection.requestedData.findIndex(r => r.id === subject.id) !== -1
+          || query.value.projection.requestedData.findIndex(r => r.subject.id === subject.id) !== -1
         ) return
-        query.value.projection.requestedData.push(subject)
+        query.value.projection.requestedData.push({ subject: subject, sort: Sort.ASC })
       }
     }
   }

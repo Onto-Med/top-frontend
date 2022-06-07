@@ -1,4 +1,5 @@
 export default {
+  asc: 'Aufsteigend',
   back: 'Zurück',
   buildQuery: 'Abfrage erstellen|Abfragen erstellen',
   buildQueryFor: 'Abfrage erstellen für|Abfragen erstellen für',
@@ -7,6 +8,7 @@ export default {
   continue: 'Fortsetzen',
   criterion: 'Kriterium|Kriterien',
   defineThing: '{thing} definieren',
+  desc: 'Absteigend',
   duplicate: 'Duplizieren',
   eligibilityCriterion: 'Auswahlkriterium|Auswahlkriterien',
   eligibilityCriterionSelection: 'Klicken Sie auf Phänotypen im linken Baum, um sie der Liste hinzuzufügen.',
@@ -19,6 +21,7 @@ export default {
   removeThing: '{thing} entfernen',
   resultSet: 'Ergebnismenge|Ergebnismengen',
   selection: 'Selektion|Selektionen',
+  sorting: 'Sortierung|Sortierungen',
   source: 'Quelle|Quellen',
   superCategory: 'Super-Kategorie|Super-Kategorien',
   missing_value: 'Fehlender Wert|Fehlende Werte',
