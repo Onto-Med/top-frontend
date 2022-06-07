@@ -45,12 +45,26 @@
           </template>
 
           <template #after>
-            <q-card>
+            <q-card class="q-ma-lg">
+              <q-item>
+                <q-item-section>
+                  <q-item-label class="text-h6">
+                    {{ t('eligibilityCriterion', 2) }}
+                  </q-item-label>
+                  <q-item-label v-t="'eligibilityCriterionSelection'" caption />
+                </q-item-section>
+              </q-item>
+
+              <q-separator />
+
               <q-card-section>
-                <q-list dense>
+                <div v-show="!query.criteria.length">
+                  {{ t('nothingSelectedYet') }}
+                </div>
+                <q-list v-show="query.criteria.length" dense>
                   <q-item v-for="(criterion, index) in query.criteria" :key="index">
                     <q-item-section avatar>
-                      <q-toggle v-model="criterion.exclusion" icon="block" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
+                      <q-toggle v-model="criterion.exclusion" :icon="criterion.exclusion ? 'block' : 'check'" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
                     </q-item-section>
                     <q-item-section :title="getSynonyms(criterion.subject)">
                       {{ getTitle(criterion.subject) }}
