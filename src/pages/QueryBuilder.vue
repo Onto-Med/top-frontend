@@ -139,7 +139,7 @@
                     <q-item-section side>
                       <q-btn-group flat>
                         <q-btn
-                          :icon="requestedData.sort === Sort.DESC ? 'arrow_upward' : 'arrow_downward'"
+                          :icon="requestedData.sort === Sort.DESC ? 'arrow_downward' : 'arrow_upward'"
                           :label="t(requestedData.sort)"
                           :title="t('sorting')"
                           @click="requestedData.sort = requestedData.sort === Sort.ASC ? Sort.DESC : Sort.ASC"
