@@ -63,7 +63,7 @@
                 <div v-show="!query.criteria.length">
                   {{ t('nothingSelectedYet') }}
                 </div>
-                <q-list v-show="query.criteria.length" dense>
+                <q-list v-show="query.criteria.length" dense separator>
                   <q-item v-for="(criterion, index) in query.criteria" :key="index">
                     <q-item-section avatar>
                       <q-toggle v-model="criterion.exclusion" :icon="criterion.exclusion ? 'block' : 'check'" color="red" :title="criterion.exclusion ? t('exclusion') : t('inclusion')" />
@@ -122,7 +122,7 @@
               <q-separator />
 
               <q-card-section>
-                <q-list v-if="query.projection && query.projection.requestedData.length" dense>
+                <q-list v-if="query.projection && query.projection.requestedData.length" dense separator>
                   <q-item v-for="(requestedData, index) in query.projection.requestedData" :key="index">
                     <q-item-section :title="getSynonyms(requestedData.subject)">
                       <div class="row items-center fit">
