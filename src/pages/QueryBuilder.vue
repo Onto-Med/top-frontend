@@ -24,16 +24,44 @@
         :error="!configurationComplete && step > 1"
         :done="configurationComplete"
       >
-        <q-input v-model="query.name" :label="t('queryName')" type="text" />
-        <q-select
-          v-model="query.configuration.sources"
-          :options="sources"
-          :label="t('dataSource', 2)"
-          :error-message="t('dataSourceDescription')"
-          :error="query.configuration.sources.length == 0"
-          multiple
-          counter
-        />
+        <div class="row q-gutter-md">
+          <div class="col-7">
+            <q-input v-model="query.name" :label="t('queryName')" type="text" />
+            <q-select
+              v-model="query.configuration.sources"
+              :options="sources"
+              :label="t('dataSource', 2)"
+              :error-message="t('dataSourceDescription')"
+              :error="query.configuration.sources.length == 0"
+              multiple
+              counter
+            />
+          </div>
+
+          <q-separator vertical />
+
+          <div class="col">
+            <p v-t="'queryImportDescription'" />
+            <q-file
+              v-model="importFile"
+              :label="t('queryImportFile')"
+              accept=".json"
+            >
+              <template #prepend>
+                <q-icon name="attach_file" />
+              </template>
+              <template #after>
+                <q-btn
+                  color="primary"
+                  icon="file_upload"
+                  :disabled="!importFile"
+                  :label="t('import')"
+                  @click="importQuery"
+                />
+              </template>
+            </q-file>
+          </div>
+        </div>
       </q-step>
 
       <q-step
@@ -292,6 +320,9 @@ export default defineComponent({
     const treeLoading = ref(false)
     const running = ref(false)
     const result = ref(undefined as Result[]|undefined)
+    const importFile = ref(undefined as Blob|undefined)
+    const fileReader = new FileReader()
+    fileReader.onload = (e) => query.value = JSON.parse(e.target?.result as string) as Query
 
     const reloadEntities = async () => {
       treeLoading.value = true
@@ -321,6 +352,7 @@ export default defineComponent({
       Sorting,
       sources: [ 'source1', 'source2' ],
       running,
+      importFile,
 
       projectionEntities: computed(() =>
         entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype].includes(e.entityType))
@@ -369,6 +401,12 @@ export default defineComponent({
 
       exportQuery: () => {
         saveToFile(JSON.stringify(query.value), new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json')
+      },
+
+      importQuery: () => {
+        if (!importFile.value) return
+        fileReader.readAsText(importFile.value)
+        importFile.value = undefined
       }
     }
   }
