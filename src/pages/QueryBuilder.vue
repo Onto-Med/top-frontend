@@ -364,7 +364,7 @@ export default defineComponent({
       importFile,
 
       projectionEntities: computed(() =>
-        entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(e.entityType))
+        entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype].includes(e.entityType))
       ),
 
       configurationComplete: computed(() =>
