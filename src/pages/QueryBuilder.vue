@@ -96,7 +96,7 @@
           <template #before>
             <div class="column fit">
               <entity-tree
-                :nodes="entities"
+                :nodes="singlePhenotypes"
                 :loading="treeLoading"
                 class="col column"
                 @refresh-clicked="reloadEntities"
@@ -224,7 +224,9 @@ export default defineComponent({
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
-      
+
+      singlePhenotypes: computed(() => entities.value.filter(e => e.entityType === EntityType.SinglePhenotype)),
+
       addCriterion: (subject: Phenotype) => {
         if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return
         query.value.criteria.push({ exclusion: false, subject: subject })
