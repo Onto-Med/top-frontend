@@ -24,7 +24,7 @@
         :error="!configurationComplete && step > 1"
         :done="configurationComplete"
       >
-        <q-input v-model="query.configuration.name" :label="t('queryName')" type="text" />
+        <q-input v-model="query.name" :label="t('queryName')" type="text" />
         <q-select
           v-model="query.configuration.sources"
           :options="sources"
@@ -196,22 +196,40 @@
         icon="flag"
         :title="t('closure')"
       >
-        <q-btn
-          v-if="configurationComplete && criteriaComplete && projectionComplete"
-          icon="play_arrow"
-          color="secondary"
-          :label="t('execute')"
-          :disable="running"
-          @click="execute()"
-        />
-        <q-btn
-          v-else
-          icon="play_arrow"
-          color="secondary"
-          :label="t('execute')"
-          :title="t('finishPreviousStep', 2)"
-          disable
-        />
+        <q-list>
+          <q-item>
+            <q-item-section top avatar class="col-2">
+              <q-btn
+                icon="save"
+                color="primary"
+                :label="t('export')"
+                @click="exportQuery"
+              />
+            </q-item-section>
+            <q-item-section v-t="'queryExportDescription'" />
+          </q-item>
+          <q-item>
+            <q-item-section top avatar class="col-2">
+              <q-btn
+                v-if="configurationComplete && criteriaComplete && projectionComplete"
+                icon="play_arrow"
+                color="secondary"
+                :label="t('execute')"
+                :disable="running"
+                @click="execute()"
+              />
+              <q-btn
+                v-else
+                icon="play_arrow"
+                color="secondary"
+                :label="t('execute')"
+                :title="t('finishPreviousStep', 2)"
+                disable
+              />
+            </q-item-section>
+            <q-item-section v-t="'queryExecuteDescription'" />
+          </q-item>
+        </q-list>
       </q-step>
 
       <template #navigation>
@@ -255,6 +273,7 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useFile from 'src/mixins/useFile'
 
 interface Result {
   message: string
@@ -267,6 +286,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { getTitle, getSynonyms, getIcon, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
+    const { saveToFile } = useFile()
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({ configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
     const treeLoading = ref(false)
@@ -345,6 +365,10 @@ export default defineComponent({
         new Promise((r) => setTimeout(r, 5000))
           .then(() => result.value = [{ message: 'result' }])
           .finally(() => running.value = false)
+      },
+
+      exportQuery: () => {
+        saveToFile(JSON.stringify(query.value), new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json')
       }
     }
   }
