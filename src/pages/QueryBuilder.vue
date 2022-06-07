@@ -29,7 +29,7 @@
           v-model="query.configuration.sources"
           :options="sources"
           :label="t('dataSource', 2)"
-          :hint="t('dataSourceDescription')"
+          :error-message="t('dataSourceDescription')"
           :error="query.configuration.sources.length == 0"
           multiple
           counter
