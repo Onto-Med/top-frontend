@@ -91,6 +91,7 @@
         icon="checklist"
         :title="t('defineThing', { thing: t('resultSet') })"
         :done="step > 3"
+        class="projection-step"
       >
         <q-splitter v-model="splitterModel" style="height: 50vh">
           <template #before>
@@ -247,7 +248,7 @@ export default defineComponent({
 </script>
 
 <style lang="sass">
-.phenotype-step
+.phenotype-step, .projection-step
   min-height: 200px
   .q-stepper__step-inner
     padding: 0 !important
