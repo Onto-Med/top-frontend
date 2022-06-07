@@ -32,7 +32,7 @@
         @update:selected="handleSelectedChange"
       >
         <template #default-header="{ node }">
-          <div class="row items-center fit">
+          <div class="row items-center fit non-selectable">
             <q-icon
               v-if="getIcon(node)"
               :name="getIcon(node)"
