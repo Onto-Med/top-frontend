@@ -1,7 +1,7 @@
 export default {
   asc: 'Ascending',
   back: 'Back',
-  buildQuery: 'Build query@Build queries',
+  buildQuery: 'Build query|Build queries',
   buildQueryFor: 'Build query for|Build queries for',
   category: 'Category|Categories',
   closure: 'Closure|Closures',
