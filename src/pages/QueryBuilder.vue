@@ -122,29 +122,29 @@
               <q-separator />
 
               <q-card-section>
-                <q-list v-if="query.projection && query.projection.requestedData.length" dense separator>
-                  <q-item v-for="(requestedData, index) in query.projection.requestedData" :key="index">
+                <q-list v-if="query.projection && query.projection.select.length" dense separator>
+                  <q-item v-for="(select, index) in query.projection.select" :key="index">
                     <q-item-section avatar>
                       <q-btn-group flat class="column">
-                        <q-btn :disable="index == 0" icon="keyboard_arrow_up" size="sm" @click="moveRequestedData(index, index - 1)" />
-                        <q-btn :disable="index == query.projection.requestedData.length - 1" icon="keyboard_arrow_down" size="sm" @click="moveRequestedData(index, index + 1)" />
+                        <q-btn :disable="index == 0" icon="keyboard_arrow_up" size="sm" @click="moveSelectEntry(index, index - 1)" />
+                        <q-btn :disable="index == query.projection.select.length - 1" icon="keyboard_arrow_down" size="sm" @click="moveSelectEntry(index, index + 1)" />
                       </q-btn-group>
                     </q-item-section>
-                    <q-item-section :title="getSynonyms(requestedData.subject)">
+                    <q-item-section :title="getSynonyms(select.subject)">
                       <div class="row items-center fit">
-                        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(requestedData.subject)" />
-                        {{ getTitle(requestedData.subject) }}
+                        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(select.subject)" />
+                        {{ getTitle(select.subject) }}
                       </div>
                     </q-item-section>
                     <q-item-section side>
                       <q-btn-group flat>
                         <q-btn
-                          :icon="requestedData.sorting === Sorting.DESC ? 'arrow_downward' : 'arrow_upward'"
-                          :label="t(requestedData.sorting)"
+                          :icon="select.sorting === Sorting.Desc ? 'arrow_downward' : 'arrow_upward'"
+                          :label="t(select.sorting)"
                           :title="t('sorting')"
-                          @click="requestedData.sorting = requestedData.sorting === Sorting.ASC ? Sorting.DESC : Sorting.ASC"
+                          @click="select.sorting = select.sorting === Sorting.Asc ? Sorting.Desc : Sorting.Asc"
                         />
-                        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.requestedData.splice(index, 1)" />
+                        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.select.splice(index, 1)" />
                       </q-btn-group>
                     </q-item-section>
                   </q-item>
@@ -181,37 +181,13 @@
 </template>
 
 <script lang="ts">
-import { EntityType, Phenotype } from '@onto-med/top-api'
+import { EntityType, Phenotype, Query, Sorting } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-
-interface Query {
-  criteria: QueryCriterion[]
-  projection?: Projection
-}
-
-interface QueryCriterion {
-  exclusion: boolean,
-  subject: Phenotype
-}
-
-interface Projection {
-  requestedData: RequestedData[]
-}
-
-interface RequestedData {
-  subject: Phenotype,
-  sorting: Sorting
-}
-
-enum Sorting {
-  ASC = 'asc',
-  DESC = 'desc'
-}
 
 export default defineComponent({
   components: { EntityTree },
@@ -227,7 +203,7 @@ export default defineComponent({
     const reloadEntities = async () => {
       treeLoading.value = true
       await entityStore.reloadEntities()
-        .then(() => query.value.criteria = query.value.criteria.filter(c => entities.value.findIndex(e => e.id === c.subject.id) !== -1))
+        .then(() => query.value.criteria = query.value.criteria?.filter(c => entities.value.findIndex(e => e.id === c.subject.id) !== -1))
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
@@ -255,22 +231,24 @@ export default defineComponent({
 
       addCriterion: (subject: Phenotype) => {
         if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return
+        if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({ exclusion: false, subject: subject })
       },
 
       addSelection: (subject: Phenotype) => {
-        if (!query.value.projection) query.value.projection = { requestedData: [] }
+        if (!query.value.projection) query.value.projection = { select: [] }
+        if (!query.value.projection.select) query.value.projection.select = []
         if (
           !subject
           || EntityType.SinglePhenotype !== subject.entityType
-          || query.value.projection.requestedData.findIndex(r => r.subject.id === subject.id) !== -1
+          || query.value.projection.select.findIndex(r => r.subject.id === subject.id) !== -1
         ) return
-        query.value.projection.requestedData.push({ subject: subject, sorting: Sorting.ASC })
+        query.value.projection.select.push({ subject: subject, sorting: Sorting.Asc })
       },
 
-      moveRequestedData: (oldIndex: number, newIndex: number) => {
-        if (!query.value.projection || newIndex < 0 || newIndex >= query.value.projection.requestedData.length) return
-        query.value.projection.requestedData.splice(newIndex, 0, query.value.projection.requestedData.splice(oldIndex, 1)[0])
+      moveSelectEntry: (oldIndex: number, newIndex: number) => {
+        if (!query.value.projection || !query.value.projection.select || newIndex < 0 || newIndex >= query.value.projection.select.length) return
+        query.value.projection.select.splice(newIndex, 0, query.value.projection.select.splice(oldIndex, 1)[0])
       },
     }
   }
