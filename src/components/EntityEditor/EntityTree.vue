@@ -32,7 +32,7 @@
         @update:selected="handleSelectedChange"
       >
         <template #default-header="{ node }">
-          <div class="row items-center fit">
+          <div class="row items-center fit non-selectable">
             <q-icon
               v-if="getIcon(node)"
               :name="getIcon(node)"
@@ -45,6 +45,7 @@
             </div>
             <q-badge v-show="!node.createdAt" v-t="'new'" color="accent" class="q-ml-sm" />
             <entity-tree-context-menu
+              v-if="showContextMenu"
               :entity="node"
               @delete-entity-clicked="$emit('deleteEntity', $event)"
               @create-entity-clicked="handleCreateEntityClicked"
@@ -53,7 +54,7 @@
           </div>
         </template>
       </q-tree>
-      <entity-tree-context-menu @create-entity-clicked="handleCreateEntityClicked" />
+      <entity-tree-context-menu v-if="showContextMenu" @create-entity-clicked="handleCreateEntityClicked" />
     </q-scroll-area>
     <q-inner-loading
       :showing="loading"
@@ -98,6 +99,14 @@ export default defineComponent({
     loading: {
       type: Boolean,
       default: false
+    },
+    showContextMenu: {
+      type: Boolean,
+      default: false
+    },
+    excludeTypeIfEmpty: {
+      type: Array as () => EntityType[],
+      default: () => []
     }
   },
   emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity'],
@@ -137,7 +146,15 @@ export default defineComponent({
       return props.nodes?.findIndex(n => !n.createdAt) !== -1
     })
 
-    const toTree = (list: Entity[]): TreeNode[] => {
+    const removeEmptyNodes = (nodes: TreeNode[], types: EntityType[]): TreeNode[] => {
+      const result = JSON.parse(JSON.stringify(nodes)) as TreeNode[]
+      return result.map(n => {
+        if (n.children) n.children = removeEmptyNodes(n.children, types)
+        return n
+      }).filter(n => !types.includes(n.entityType) || n.children && n.children.length !== 0)
+    }
+
+    const toTree = (list: Entity[], excludeTypeIfEmpty: EntityType[] = []): TreeNode[] => {
       const map: Map<string, TreeNode> = new Map<string, TreeNode>()
       const treeNodes: TreeNode[] = []
 
@@ -169,7 +186,7 @@ export default defineComponent({
           }
         })
 
-      return treeNodes
+      return excludeTypeIfEmpty.length !== 0 ? removeEmptyNodes(treeNodes, excludeTypeIfEmpty) : treeNodes
     }
 
     return {
@@ -186,7 +203,7 @@ export default defineComponent({
       isRestricted,
 
       treeNodes: computed((): TreeNode[] => {
-        return toTree(visibleNodes.value)
+        return toTree(visibleNodes.value, props.excludeTypeIfEmpty)
       }),
 
       handleRefreshClick (): void {

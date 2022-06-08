@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,12 +9,14 @@ export const useEntity = defineStore('entity', {
     return {
       organisationId: undefined as string|undefined,
       repositoryId: undefined as string|undefined,
+      organisation: undefined as Organisation|undefined,
       repository: undefined as Repository|undefined,
       entities: [] as Entity[],
       operators: new Map<string, ExpressionOperator[]>(),
       keycloak: undefined as KeycloakInstance|undefined,
       entityApi: undefined as EntityApi|undefined,
       expressionOperatorApi: undefined as ExpressionOperatorApi|undefined,
+      organisationApi: undefined as OrganisationApi|undefined,
       repositoryApi: undefined as RepositoryApi|undefined,
       forkApi: undefined as ForkApi|undefined
     }
@@ -38,6 +40,16 @@ export const useEntity = defineStore('entity', {
     async reloadOperators () {
       await this.reloadOperatorsByType('math')
       await this.reloadOperatorsByType('boolean')
+    },
+
+    async setOrganisation (organisationId: string|undefined) {
+      this.organisationId = organisationId
+      if (!organisationId) {
+        this.organisation = undefined
+        return
+      }
+      await this.organisationApi?.getOrganisationById(organisationId)
+        .then(r => this.organisation = r.data)
     },
 
     async setRepository (repositoryId: string|undefined) {

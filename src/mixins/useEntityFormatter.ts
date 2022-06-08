@@ -142,6 +142,17 @@ export default function (this: void) {
         EntityType.DerivedRestriction,
         EntityType.SingleRestriction
       ]
+    },
+
+    phenotypeEntityTypes (this: void): EntityType[] {
+      return [
+        EntityType.SinglePhenotype,
+        EntityType.CombinedPhenotype,
+        EntityType.DerivedPhenotype,
+        EntityType.SingleRestriction,
+        EntityType.CombinedRestriction,
+        EntityType.DerivedRestriction
+      ]
     }
   }
 }

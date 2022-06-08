@@ -41,7 +41,8 @@ export default route(function (/* { store, ssrContext } */) {
       if (entityStore.keycloak && !entityStore.keycloak.authenticated)
         void entityStore.keycloak.login()
     }
-    entityStore.organisationId = to.params.organisationId as string | undefined
+    entityStore.setOrganisation(to.params.organisationId as string | undefined)
+      .catch((e: AxiosError) => console.log(e.message))
     entityStore.setRepository(to.params.repositoryId as string | undefined)
       .catch((e: AxiosError) => console.log(e.message))
   })

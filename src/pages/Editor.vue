@@ -8,6 +8,17 @@
             <div v-if="repository">
               {{ repository.name || repository.id }}
             </div>
+            <q-space />
+            <div v-if="repository">
+              <q-btn
+                dense
+                flat
+                no-caps
+                icon="manage_search"
+                :label="t('buildQuery')"
+                :to="{ name: 'queryBuilder' }"
+              />
+            </div>
           </div>
 
           <entity-tree
@@ -15,6 +26,7 @@
             :nodes="entities"
             :loading="treeLoading"
             class="col column"
+            show-context-menu
             @refresh-clicked="reloadEntities"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
