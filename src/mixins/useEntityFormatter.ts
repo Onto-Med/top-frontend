@@ -57,7 +57,7 @@ export default function (this: void) {
           case DataType.String:
             return 'article'
           case DataType.Boolean:
-            return 'check_box'
+            return 'flaky'
           default:
             return 'help_center'
         }
