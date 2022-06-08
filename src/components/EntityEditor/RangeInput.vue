@@ -1,7 +1,7 @@
 <template>
   <div class="row items-center">
     <q-select
-      :model-value="minOperator"
+      :model-value="minOperator || minOperators[0]"
       :options="minOperators"
       :readonly="readonly"
       outlined
@@ -20,7 +20,7 @@
     />
 
     <q-select
-      :model-value="maxOperator"
+      :model-value="maxOperator ||maxOperators[0]"
       :options="maxOperators"
       :readonly="readonly"
       emit-value
@@ -53,15 +53,15 @@ export default defineComponent({
     minOperators: {
       type: Array,
       default: () => [
-        RestrictionOperator.GreaterThan,
-        RestrictionOperator.GreaterThanOrEqualTo
+        RestrictionOperator.GreaterThanOrEqualTo,
+        RestrictionOperator.GreaterThan
       ]
     },
     maxOperators: {
       type: Array,
       default: () => [
-        RestrictionOperator.LessThan,
-        RestrictionOperator.LessThanOrEqualTo
+        RestrictionOperator.LessThanOrEqualTo,
+        RestrictionOperator.LessThan
       ]
     },
     readonly: Boolean,
