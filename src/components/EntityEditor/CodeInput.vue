@@ -12,7 +12,7 @@
         >
           <template #before>
             <code-system-input
-              :model-value="modelValue[index].codeSystem"
+              :model-value="getCodeSystem(modelValue[index].codeSystem.uri)"
               :options="codeSystems"
               :readonly="readonly"
               class="system-input"
@@ -96,6 +96,9 @@ export default defineComponent({
       codeUrl (code: Code) {
         if (!code || !code.codeSystem) return null
         return code.codeSystem.uri + '/' + code.code
+      },
+      getCodeSystem (uri: string) {
+        return codeSystems.find(c => c.uri === uri)
       },
       removeEntryByIndex (index: number) {
         let newModelValue = props.modelValue.slice()
