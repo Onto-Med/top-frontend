@@ -22,9 +22,9 @@
               :type="DataType.Number"
               class="col"
             />
-            <q-btn icon="remove" :title="t('removeThing', { thing: t('ageRestriction') })" class="col-auto" @click="removeAgeRestriction(index)" />
+            <q-btn flat icon="remove" :title="t('removeThing', { thing: t('ageRestriction') })" class="col-auto" @click="removeAgeRestriction(index)" />
           </div>
-          <q-btn flat icon="add" :label="t('addThing', { thing: t('ageRestriction') })" @click="addAgeRestriction()" />
+          <q-btn flat icon="add" class="q-mt-md" :label="t('addThing', { thing: t('ageRestriction') })" @click="addAgeRestriction()" />
         </q-card-section>
         <q-separator />
         <q-card-section>
@@ -38,9 +38,9 @@
               :type="DataType.DateTime"
               class="col"
             />
-            <q-btn icon="remove" :title="t('removeThing', { thing: t('timeRestriction') })" class="col-auto" @click="removeTimeRestriction(index)" />
+            <q-btn flat icon="remove" :title="t('removeThing', { thing: t('timeRestriction') })" class="col-auto" @click="removeTimeRestriction(index)" />
           </div>
-          <q-btn flat icon="add" :label="t('addThing', { thing: t('timeRestriction') })" @click="addTimeRestriction()" />
+          <q-btn flat icon="add" class="q-mt-md" :label="t('addThing', { thing: t('timeRestriction') })" @click="addTimeRestriction()" />
         </q-card-section>
       </q-card>
     </q-dialog>

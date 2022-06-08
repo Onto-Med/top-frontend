@@ -24,6 +24,8 @@ export default {
   finishPreviousStep: 'Bitte den vorherigen Schritt abschließen|Bitte vorherige Schritte abschließen',
   import: 'Importieren',
   inclusion: 'Einschluss|Einschlüsse',
+  maximum: 'Maximum',
+  minimum: 'Minimum',
   nothingSelectedYet: 'Es wurde noch nichts ausgewählt.',
   projection: 'Projektion|Projektionen',
   projectionSelection: 'Klicken Sie auf einfache Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.',
