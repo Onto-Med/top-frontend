@@ -24,6 +24,8 @@ export default {
   finishPreviousStep: 'Please finish the previous step|Please finish previous steps',
   import: 'Import',
   inclusion: 'Inclusion|Inclusions',
+  maximum: 'Maximum',
+  minimum: 'Minimum',
   nothingSelectedYet: 'Nothing has been selected yet.',
   projection: 'Projection|Projections',
   projectionSelection: 'Click on phenotypes in the left tree to add them to the projection.',

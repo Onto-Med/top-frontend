@@ -1,40 +1,41 @@
 <template>
   <div class="row items-center">
-    <q-input :model-value="minimum" outlined :type="type" @update:model-value="updateMinimum($event)">
-      <template #after>
-        <q-select
-          :model-value="minOperator"
-          :options="operators || defaultOperators"
-          :readonly="readonly"
-          outlined
-          emit-value
-          map-options
-          class="operator-input"
-          @update:model-value="$emit('update:minOperator', $event)"
-        />
-      </template>
-    </q-input>
-    <q-field borderless>
-      <template #control>
-        <div class="self-center full-width no-outline q-px-sm" tabindex="0">
-          {{ t('value', 2) }}
-        </div>
-      </template>
-    </q-field>
-    <q-input :model-value="maximum" outlined :type="type" @update:model-value="$emit('update:maximum', $event)">
-      <template #before>
-        <q-select
-          :model-value="maxOperator"
-          :options="operators || defaultOperators"
-          :readonly="readonly"
-          emit-value
-          map-options
-          outlined
-          class="operator-input"
-          @update:model-value="$emit('update:maxOperator', $event)"
-        />
-      </template>
-    </q-input>
+    <q-select
+      :model-value="minOperator"
+      :options="minOperators"
+      :readonly="readonly"
+      outlined
+      emit-value
+      map-options
+      class="operator-input"
+      @update:model-value="$emit('update:minOperator', $event)"
+    />
+    <q-input
+      :model-value="minimum"
+      :label="t('minimum')"
+      outlined
+      :type="type"
+      class="q-mr-md"
+      @update:model-value="updateMinimum($event)"
+    />
+
+    <q-select
+      :model-value="maxOperator"
+      :options="maxOperators"
+      :readonly="readonly"
+      emit-value
+      map-options
+      outlined
+      class="operator-input"
+      @update:model-value="$emit('update:maxOperator', $event)"
+    />
+    <q-input
+      :model-value="maximum"
+      :label="t('maximum')"
+      outlined
+      :type="type"
+      @update:model-value="$emit('update:maximum', $event)"
+    />
   </div>
 </template>
 
@@ -49,7 +50,20 @@ export default defineComponent({
     maximum: [Number, Date],
     minOperator: String,
     maxOperator: String,
-    operators: Array,
+    minOperators: {
+      type: Array,
+      default: () => [
+        RestrictionOperator.GreaterThan,
+        RestrictionOperator.GreaterThanOrEqualTo
+      ]
+    },
+    maxOperators: {
+      type: Array,
+      default: () => [
+        RestrictionOperator.LessThan,
+        RestrictionOperator.LessThanOrEqualTo
+      ]
+    },
     readonly: Boolean,
     type: String
   },
@@ -60,7 +74,6 @@ export default defineComponent({
 
     return {
       t,
-      defaultOperators: ([ null ] as Array<RestrictionOperator|null>).concat(Object.values(RestrictionOperator)),
 
       updateMinimum: (value: number|Date) => {
         if (props.type === DataType.Number) {
