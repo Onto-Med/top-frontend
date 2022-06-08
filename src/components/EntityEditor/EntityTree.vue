@@ -164,6 +164,11 @@ export default defineComponent({
 
       list
         .filter(e => e.id)
+        .sort((a, b) => {
+          if (a.entityType === EntityType.Category && b.entityType !== EntityType.Category) return -1
+          if (a.entityType !== EntityType.Category && b.entityType === EntityType.Category) return 1
+          return getTitle(a).localeCompare(getTitle(b))
+        })
         .forEach(e => {
           let root = true;
 
