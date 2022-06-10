@@ -19,9 +19,9 @@
       <q-btn-group flat>
         <criterion-configuration
           :age-restrictions="ageRestrictions"
-          :time-restrictions="timeRestrictions"
+          :time-restrictions="dateTimeRestrictions"
           @update:age-restrictions="$emit('update:ageRestrictions', $event)"
-          @update:time-restrictions="$emit('update:timeRestrictions', $event)"
+          @update:time-restrictions="$emit('update:dateTimeRestrictions', $event)"
         />
         <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="$emit('removeClicked')" />
       </q-btn-group>
@@ -46,7 +46,7 @@ export default defineComponent({
     ageRestrictions: {
       type: Array as () => NumberRestriction[]
     },
-    timeRestrictions: {
+    dateTimeRestrictions: {
       type: Array as () => DateTimeRestriction[]
     },
     subject: {
@@ -54,7 +54,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['removeClicked', 'update:exclusion', 'update:ageRestrictions', 'update:timeRestrictions'],
+  emits: ['removeClicked', 'update:exclusion', 'update:ageRestrictions', 'update:dateTimeRestrictions'],
   setup() {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()

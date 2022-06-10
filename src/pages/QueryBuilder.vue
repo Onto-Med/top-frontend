@@ -109,7 +109,7 @@
                     <criterion
                       v-model:exclusion="criterion.exclusion"
                       v-model:age-restrictions="criterion.ageRestrictions"
-                      v-model:time-restrictions="criterion.timeRestrictions"
+                      v-model:time-restrictions="criterion.dateTimeRestrictions"
                       :subject="criterion.subject"
                       @remove-clicked="query.criteria.splice(index, 1)"
                     />

@@ -281,7 +281,7 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
 
-      setConstant (constant: number|undefined): void {
+      setConstant (constant: string|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.constant = constant
         emit('update:modelValue', newModelValue)

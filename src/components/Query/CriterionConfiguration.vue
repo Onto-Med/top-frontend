@@ -28,8 +28,8 @@
         </q-card-section>
         <q-separator />
         <q-card-section>
-          <p v-t="'timeRestrictionDescription'" />
-          <div v-for="(restriction, index) in timeRestrictions" :key="index" class="row">
+          <p v-t="'dateTimeRestrictionDescription'" />
+          <div v-for="(restriction, index) in dateTimeRestrictions" :key="index" class="row">
             <range-input
               v-model:minimum="restriction.values[0]"
               v-model:maximum="restriction.values[1]"
@@ -38,9 +38,9 @@
               :type="DataType.DateTime"
               class="col"
             />
-            <q-btn flat icon="remove" :title="t('removeThing', { thing: t('timeRestriction') })" class="col-auto" @click="removeTimeRestriction(index)" />
+            <q-btn flat icon="remove" :title="t('removeThing', { thing: t('dateTimeRestriction') })" class="col-auto" @click="removeDateTimeRestriction(index)" />
           </div>
-          <q-btn flat icon="add" class="q-mt-md" :label="t('addThing', { thing: t('timeRestriction') })" @click="addTimeRestriction()" />
+          <q-btn flat icon="add" class="q-mt-md" :label="t('addThing', { thing: t('dateTimeRestriction') })" @click="addDateTimeRestriction()" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -60,12 +60,12 @@ export default defineComponent({
       type: Array as () => NumberRestriction[],
       default: () => []
     },
-    timeRestrictions: {
+    dateTimeRestrictions: {
       type: Array as () => DateTimeRestriction[],
       default: () => []
     }
   },
-  emits: ['update:ageRestrictions', 'update:timeRestrictions'],
+  emits: ['update:ageRestrictions', 'update:dateTimeRestrictions'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
@@ -75,7 +75,7 @@ export default defineComponent({
       DataType,
       showDialog: ref(false),
 
-      hasContent: computed(() => props.ageRestrictions.length > 0 || props.timeRestrictions.length > 0),
+      hasContent: computed(() => props.ageRestrictions.length > 0 || props.dateTimeRestrictions.length > 0),
 
       addAgeRestriction: () => {
         const newValue = JSON.parse(JSON.stringify(props.ageRestrictions)) as NumberRestriction[]
@@ -83,10 +83,10 @@ export default defineComponent({
         emit('update:ageRestrictions', newValue)
       },
 
-      addTimeRestriction: () => {
-        const newValue = JSON.parse(JSON.stringify(props.timeRestrictions)) as DateTimeRestriction[]
+      addDateTimeRestriction: () => {
+        const newValue = JSON.parse(JSON.stringify(props.dateTimeRestrictions)) as DateTimeRestriction[]
         newValue.push({ type: DataType.DateTime, values: [] })
-        emit('update:timeRestrictions', newValue)
+        emit('update:dateTimeRestrictions', newValue)
       },
 
       removeAgeRestriction: (index: number) => {
@@ -95,10 +95,10 @@ export default defineComponent({
         emit('update:ageRestrictions', newValue)
       },
 
-      removeTimeRestriction: (index: number) => {
-        const newValue = JSON.parse(JSON.stringify(props.timeRestrictions)) as DateTimeRestriction[]
+      removeDateTimeRestriction: (index: number) => {
+        const newValue = JSON.parse(JSON.stringify(props.dateTimeRestrictions)) as DateTimeRestriction[]
         newValue.splice(index, 1)
-        emit('update:timeRestrictions', newValue)
+        emit('update:dateTimeRestrictions', newValue)
       }
     }
   }
