@@ -258,7 +258,15 @@ export default defineComponent({
           .then((r) => {
             alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
             const index = tabs.value.findIndex(t => t.entity.id === r.id)
-            if (index != -1) tabs.value[index].entity = r
+            if (index != -1) {
+              tabs.value[index].entity = r
+              tabs.value[index].selectedVersion = r.version
+            }
+            void router.push({
+              name: 'editor',
+              params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: r.id },
+              query: { version: r.version }
+            })
           })
           .catch((e: Error) => alert(t(e.message)))
       },
