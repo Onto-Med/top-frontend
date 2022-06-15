@@ -155,7 +155,7 @@ export default defineComponent({
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
-    void entityStore.reloadOperators()
+    void entityStore.reloadFunctions()
     const selectTabByKey = (key: string|undefined): void => {
       const index = tabs.value.map(t => t.entity.id).indexOf(key)
       if (index !== -1)

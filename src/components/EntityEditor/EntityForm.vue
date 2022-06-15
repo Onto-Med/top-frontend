@@ -76,7 +76,7 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         :entity-types="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype]"
-        operator-type="math"
+        function-type="math"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />
@@ -100,7 +100,7 @@
         :repository-id="repositoryId"
         :help-text="t('entityEditor.expressionHelp')"
         :entity-types="restrictionEntityTypes()"
-        operator-type="boolean"
+        function-type="boolean"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />

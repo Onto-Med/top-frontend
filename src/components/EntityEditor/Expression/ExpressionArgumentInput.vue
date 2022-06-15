@@ -1,13 +1,13 @@
 <template>
   <div class="expression-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
-    <div v-if="operator && operator.id === 'entity'">
+    <div v-if="fun && fun.id === 'entity'">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
    --><entity-chip
         :entity-id="modelValue.id"
         :entity-types="entityTypes"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :label="t('selectThing', { thing: t(operator.title) }) + '...'"
+        :label="t('selectThing', { thing: t(fun.title) }) + '...'"
         :disable="readonly"
         @entity-clicked="$emit('entityClicked', $event)"
         @entity-set="setEntity($event)"
@@ -21,7 +21,7 @@
       </entity-chip>
     </div>
     <constant-input
-      v-else-if="operator && operator.id === 'constant'"
+      v-else-if="fun && fun.id === 'constant'"
       :model-value="modelValue.constant"
       :readonly="readonly"
       :indent-level="indentLevel"
@@ -31,7 +31,7 @@
       @enclose="enclose()"
       @remove="$emit('update:modelValue', undefined)"
     />
-    <template v-else-if="operator">
+    <template v-else-if="fun">
       <div
         v-if="prefix"
         :class="{ hover: hover }"
@@ -39,13 +39,13 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ operatorTitle }}</b> (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
-          :operators="operators"
+          :functions="functions"
           @enclose="enclose()"
           @remove="$emit('update:modelValue', undefined)"
-          @select="setOperator($event)"
+          @select="setFunction($event)"
         />
       </div>
       <div
@@ -57,7 +57,7 @@
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}(
       </div>
 
-      <template v-for="(n, index) in operandCount" :key="index">
+      <template v-for="(n, index) in argumentCount" :key="index">
         <div
           v-if="index != 0 && infix"
           :class="{ hover: hover }"
@@ -65,13 +65,13 @@
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ operatorTitle }}</b>{{ !expand ? '&nbsp;' : '' }}
+          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}
           <expression-context-menu
             v-if="!readonly"
-            :operators="operators"
+            :functions="functions"
             @enclose="enclose()"
             @remove="$emit('update:modelValue', undefined)"
-            @select="setOperator($event)"
+            @select="setFunction($event)"
           />
         </div>
         <div
@@ -82,31 +82,31 @@
         >
           {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '' }},{{ !expand ? '&nbsp;' : '' }}
         </div>
-        <expression-operand-input
-          :model-value="modelValue.operands[index]"
+        <expression-argument-input
+          :model-value="modelValue.arguments[index]"
           :readonly="readonly"
-          :operators="operators"
+          :functions="functions"
           :expand="expand"
           :indent="indent"
           :indent-level="indentLevel + 1"
           :organisation-id="organisationId"
           :repository-id="repositoryId"
           :entity-types="entityTypes"
-          @update:model-value="handleOperandUpdate(index, $event)"
+          @update:model-value="handleArgumentUpdate(index, $event)"
           @entity-clicked="$emit('entityClicked', $event)"
         />
       </template>
 
-      <template v-if="!readonly && operator && operator.type === TypeEnum.Multary">
+      <template v-if="!readonly && fun && showMoreBtn">
         <div
-          v-if="operandCount != 0 && !infix"
+          v-if="argumentCount != 0 && !infix"
           :class="{ hover: hover }"
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
           {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '' }},
         </div>
-        {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<q-chip icon="add" clickable :label="t('more')" :title="t('addMoreOperands')" @click="handleOperandUpdate(operandCount, {})" />
+        {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<q-chip icon="add" clickable :label="t('more')" :title="t('addMoreArguments')" @click="handleArgumentUpdate(argumentCount, {})" />
       </template>
 
       <div
@@ -115,13 +115,13 @@
         @mouseleave="hover = false"
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-        <b>{{ operatorTitle }}</b>
+        <b>{{ functionTitle }}</b>
         <expression-context-menu
           v-if="!readonly"
-          :operators="operators"
+          :functions="functions"
           @enclose="enclose()"
           @remove="$emit('update:modelValue', undefined)"
-          @select="setOperator($event)"
+          @select="setFunction($event)"
         />
       </div>
       <div
@@ -134,12 +134,12 @@
       </div>
     </template>
     <div v-else class="clickable">
-      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[{{ modelValue?.operands ? '...' : t('selectThing', { thing: t('operator') }) }}]
+      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[{{ modelValue?.arguments ? '...' : t('selectThing', { thing: t('function') }) }}]
       <expression-context-menu
         v-if="!readonly"
         :enclosable="false"
-        :operators="operators"
-        @select="setOperator($event)"
+        :functions="functions"
+        @select="setFunction($event)"
         @remove="$emit('update:modelValue', null)"
       />
     </div>
@@ -153,17 +153,14 @@ import {
   Entity,
   EntityType,
   Expression,
-  ExpressionMultaryOperator,
-  ExpressionOperator,
-  RepresentationEnum,
-  TypeEnum,
+  ExpressionFunction,
+  NotationEnum
 } from '@onto-med/top-api';
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 import ConstantInput from 'src/components/EntityEditor/Expression/ConstantInput.vue'
 
 export default defineComponent({
-  name: 'FormulaOperandInput',
   components: {
     EntityChip,
     ExpressionContextMenu,
@@ -179,7 +176,7 @@ export default defineComponent({
     readonly: Boolean,
     root: Boolean,
     expand: Boolean,
-    operators: Array as () => ExpressionOperator[],
+    functions: Array as () => ExpressionFunction[],
     indent: {
       type: Number,
       default: 2
@@ -198,79 +195,75 @@ export default defineComponent({
     const { t, te } = useI18n()
     const flash = ref(false)
 
-    const getOperator = (operator: string|undefined) => props.operators?.find((o) => o.id === operator)
-    const operator = computed(() => getOperator(props.modelValue?.operator))
+    const getFunction = (fun: string|undefined) => props.functions?.find((o) => o.id === fun)
+    const fun = computed(() => getFunction(props.modelValue?.function))
 
     const blink = () => {
       flash.value = true
       setTimeout(() => flash.value = false, 500)
     }
 
-    const countOperands = (expression: Expression, operator: ExpressionOperator|undefined) => {
-      if (!operator) return 0;
-      switch (operator.type) {
-        case TypeEnum.Nullary:
-          return 0
-        case TypeEnum.Unary:
-          return 1
-        case TypeEnum.Binary:
-          return 2
-        default:
-          return Math.max(expression.operands?.length || 0, (operator as ExpressionMultaryOperator).required)
-      }
+    const countArguments = (expression: Expression, fun: ExpressionFunction|undefined) => {
+      if (!fun) return 0;
+      const count = Math.max(expression.arguments?.length || 0, fun.minArgumentNumber || 0)
+      if (fun.maxArgumentNumber && fun.maxArgumentNumber < count) return fun.maxArgumentNumber
+      return count
     }
+
+    const argumentCount = computed(() => countArguments(props.modelValue, fun.value))
 
     return {
       t,
-      TypeEnum,
-      operator,
+      fun,
       hover: ref(false),
       flash,
+      argumentCount,
 
-      operatorTitle: computed(() => {
-        if (!operator.value || !operator.value.title) return ''
-        return te(operator.value.title) ? t(operator.value.title) : operator.value.title
+      showMoreBtn: computed(() =>
+        fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
+      ),
+
+      functionTitle: computed(() => {
+        if (!fun.value || !fun.value.title) return ''
+        return te(fun.value.title) ? t(fun.value.title) : fun.value.title
       }),
 
       prefix: computed(
         () =>
-          operator.value &&
-          operator.value.representation === RepresentationEnum.Prefix
+          fun.value &&
+          fun.value.notation === NotationEnum.Prefix
       ),
 
       infix: computed(
         () =>
-          !operator.value ||
-          operator.value.representation === RepresentationEnum.Infix
+          !fun.value ||
+          fun.value.notation === NotationEnum.Infix
       ),
 
       postfix: computed(
         () =>
-          operator.value &&
-          operator.value.representation === RepresentationEnum.Postfix
+          fun.value &&
+          fun.value.notation === NotationEnum.Postfix
       ),
 
-      operandCount: computed(() => countOperands(props.modelValue, operator.value)),
-
-      handleOperandUpdate(index: number, operand: Expression | undefined | null): void {
+      handleArgumentUpdate(index: number, argument: Expression | undefined | null): void {
         const newModelValue = JSON.parse(
           JSON.stringify(props.modelValue)
         ) as Expression
-        if (!newModelValue.operands) newModelValue.operands = []
-        if (operand) newModelValue.operands[index] = operand
-        else if (operand === undefined) delete newModelValue.operands[index]
-        else newModelValue.operands.splice(index, 1)
+        if (!newModelValue.arguments) newModelValue.arguments = []
+        if (argument) newModelValue.arguments[index] = argument
+        else newModelValue.arguments.splice(index, 1)
         emit('update:modelValue', newModelValue)
       },
 
-      setOperator(operatorId: string) {
+      setFunction(functionId: string) {
         const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
         ) || {}) as Expression
-        newModelValue.operator = operatorId
-        if (!newModelValue.operands) newModelValue.operands = []
-        const count = countOperands(newModelValue, getOperator(newModelValue.operator))
-        newModelValue.operands.splice(count, newModelValue.operands.length - count)
+        newModelValue.function = functionId
+        if (!newModelValue.arguments) newModelValue.arguments = []
+        const count = countArguments(newModelValue, getFunction(newModelValue.function))
+        newModelValue.arguments.splice(count, newModelValue.arguments.length - count)
         emit('update:modelValue', newModelValue)
         blink()
       },
@@ -289,7 +282,7 @@ export default defineComponent({
 
       enclose (): void {
         const newModelValue = {
-          operands: [ JSON.parse(JSON.stringify(props.modelValue)) ]
+          arguments: [ JSON.parse(JSON.stringify(props.modelValue)) ]
         } as Expression
         emit('update:modelValue', newModelValue)
       }

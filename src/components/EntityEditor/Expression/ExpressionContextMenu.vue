@@ -2,13 +2,13 @@
   <q-menu>
     <q-list dense>
       <q-item
-        v-for="operator in operators"
-        :key="operator.id"
+        v-for="fun in functions"
+        :key="fun.id"
         v-close-popup
         clickable
-        @click="$emit('select', operator.id)"
+        @click="$emit('select', fun.id)"
       >
-        <q-item-section>{{ te(operator.title) ? t(operator.title) : operator.title }}</q-item-section>
+        <q-item-section>{{ te(fun.title) ? t(fun.title) : fun.title }}</q-item-section>
       </q-item>
       <q-separator />
       <q-item v-if="enclosable" v-close-popup clickable @click="$emit('enclose')">
@@ -29,7 +29,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { ExpressionOperator } from '@onto-med/top-api';
+import { ExpressionFunction } from '@onto-med/top-api';
 
 export default defineComponent({
   name: 'ExpressionContextMenu',
@@ -42,8 +42,8 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
-    operators: {
-      type: Array as () => ExpressionOperator[],
+    functions: {
+      type: Array as () => ExpressionFunction[],
       required: true
     }
   },

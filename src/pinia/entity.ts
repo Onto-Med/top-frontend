@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionOperator, ExpressionOperatorApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -12,10 +12,10 @@ export const useEntity = defineStore('entity', {
       organisation: undefined as Organisation|undefined,
       repository: undefined as Repository|undefined,
       entities: [] as Entity[],
-      operators: new Map<string, ExpressionOperator[]>(),
+      functions: new Map<string, ExpressionFunction[]>(),
       keycloak: undefined as KeycloakInstance|undefined,
       entityApi: undefined as EntityApi|undefined,
-      expressionOperatorApi: undefined as ExpressionOperatorApi|undefined,
+      expressionFunctionApi: undefined as ExpressionFunctionApi|undefined,
       organisationApi: undefined as OrganisationApi|undefined,
       repositoryApi: undefined as RepositoryApi|undefined,
       forkApi: undefined as ForkApi|undefined
@@ -32,14 +32,14 @@ export const useEntity = defineStore('entity', {
         .then((r) => this.entities = r.data)
     },
 
-    async reloadOperatorsByType (type: string) {
-      await this.expressionOperatorApi?.getExpressionOperators(type)
-        .then((r) => this.operators.set(type, r.data))
+    async reloadFunctionsByType (type: string) {
+      await this.expressionFunctionApi?.getExpressionFunctions(type)
+        .then((r) => this.functions.set(type, r.data))
     },
 
-    async reloadOperators () {
-      await this.reloadOperatorsByType('math')
-      await this.reloadOperatorsByType('boolean')
+    async reloadFunctions () {
+      await this.reloadFunctionsByType('math')
+      await this.reloadFunctionsByType('boolean')
     },
 
     async setOrganisation (organisationId: string|undefined) {
@@ -63,10 +63,10 @@ export const useEntity = defineStore('entity', {
         .then(r => this.repository = r.data)
     },
 
-    async getOperators (type: string): Promise<ExpressionOperator[]> {
-      if (!this.operators.get(type))
-        await this.reloadOperatorsByType(type)
-      return this.operators.get(type) || []
+    async getFunctions (type: string): Promise<ExpressionFunction[]> {
+      if (!this.functions.get(type))
+        await this.reloadFunctionsByType(type)
+      return this.functions.get(type) || []
     },
 
     getEntity (id: string|undefined): Entity|undefined {

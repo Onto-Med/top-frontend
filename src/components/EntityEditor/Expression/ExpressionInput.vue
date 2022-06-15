@@ -1,16 +1,16 @@
 <template>
   <expandable-card
     :title="label"
-    :error="modelValue === undefined || modelValue.operator === undefined"
+    :error="modelValue === undefined || modelValue.function === undefined"
     :help-text="helpText"
     :expanded="expanded"
     :show-help="showHelp"
   >
     <template #default>
-      <expression-operand-input
-        v-if="operators"
+      <expression-argument-input
+        v-if="functions"
         class="text-subtitle1"
-        :operators="operators"
+        :functions="functions"
         :readonly="readonly"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
@@ -84,13 +84,13 @@
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import ExpressionOperandInput from 'src/components/EntityEditor/Expression/ExpressionOperandInput.vue'
-import { EntityType, Expression, ExpressionOperator } from '@onto-med/top-api'
+import ExpressionArgumentInput from 'src/components/EntityEditor/Expression/ExpressionArgumentInput.vue'
+import { EntityType, Expression, ExpressionFunction } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   components: {
-    ExpressionOperandInput,
+    ExpressionArgumentInput,
     ExpandableCard
   },
   props: {
@@ -113,7 +113,7 @@ export default defineComponent({
       type: Array as () => EntityType[],
       default: () => []
     },
-    operatorType: {
+    functionType: {
       type: String,
       required: true,
       validator: (value: string) => ['math', 'boolean'].includes(value)
@@ -124,17 +124,17 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const entityStore = useEntity()
-    const operators = ref(undefined as ExpressionOperator[]|undefined)
+    const functions = ref(undefined as ExpressionFunction[]|undefined)
 
-    void entityStore.getOperators(props.operatorType)
-      .then(o => operators.value = o)
+    void entityStore.getFunctions(props.functionType)
+      .then(o => functions.value = o)
 
     return {
       t,
       expandExpression: ref(false),
       indent: ref(2),
       showClearDialog: ref(false),
-      operators
+      functions
     }
   }
 })
