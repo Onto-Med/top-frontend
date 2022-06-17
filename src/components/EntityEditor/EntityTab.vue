@@ -266,7 +266,7 @@ export default defineComponent({
     const isValid = computed((): boolean => {
       var result = true
 
-      result &&= local.value.titles != undefined && local.value.titles.filter(t => t.lang && t.text).length > 0
+      result &&= local.value.titles != undefined && local.value.titles.length > 0 && local.value.titles.filter(t => !t.lang || !t.text).length === 0
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
       
