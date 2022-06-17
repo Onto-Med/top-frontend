@@ -237,7 +237,8 @@ export default defineComponent({
         switchTab(-1)
       } else if (e.code === 'ArrowRight' && (e.ctrlKey || e.metaKey)) {
         switchTab(1)
-      }
+      } else return
+      e.preventDefault()
     }
 
     onMounted(async () => {
