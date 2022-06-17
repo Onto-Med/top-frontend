@@ -24,6 +24,7 @@
           no-caps
           color="primary"
           :label="t('save')"
+          :title="t('ctrl') + '+S'"
           :disabled="!hasUnsavedChanges && !isNew"
           @click="save()"
         />
