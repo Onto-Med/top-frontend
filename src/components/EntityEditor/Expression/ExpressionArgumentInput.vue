@@ -1,5 +1,6 @@
 <template>
   <div class="expression-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
+    <slot name="prepend" />
     <div v-if="fun && fun.id === 'entity'">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
    --><entity-chip
@@ -19,18 +20,22 @@
           </q-item>
         </template>
       </entity-chip>
+      <slot name="append" />
     </div>
-    <constant-input
-      v-else-if="fun && fun.id === 'constant'"
-      :model-value="modelValue.constant"
-      :readonly="readonly"
-      :indent-level="indentLevel"
-      :indent="indent"
-      :expand="expand"
-      @update:modelValue="setConstant($event)"
-      @enclose="enclose()"
-      @remove="$emit('update:modelValue', undefined)"
-    />
+    <div v-else-if="fun && fun.id === 'constant'">
+      <constant-input
+        class="inline"
+        :model-value="modelValue.constant"
+        :readonly="readonly"
+        :indent-level="indentLevel"
+        :indent="indent"
+        :expand="expand"
+        @update:modelValue="setConstant($event)"
+        @enclose="enclose()"
+        @remove="$emit('update:modelValue', undefined)"
+      />
+      <slot name="append" />
+    </div>
     <template v-else-if="fun">
       <div
         v-if="prefix"
@@ -65,7 +70,7 @@
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}
+          <span>{{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}</span>
           <expression-context-menu
             v-if="!readonly"
             :functions="functions"
@@ -73,14 +78,6 @@
             @remove="$emit('update:modelValue', undefined)"
             @select="setFunction($event)"
           />
-        </div>
-        <div
-          v-else-if="index != 0"
-          :class="{ hover: hover }"
-          @mouseover="hover = true"
-          @mouseleave="hover = false"
-        >
-          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '' }},{{ !expand ? '&nbsp;' : '' }}
         </div>
         <expression-argument-input
           :model-value="modelValue.arguments[index]"
@@ -94,28 +91,39 @@
           :entity-types="entityTypes"
           @update:model-value="handleArgumentUpdate(index, $event)"
           @entity-clicked="$emit('entityClicked', $event)"
-        />
+        >
+          <template
+            v-if="!infix && index < argumentCount"
+            #append
+            :class="{ hover: hover }"
+            @mouseover="hover = true"
+            @mouseleave="hover = false"
+          >
+            <span>,{{ !expand ? '&nbsp;' : '' }}</span>
+          </template>
+        </expression-argument-input>
       </template>
 
       <template v-if="!readonly && fun && showMoreBtn">
-        <div
-          v-if="argumentCount != 0 && !infix"
-          :class="{ hover: hover }"
-          @mouseover="hover = true"
-          @mouseleave="hover = false"
-        >
-          {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '' }},
-        </div>
-        {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<q-chip icon="add" clickable :label="t('more')" :title="t('addMoreArguments')" @click="handleArgumentUpdate(argumentCount, {})" />
+        <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
+        <q-chip
+          icon="add"
+          clickable
+          :label="t('more')"
+          :title="t('addMoreArguments')"
+          @click="handleArgumentUpdate(argumentCount, {})"
+        />
       </template>
 
       <div
         v-if="postfix"
+        :class="{ hover: hover }"
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
         <b>{{ functionTitle }}</b>
+        <slot name="append" />
         <expression-context-menu
           v-if="!readonly"
           :functions="functions"
@@ -130,11 +138,12 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
+        <span>{{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})</span>
+        <slot name="append" />
       </div>
     </template>
     <div v-else class="clickable">
-      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[{{ modelValue?.arguments ? '...' : t('selectThing', { thing: t('function') }) }}]
+      <span>{{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[{{ modelValue?.arguments ? '...' : t('selectThing', { thing: t('function') }) }}]</span>
       <expression-context-menu
         v-if="!readonly"
         :enclosable="false"
@@ -142,6 +151,7 @@
         @select="setFunction($event)"
         @remove="$emit('update:modelValue', null)"
       />
+      <slot name="append" />
     </div>
   </div>
 </template>
@@ -296,13 +306,19 @@ export default defineComponent({
   color: var(--q-primary)
   font-weight: 900
 
-.clickable:hover
-  cursor: pointer
-  @extend .hover
+.clickable
+  display: inline
+  &:hover
+    cursor: pointer
+    @extend .hover
+
+.d-inline
+  display: inline
 
 .expression-input .entity-search-input-field
   width: 200px
   margin: 4px
+  display: inline
   vertical-align: middle
   .q-field__inner, .q-field__control
     min-height: 2em !important

@@ -1,32 +1,30 @@
 <template>
-  <div>
-    <div class="clickable">
-      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue ? modelValue : '[' + t('constant') + ']' }}
-    </div>
-    <q-popup-edit
-      v-if="!readonly"
-      ref="popup"
-      v-slot="scope"
-      :model-value="modelValue"
-      :cover="false"
-      auto-save
-      @update:model-value="$emit('update:modelValue', $event)"
-    >
-      <q-input v-model="scope.value" :type="dataType" dense autofocus @keyup.enter="scope.set">
-        <template #append>
-          <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
-        </template>
-      </q-input>
-      <q-list dense>
-        <q-item clickable @click="$emit('enclose')">
-          <q-item-section v-t="'encloseWithExpression'" />
-        </q-item>
-        <q-item clickable @click="$emit('remove')">
-          <q-item-section v-t="'remove'" />
-        </q-item>
-      </q-list>
-    </q-popup-edit>
+  <div class="clickable">
+    {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue ? modelValue : '[' + t('constant') + ']' }}
   </div>
+  <q-popup-edit
+    v-if="!readonly"
+    ref="popup"
+    v-slot="scope"
+    :model-value="modelValue"
+    :cover="false"
+    auto-save
+    @update:model-value="$emit('update:modelValue', $event)"
+  >
+    <q-input v-model="scope.value" :type="dataType" dense autofocus @keyup.enter="scope.set">
+      <template #append>
+        <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
+      </template>
+    </q-input>
+    <q-list dense>
+      <q-item clickable @click="$emit('enclose')">
+        <q-item-section v-t="'encloseWithExpression'" />
+      </q-item>
+      <q-item clickable @click="$emit('remove')">
+        <q-item-section v-t="'remove'" />
+      </q-item>
+    </q-list>
+  </q-popup-edit>
 </template>
 
 <script lang="ts">
@@ -70,7 +68,9 @@ export default defineComponent({
   color: var(--q-primary)
   font-weight: 900
 
-.clickable:hover
-  cursor: pointer
-  @extend .hover
+.clickable
+  display: inline
+  &:hover
+    cursor: pointer
+    @extend .hover
 </style>
