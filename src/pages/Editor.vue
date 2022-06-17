@@ -231,7 +231,9 @@ export default defineComponent({
     }
 
     const keylistener = (e: KeyboardEvent) => {
-      if (e.code === 'ArrowLeft' && (e.ctrlKey || e.metaKey)) {
+      if (e.code === 'Delete' && (e.ctrlKey || e.metaKey)) {
+        closeTab(selected.value)
+      } if (e.code === 'ArrowLeft' && (e.ctrlKey || e.metaKey)) {
         switchTab(-1)
       } else if (e.code === 'ArrowRight' && (e.ctrlKey || e.metaKey)) {
         switchTab(1)
