@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -12,9 +12,11 @@ export const useEntity = defineStore('entity', {
       organisation: undefined as Organisation|undefined,
       repository: undefined as Repository|undefined,
       entities: [] as Entity[],
+      constants: undefined as Constant[]|undefined,
       functions: new Map<string, ExpressionFunction[]>(),
       keycloak: undefined as KeycloakInstance|undefined,
       entityApi: undefined as EntityApi|undefined,
+      expressionConstantApi: undefined as ExpressionConstantApi|undefined,
       expressionFunctionApi: undefined as ExpressionFunctionApi|undefined,
       organisationApi: undefined as OrganisationApi|undefined,
       repositoryApi: undefined as RepositoryApi|undefined,
@@ -30,6 +32,11 @@ export const useEntity = defineStore('entity', {
         }
       await this.entityApi?.getEntitiesByRepositoryId(this.organisationId, this.repositoryId)
         .then((r) => this.entities = r.data)
+    },
+
+    async reloadConstants () {
+      await this.expressionConstantApi?.getConstants()
+        .then(r => this.constants = r.data)
     },
 
     async reloadFunctionsByType (type: string) {
@@ -61,6 +68,12 @@ export const useEntity = defineStore('entity', {
       if (!this.organisationId) return
       await this.repositoryApi?.getRepositoryById(this.organisationId, repositoryId, undefined)
         .then(r => this.repository = r.data)
+    },
+
+    async getConstants (): Promise<Constant[]> {
+      if (!this.constants)
+        await this.reloadConstants()
+      return this.constants || []
     },
 
     async getFunctions (type: string): Promise<ExpressionFunction[]> {

@@ -1,34 +1,44 @@
 <template>
-  <div class="clickable">
-    {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue ? modelValue : '[' + t('constant') + ']' }}
+  <div>
+    <div class="clickable">
+      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue ? modelValue : '[' + t('constant') + ']' }}
+    </div>
+    <q-popup-edit
+      v-if="!readonly"
+      ref="popup"
+      v-slot="scope"
+      :model-value="modelValue"
+      :cover="false"
+      auto-save
+      @update:model-value="$emit('update:modelValue', $event)"
+    >
+      <q-input v-model="scope.value" :type="dataType" dense autofocus @keyup.enter="scope.set">
+        <template #append>
+          <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
+        </template>
+      </q-input>
+      <q-list v-if="constants" dense>
+        <q-item v-for="constant in constants" :key="constant.id" v-close-popup clickable @click="$emit('update:modelValue', constant.id)">
+          {{ constant.title || constant.id }}
+        </q-item>
+      </q-list>
+      <q-separator />
+      <q-list dense>
+        <q-item clickable @click="$emit('enclose')">
+          <q-item-section v-t="'encloseWithExpression'" />
+        </q-item>
+        <q-item clickable @click="$emit('remove')">
+          <q-item-section v-t="'remove'" />
+        </q-item>
+      </q-list>
+    </q-popup-edit>
   </div>
-  <q-popup-edit
-    v-if="!readonly"
-    ref="popup"
-    v-slot="scope"
-    :model-value="modelValue"
-    :cover="false"
-    auto-save
-    @update:model-value="$emit('update:modelValue', $event)"
-  >
-    <q-input v-model="scope.value" :type="dataType" dense autofocus @keyup.enter="scope.set">
-      <template #append>
-        <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
-      </template>
-    </q-input>
-    <q-list dense>
-      <q-item clickable @click="$emit('enclose')">
-        <q-item-section v-t="'encloseWithExpression'" />
-      </q-item>
-      <q-item clickable @click="$emit('remove')">
-        <q-item-section v-t="'remove'" />
-      </q-item>
-    </q-list>
-  </q-popup-edit>
 </template>
 
 <script lang="ts">
+import { Constant } from '@onto-med/top-api';
 import { QPopupEdit } from 'quasar';
+import { useEntity } from 'src/pinia/entity';
 import { defineComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n';
 
@@ -38,7 +48,7 @@ export default defineComponent({
     modelValue: [Number, Date, String],
     dataType: {
       type: String,
-      default: 'number'
+      default: 'text'
     },
     readonly: Boolean,
     expand: Boolean,
@@ -50,6 +60,11 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const popup = ref(null as unknown as QPopupEdit)
+    const entityStore = useEntity()
+    const constants = ref(undefined as Constant[]|undefined)
+
+    void entityStore.getConstants()
+      .then(o => constants.value = o)
 
     onMounted(() => {
       if (!props.modelValue) popup.value.show()
@@ -57,7 +72,8 @@ export default defineComponent({
 
     return {
       t,
-      popup
+      popup,
+      constants
     }
   },
 })
