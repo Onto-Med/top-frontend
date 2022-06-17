@@ -83,6 +83,7 @@
                 :entity="tab.entity"
                 :repository-id="repository.id"
                 :organisation-id="organisationId"
+                :hotkeys-enabled="selected?.id === tab.entity.id"
                 @change="tab.dirty = $event"
                 @update:entity="saveEntity"
                 @entity-clicked="selectTabByKey($event)"
@@ -131,7 +132,11 @@ export default defineComponent({
   components: { EntityTab, EntityTree },
   props: {
     entityId: String,
-    version: Number
+    version: Number,
+    hotkeysEnabled: {
+      type: Boolean,
+      default: true
+    }
   },
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -218,7 +223,28 @@ export default defineComponent({
       }
     )
 
+    const switchTab = (offset: number) => {
+      var index = tabs.value.findIndex(t => selected.value?.id === t.entity.id)
+      if (index === -1) return
+      index += offset
+      if (tabs.value[index] === undefined) return
+      selectTabByKey(tabs.value[index].entity.id)
+    }
+
+    const keylistener = (e: KeyboardEvent) => {
+      if (!props.hotkeysEnabled) return
+      if (e.code === 'Delete' && (e.ctrlKey || e.metaKey)) {
+        closeTab(selected.value)
+      } if (e.code === 'ArrowLeft' && (e.ctrlKey || e.metaKey)) {
+        switchTab(-1)
+      } else if (e.code === 'ArrowRight' && (e.ctrlKey || e.metaKey)) {
+        switchTab(1)
+      } else return
+      e.preventDefault()
+    }
+
     onMounted(async () => {
+      document.addEventListener('keydown', keylistener)
       await reloadEntities().then(() => {
         if (!props.entityId) return
         const entity = entityStore.getEntity(props.entityId)

@@ -24,6 +24,7 @@
           no-caps
           color="primary"
           :label="t('save')"
+          :title="t('ctrl') + '+S'"
           :disabled="!hasUnsavedChanges && !isNew"
           @click="save()"
         />
@@ -204,6 +205,14 @@ export default defineComponent({
     organisationId: {
       type: String,
       required: true
+    },
+    hotkeysEnabled: {
+      type: Boolean,
+      default: true
+    },
+    isOpen: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'change'],
@@ -258,7 +267,7 @@ export default defineComponent({
     const isValid = computed((): boolean => {
       var result = true
 
-      result &&= local.value.titles != undefined && local.value.titles.filter(t => t.lang && t.text).length > 0
+      result &&= local.value.titles != undefined && local.value.titles.length > 0 && local.value.titles.filter(t => !t.lang || !t.text).length === 0
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
       
@@ -269,7 +278,27 @@ export default defineComponent({
       return result
     })
 
+    const save = () => {
+      if ((isNew.value || hasUnsavedChanges.value)) {
+        if (isValid.value) {
+          emit('update:entity', local.value)
+          versionHistoryDialogKey.value++
+        } else {
+          alert(t('pleaseCheckInput'))
+        }
+      }
+    }
+
+    const keylistener = (e: KeyboardEvent) => {
+      if (!props.hotkeysEnabled) return
+      if (e.code === 'KeyS' && (e.ctrlKey || e.metaKey)) {
+        save()
+      } else return
+      e.preventDefault()
+    }
+
     onMounted(() => {
+      document.addEventListener('keydown', keylistener)
       if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
       loading.value = true
       entityApi.getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
@@ -302,6 +331,7 @@ export default defineComponent({
       isForking: true,
 
       hasUnsavedChanges,
+      save,
 
       prefillFromVersion,
 
@@ -326,14 +356,6 @@ export default defineComponent({
           query: { version: local.value.version }
         })
         emit('changeVersion', local.value.version)
-      },
-
-      save: () => {
-        if ((isNew.value || hasUnsavedChanges.value) && isValid.value) {
-          emit('update:entity', local.value)
-          versionHistoryDialogKey.value++
-        } else
-          alert(t('pleaseCheckInput'))
       }
     }
   }

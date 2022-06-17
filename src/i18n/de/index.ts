@@ -10,6 +10,7 @@ export default {
   configureThing: '{thing} konfigurieren',
   continue: 'Fortsetzen',
   criterion: 'Kriterium|Kriterien',
+  ctrl: 'STRG',
   dataSource: 'Datenquelle|Datenquellen',
   dataSourceDescription: 'Wählen Sie mindestens eine Datenquelle aus, auf der die Abfrage ausgeführt werden soll.',
   defineThing: '{thing} definieren',
