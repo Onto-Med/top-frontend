@@ -211,7 +211,10 @@ export const useEntity = defineStore('entity', {
         }
 
       await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
-        .then(() => Object.assign(this.entities.find(e => e.id == entity.id), entity))
+        .then(() => {
+          const old = this.entities.find(e => e.id == entity.id)
+          if (old) Object.assign(old, entity)
+        })
     },
 
     hasSuperCategory (entity: Category|Phenotype, category: Category): boolean {
