@@ -1,7 +1,8 @@
 <template>
   <div>
     <div class="clickable">
-      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}{{ modelValue ? modelValue : '[' + t('constant') + ']' }}
+      <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel) * indent) }}</span>
+      <span>{{ defaultConstant ? defaultConstant.title || defaultConstant.id : modelValue ? modelValue : '[' + t('constant') + ']' }}</span>
     </div>
     <q-popup-edit
       v-if="!readonly"
@@ -39,7 +40,7 @@
 import { Constant } from '@onto-med/top-api';
 import { QPopupEdit } from 'quasar';
 import { useEntity } from 'src/pinia/entity';
-import { defineComponent, onMounted, ref } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
@@ -70,10 +71,13 @@ export default defineComponent({
       if (!props.modelValue) popup.value.show()
     })
 
+    const defaultConstant = computed(() => constants.value?.find(c => c.id === props.modelValue))
+
     return {
       t,
       popup,
-      constants
+      constants,
+      defaultConstant
     }
   },
 })
