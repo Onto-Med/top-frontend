@@ -1,15 +1,16 @@
 import { boot } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
 import { EntityApi, ExpressionFunctionApi, ForkApi, OrganisationApi, RepositoryApi } from '@onto-med/top-api'
+import { AxiosInstance } from 'axios'
 
 export default boot(({ app }) => {
   const pinia = createPinia()
   pinia.use(() => ({
-    entityApi: new EntityApi(undefined, '', app.config.globalProperties.$axios),
-    expressionFunctionApi: new ExpressionFunctionApi(undefined, '', app.config.globalProperties.$axios),
-    forkApi: new ForkApi(undefined, '', app.config.globalProperties.$axios),
-    organisationApi: new OrganisationApi(undefined, '', app.config.globalProperties.$axios),
-    repositoryApi: new RepositoryApi(undefined, '', app.config.globalProperties.$axios)
+    entityApi: new EntityApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
+    expressionFunctionApi: new ExpressionFunctionApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
+    forkApi: new ForkApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
+    organisationApi: new OrganisationApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
+    repositoryApi: new RepositoryApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined)
   }))
   app.use(pinia)
 })
