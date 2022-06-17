@@ -83,6 +83,7 @@
                 :entity="tab.entity"
                 :repository-id="repository.id"
                 :organisation-id="organisationId"
+                :hotkeys-enabled="selected?.id === tab.entity.id"
                 @change="tab.dirty = $event"
                 @update:entity="saveEntity"
                 @entity-clicked="selectTabByKey($event)"
@@ -231,6 +232,7 @@ export default defineComponent({
     }
 
     const keylistener = (e: KeyboardEvent) => {
+      if (!props.hotkeysEnabled) return
       if (e.code === 'Delete' && (e.ctrlKey || e.metaKey)) {
         closeTab(selected.value)
       } if (e.code === 'ArrowLeft' && (e.ctrlKey || e.metaKey)) {
@@ -242,7 +244,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      if (props.hotkeysEnabled) document.addEventListener('keydown', keylistener)
+      document.addEventListener('keydown', keylistener)
       await reloadEntities().then(() => {
         if (!props.entityId) return
         const entity = entityStore.getEntity(props.entityId)

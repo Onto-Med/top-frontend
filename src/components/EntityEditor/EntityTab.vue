@@ -204,6 +204,14 @@ export default defineComponent({
     organisationId: {
       type: String,
       required: true
+    },
+    hotkeysEnabled: {
+      type: Boolean,
+      default: true
+    },
+    isOpen: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'change'],
@@ -269,7 +277,27 @@ export default defineComponent({
       return result
     })
 
+    const save = () => {
+      if ((isNew.value || hasUnsavedChanges.value)) {
+        if (isValid.value) {
+          emit('update:entity', local.value)
+          versionHistoryDialogKey.value++
+        } else {
+          alert(t('pleaseCheckInput'))
+        }
+      }
+    }
+
+    const keylistener = (e: KeyboardEvent) => {
+      if (!props.hotkeysEnabled) return
+      if (e.code === 'KeyS' && (e.ctrlKey || e.metaKey)) {
+        save()
+      } else return
+      e.preventDefault()
+    }
+
     onMounted(() => {
+      document.addEventListener('keydown', keylistener)
       if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
       loading.value = true
       entityApi.getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
@@ -302,6 +330,7 @@ export default defineComponent({
       isForking: true,
 
       hasUnsavedChanges,
+      save,
 
       prefillFromVersion,
 
@@ -326,14 +355,6 @@ export default defineComponent({
           query: { version: local.value.version }
         })
         emit('changeVersion', local.value.version)
-      },
-
-      save: () => {
-        if ((isNew.value || hasUnsavedChanges.value) && isValid.value) {
-          emit('update:entity', local.value)
-          versionHistoryDialogKey.value++
-        } else
-          alert(t('pleaseCheckInput'))
       }
     }
   }
