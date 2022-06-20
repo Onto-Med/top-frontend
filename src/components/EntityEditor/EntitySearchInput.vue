@@ -12,6 +12,7 @@
       class="inline col-3 q-mr-xs"
     />
     <q-select
+      ref="select"
       v-model="selection"
       :rounded="rounded"
       :outlined="outlined"
@@ -71,7 +72,7 @@
               round
               icon="content_copy"
               :title="t('forkToCurrentRepository')"
-              @click.stop="$emit('forkClicked', scope.opt)"
+              @click.stop="handleFork(scope.opt)"
             />
           </q-item-section>
         </q-item>
@@ -96,6 +97,7 @@ import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
+import { QSelect } from 'quasar'
 
 export default defineComponent({
   name: 'EntitySearchInput',
@@ -138,10 +140,11 @@ export default defineComponent({
     const selection = ref(null)
     const loading = ref(false)
     const repository = ref(undefined as (Repository|undefined))
+    const select = ref(null as unknown as QSelect)
 
     return {
       t, getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted,
-      repository, options, selection, loading,
+      select, repository, options, selection, loading,
       async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
         if (val.length < props.minLength || !entityApi) {
           abort()
@@ -168,6 +171,10 @@ export default defineComponent({
           repository.value = undefined
         }
         emit('entitySelected', entity)
+      },
+      handleFork (entity: Entity) {
+        select.value?.updateInputValue('')
+        emit('forkClicked', entity)
       }
     }
   },
