@@ -138,9 +138,9 @@
           <template #before>
             <div class="column fit">
               <entity-tree
-                :nodes="projectionEntities"
+                :nodes="entities"
                 :loading="treeLoading"
-                :exclude-type-if-empty="[EntityType.Category]"
+                :exclude-type-if-empty="[EntityType.Category, EntityType.CombinedPhenotype]"
                 class="col column"
                 @refresh-clicked="reloadEntities"
                 @update:selected="addSelection"
@@ -362,10 +362,6 @@ export default defineComponent({
       sources: [ 'source1', 'source2' ],
       importFile,
 
-      projectionEntities: computed(() =>
-        entities.value.filter(e => [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype].includes(e.entityType))
-      ),
-
       configurationComplete: computed(() =>
         query.value.configuration && query.value.configuration.sources.length > 0
       ),
@@ -388,7 +384,7 @@ export default defineComponent({
         if (!query.value.projection.select) query.value.projection.select = []
         if (
           !subject
-          || ![EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(subject.entityType)
+          || ![EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedRestriction].includes(subject.entityType)
           || query.value.projection.select.findIndex(r => r.subject.id === subject.id) !== -1
         ) return
         query.value.projection.select.push({ subject: subject, sorting: Sorting.Asc })
