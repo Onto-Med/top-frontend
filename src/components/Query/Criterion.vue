@@ -19,9 +19,9 @@
       <q-btn-group flat>
         <criterion-configuration
           :age-restrictions="ageRestrictions"
-          :time-restrictions="dateTimeRestrictions"
+          :date-time-restrictions="dateTimeRestrictions"
           @update:age-restrictions="$emit('update:ageRestrictions', $event)"
-          @update:time-restrictions="$emit('update:dateTimeRestrictions', $event)"
+          @update:date-time-restrictions="$emit('update:dateTimeRestrictions', $event)"
         />
         <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="$emit('removeClicked')" />
       </q-btn-group>

@@ -1,6 +1,6 @@
 export default {
   ageRestriction: 'Age restriction|Age restrictions',
-  ageRestrictionDescription: 'Set one ore more age restrictions for this phenotype. Values are in years.',
+  ageRestrictionDescription: 'Set one or more age restrictions for this phenotype. Values are in years.',
   asc: 'Ascending',
   back: 'Back',
   buildQuery: 'Build query|Build queries',
