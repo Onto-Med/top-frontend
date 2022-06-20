@@ -1,14 +1,31 @@
 <template>
   <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
-    <q-card>
+    <q-card v-if="forkingStats">
       <q-card-section v-t="'forkingState'" class="text-h6" />
+
+      <template v-if="forkingStats.origin">
+        <q-separator />
+
+        <q-card-section>
+          <div v-t="'entityIsForkDescription'" />
+          <span v-t="'origin'" />:
+          <q-btn
+            flat
+            dense
+            no-caps
+            :label="getTitle(forkingStats.origin)"
+            :title="t('showThing', { thing: t('origin') })"
+            @click="routeToEntity(forkingStats.origin)"
+          />
+        </q-card-section>
+      </template>
 
       <q-separator />
 
       <q-table
         class="sticky-header-table"
         :title="t('fork', 2)"
-        :rows="forks"
+        :rows="forkingStats.forks"
         :columns="forkColumns"
         :no-data-label="t('noDataPresent')"
         row-key="id"
@@ -48,9 +65,10 @@
 import { defineComponent, ref, inject, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ForkApiKey } from 'src/boot/axios'
-import { Entity } from '@onto-med/top-api'
+import { Entity, ForkingStats } from '@onto-med/top-api'
 import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   props: {
@@ -66,19 +84,20 @@ export default defineComponent({
   emits: ['update:show'],
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, d }  = useI18n()
-    const forkApi   = inject(ForkApiKey)
-    const { alert } = useAlert()
-    const router    = useRouter()
-    const loading   = ref(false)
-    const forks     = ref([] as Entity[])
+    const { t, d }     = useI18n()
+    const forkApi      = inject(ForkApiKey)
+    const { alert }    = useAlert()
+    const router       = useRouter()
+    const loading      = ref(false)
+    const forkingStats = ref(undefined as ForkingStats|undefined)
+    const { getTitle } = useEntityFormatter()
 
     const reload = async () => {
       if (!forkApi || !props.entity || !props.entity.id || !props.entity.repository || !props.entity.repository.organisation) return
       loading.value = true
 
       await forkApi.getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
-        .then(r => forks.value = r.data)
+        .then(r => forkingStats.value = r.data)
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
     }
@@ -86,7 +105,7 @@ export default defineComponent({
     watch(
       () => props.show,
       (newShow: boolean) => {
-        if (newShow && !forks.value.length) void reload()
+        if (newShow && !forkingStats.value) void reload()
       }
     )
 
@@ -95,7 +114,8 @@ export default defineComponent({
       d,
       loading,
       reload,
-      forks,
+      forkingStats,
+      getTitle,
 
       forkColumns: computed(() => [
         { name: 'organisation', label: t('organisation'), align: 'left' },
