@@ -6,6 +6,7 @@ export default {
   buildQuery: 'Abfrage erstellen|Abfragen erstellen',
   buildQueryFor: 'Abfrage erstellen für|Abfragen erstellen für',
   category: 'Kategorie|Kategorien',
+  change: 'Ändern',
   closure: 'Abschluss|Abschlüsse',
   configureThing: '{thing} konfigurieren',
   continue: 'Fortsetzen',

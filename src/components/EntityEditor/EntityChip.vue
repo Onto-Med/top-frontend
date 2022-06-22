@@ -21,7 +21,7 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         @entity-selected="setEntity($event)"
-        @btn-clicked="$emit('removeClicked')"
+        @btn-clicked="popup.cancel()"
       />
       <q-list dense>
         <slot name="additionalOptions" />
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Entity, EntityType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
@@ -88,10 +88,14 @@ export default defineComponent({
     const loading = ref(false)
     const entityStore = useEntity()
     const { getIcon, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
-    const state = ref(undefined as unknown as Entity)
+    const state = ref(undefined as unknown as Entity|undefined)
 
     const reload = () => {
-      if (!props.entityId) return
+      if (!props.entityId) {
+        state.value = undefined
+        void nextTick(() => popup.value?.show())
+        return
+      }
       loading.value = true
       if (props.entityId) {
         const entity = entityStore.getEntity(props.entityId)
@@ -106,6 +110,13 @@ export default defineComponent({
       else reload()
       if (!state.value) popup.value.show()
     })
+
+    watch(
+      () => props.entityId,
+      (newVal, oldVal) => {
+        if (newVal !== oldVal) reload()
+      }
+    )
 
     return {
       t,
