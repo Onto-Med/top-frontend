@@ -6,6 +6,7 @@ export default {
   buildQuery: 'Build query|Build queries',
   buildQueryFor: 'Build query for|Build queries for',
   category: 'Category|Categories',
+  change: 'Change',
   closure: 'Closure|Closures',
   configureThing: 'Configure {thing}',
   continue: 'Continue',

@@ -18,6 +18,9 @@
           <q-item v-close-popup clickable @click="enclose()">
             <q-item-section v-t="'encloseWithExpression'" />
           </q-item>
+          <q-item v-show="modelValue.id" v-close-popup clickable @click="setEntity(undefined)">
+            <q-item-section v-t="'change'" />
+          </q-item>
         </template>
       </entity-chip>
       <slot name="append" />
@@ -111,8 +114,15 @@
           clickable
           :label="t('more')"
           :title="t('addMoreArguments')"
-          @click="handleArgumentUpdate(argumentCount, {})"
-        />
+        >
+          <expression-context-menu
+            v-if="!readonly"
+            :enclosable="false"
+            :functions="functions"
+            :removable="false"
+            @select="handleArgumentUpdate(argumentCount, { function: $event, arguments: [] })"
+          />
+        </q-chip>
       </template>
 
       <div
@@ -278,9 +288,9 @@ export default defineComponent({
         blink()
       },
 
-      setEntity (entity: Entity): void {
+      setEntity (entity: Entity|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.id = entity.id
+        newModelValue.id = entity?.id
         emit('update:modelValue', newModelValue)
       },
 
