@@ -10,6 +10,7 @@
         :repository-id="repositoryId"
         :label="t('selectThing', { thing: t(fun.title) }) + '...'"
         :disable="readonly"
+        show-change
         @entity-clicked="$emit('entityClicked', $event)"
         @entity-set="setEntity($event)"
         @remove-clicked="$emit('update:modelValue', undefined)"
@@ -17,9 +18,6 @@
         <template v-if="!readonly" #additionalOptions>
           <q-item v-close-popup clickable @click="enclose()">
             <q-item-section v-t="'encloseWithExpression'" />
-          </q-item>
-          <q-item v-show="modelValue.id" v-close-popup clickable @click="setEntity(undefined)">
-            <q-item-section v-t="'change'" />
           </q-item>
         </template>
       </entity-chip>
