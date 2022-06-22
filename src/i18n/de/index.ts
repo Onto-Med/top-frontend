@@ -1,6 +1,8 @@
 export default {
   ageRestriction: 'Altersbegrenzung|Altersbegrenzungen',
   ageRestrictionDescription: 'Legen Sie eine oder mehrere Altersbegrenzungen fest. Altersangaben werden in Jahren angegeben.',
+  appSubtitle: 'Diese Framework unterstützt bei der Modellierung und Anwendung von Phänotypen.',
+  appDescription: 'Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.',
   asc: 'Aufsteigend',
   back: 'Zurück',
   buildQuery: 'Abfrage erstellen|Abfragen erstellen',
