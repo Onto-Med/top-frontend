@@ -229,6 +229,7 @@ export default {
     confirmDelete: 'Do you really want to delete this organisation?',
   },
   repositoryPage: {
+    description: 'Phenotypes can be modelled in repositories. We recommend that you distribute phenotypes topic-based across various repositories.',
     confirmDelete: 'Do you really want to delete this repository?'
   },
   entityTree: {

@@ -232,6 +232,7 @@ export default {
     confirmDelete: 'Möchten Sie diese Organisation wirklich löschen?',
   },
   repositoryPage: {
+    description: 'In Repositorien können Phänotypen modelliert werden. Wir empfehlen Ihnen, Phänotypen themenbasiert auf verschiedene Repositorien zu verteilen.',
     confirmDelete: 'Möchten Sie dieses Repositorium wirklich löschen?'
   },
   entityTree: {
