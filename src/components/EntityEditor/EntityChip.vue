@@ -49,6 +49,9 @@
         </q-item>
         <q-separator />
         <slot name="additionalOptions" />
+        <q-item v-if="showChange && state" v-close-popup clickable @click="setEntity(undefined)">
+          <q-item-section v-t="'change'" />
+        </q-item>
         <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked')">
           <q-item-section v-t="'remove'" />
         </q-item>
@@ -78,7 +81,11 @@ export default defineComponent({
     entityTypes: Array as () => EntityType[],
     organisationId: String,
     repositoryId: String,
-    disable: Boolean
+    disable: Boolean,
+    showChange: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {
@@ -92,7 +99,6 @@ export default defineComponent({
 
     const reload = () => {
       if (!props.entityId) {
-        state.value = undefined
         void nextTick(() => popup.value?.show())
         return
       }
@@ -128,7 +134,7 @@ export default defineComponent({
       state,
       loading,
 
-      setEntity: (entity: Entity) => {
+      setEntity: (entity: Entity|undefined) => {
         state.value = entity
         emit('entitySet', entity)
       }
