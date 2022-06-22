@@ -93,7 +93,7 @@
           @entity-clicked="$emit('entityClicked', $event)"
         >
           <template
-            v-if="!infix && index < argumentCount"
+            v-if="!infix && (index + 1 < argumentCount || showMoreBtn)"
             #append
             :class="{ hover: hover }"
             @mouseover="hover = true"
