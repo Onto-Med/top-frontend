@@ -111,8 +111,15 @@
           clickable
           :label="t('more')"
           :title="t('addMoreArguments')"
-          @click="handleArgumentUpdate(argumentCount, {})"
-        />
+        >
+          <expression-context-menu
+            v-if="!readonly"
+            :enclosable="false"
+            :functions="functions"
+            :removable="false"
+            @select="handleArgumentUpdate(argumentCount, { function: $event, arguments: [] })"
+          />
+        </q-chip>
       </template>
 
       <div
