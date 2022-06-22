@@ -114,7 +114,6 @@ export default defineComponent({
       if (props.entity)
         state.value = props.entity
       else reload()
-      if (!state.value) popup.value.show()
     })
 
     watch(
