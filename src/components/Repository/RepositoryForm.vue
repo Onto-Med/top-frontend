@@ -21,7 +21,26 @@
       <q-separator />
 
       <q-card-section>
-        <q-input v-model="state.id" :readonly="!isNew" type="text" :label="t('id')" />
+        <q-input
+          v-model="state.name"
+          type="text"
+          :label="t('name')"
+          autocomplete="Off"
+          @update:model-value="setId"
+        />
+
+        <q-input
+          :model-value="state.id"
+          dense
+          required
+          type="text"
+          class="q-ml-xl"
+          autocomplete="Off"
+          :label="t('id')"
+          :readonly="!isNew"
+          @update:model-value="setId"
+        />
+
         <q-item :v-ripple="isNew" :tag="isNew ? 'label' : 'div'" class="q-pl-none">
           <q-item-section avatar>
             <q-toggle v-model="state.primary" :disable="!isNew" />
@@ -31,12 +50,7 @@
             <q-item-label v-t="'primaryRepositoryDescription'" caption />
           </q-item-section>
         </q-item>
-      </q-card-section>
 
-      <q-separator />
-
-      <q-card-section>
-        <q-input v-model="state.name" type="text" :label="t('name')" />
         <q-input v-model="state.description" type="textarea" :label="t('description')" />
       </q-card-section>
 
@@ -95,6 +109,7 @@ export default defineComponent({
     }
     const state = ref(copy(props.modelValue))
     const showDeleteDialog = ref(false)
+    const isNew = computed(() => !state.value.createdAt)
 
     watch(() => props.modelValue, (value) => {
       state.value = copy(value)
@@ -103,8 +118,13 @@ export default defineComponent({
     return {
       t,
       state,
-      isNew: computed(() => state.value.createdAt == null),
-      showDeleteDialog: showDeleteDialog
+      isNew,
+      showDeleteDialog,
+
+      setId (id: string|undefined) {
+        if (!isNew.value) return
+        state.value.id = id ? id.replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
+      }
     }
   }
 })

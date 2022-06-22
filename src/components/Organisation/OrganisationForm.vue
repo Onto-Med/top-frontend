@@ -20,10 +20,28 @@
       </q-card-section>
 
       <q-card-section>
-        <q-input :model-value="state.id" :readonly="state.createdAt != null" type="text" :label="t('id')" @update:model-value="state.id = $event" />
-        <q-input :model-value="state.name" type="text" :label="t('name')" @update:model-value="state.name = $event" />
-        <q-input :model-value="state.description" type="textarea" :label="t('description')" @update:model-value="state.description = $event" />
-        <organisation-select-input :model-value="state.superOrganisation" :label="t('superOrganisation')" @update:model-value="state.superOrganisation = $event" />
+        <q-input
+          v-model="state.name"
+          type="text"
+          autocomplete="Off"
+          :label="t('name')"
+          @update:model-value="setId"
+        />
+
+        <q-input
+          :model-value="state.id"
+          dense
+          class="q-ml-xl"
+          type="text"
+          autocomplete="Off"
+          :readonly="!isNew"
+          :label="t('id')"
+          @update:model-value="setId"
+        />
+
+        <q-input v-model="state.description" type="textarea" :label="t('description')" />
+
+        <organisation-select-input v-model="state.superOrganisation" :label="t('superOrganisation')" />
       </q-card-section>
 
       <q-card-actions align="right">
@@ -56,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
 import OrganisationSelectInput from 'src/components/Organisation/OrganisationSelectInput.vue'
@@ -82,7 +100,7 @@ export default defineComponent({
       return JSON.parse(JSON.stringify(value)) as Organisation
     }
     const state = ref(copy(props.modelValue))
-    const showDeleteDialog = ref(false)
+    const isNew = computed(() => !state.value.createdAt)
 
     watch(() => props.modelValue, (value) => {
       state.value = copy(value)
@@ -91,7 +109,13 @@ export default defineComponent({
     return {
       t,
       state,
-      showDeleteDialog: showDeleteDialog
+      isNew,
+      showDeleteDialog: ref(false),
+
+      setId (id: string) {
+        if (!isNew.value) return
+        state.value.id = id ? id : ''
+      }
     }
   }
 })
