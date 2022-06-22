@@ -50,6 +50,8 @@ export const useEntity = defineStore('entity', {
     },
 
     async setOrganisation (organisationId: string|undefined) {
+      if (this.organisationId !== organisationId)
+        this.entities = []
       this.organisationId = organisationId
       if (!organisationId) {
         this.organisation = undefined
@@ -60,6 +62,8 @@ export const useEntity = defineStore('entity', {
     },
 
     async setRepository (repositoryId: string|undefined) {
+      if (this.repositoryId !== repositoryId)
+        this.entities = []
       this.repositoryId = repositoryId
       if (!repositoryId) {
         this.repository = undefined
