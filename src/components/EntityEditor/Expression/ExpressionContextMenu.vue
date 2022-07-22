@@ -1,6 +1,6 @@
 <template>
   <q-menu>
-    <q-list dense>
+    <q-list dense class="scroll">
       <q-item
         v-for="fun in functions"
         :key="fun.id"
@@ -10,7 +10,9 @@
       >
         <q-item-section>{{ te(fun.title) ? t(fun.title) : fun.title }}</q-item-section>
       </q-item>
-      <q-separator />
+    </q-list>
+    <q-separator />
+    <q-list dense>
       <q-item v-if="enclosable" v-close-popup clickable @click="$emit('enclose')">
         <q-item-section v-t="'encloseWithExpression'" />
       </q-item>
@@ -56,3 +58,8 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.scroll
+  max-height: 300px
+</style>
