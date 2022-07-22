@@ -4,7 +4,8 @@
       emit-value
       use-input
       input-debounce="200"
-      class="ucum-select-field"
+      :class="{ 'ucum-select-field': fixedWidth }"
+      :label="showLabel ? t('unit') : undefined"
       :readonly="readonly"
       :model-value="modelValue"
       :options="options"
@@ -43,7 +44,9 @@ export default defineComponent({
   name: 'UcumInput',
   props: {
     modelValue: String,
-    readonly: Boolean
+    readonly: Boolean,
+    showLabel: Boolean,
+    fixedWidth: Boolean
   },
   emits: ['update:modelValue'],
   setup (props) {

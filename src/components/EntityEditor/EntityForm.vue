@@ -110,6 +110,7 @@
         :model-value="units"
         :readonly="readonly"
         :expanded="units && units.length > 0"
+        fixed-width
         @update:model-value="$emit('update:units', $event)"
       />
 
