@@ -33,8 +33,10 @@ export default function (this: void) {
     isPhenotype,
     isCategory,
 
-    hasDataType: (entity: Entity|DataType) => {
-      return (entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity) === EntityType.SinglePhenotype
+    hasDataType: (entity: Entity|EntityType) => {
+      return [EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(
+        entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
+      )
     },
 
     /**
