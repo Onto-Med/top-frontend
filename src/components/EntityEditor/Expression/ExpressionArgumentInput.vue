@@ -213,7 +213,11 @@ export default defineComponent({
     const { t, te } = useI18n()
     const flash = ref(false)
 
-    const getFunction = (fun: string|undefined) => props.functions?.find((o) => o.id === fun)
+    const getFunction = (functionId: string|undefined) => {
+      const fun = props.functions?.find((o) => o.id === functionId)
+      if (fun) return fun
+      return { id: functionId, title: t('invalid').toUpperCase(), notation: NotationEnum.Prefix } as ExpressionFunction
+    }
     const fun = computed(() => getFunction(props.modelValue?.function))
 
     const blink = () => {
