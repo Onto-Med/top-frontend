@@ -214,6 +214,7 @@ export default defineComponent({
     const flash = ref(false)
 
     const getFunction = (functionId: string|undefined) => {
+      if (!functionId) return undefined
       const fun = props.functions?.find((o) => o.id === functionId)
       if (fun) return fun
       return { id: functionId, title: t('invalid').toUpperCase(), notation: NotationEnum.Prefix } as ExpressionFunction
