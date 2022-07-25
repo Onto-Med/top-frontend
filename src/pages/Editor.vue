@@ -31,6 +31,7 @@
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
+            @export-entity="handleEntityExport"
           />
         </div>
       </template>
@@ -111,6 +112,8 @@
         </div>
       </template>
     </q-splitter>
+
+    <export-dialog v-model:show="showExportDialog" :entity="exportEntity" />
   </q-page>
 </template>
 
@@ -123,13 +126,14 @@ import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
+import ExportDialog from 'src/components/EntityEditor/ExportDialog.vue'
 import { Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'Editor',
-  components: { EntityTab, EntityTree },
+  components: { EntityTab, EntityTree, ExportDialog },
   props: {
     entityId: String,
     version: Number,
@@ -140,18 +144,20 @@ export default defineComponent({
   },
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, locale }         = useI18n()
+    const { t, locale } = useI18n()
     const { getIcon, getTitle, isRestricted, isPhenotype } = useEntityFormatter()
-    const router        = useRouter()
-    const entityStore   = useEntity()
-    const { alert }     = useAlert()
-    const entityApi     = inject(EntityApiKey)
-    const showJson      = ref(false)
-    const splitterModel = ref(25)
+    const router           = useRouter()
+    const entityStore      = useEntity()
+    const { alert }        = useAlert()
+    const entityApi        = inject(EntityApiKey)
+    const showJson         = ref(false)
+    const splitterModel    = ref(25)
+    const showExportDialog = ref(false)
+    const exportEntity     = ref(undefined as Entity|undefined)
     const { entities, repository, organisationId } = storeToRefs(entityStore)
-    const selected      = ref<Entity|undefined>(undefined)
-    const tabs          = ref([] as EditorTab[])
-    const treeLoading   = ref(false)
+    const selected    = ref<Entity|undefined>(undefined)
+    const tabs        = ref([] as EditorTab[])
+    const treeLoading = ref(false)
 
     const reloadEntities = async () => {
       treeLoading.value = true
@@ -256,7 +262,7 @@ export default defineComponent({
     })
 
     return {
-      t, showJson, splitterModel, entities, selected, tabs, treeLoading,
+      t, showJson, splitterModel, entities, selected, tabs, treeLoading, showExportDialog, exportEntity,
       isRestricted, getTitle, getIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
       organisationId,
@@ -316,6 +322,11 @@ export default defineComponent({
       handleEntityDuplication (entity: Entity): void {
         const duplicate = entityStore.addDuplicate(entity)
         if (duplicate) selectTabByKey(duplicate.id)
+      },
+
+      handleEntityExport (entity: Entity): void {
+        showExportDialog.value = true
+        exportEntity.value = entity
       },
 
       closeOtherTabs (tab: EditorTab): void {
