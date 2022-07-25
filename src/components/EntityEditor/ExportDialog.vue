@@ -36,7 +36,18 @@
           </template>
         </q-select>
 
-        <q-input v-model="result" filled type="textarea" />
+        <q-input v-model="result" filled type="textarea" class="result-field">
+          <template #append>
+            <q-btn
+              dense
+              flat
+              icon="content_copy"
+              :title="t('copyToClipboard')"
+              :disable="!result"
+              @click="copyResult"
+            />
+          </template>
+        </q-input>
 
         <q-inner-loading
           :showing="loading"
@@ -60,6 +71,7 @@ import { EntityApiKey } from 'src/boot/axios'
 import { Entity } from '@onto-med/top-api'
 import useAlert from 'src/mixins/useAlert'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { copyToClipboard } from 'quasar'
 
 export default defineComponent({
   props: {
@@ -107,6 +119,13 @@ export default defineComponent({
           .then(r => result.value = r.data)
           .catch((e: Error) => alert(e.message))
           .finally(() => loading.value = false)
+      },
+
+      copyResult: () => {
+        if (result.value)
+          copyToClipboard(result.value)
+            .then(() => alert(t('copiedToClipboard'), 'positive'))
+            .catch(() => alert(t('copyFailed')))
       }
     }
   }
@@ -116,4 +135,10 @@ export default defineComponent({
 <style lang="sass" scoped>
 .export-dialog
   min-width: 400px
+</style>
+
+<style lang="sass">
+.result-field .q-field__append
+  position: absolute
+  right: 10px
 </style>
