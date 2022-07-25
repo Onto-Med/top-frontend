@@ -19,6 +19,7 @@
           :options="options"
           :label="t('format')"
           :placeholder="t('selectThing', { thing: t('format') })"
+          :error="!format"
           emit-value
           map-options
           class="q-mb-md"
@@ -29,6 +30,7 @@
               color="primary"
               icon="download"
               :label="t('export')"
+              :disable="!format"
               @click="doExport"
             />
           </template>
