@@ -25,7 +25,6 @@
     </div>
     <div v-else-if="fun && fun.id === 'constant'">
       <constant-input
-        class="inline"
         :model-value="modelValue.constant"
         :readonly="readonly"
         :indent-level="indentLevel"
