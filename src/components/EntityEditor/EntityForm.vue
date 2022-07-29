@@ -62,6 +62,14 @@
               :readonly="readonly"
               @update:model-value="$emit('update:dataType', $event)"
             />
+
+            <unit-input
+              v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entityType) && dataType === DataType.Number"
+              :model-value="unit"
+              :readonly="readonly"
+              show-label
+              @update:model-value="$emit('update:unit', $event)"
+            />
           </q-card-section>
         </q-card>
       </div>
@@ -105,15 +113,6 @@
         @update:model-value="$emit('update:expression', $event)"
       />
 
-      <ucum-card
-        v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entityType) && dataType === DataType.Number"
-        :model-value="units"
-        :readonly="readonly"
-        :expanded="units && units.length > 0"
-        fixed-width
-        @update:model-value="$emit('update:units', $event)"
-      />
-
       <localized-text-input
         :model-value="synonyms"
         :readonly="readonly"
@@ -152,7 +151,7 @@ import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
-import UcumCard from 'src/components/UcumCard.vue'
+import UnitInput from 'src/components/UnitInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
@@ -162,7 +161,7 @@ export default defineComponent({
     DataTypeSelect,
     RestrictionInput,
     ExpressionInput,
-    UcumCard,
+    UnitInput,
     CodeInput,
     EntityChip
   },
@@ -193,9 +192,9 @@ export default defineComponent({
     score: {
       type: Number
     },
-    units: {
-      type: Array as () => Unit[],
-      default: () => []
+    unit: {
+      type: Object as () => Unit,
+      default: () => { {} }
     },
     titles: {
       type: Array as () => LocalisableText[],
@@ -229,7 +228,7 @@ export default defineComponent({
     }
   },
   emits: [
-    'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:units', 'update:expression', 'update:restriction',
+    'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
     'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory'
   ],
   setup () {

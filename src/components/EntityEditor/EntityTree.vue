@@ -50,6 +50,7 @@
               @delete-entity-clicked="$emit('deleteEntity', $event)"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
+              @export-clicked="$emit('exportEntity', $event)"
             />
           </div>
         </template>
@@ -109,7 +110,7 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity'],
+  emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()

@@ -148,7 +148,7 @@
       v-model:data-type="local.dataType"
       v-model:restriction="local.restriction"
       v-model:expression="local.expression"
-      v-model:units="local.units"
+      v-model:unit="local.unit"
       v-model:score="local.score"
       v-model:superCategories="local.superCategories"
       v-model:codes="local.codes"

@@ -34,6 +34,11 @@
     </q-list>
     <q-separator />
     <q-list v-if="entity" dense>
+      <q-item v-close-popup clickable @click="$emit('exportClicked', entity)">
+        <q-item-section v-t="'export'" />
+      </q-item>
+    </q-list>
+    <q-list v-if="entity" dense>
       <q-item clickable @click="showDeleteDialog = true">
         <q-item-section v-t="'delete'" />
       </q-item>
@@ -71,7 +76,7 @@ export default defineComponent({
   props: {
     entity: Object as () => Entity
   },
-  emits: ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked'],
+  emits: ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked', 'exportClicked'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
