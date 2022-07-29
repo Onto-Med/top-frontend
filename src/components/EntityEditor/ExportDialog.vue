@@ -41,6 +41,7 @@
             <q-btn
               dense
               flat
+              size="sm"
               icon="content_copy"
               :title="t('copyToClipboard')"
               :disable="!result"
@@ -138,7 +139,11 @@ export default defineComponent({
 </style>
 
 <style lang="sass">
-.result-field .q-field__append
-  position: absolute
-  right: 10px
+.result-field
+  .q-field__inner
+    .q-field__control
+      padding-right: 0
+  .q-field__append
+    position: absolute
+    right: 20px
 </style>
