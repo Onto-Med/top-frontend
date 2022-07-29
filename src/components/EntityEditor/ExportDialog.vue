@@ -7,9 +7,7 @@
 
       <q-separator />
 
-      <q-card-section>
-        <p v-t="'exportDescription'" />
-      </q-card-section>
+      <q-card-section v-t="'exportDescription'" />
 
       <q-separator />
 
