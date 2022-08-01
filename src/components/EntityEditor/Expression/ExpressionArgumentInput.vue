@@ -4,7 +4,7 @@
     <div v-if="fun && fun.id === 'entity'">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
    --><entity-chip
-        :entity-id="modelValue.id"
+        :entity-id="modelValue.entityId"
         :entity-types="entityTypes"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
@@ -23,14 +23,14 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="fun && fun.id === 'constant'">
-      <constant-input
-        :model-value="modelValue.constant"
+    <div v-else-if="fun && (fun.id === 'constant' || fun.id === 'value')">
+      <expression-value-input
+        :model-value="modelValue.value"
         :readonly="readonly"
         :indent-level="indentLevel"
         :indent="indent"
         :expand="expand"
-        @update:modelValue="setConstant($event)"
+        @update:modelValue="setValue($event)"
         @enclose="enclose()"
         @remove="$emit('update:modelValue', undefined)"
       />
@@ -171,17 +171,18 @@ import {
   EntityType,
   Expression,
   ExpressionFunction,
+  ExpressionValue,
   NotationEnum
 } from '@onto-med/top-api';
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
-import ConstantInput from 'src/components/EntityEditor/Expression/ConstantInput.vue'
+import ExpressionValueInput from 'src/components/EntityEditor/Expression/ExpressionValueInput.vue'
 
 export default defineComponent({
   components: {
     EntityChip,
     ExpressionContextMenu,
-    ConstantInput
+    ExpressionValueInput
   },
   props: {
     modelValue: {
@@ -292,13 +293,13 @@ export default defineComponent({
 
       setEntity (entity: Entity|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.id = entity?.id
+        newModelValue.entityId = entity?.id
         emit('update:modelValue', newModelValue)
       },
 
-      setConstant (constant: string|undefined): void {
+      setValue (value: ExpressionValue|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.constant = constant
+        newModelValue.value = value
         emit('update:modelValue', newModelValue)
       },
 
