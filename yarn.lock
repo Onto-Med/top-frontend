@@ -1334,8 +1334,8 @@
 
 "@onto-med/top-api@^0.4.1-SNAPSHOT":
   version "0.4.1-SNAPSHOT"
-  resolved "https://npm.pkg.github.com/download/@onto-med/top-api/0.4.1-SNAPSHOT/86c00cc34b311f3323a81015f640854d3b3d139a92860220c7c2a8057e71cdc8#ee422ffee39039dd44ed86cc063e86bec793b57b"
-  integrity sha512-qsLboZbmJaAczVK0s8UHGNyXAOD590viDOgdSWLd6Vu+cMBVTmJdSGK3m4UtZWzXXM4TrA5dKrIQF9/b6qah5g==
+  resolved "https://npm.pkg.github.com/download/@onto-med/top-api/0.4.1-SNAPSHOT/6763ddf50575a4e80fce8ae6f7119ffad1b96d5a6878124336577ca31baa075f#bcf71b2fdc70fbcf8ca42f47d9d5739f7f5b9973"
+  integrity sha512-3mWxdRAaY4gnNgYV46JJED3uqH9lvM+4/gXIq9yaA+aajoFn5/tf47HYKSJovGorcmanXuphJ2FrovdOHk8ADA==
   dependencies:
     axios "^0.21.4"
 
