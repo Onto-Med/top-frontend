@@ -57,7 +57,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as () => ExpressionValue,
-      require: true
+      default: () => { return { } }
     },
     readonly: Boolean,
     expand: Boolean,
@@ -77,7 +77,8 @@ export default defineComponent({
       .then(o => constants.value = o)
 
     onMounted(() => {
-      if (!props.modelValue) popup.value.show()
+      if (!props.modelValue?.value && props.modelValue?.constant === undefined)
+        popup.value.show()
     })
 
     const defaultConstant = computed(() => props.modelValue?.constant)
