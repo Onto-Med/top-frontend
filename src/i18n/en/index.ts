@@ -1,6 +1,8 @@
 export default {
   ageRestriction: 'Age restriction|Age restrictions',
   ageRestrictionDescription: 'Set one or more age restrictions for this phenotype. Values are in years.',
+  aggregationFunction: 'Aggregation function|Aggregation functions',
+  aggregationFunctionDescription: 'Select an aggregation function for cases, where this query returns multiple values for a single phenotype.',
   appSubtitle: 'This framework supports the modelling and application of phenotypes.',
   appDescription: 'Currently, the framework is under heavy development and will be extended with further functionalities.',
   asc: 'Ascending',

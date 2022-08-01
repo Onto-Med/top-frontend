@@ -10,9 +10,25 @@
           <q-space />
           <q-btn v-close-popup icon="close" flat round dense />
         </q-card-section>
+
         <q-separator />
+
         <q-card-section>
-          <p v-t="'ageRestrictionDescription'" />
+          <div v-t="'aggregationFunctionDescription'" />
+          <q-select
+            :model-value="defaultAggregationFunction"
+            :options="aggregationFunctionOptions"
+            :label="t('aggregationFunction')"
+            option-value="id"
+            option-label="title"
+            @update:model-value="$emit('update:default-aggregation-function', $event)"
+          />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section>
+          <div v-t="'ageRestrictionDescription'" />
           <div v-for="(restriction, index) in ageRestrictions" :key="index" class="row">
             <range-input
               v-model:minimum="restriction.values[0]"
@@ -26,9 +42,11 @@
           </div>
           <q-btn flat icon="add" class="q-mt-md" :label="t('addThing', { thing: t('ageRestriction') })" @click="addAgeRestriction()" />
         </q-card-section>
+
         <q-separator />
+
         <q-card-section>
-          <p v-t="'dateTimeRestrictionDescription'" />
+          <div v-t="'dateTimeRestrictionDescription'" />
           <div v-for="(restriction, index) in dateTimeRestrictions" :key="index" class="row">
             <range-input
               v-model:minimum="restriction.values[0]"
@@ -50,7 +68,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NumberRestriction, DateTimeRestriction, DataType } from '@onto-med/top-api'
+import { NumberRestriction, DateTimeRestriction, DataType, ExpressionFunction } from '@onto-med/top-api'
 import RangeInput from '../EntityEditor/RangeInput.vue'
 
 export default defineComponent({
@@ -63,9 +81,17 @@ export default defineComponent({
     dateTimeRestrictions: {
       type: Array as () => DateTimeRestriction[],
       default: () => []
+    },
+    defaultAggregationFunction: {
+      type: Object as () => ExpressionFunction,
+      require: true
+    },
+    aggregationFunctionOptions: {
+      type: Array as () => ExpressionFunction[],
+      default: () => []
     }
   },
-  emits: ['update:ageRestrictions', 'update:dateTimeRestrictions'],
+  emits: ['update:ageRestrictions', 'update:dateTimeRestrictions', 'update:default-aggregation-function'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
