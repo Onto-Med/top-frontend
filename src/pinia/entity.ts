@@ -86,6 +86,12 @@ export const useEntity = defineStore('entity', {
       return this.functions.get(type) || []
     },
 
+    async getFunction (type: string, ...id: string[]): Promise<ExpressionFunction[]> {
+      if (!this.functions.get(type))
+        await this.reloadFunctionsByType(type)
+      return (this.functions.get(type) || []).filter(f => id.includes(f.id))
+    },
+
     getEntity (id: string|undefined): Entity|undefined {
       return this.entities.find(e => e.id === id)
     },

@@ -1,6 +1,8 @@
 export default {
   ageRestriction: 'Altersbegrenzung|Altersbegrenzungen',
   ageRestrictionDescription: 'Legen Sie eine oder mehrere Altersbegrenzungen fest. Altersangaben werden in Jahren angegeben.',
+  aggregationFunction: 'Aggregationsfunktion|Aggregationsfunktionen',
+  aggregationFunctionDescription: 'Wählen Sie eine Aggregationsfunktion für Fälle, in denen diese Abfrage mehrere Werte für einen einzigen Phänotyp liefert.',
   appSubtitle: 'Diese Framework unterstützt bei der Modellierung und Anwendung von Phänotypen.',
   appDescription: 'Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.',
   asc: 'Aufsteigend',

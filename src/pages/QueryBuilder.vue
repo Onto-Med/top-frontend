@@ -100,7 +100,7 @@
 
               <q-separator />
 
-              <q-card-section>
+              <q-card-section v-if="aggregationFunctionOptions">
                 <div v-show="!query.criteria.length">
                   {{ t('nothingSelectedYet') }}
                 </div>
@@ -110,6 +110,8 @@
                       v-model:exclusion="criterion.exclusion"
                       v-model:age-restrictions="criterion.ageRestrictions"
                       v-model:date-time-restrictions="criterion.dateTimeRestrictions"
+                      v-model:default-aggregation-function="criterion.defaultAggregationFunction"
+                      :aggregation-function-options="aggregationFunctionOptions"
                       :subject="criterion.subject"
                       @remove-clicked="query.criteria.splice(index, 1)"
                     />
@@ -283,7 +285,7 @@
 </template>
 
 <script lang="ts">
-import { EntityType, Phenotype, Query, Sorting } from '@onto-med/top-api'
+import { EntityType, ExpressionFunction, Phenotype, Query, Sorting } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import Criterion from 'src/components/Query/Criterion.vue'
@@ -331,6 +333,11 @@ export default defineComponent({
         .finally(() => treeLoading.value = false)
     }
 
+    const aggregationFunctionOptions = ref([] as ExpressionFunction[])
+    entityStore.getFunction('math', 'last', 'first')
+      .then(r => aggregationFunctionOptions.value = r)
+      .catch((e: Error) => alert(e.message))
+
     const getRunIndex = (id: number) => runs.value.findIndex(r => r.id === id)
 
     onMounted(() => reloadEntities())
@@ -361,6 +368,7 @@ export default defineComponent({
       Sorting,
       sources: [ 'source1', 'source2' ],
       importFile,
+      aggregationFunctionOptions,
 
       configurationComplete: computed(() =>
         query.value.configuration && query.value.configuration.sources.length > 0
@@ -376,7 +384,11 @@ export default defineComponent({
       addCriterion: (subject: Phenotype) => {
         if (!subject || (!isPhenotype(subject) && !isRestricted(subject)) || subject.entityType === EntityType.CombinedPhenotype) return
         if (!query.value.criteria) query.value.criteria = []
-        query.value.criteria.push({ exclusion: false, subject: subject })
+        query.value.criteria.push({
+          defaultAggregationFunction: { id: 'last', title: 'last' },
+          exclusion: false,
+          subject: subject
+        })
       },
 
       addSelection: (subject: Phenotype) => {
