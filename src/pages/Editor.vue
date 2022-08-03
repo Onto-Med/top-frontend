@@ -5,10 +5,10 @@
         <div class="column fit">
           <div class="row items-center q-pl-sm bg-primary text-white shadow-2 entity-editor-tabs-bar">
             <q-icon name="tab" class="q-mr-sm q-tree__icon" />
-            <div v-if="repository">
+            <div v-if="repository" class="col ellipsis" :title="repository.name || repository.id">
               {{ repository.name || repository.id }}
             </div>
-            <q-space />
+            
             <div v-if="repository">
               <q-btn
                 dense
