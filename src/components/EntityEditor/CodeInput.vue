@@ -112,8 +112,11 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
       addEntry () {
-        let newModelValue = props.modelValue.slice()
-        newModelValue.push({ codeSystem: codeSystems[0], code: '' })
+        const newModelValue = props.modelValue.slice()
+        let codeSystem = codeSystems[0]
+        if (props.modelValue.length > 0 && props.modelValue[props.modelValue.length - 1].codeSystem)
+          codeSystem = props.modelValue[props.modelValue.length - 1].codeSystem
+        newModelValue.push({ codeSystem: codeSystem, code: '' })
         emit('update:modelValue', newModelValue)
       }
     }
