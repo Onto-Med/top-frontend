@@ -183,7 +183,7 @@ export default defineComponent({
       } else {
         const id = entity.id
         const index = tabs.value.map(t => t.entity.id).indexOf(id)
-        tabs.value.splice(index, 1)
+        if (index !== -1) tabs.value.splice(index, 1)
         if (selected.value && selected.value.id === id) {
           if (tabs.value[tabs.value.length - 1])
             selected.value = tabs.value[tabs.value.length - 1].entity || undefined
