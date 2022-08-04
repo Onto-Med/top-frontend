@@ -3,12 +3,15 @@
     <template #default>
       <div v-for="(entry, index) in modelValue" :key="index" class="row">
         <q-input
+          :ref="setInputRef"
           :model-value="modelValue[index].code"
           :readonly="readonly"
           type="text"
           debounce="200"
           class="col"
           @update:model-value="updateEntryByIndex(index, $event, modelValue[index].codeSystem)"
+          @keyup.down="focusRow(index + 1)"
+          @keyup.up="focusRow(index - 1)"
         >
           <template #before>
             <code-system-input
@@ -58,10 +61,11 @@
 
 <script lang="ts">
 import { Code, CodeSystem } from '@onto-med/top-api'
-import { defineComponent } from 'vue'
+import { defineComponent, nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
+import { QInput } from 'quasar'
 
 export default defineComponent({
   name: 'CodeInput',
@@ -82,6 +86,7 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const inputs = ref([] as QInput[])
     const codeSystems = [
       { uri: 'http://snomed.info/id', name: 'SNOMED CT' },
       { uri: 'http://loinc.org', name: 'LOINC' },
@@ -90,33 +95,50 @@ export default defineComponent({
       { uri: 'http://fhir.de/CodeSystem/bfarm/atc', name: 'ATC' }
     ] as CodeSystem[]
 
+    const addEntry = () => {
+      const newModelValue = props.modelValue.slice()
+      let codeSystem = codeSystems[0]
+      if (props.modelValue.length > 0 && props.modelValue[props.modelValue.length - 1].codeSystem)
+        codeSystem = props.modelValue[props.modelValue.length - 1].codeSystem
+      newModelValue.push({ codeSystem: codeSystem, code: '' })
+      const index = newModelValue.length - 1
+      inputs.value = []
+      emit('update:modelValue', newModelValue)
+      void nextTick(() => focusRow(index))
+    }
+
+    const focusRow = (index: number) => {
+      if (index == undefined || index < 0) return
+      if (index > props.modelValue.length - 1) addEntry()
+      else inputs.value[index].focus()
+    }
+
     return {
-      t, codeSystems,
+      t, codeSystems, addEntry, focusRow,
+
+      setInputRef (el: QInput) {
+        if (el) inputs.value.push(el)
+      },
 
       codeUrl (code: Code) {
         if (!code || !code.codeSystem) return null
         return code.codeSystem.uri + '/' + code.code
       },
+
       getCodeSystem (uri: string) {
         return codeSystems.find(c => c.uri === uri)
       },
+
       removeEntryByIndex (index: number) {
         let newModelValue = props.modelValue.slice()
         newModelValue.splice(index, 1)
         emit('update:modelValue', newModelValue)
       },
+
       updateEntryByIndex (index: number, code: string, system: CodeSystem) {
         let newModelValue = props.modelValue.slice()
         newModelValue[index].code = code
         newModelValue[index].codeSystem = system
-        emit('update:modelValue', newModelValue)
-      },
-      addEntry () {
-        const newModelValue = props.modelValue.slice()
-        let codeSystem = codeSystems[0]
-        if (props.modelValue.length > 0 && props.modelValue[props.modelValue.length - 1].codeSystem)
-          codeSystem = props.modelValue[props.modelValue.length - 1].codeSystem
-        newModelValue.push({ codeSystem: codeSystem, code: '' })
         emit('update:modelValue', newModelValue)
       }
     }
