@@ -272,6 +272,7 @@ export default defineComponent({
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
       
       result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
+      result &&= !hasDataType(props.entity) || (local.value as Phenotype).dataType !== DataType.Number || !!(local.value as Phenotype).unit?.unit
       result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined || local.value.entityType === EntityType.CombinedRestriction
       result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
