@@ -46,7 +46,7 @@
       <template #selected>
         <span v-if="selection">
           <q-icon :name="getIcon(selection)" />
-          {{ getTitle(selection) }}
+          {{ getTitle(selection, true) }}
         </span>
       </template>
       <template #option="scope">
@@ -58,7 +58,7 @@
             <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
               {{ scope.opt.repository.name }}
             </q-item-label>
-            <q-item-label>{{ getTitle(scope.opt) }}</q-item-label>
+            <q-item-label>{{ getTitle(scope.opt, true) }}</q-item-label>
             <template v-if="showDetails">
               <q-item-label v-for="(description, index) in getDescriptions(scope.opt)" :key="index" caption class="ellipsis">
                 {{ description }}

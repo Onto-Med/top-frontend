@@ -29,9 +29,50 @@ export default function (this: void) {
     return entity.entityType === EntityType.Category
   }
 
+  /**
+     * Returns a Boolean, indicating if the provided entity is restricted.
+     * @param entity the entity
+     * @returns true if entity is restricted
+     */
+  const isRestricted = (entity: Entity|EntityType): entity is Phenotype => {
+    return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(
+      entity.hasOwnProperty('id') ? (entity as Entity).entityType : (entity as EntityType)
+    )
+  }
+
+  /**
+     * Get a title for the provided entity. The resulting title is derived from the titles field.
+     * A title, were lang matches the currently selected language for i18n, is priortized.
+     * If the entity has no titles, 'unnamed entity' is returned.
+     * @param entity the entity
+     * @returns the title
+     */
+  const getTitle = (entity: Entity, prefix?: boolean): string => {
+    const lang = locale.value.split('-')[0]
+    let superPhenotypePrefix = ''
+
+    if (prefix && isRestricted(entity) && entity.superPhenotype) {
+      superPhenotypePrefix += getTitle(entity.superPhenotype) + ': '
+    }
+
+    if (entity.titles) {
+      const result = entity.titles.filter(t => t.lang === lang).shift()
+      if (result && result.text) return superPhenotypePrefix + result.text
+      if (entity.titles[0] && entity.titles[0].text) return superPhenotypePrefix + entity.titles[0].text
+    }
+    if (isCategory(entity))
+      return t('unnamedCategory')
+    else if (isPhenotype(entity))
+      return t('unnamedPhenotype')
+
+    return superPhenotypePrefix + t('unnamedRestriction')
+  }
+
   return {
     isPhenotype,
     isCategory,
+    isRestricted,
+    getTitle,
 
     hasDataType: (entity: Entity|EntityType) => {
       return [EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(
@@ -82,28 +123,6 @@ export default function (this: void) {
     },
 
     /**
-     * Get a title for the provided entity. The resulting title is derived from the titles field.
-     * A title, were lang matches the currently selected language for i18n, is priortized.
-     * If the entity has no titles, 'unnamed entity' is returned.
-     * @param entity the entity
-     * @returns the title
-     */
-    getTitle (this: void, entity: Entity): string {
-      const lang = locale.value.split('-')[0]
-      if (entity.titles) {
-        const result = entity.titles.filter(t => t.lang === lang).shift()
-        if (result && result.text) return result.text
-        if (entity.titles[0] && entity.titles[0].text) return entity.titles[0].text
-      }
-      if (isCategory(entity))
-        return t('unnamedCategory')
-      else if (isPhenotype(entity))
-        return t('unnamedPhenotype')
-
-      return t('unnamedRestriction')
-    },
-
-    /**
      * Get all synonyms of the provided entity for the currently selected language.
      * @param entity the entity
      * @returns the synonyms
@@ -119,17 +138,6 @@ export default function (this: void) {
      */
     getDescriptions (this: void, entity: Entity): string[] {
       return getLocalizedPropertyValues(entity, 'descriptions')
-    },
-
-    /**
-     * Returns a Boolean, indicating if the provided entity is restricted.
-     * @param entity the entity
-     * @returns true if entity is restricted
-     */
-    isRestricted (this: void, entity: Entity|EntityType): entity is Phenotype {
-      return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(
-        entity.hasOwnProperty('id') ? (entity as Entity).entityType : (entity as EntityType)
-      )
     },
 
     hasExpression (this: void, entity: Entity|EntityType): entity is Phenotype {
