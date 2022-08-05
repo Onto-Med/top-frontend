@@ -36,7 +36,7 @@
     v-else
     clickable
     color="grey-4"
-    :label="getTitle(state)"
+    :label="getTitle(state, true)"
     :icon="getIcon(state)"
     :title="getDescriptions(state).join('\n')"
     :class="{ restriction: isRestricted(state) }"

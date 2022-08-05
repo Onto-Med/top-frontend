@@ -50,7 +50,7 @@
             <q-tab v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id">
               <span class="no-wrap">
                 <q-icon :name="getIcon(tab.entity)" :class="{ restriction: isRestricted(tab.entity) }" />
-                {{ getTitle(tab.entity) }}
+                {{ getTitle(tab.entity, true) }}
                 <span v-show="tab.dirty" class="text-accent" :title="t('unsavedChanges')">*</span>
                 <q-btn
                   flat
