@@ -5,7 +5,7 @@
     :readonly="readonly"
     option-value="uri"
     option-label="name"
-    @update:modelValue="$emit('selectionChanged', $event)"
+    @update:model-value="$emit('update:modelValue', $event)"
   />
 </template>
 
@@ -26,7 +26,7 @@ export default defineComponent({
     },
     readonly: Boolean
   },
-  emits: ['selectionChanged'],
+  emits: ['update:modelValue'],
   setup () {
     return {}
   }
