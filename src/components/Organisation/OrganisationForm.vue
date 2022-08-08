@@ -112,9 +112,9 @@ export default defineComponent({
       isNew,
       showDeleteDialog: ref(false),
 
-      setId (id: string) {
+      setId (id: string|undefined) {
         if (!isNew.value) return
-        state.value.id = id ? id : ''
+        state.value.id = id ? id.replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
       }
     }
   }
