@@ -40,7 +40,7 @@
               :class="{ restriction: isRestricted(node) }"
               class="q-mr-sm"
             />
-            <div :title="getDescriptions(node).join('\n')" :class="{ 'text-italic': !node.createdAt }">
+            <div :title="getDescriptions(node).join('\n')" :class="{ 'text-italic': !node.createdAt }" class="col ellipsis">
               {{ getTitle(node) }}
             </div>
             <q-badge v-show="!node.createdAt" v-t="'new'" color="accent" class="q-ml-sm" />
