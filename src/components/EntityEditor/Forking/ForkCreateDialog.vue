@@ -29,9 +29,6 @@
             <q-checkbox v-model="cascade" :label="t('includeThing', { thing: t('restriction', 2) })" />
           </q-item>
           <q-item>
-            <q-checkbox v-model="history" :label="t('includeThing', { thing: t('versionHistory', 2) })" />
-          </q-item>
-          <q-item>
             <q-checkbox v-model="update" :label="t('updateExistingThing', { thing: t('entity', 2) })" />
           </q-item>
         </q-list>
@@ -74,12 +71,10 @@ export default defineComponent({
     const { getTitle }   = useEntityFormatter()
     const { repository } = storeToRefs(useEntity())
     const cascade = ref(false)
-    const history = ref(false)
     const update  = ref(false)
 
     const reset = () => {
       cascade.value = false
-      history.value = false
       update.value  = false
     }
 
@@ -88,13 +83,11 @@ export default defineComponent({
       getTitle,
       repository,
       cascade,
-      history,
       update,
 
       handleCreateFork () {
         emit('createFork', {
           cascade: cascade.value,
-          history: history.value,
           update:  update.value
         } as ForkUpdateInstruction)
         reset()
