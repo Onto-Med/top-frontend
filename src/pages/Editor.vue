@@ -8,7 +8,7 @@
             <div v-if="repository" class="col ellipsis" :title="repository.name || repository.id">
               {{ repository.name || repository.id }}
             </div>
-            
+
             <div v-if="repository">
               <q-btn
                 dense

@@ -30,8 +30,14 @@ export const useEntity = defineStore('entity', {
           name: 'MissingParametersException',
           message: 'organisationId or repositoryId missing'
         }
-      await this.entityApi?.getEntitiesByRepositoryId(this.organisationId, this.repositoryId)
-        .then((r) => this.entities = r.data)
+      const organisationId = this.organisationId
+      const repositoryId = this.repositoryId
+
+      await this.entityApi?.getEntitiesByRepositoryId(organisationId, repositoryId)
+        .then((r) => {
+          if (organisationId === this.organisationId && repositoryId === this.repositoryId)
+            this.entities = r.data
+        })
     },
 
     async reloadConstants () {
@@ -58,7 +64,10 @@ export const useEntity = defineStore('entity', {
         return
       }
       await this.organisationApi?.getOrganisationById(organisationId)
-        .then(r => this.organisation = r.data)
+        .then(r => {
+          if (organisationId === this.organisationId)
+            this.organisation = r.data
+        })
     },
 
     async setRepository (repositoryId: string|undefined) {
@@ -69,9 +78,13 @@ export const useEntity = defineStore('entity', {
         this.repository = undefined
         return
       }
-      if (!this.organisationId) return
-      await this.repositoryApi?.getRepositoryById(this.organisationId, repositoryId, undefined)
-        .then(r => this.repository = r.data)
+      const organisationId = this.organisationId
+      if (!organisationId) return
+      await this.repositoryApi?.getRepositoryById(organisationId, repositoryId, undefined)
+        .then(r => {
+          if (organisationId === this.organisationId && repositoryId === this.repositoryId)
+          this.repository = r.data
+        })
     },
 
     async getConstants (): Promise<Constant[]> {
@@ -132,17 +145,23 @@ export const useEntity = defineStore('entity', {
     async forkEntity (entity: Entity) {
       if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return
 
+      const organisationId = this.organisationId
+      const repositoryId = this.repositoryId
+
       return this.forkApi.createFork(
         entity.repository.organisation.id,
         entity.repository.id,
         entity.id,
         {
-          organisationId: this.organisationId,
-          repositoryId: this.repositoryId
+          organisationId: organisationId,
+          repositoryId: repositoryId
         } as ForkCreateInstruction,
         undefined,
         entity.version
-      ).then(r => r.data.forEach(e => this.addOrReplaceEntity(e)))
+      ).then(r => {
+        if (organisationId === this.organisationId && repositoryId === this.repositoryId)
+          r.data.forEach(e => this.addOrReplaceEntity(e))
+      })
     },
 
     addOrReplaceEntity (entity: Entity): void {
@@ -152,7 +171,10 @@ export const useEntity = defineStore('entity', {
     },
 
     async saveEntity (entity: Entity) {
-      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
+      const organisationId = this.organisationId
+      const repositoryId = this.repositoryId
+
+      if (!entity || !this.entityApi || !organisationId || !repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
@@ -160,13 +182,15 @@ export const useEntity = defineStore('entity', {
 
       let promise: Promise<AxiosResponse<Entity>>
       if (!entity.createdAt) {
-        promise = this.entityApi.createEntity(this.organisationId, this.repositoryId, entity)
+        promise = this.entityApi.createEntity(organisationId, repositoryId, entity)
       } else {
-        promise = this.entityApi.updateEntityById(this.organisationId, this.repositoryId, entity.id as string, entity)
+        promise = this.entityApi.updateEntityById(organisationId, repositoryId, entity.id as string, entity)
       }
 
       return promise
         .then((r) => {
+          if (organisationId !== this.organisationId || repositoryId !== this.repositoryId)
+            throw new Error('Entity saved, but repository has been changed in the meantime.')
           const existing = this.getEntity(r.data.id)
           if (existing)
             return Object.assign(existing, r.data)
@@ -182,13 +206,18 @@ export const useEntity = defineStore('entity', {
       if (index === -1) return
 
       if (entity.version) {
-        if (!this.organisationId || !this.repositoryId || !entity.id)
+        const organisationId = this.organisationId
+        const repositoryId = this.repositoryId
+        if (!organisationId || !repositoryId || !entity.id)
           throw {
             name: 'MissingAttributesException',
             message: 'attributesMissing'
           }
-        await this.entityApi?.deleteEntityById(this.organisationId, this.repositoryId, entity.id)
-          .then(() => this.entities.splice(index, 1))
+        await this.entityApi?.deleteEntityById(organisationId, repositoryId, entity.id)
+          .then(() => {
+            if (organisationId === this.organisationId && repositoryId === this.repositoryId)
+              this.entities.splice(index, 1)
+          })
       } else {
         this.entities.splice(index, 1)
       }
