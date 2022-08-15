@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkUpdateInstruction } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -142,8 +142,8 @@ export const useEntity = defineStore('entity', {
       return duplicate
     },
 
-    async forkEntity (entity: Entity) {
-      if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return
+    async forkEntity (entity: Entity, forkInstruction: ForkUpdateInstruction): Promise<number> {
+      if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return 0
 
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
@@ -154,13 +154,17 @@ export const useEntity = defineStore('entity', {
         entity.id,
         {
           organisationId: organisationId,
-          repositoryId: repositoryId
+          repositoryId: repositoryId,
+          ...forkInstruction
         } as ForkCreateInstruction,
         undefined,
-        entity.version
+        undefined
       ).then(r => {
-        if (organisationId === this.organisationId && repositoryId === this.repositoryId)
+        if (organisationId === this.organisationId && repositoryId === this.repositoryId) {
           r.data.forEach(e => this.addOrReplaceEntity(e))
+          return r.data.length
+        }
+        return 0
       })
     },
 

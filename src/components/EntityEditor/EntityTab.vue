@@ -177,7 +177,7 @@ import { ref, computed, defineComponent, watch, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, DataType, Category, Phenotype } from '@onto-med/top-api'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
-import ForkingDialog from 'src/components/EntityEditor/ForkingDialog.vue'
+import ForkingDialog from 'src/components/EntityEditor/Forking/ForkingDialog.vue'
 import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useAlert from 'src/mixins/useAlert'
@@ -221,7 +221,7 @@ export default defineComponent({
     const { t, d } = useI18n()
     const clone = (value: Category|Phenotype) =>
       JSON.parse(JSON.stringify(value)) as Category|Phenotype
-    const equals = (expected: unknown, actual: unknown): boolean => 
+    const equals = (expected: unknown, actual: unknown): boolean =>
       JSON.stringify(expected) === JSON.stringify(actual)
 
     const { getTitle, isRestricted, hasDataType, hasExpression } = useEntityFormatter()
@@ -270,7 +270,7 @@ export default defineComponent({
       result &&= local.value.titles != undefined && local.value.titles.length > 0 && local.value.titles.filter(t => !t.lang || !t.text).length === 0
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
-      
+
       result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
       result &&= !hasDataType(props.entity) || (local.value as Phenotype).dataType !== DataType.Number || !!(local.value as Phenotype).unit?.unit
       result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined || local.value.entityType === EntityType.CombinedRestriction
