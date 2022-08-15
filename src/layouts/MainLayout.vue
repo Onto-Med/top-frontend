@@ -34,7 +34,7 @@
             fork
             class="q-mr-sm fit"
             @entity-selected="routeToEntity"
-            @fork-clicked="forkEntity"
+            @fork-clicked="forkOrigin = $event; showForkCreateDialog = true"
           >
             <template #append>
               <q-btn dense flat icon="search" :title="t('search')" />
@@ -143,6 +143,12 @@
       </q-scroll-area>
     </q-drawer>
 
+    <fork-create-dialog
+      v-model:show="showForkCreateDialog"
+      :origin="forkOrigin"
+      @create-fork="forkEntity(forkOrigin, $event)"
+    />
+
     <q-page-container>
       <router-view :key="repositoryId" />
     </q-page-container>
@@ -156,24 +162,23 @@ import { useEntity } from 'src/pinia/entity'
 import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
+import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDialog.vue'
 import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
-import { Entity } from '@onto-med/top-api'
+import { Entity, ForkUpdateInstruction } from '@onto-med/top-api'
 import { useQuasar } from 'quasar'
 import { fabGithub } from '@quasar/extras/fontawesome-v5'
 import useAlert from 'src/mixins/useAlert'
 
 export default defineComponent({
-  name: 'MainLayout',
-
   components: {
     NavbarLink,
     LanguageSwitch,
-    EntitySearchInput
+    EntitySearchInput,
+    ForkCreateDialog
   },
 
   setup () {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const router = useRouter()
     const entityStore = useEntity()
@@ -181,6 +186,7 @@ export default defineComponent({
     const $q = useQuasar()
     const { alert } = useAlert()
     const keycloak = entityStore.keycloak
+    const forkOrigin = ref(undefined as Entity|undefined)
 
     const linksList = computed(() => [
       {
@@ -212,6 +218,8 @@ export default defineComponent({
       leftDrawerOpen,
       fabGithub,
       keycloak,
+      forkOrigin,
+      showForkCreateDialog: ref(false),
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value
@@ -228,9 +236,12 @@ export default defineComponent({
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
       },
 
-      forkEntity (entity: Entity) {
-        entityStore.forkEntity(entity)
-          .then(() => alert(t('thingCreated', { thing: t('fork') }), 'positive'))
+      forkEntity (entity: Entity, forkInstruction: ForkUpdateInstruction) {
+        entityStore.forkEntity(entity, forkInstruction)
+          .then((count) => {
+            forkOrigin.value = undefined
+            alert(t('thingCreatedOrUpdated', { thing: `${count} ` + t('fork', count) }), 'positive')
+          })
           .catch((e: Error) => alert(t(e.message)))
       },
 
