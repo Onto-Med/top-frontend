@@ -8,7 +8,13 @@
     :label="label || t('itemType')"
     :options="options || defaultOptions"
     :error="!itemType"
-  />
+  >
+    <template #option="scope">
+      <q-item v-bind="scope.itemProps">
+        <q-item-section v-t="scope.opt.label" :title="scope.opt.title" />
+      </q-item>
+    </template>
+  </q-select>
 </template>
 
 <script lang="ts">
@@ -31,7 +37,7 @@ export default defineComponent({
       set (value: string): void { emit('update:modelValue', value) }
     })
     const defaultOptions = computed(() =>
-      Object.values(ItemType).map(d => { return { label: t(d), value: d } })
+      Object.values(ItemType).map(d => { return { label: t(d), value: d, title: t(`${d}.description`) } })
     )
 
     return { t, itemType, defaultOptions }
