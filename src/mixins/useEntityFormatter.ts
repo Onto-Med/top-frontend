@@ -80,6 +80,12 @@ export default function (this: void) {
       )
     },
 
+    hasScore: (entity: Entity|EntityType) => {
+      return [EntityType.CombinedRestriction].includes(
+        entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
+      )
+    },
+
     /**
      * Get an appropriate material icon name for the provided entity.
      * When building an icon, you should make restrictions visually distinguishable from phenotypes.
