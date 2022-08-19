@@ -86,6 +86,12 @@ export default function (this: void) {
       )
     },
 
+    hasItemType: (entity: Entity|EntityType) => {
+      return [EntityType.SinglePhenotype].includes(
+        entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
+      )
+    },
+
     /**
      * Get an appropriate material icon name for the provided entity.
      * When building an icon, you should make restrictions visually distinguishable from phenotypes.

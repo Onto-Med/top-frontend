@@ -127,6 +127,7 @@ export const useEntity = defineStore('entity', {
           (entity as Category).superCategories = [ short ]
         }
       }
+
       this.entities.push(entity)
 
       return entity
