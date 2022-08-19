@@ -48,7 +48,7 @@
         <q-card v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-4">
           <q-card-section>
             <q-input
-              v-if="isRestricted(entityType)"
+              v-if="hasScore(entityType)"
               :model-value="score"
               type="number"
               :readonly="readonly"
@@ -234,7 +234,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const { isRestricted, hasDataType, restrictionEntityTypes } = useEntityFormatter()
+    const { isRestricted, hasDataType, hasScore, restrictionEntityTypes } = useEntityFormatter()
     const restrictionKey = ref(0)
     const showSuperCategoryInput = ref(false)
 
@@ -243,6 +243,7 @@ export default defineComponent({
       isRestricted,
       hasDataType,
       restrictionEntityTypes,
+      hasScore,
 
       restrictionKey,
       EntityType,
