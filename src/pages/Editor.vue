@@ -198,16 +198,16 @@ export default defineComponent({
       (entity: Entity|undefined) => {
         tabs.value.filter(t => !t.preserve).forEach(t => closeTab(t.entity))
         if (entity) {
-          const tab = tabs.value.find(t => t.entity.id === entity.id)
+          let tab = tabs.value.find(t => t.entity.id === entity.id)
           if (!tab) {
             tabs.value.push({ selectedVersion: entity.version, entity: entity, dirty: false })
-          } else {
-            void router.push({
-              name: 'editor',
-              params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: entity.id },
-              query: tab.selectedVersion ? { version: tab.selectedVersion } : {}
-            })
+            tab = tabs.value[tabs.value.length - 1]
           }
+          void router.push({
+            name: 'editor',
+            params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: entity.id },
+            query: tab.selectedVersion ? { version: tab.selectedVersion } : {}
+          })
         } else {
           void router.push({
             name: 'editor',
