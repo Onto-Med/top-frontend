@@ -32,6 +32,7 @@
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
             @export-entity="handleEntityExport"
+            @dblclick="preserve()"
           />
         </div>
       </template>
@@ -47,8 +48,8 @@
             class="bg-primary text-white shadow-2 entity-editor-tabs-bar"
             @update:model-value="selectTabByKey($event)"
           >
-            <q-tab v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id">
-              <span class="no-wrap">
+            <q-tab v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" @dblclick="tab.preserve = true">
+              <span class="no-wrap" :class="{ 'text-italic': !tab.preserve }">
                 <q-icon :name="getIcon(tab.entity)" :class="{ restriction: isRestricted(tab.entity) }" />
                 {{ getTitle(tab.entity, true) }}
                 <span v-show="tab.dirty" class="text-accent" :title="t('unsavedChanges')">*</span>
@@ -85,7 +86,7 @@
                 :repository-id="repository.id"
                 :organisation-id="organisationId"
                 :hotkeys-enabled="selected?.id === tab.entity.id"
-                @change="tab.dirty = $event"
+                @change="tab.dirty = $event; tab.preserve = tab.preserve || $event"
                 @update:entity="saveEntity"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab.entity); alert($event.message)"
@@ -118,7 +119,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted, Ref, inject, nextTick } from 'vue'
+import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
@@ -195,12 +196,11 @@ export default defineComponent({
     watch(
       selected as Ref<Entity|undefined>,
       (entity: Entity|undefined) => {
+        tabs.value.filter(t => !t.preserve).forEach(t => closeTab(t.entity))
         if (entity) {
           const tab = tabs.value.find(t => t.entity.id === entity.id)
           if (!tab) {
-            selected.value = undefined
             tabs.value.push({ selectedVersion: entity.version, entity: entity, dirty: false })
-            void nextTick(() => selected.value = entity)
           } else {
             void router.push({
               name: 'editor',
@@ -336,6 +336,15 @@ export default defineComponent({
 
       closeSavedTabs (): void {
         tabs.value.filter(t => !t.dirty).forEach(t => closeTab(t.entity))
+      },
+
+      preserve (): void {
+        void nextTick(() => {
+          if (selected.value) {
+            const tab = tabs.value.find(t => t.entity.id === selected.value?.id)
+            if (tab) tab.preserve = true
+          }
+        })
       }
     }
   }
@@ -344,7 +353,8 @@ export default defineComponent({
 interface EditorTab {
   entity: Entity,
   selectedVersion?: number,
-  dirty: boolean
+  dirty: boolean,
+  preserve?: boolean
 }
 </script>
 
