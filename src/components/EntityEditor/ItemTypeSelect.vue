@@ -8,7 +8,16 @@
     :label="label || t('itemType')"
     :options="options || defaultOptions"
     :error="!itemType"
-  />
+  >
+    <template v-if="tooltip" #option="scope">
+      <q-item v-bind="scope.itemProps">
+        <q-item-section v-t="scope.opt.label" :title="scope.opt.title" />
+      </q-item>
+    </template>
+    <template v-if="description" #after>
+      <q-icon name="help" :title="t('itemType.description')" />
+    </template>
+  </q-select>
 </template>
 
 <script lang="ts">
@@ -21,7 +30,9 @@ export default defineComponent({
     modelValue: String,
     label: String,
     options: Array,
-    readonly: Boolean
+    readonly: Boolean,
+    description: Boolean,
+    tooltip: Boolean
   },
   emits: ['update:modelValue'],
   setup (props: Record<string, unknown>, { emit }: SetupContext) {
@@ -31,7 +42,9 @@ export default defineComponent({
       set (value: string): void { emit('update:modelValue', value) }
     })
     const defaultOptions = computed(() =>
-      Object.values(ItemType).map(d => { return { label: t(d), value: d } })
+      Object.values(ItemType)
+        .map(it => { return { label: t(it), value: it, title: t(`${it}.description`) } })
+        .sort((a, b) => a.label.localeCompare(b.label))
     )
 
     return { t, itemType, defaultOptions }

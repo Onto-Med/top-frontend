@@ -4,6 +4,7 @@ export default {
   aggregationFunction: 'Aggregationsfunktion|Aggregationsfunktionen',
   aggregationFunctionDescription: 'Wählen Sie eine Aggregationsfunktion für Fälle, in denen diese Abfrage mehrere Werte für einen einzigen Phänotyp liefert.',
   allergy_intolerance: 'Allergische Unverträglichkeit|Allergische Unverträglichkeiten',
+  'allergy_intolerance.description': 'Aufzeichnungen über eine klinische Bewertung einer Allergie oder Unverträglichkeit.',
   appSubtitle: 'Diese Framework unterstützt bei der Modellierung und Anwendung von Phänotypen.',
   appDescription: 'Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.',
   asc: 'Aufsteigend',
@@ -13,6 +14,8 @@ export default {
   category: 'Kategorie|Kategorien',
   change: 'Ändern',
   clinical_impression: 'Klinischer Eindruck|Klinische Eindrücke',
+  'clinical_impression.description': 'Eine Aufzeichnung einer klinischen Bewertung, die durchgeführt wird, um festzustellen, '
+    + 'welche Probleme den Patienten betreffen könnten, und bevor die Behandlung geplant wird, die am besten für den Zustand des Patienten geeignet ist.',
   closure: 'Abschluss|Abschlüsse',
   configureThing: '{thing} konfigurieren',
   continue: 'Fortsetzen',
@@ -42,20 +45,30 @@ export default {
   forkEntityToRepository: 'Möchten Sie {entity} in das Repositorium {repository} übernehmen?',
   format: 'Format|Formate',
   function: 'Funktion',
+  hideThing: '{thing} ausblenden',
   import: 'Importieren',
   includeThing: '{thing} einschließen',
   inclusion: 'Einschluss|Einschlüsse',
   itemType: 'Item Typ|Item Typen',
+  'itemType.description': 'Item Typen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. '
+    + 'Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. '
+    + 'Je nach Datenquelle kann sich der Datenabruf zwischen den Item Typen drastisch unterscheiden.',
   maximum: 'Maximum',
   medication_administration: 'Medikamentenverabreichung|Medikamentenverabreichungen',
+  'medication_administration.description': 'Beschreibt das Ereignis, bei dem ein Individuum ein Medikament einnimmt oder auf andere Weise verabreicht bekommt.',
   medication_request: 'Arzneimittelanforderung|Arzneimittelanforderungen',
+  'medication_request.description': 'Ein Auftrag oder eine Aufforderung zur Lieferung des Medikaments und die Anweisungen zur Verabreichung des Medikaments an einen Patienten.',
   medication_statement: 'Arzneimittelverordnung|Arzneimittelverordnungen',
+  'medication_statement.description': 'Eine Aufzeichnung über ein Medikament, das von einem Individuum eingenommen wird.',
   minimum: 'Minimum',
   nothingSelectedYet: 'Es wurde noch nichts ausgewählt.',
   observation: 'Beobachtung|Beobachtungen',
+  'observation.description': 'Messungen und einfache Behauptungen, die über ein Individuum gemacht werden.',
   performThing: '{thing} ausführen',
   pleaseModifySettings: 'Bitte passen Sie die Einstellungen an',
   procedure: 'Prozedur|Prozeduren',
+  'procedure.description': 'Eine Aktion, die an oder für ein Individuum durchgeführt wird oder wurde. '
+    + 'Dies kann ein körperlicher Eingriff, eine Beratung oder eine andere Dienstleistung sein.',
   projection: 'Projektion|Projektionen',
   projectionSelection: 'Klicken Sie auf einfache Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.',
   query: 'Abfrage|Abfragen',
@@ -72,7 +85,11 @@ export default {
   sorting: 'Sortierung|Sortierungen',
   source: 'Quelle|Quellen',
   subject_age: 'Alter des Subjects',
+  'subject_age.description': 'Die Phänotypklasse für das Alter eines Individuums bedarf unter Umständen einer speziellen Behandlung '
+    + 'beim Zugriff auf Datenquellen und muss daher gesondert markiert werden.',
   subject_sex: 'Geschlecht des Subjects',
+  'subject_sex.description': 'Die Phänotypklasse für das Geschlecht eines Individuums bedarf unter Umständen einer speziellen Behandlung '
+    + 'beim Zugriff auf Datenquellen und muss daher gesondert markiert werden.',
   superCategory: 'Super-Kategorie|Super-Kategorien',
   thingIsRunning: '{thing} läuft',
   updateExistingThing: 'Existierende {thing} aktualisieren',
@@ -184,6 +201,8 @@ export default {
   closeSaved: 'Gespeicherte schließen',
   code: 'Code|Codes',
   condition: 'Bedingung|Bedingungen',
+  'condition.description': 'Ein klinischer Zustand, ein Problem, eine Diagnose oder ein anderes Ereignis, eine Situation, '
+    + 'eine Frage oder ein klinisches Konzept, das ein bestimmtes Ausmaß an Bedenken erreicht hat.',
   squareRoot: 'Quadratwurzel',
   exponent: 'Exponent|Exponenten',
   base: 'Basis|Basen',
@@ -261,7 +280,6 @@ export default {
     confirmDelete: 'Möchten Sie dieses Repositorium wirklich löschen?'
   },
   entityTree: {
-    listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und der Listenansicht ohne Kategorien.',
     noNodesLabel: 'Es sind keine Entitäten vorhanden.',
     noResultsLabel: 'Die Filterung liefert keine Ergebnisse.'
   },
