@@ -196,7 +196,9 @@ export default defineComponent({
     watch(
       selected as Ref<Entity|undefined>,
       (entity: Entity|undefined) => {
-        tabs.value.filter(t => !t.preserve).forEach(t => closeTab(t.entity))
+        tabs.value
+          .filter(t => !t.preserve && t.entity.id !== entity?.id)
+          .forEach(t => closeTab(t.entity))
         if (entity) {
           let tab = tabs.value.find(t => t.entity.id === entity.id)
           if (!tab) {
