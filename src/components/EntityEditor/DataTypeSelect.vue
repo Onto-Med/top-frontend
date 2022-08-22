@@ -33,7 +33,9 @@ export default defineComponent({
       set (value: string): void { emit('update:modelValue', value) }
     })
     const defaultOptions = computed(() =>
-      Object.values(DataType).map(d => { return { label: t(d), value: d } })
+      Object.values(DataType)
+        .map(d => { return { label: t(d), value: d } })
+        .sort((a, b) => a.label.localeCompare(b.label))
     )
 
     return { t, dataType, defaultOptions }
