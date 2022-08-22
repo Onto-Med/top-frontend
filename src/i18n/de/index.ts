@@ -5,6 +5,7 @@ export default {
   aggregationFunctionDescription: 'Wählen Sie eine Aggregationsfunktion für Fälle, in denen diese Abfrage mehrere Werte für einen einzigen Phänotyp liefert.',
   allergy_intolerance: 'Allergische Unverträglichkeit|Allergische Unverträglichkeiten',
   'allergy_intolerance.description': 'Aufzeichnungen über eine klinische Bewertung einer Allergie oder Unverträglichkeit.',
+  and: 'und',
   appSubtitle: 'Diese Framework unterstützt bei der Modellierung und Anwendung von Phänotypen.',
   appDescription: 'Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.',
   asc: 'Aufsteigend',

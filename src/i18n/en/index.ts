@@ -5,6 +5,7 @@ export default {
   aggregationFunctionDescription: 'Select an aggregation function for cases, where this query returns multiple values for a single phenotype.',
   allergy_intollerance: 'Allergy intollerance|Allergy intollerances',
   'allergy_intollerance.description': 'A record of a clinical assessment of an allergy or intolerance.',
+  and: 'and',
   appSubtitle: 'This framework supports the modelling and application of phenotypes.',
   appDescription: 'Currently, the framework is under heavy development and will be extended with further functionalities.',
   asc: 'Ascending',
