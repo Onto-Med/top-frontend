@@ -21,11 +21,9 @@
     <q-item-section side>
       <q-btn-group flat>
         <criterion-configuration
-          :age-restrictions="ageRestrictions"
           :date-time-restrictions="dateTimeRestrictions"
           :default-aggregation-function="defaultAggregationFunction"
           :aggregation-function-options="aggregationFunctionOptions"
-          @update:age-restrictions="$emit('update:ageRestrictions', $event)"
           @update:date-time-restrictions="$emit('update:dateTimeRestrictions', $event)"
           @update:default-aggregation-function="$emit('update:defaultAggregationFunction', $event)"
         />
@@ -38,7 +36,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Phenotype, NumberRestriction, DateTimeRestriction, ExpressionFunction } from '@onto-med/top-api'
+import { Phenotype, DateTimeRestriction, ExpressionFunction } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import CriterionConfiguration from './CriterionConfiguration.vue'
 
@@ -48,9 +46,6 @@ export default defineComponent({
     exclusion: {
       type: Boolean,
       default: false
-    },
-    ageRestrictions: {
-      type: Array as () => NumberRestriction[]
     },
     dateTimeRestrictions: {
       type: Array as () => DateTimeRestriction[]
@@ -67,9 +62,8 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['removeClicked', 'update:exclusion', 'update:ageRestrictions', 'update:dateTimeRestrictions', 'update:defaultAggregationFunction'],
-  setup() {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  emits: ['removeClicked', 'update:exclusion', 'update:dateTimeRestrictions', 'update:defaultAggregationFunction'],
+  setup () {
     const { t } = useI18n()
     const { getSynonyms, isRestricted, getIcon, getTitle } = useEntityFormatter()
 

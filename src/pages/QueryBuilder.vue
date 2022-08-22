@@ -108,7 +108,6 @@
                   <template v-for="(criterion, index) in query.criteria" :key="index">
                     <criterion
                       v-model:exclusion="criterion.exclusion"
-                      v-model:age-restrictions="criterion.ageRestrictions"
                       v-model:date-time-restrictions="criterion.dateTimeRestrictions"
                       v-model:default-aggregation-function="criterion.defaultAggregationFunction"
                       :aggregation-function-options="aggregationFunctionOptions"
@@ -311,7 +310,6 @@ interface Run {
 export default defineComponent({
   components: { EntityTree, Criterion, QueryResult },
   setup () {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const { getTitle, getSynonyms, getIcon, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
