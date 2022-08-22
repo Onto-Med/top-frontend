@@ -14,6 +14,9 @@
         <q-item-section v-t="scope.opt.label" :title="scope.opt.title" />
       </q-item>
     </template>
+    <template #after>
+      <q-icon name="help" :title="t('itemType.description')" />
+    </template>
   </q-select>
 </template>
 

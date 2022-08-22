@@ -46,6 +46,9 @@ export default {
   includeThing: '{thing} einschließen',
   inclusion: 'Einschluss|Einschlüsse',
   itemType: 'Item Typ|Item Typen',
+  'itemType.description': 'Item Typen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. '
+    + 'Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. '
+    + 'Je nach Datenquelle kann sich der Datenabruf zwischen den Item Typen drastisch unterscheiden.',
   maximum: 'Maximum',
   medication_administration: 'Medikamentenverabreichung|Medikamentenverabreichungen',
   medication_request: 'Arzneimittelanforderung|Arzneimittelanforderungen',
