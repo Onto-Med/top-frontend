@@ -28,24 +28,6 @@
         <q-separator />
 
         <q-card-section>
-          <div v-t="'ageRestrictionDescription'" />
-          <div v-for="(restriction, index) in ageRestrictions" :key="index" class="row">
-            <range-input
-              v-model:minimum="restriction.values[0]"
-              v-model:maximum="restriction.values[1]"
-              v-model:min-operator="restriction.minOperator"
-              v-model:max-operator="restriction.maxOperator"
-              :type="DataType.Number"
-              class="col"
-            />
-            <q-btn flat icon="remove" :title="t('removeThing', { thing: t('ageRestriction') })" class="col-auto" @click="removeAgeRestriction(index)" />
-          </div>
-          <q-btn flat icon="add" class="q-mt-md" :label="t('addThing', { thing: t('ageRestriction') })" @click="addAgeRestriction()" />
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section>
           <div v-t="'dateTimeRestrictionDescription'" />
           <div v-for="(restriction, index) in dateTimeRestrictions" :key="index" class="row">
             <range-input
@@ -68,16 +50,12 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NumberRestriction, DateTimeRestriction, DataType, ExpressionFunction } from '@onto-med/top-api'
+import { DateTimeRestriction, DataType, ExpressionFunction } from '@onto-med/top-api'
 import RangeInput from '../EntityEditor/RangeInput.vue'
 
 export default defineComponent({
   components: { RangeInput },
   props: {
-    ageRestrictions: {
-      type: Array as () => NumberRestriction[],
-      default: () => []
-    },
     dateTimeRestrictions: {
       type: Array as () => DateTimeRestriction[],
       default: () => []
@@ -91,9 +69,8 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['update:ageRestrictions', 'update:dateTimeRestrictions', 'update:default-aggregation-function'],
-  setup(props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  emits: ['update:dateTimeRestrictions', 'update:default-aggregation-function'],
+  setup (props, { emit }) {
     const { t } = useI18n()
 
     return {
@@ -101,24 +78,12 @@ export default defineComponent({
       DataType,
       showDialog: ref(false),
 
-      hasContent: computed(() => props.ageRestrictions.length > 0 || props.dateTimeRestrictions.length > 0),
-
-      addAgeRestriction: () => {
-        const newValue = JSON.parse(JSON.stringify(props.ageRestrictions)) as NumberRestriction[]
-        newValue.push({ type: DataType.Number, values: [] })
-        emit('update:ageRestrictions', newValue)
-      },
+      hasContent: computed(() => props.dateTimeRestrictions.length > 0),
 
       addDateTimeRestriction: () => {
         const newValue = JSON.parse(JSON.stringify(props.dateTimeRestrictions)) as DateTimeRestriction[]
         newValue.push({ type: DataType.DateTime, values: [] })
         emit('update:dateTimeRestrictions', newValue)
-      },
-
-      removeAgeRestriction: (index: number) => {
-        const newValue = JSON.parse(JSON.stringify(props.ageRestrictions)) as NumberRestriction[]
-        newValue.splice(index, 1)
-        emit('update:ageRestrictions', newValue)
       },
 
       removeDateTimeRestriction: (index: number) => {
