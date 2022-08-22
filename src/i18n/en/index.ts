@@ -83,7 +83,7 @@ export default {
   selection: 'Selection|Selections',
   sorting: 'Sorting|Sortings',
   source: 'Source|Sources',
-  subject_age: 'Age of the subjecte',
+  subject_age: 'Age of the subject',
   'subject_age.description': 'The phenotype class for the age of a subject may require special handling when accessing data sources '
     + 'and must therefore be marked separately.',
   subject_sex: 'Sex of the subject',
