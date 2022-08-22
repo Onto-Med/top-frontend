@@ -248,7 +248,7 @@ export default defineComponent({
 
       functionTitle: computed(() => {
         if (!fun.value || !fun.value.title) return ''
-        return te(fun.value.title) ? t(fun.value.title) : fun.value.title
+        return te('functions.' + fun.value.title) ? t('functions.' + fun.value.title) : fun.value.title
       }),
 
       prefix: computed(
