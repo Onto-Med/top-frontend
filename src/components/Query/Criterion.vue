@@ -14,7 +14,7 @@
         <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
         {{ getTitle(subject) }}
         <small v-if="defaultAggregationFunction" :title="t('aggregationFunction')" class="q-ml-md">
-          ({{ defaultAggregationFunction.title }})
+          ({{ te('functions.' + defaultAggregationFunction.title) ? t('functions.' + defaultAggregationFunction.title) : defaultAggregationFunction.title }})
         </small>
       </div>
     </q-item-section>
@@ -64,11 +64,13 @@ export default defineComponent({
   },
   emits: ['removeClicked', 'update:exclusion', 'update:dateTimeRestrictions', 'update:defaultAggregationFunction'],
   setup () {
-    const { t } = useI18n()
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t, te } = useI18n()
     const { getSynonyms, isRestricted, getIcon, getTitle } = useEntityFormatter()
 
     return {
       t,
+      te,
       getSynonyms,
       isRestricted,
       getIcon,

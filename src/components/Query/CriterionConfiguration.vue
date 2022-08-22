@@ -19,10 +19,17 @@
             :model-value="defaultAggregationFunction"
             :options="aggregationFunctionOptions"
             :label="t('aggregationFunction')"
-            option-value="id"
-            option-label="title"
             @update:model-value="$emit('update:default-aggregation-function', $event)"
-          />
+          >
+            <template #selected>
+              {{ te('functions.' + defaultAggregationFunction.title) ? t('functions.' + defaultAggregationFunction.title) : defaultAggregationFunction.title }}
+            </template>
+            <template #option="scope">
+              <q-item v-bind="scope.itemProps">
+                {{ te('functions.' + scope.opt.title) ? t('functions.' + scope.opt.title) : scope.opt.title }}
+              </q-item>
+            </template>
+          </q-select>
         </q-card-section>
 
         <q-separator />
@@ -71,10 +78,12 @@ export default defineComponent({
   },
   emits: ['update:dateTimeRestrictions', 'update:default-aggregation-function'],
   setup (props, { emit }) {
-    const { t } = useI18n()
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t, te } = useI18n()
 
     return {
       t,
+      te,
       DataType,
       showDialog: ref(false),
 
