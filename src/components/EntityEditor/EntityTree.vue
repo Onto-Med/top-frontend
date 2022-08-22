@@ -10,7 +10,28 @@
       </q-toolbar-title>
 
       <q-separator vertical />
-      <q-btn stretch flat :icon="asList ? 'account_tree' : 'view_list'" :title="t('entityTree.listDescription')" @click="asList = !asList" />
+      <q-btn stretch flat icon="filter_alt" :title="t('filter')">
+        <q-menu class="filter-menu">
+          <q-list dense>
+            <q-item>
+              <q-checkbox v-model="hideCategories" :label="t('hideThing', { thing: t('category', 2) })" />
+            </q-item>
+            <q-item>
+              <q-select
+                v-model="filterItemTypes"
+                emit-value
+                map-options
+                multiple
+                clearable
+                use-chips
+                :label="t('itemType', 2)"
+                :options="itemTypeOptions"
+                class="col"
+              />
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
       <q-separator vertical />
       <q-btn stretch flat icon="refresh" :title="t('reload')" @click="handleRefreshClick" />
     </q-toolbar>
@@ -89,7 +110,7 @@ import { defineComponent, computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
-import { Category, EntityType, Entity } from '@onto-med/top-api'
+import { Category, EntityType, Entity, ItemType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTree',
@@ -112,18 +133,25 @@ export default defineComponent({
   },
   emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
   setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t }     = useI18n()
-    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
-    const expansion = ref([] as string[])
-    const filter    = ref('')
-    const asList    = ref(false)
+    const { t } = useI18n()
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted, isPhenotype } = useEntityFormatter()
+    const expansion         = ref([] as string[])
+    const filter            = ref('')
+    const hideCategories    = ref(false)
+    const filterItemTypes   = ref([] as ItemType[])
     const showRefreshDialog = ref(false)
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
-      if (!asList.value) return props.nodes
-      return props.nodes.filter(n => n.entityType !== EntityType.Category)
+      return props.nodes.filter(n => {
+        if (hideCategories.value && n.entityType === EntityType.Category) return false
+        if (filterItemTypes.value
+          && filterItemTypes.value.length > 0
+          && isPhenotype(n)
+          && (n.entityType !== EntityType.SinglePhenotype || !n.itemType || !filterItemTypes.value.includes(n.itemType))
+        ) return false
+        return true
+      })
     })
 
     const expand = (entity: Entity|undefined): void => {
@@ -180,10 +208,9 @@ export default defineComponent({
             }
           })
           if (isRestricted(e)) {
-            if (e.superPhenotype && e.superPhenotype.id && map.get(e.superPhenotype.id)) {
+            root = false
+            if (e.superPhenotype && e.superPhenotype.id && map.get(e.superPhenotype.id))
               (map.get(e.superPhenotype.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
-              root = false
-            }
           }
 
           if (root) {
@@ -198,8 +225,9 @@ export default defineComponent({
     return {
       t,
       expansion,
-      asList,
+      hideCategories,
       filter,
+      filterItemTypes,
       EntityType,
       showRefreshDialog,
       getIcon,
@@ -207,6 +235,10 @@ export default defineComponent({
       getTitle,
       getDescriptions,
       isRestricted,
+
+      itemTypeOptions: computed(() =>
+        Object.values(ItemType).map(d => { return { label: t(d), value: d } })
+      ),
 
       treeNodes: computed((): TreeNode[] => {
         return toTree(visibleNodes.value, props.excludeTypeIfEmpty)
@@ -248,4 +280,7 @@ interface TreeNode extends Entity {
 <style lang="sass">
 .q-splitter__separator-area
   left: 0px !important
+.filter-menu
+  min-width: 300px
+  max-width: 300px
 </style>

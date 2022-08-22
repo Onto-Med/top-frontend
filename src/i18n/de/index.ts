@@ -42,6 +42,7 @@ export default {
   forkEntityToRepository: 'Möchten Sie {entity} in das Repositorium {repository} übernehmen?',
   format: 'Format|Formate',
   function: 'Funktion',
+  hideThing: '{thing} ausblenden',
   import: 'Importieren',
   includeThing: '{thing} einschließen',
   inclusion: 'Einschluss|Einschlüsse',
@@ -264,7 +265,6 @@ export default {
     confirmDelete: 'Möchten Sie dieses Repositorium wirklich löschen?'
   },
   entityTree: {
-    listDescription: 'Wechseln Sie zwischen der Baumansicht mit Kategorien und der Listenansicht ohne Kategorien.',
     noNodesLabel: 'Es sind keine Entitäten vorhanden.',
     noResultsLabel: 'Die Filterung liefert keine Ergebnisse.'
   },

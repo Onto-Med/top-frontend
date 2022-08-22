@@ -42,6 +42,7 @@ export default {
   forkEntityToRepository: 'Do you want to transfer {entity} to the repository {repository}?',
   format: 'Format|Formats',
   function: 'Function',
+  hideThing: 'Hide {thing}',
   import: 'Import',
   includeThing: 'Include {thing}',
   inclusion: 'Inclusion|Inclusions',
@@ -261,7 +262,6 @@ export default {
     confirmDelete: 'Do you really want to delete this repository?'
   },
   entityTree: {
-    listDescription: 'Switch between the tree view with categories and the list view without categories.',
     noNodesLabel: 'There are no entities.',
     noResultsLabel: 'The filtering has no results.'
   },
