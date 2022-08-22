@@ -9,12 +9,12 @@
     :options="options || defaultOptions"
     :error="!itemType"
   >
-    <template #option="scope">
+    <template v-if="tooltip" #option="scope">
       <q-item v-bind="scope.itemProps">
         <q-item-section v-t="scope.opt.label" :title="scope.opt.title" />
       </q-item>
     </template>
-    <template #after>
+    <template v-if="description" #after>
       <q-icon name="help" :title="t('itemType.description')" />
     </template>
   </q-select>
@@ -30,7 +30,9 @@ export default defineComponent({
     modelValue: String,
     label: String,
     options: Array,
-    readonly: Boolean
+    readonly: Boolean,
+    description: Boolean,
+    tooltip: Boolean
   },
   emits: ['update:modelValue'],
   setup (props: Record<string, unknown>, { emit }: SetupContext) {

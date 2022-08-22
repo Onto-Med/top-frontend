@@ -51,6 +51,8 @@
               v-if="hasItemType(entityType)"
               :model-value="itemType"
               :readonly="readonly"
+              description
+              tooltip
               @update:model-value="$emit('update:itemType', $event)"
             />
             <q-input

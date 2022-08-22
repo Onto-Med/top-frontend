@@ -17,17 +17,7 @@
               <q-checkbox v-model="hideCategories" :label="t('hideThing', { thing: t('category', 2) })" />
             </q-item>
             <q-item>
-              <q-select
-                v-model="filterItemTypes"
-                emit-value
-                map-options
-                multiple
-                clearable
-                use-chips
-                :label="t('itemType', 2)"
-                :options="itemTypeOptions"
-                class="col"
-              />
+              <item-type-select v-model="filterItemTypes" multiple clearable use-chips class="col" />
             </q-item>
           </q-list>
         </q-menu>
@@ -110,11 +100,12 @@ import { defineComponent, computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
+import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import { Category, EntityType, Entity, ItemType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTree',
-  components: { EntityTreeContextMenu },
+  components: { EntityTreeContextMenu, ItemTypeSelect },
   props: {
     nodes: Array as () => Entity[],
     selected: Object as () => Entity,
@@ -235,10 +226,6 @@ export default defineComponent({
       getTitle,
       getDescriptions,
       isRestricted,
-
-      itemTypeOptions: computed(() =>
-        Object.values(ItemType).map(d => { return { label: t(d), value: d } })
-      ),
 
       treeNodes: computed((): TreeNode[] => {
         return toTree(visibleNodes.value, props.excludeTypeIfEmpty)
