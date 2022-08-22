@@ -9,7 +9,7 @@
         :class="{ 'col-6': grid }"
         @click="$emit('select', fun.id)"
       >
-        <q-item-section>{{ te(fun.title) ? t(fun.title) : fun.title }}</q-item-section>
+        <q-item-section>{{ te('functions.' + fun.title) ? t('functions.' + fun.title) : fun.title }}</q-item-section>
       </q-item>
     </q-list>
     <q-separator />
