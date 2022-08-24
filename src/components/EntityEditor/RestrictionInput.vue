@@ -1,5 +1,11 @@
 <template>
-  <expandable-card :title="label || t('restriction')" :help-text="t('entityEditor.restrictionHelp')" :expanded="expanded" :show-help="showHelp">
+  <expandable-card
+    :title="label || t('restriction')"
+    :help-text="t('entityEditor.restrictionHelp')"
+    :expanded="expanded"
+    :show-help="showHelp"
+    :error="!isValid"
+  >
     <template #default>
       <div class="row q-mb-md q-gutter-md">
         <q-select
@@ -161,7 +167,16 @@ export default defineComponent({
       emit('update:modelValue', newState)
     }
 
-    return { t, defaultQuantors, state, hasRange, canHaveRange, handleHasRangeChanged, Quantor,
+    return {
+      t,
+      defaultQuantors,
+      state,
+      hasRange,
+      canHaveRange,
+      handleHasRangeChanged,
+      Quantor,
+
+      isValid: computed(() => ![Quantor.Exact, Quantor.Min, Quantor.Max].includes(state.quantor) || state.count),
       addValue () {
         if (!state.values) state.values = []
         state.values.push(null as never)
