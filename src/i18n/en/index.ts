@@ -23,6 +23,7 @@ export default {
   copyiedToClipboard: 'The content has been copied to the clipboard.',
   copyFailed: 'The content could not be copied.',
   copyToClipboard: 'Copy to clipboard.',
+  count: 'Count|Counts',
   thingCreatedOrUpdated: '{thing} created or updated.',
   criterion: 'Criterion|Criteria',
   ctrl: 'CTRL',

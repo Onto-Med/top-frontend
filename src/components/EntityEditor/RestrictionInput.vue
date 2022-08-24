@@ -1,7 +1,7 @@
 <template>
   <expandable-card :title="label || t('restriction')" :help-text="t('entityEditor.restrictionHelp')" :expanded="expanded" :show-help="showHelp">
     <template #default>
-      <div class="row q-mb-md">
+      <div class="row q-mb-md q-gutter-md">
         <q-select
           v-model="state.quantor"
           stack-label
@@ -12,6 +12,14 @@
           :readonly="readonly"
           :label="t('quantor')"
           :options="quantors || defaultQuantors"
+        />
+
+        <q-input
+          v-if="[Quantor.Exact, Quantor.Min, Quantor.Max].includes(state.quantor)"
+          v-model="state.count"
+          type="number"
+          :error="!state.count"
+          :label="t('count')"
         />
       </div>
 
@@ -123,7 +131,7 @@ export default defineComponent({
     }
     if (state.negated === undefined) state.negated = false
     if (!state.quantor) state.quantor = Quantor.Some
-    
+
 
     watch(
       () => state,

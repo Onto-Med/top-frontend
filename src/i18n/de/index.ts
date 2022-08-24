@@ -23,6 +23,7 @@ export default {
   copyiedToClipboard: 'Der Inhalt wurde in die Zwischenablage kopiert.',
   copyFailed: 'Der Inhalt konnte nicht kopiert werden.',
   copyToClipboard: 'In Zwischenablage kopieren.',
+  count: 'Anzahl|Anzahlen',
   thingCreatedOrUpdated: '{thing} erzeugt oder aktualisiert.',
   criterion: 'Kriterium|Kriterien',
   ctrl: 'STRG',
