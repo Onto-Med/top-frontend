@@ -12,6 +12,7 @@ export default {
   back: 'Back',
   buildQuery: 'Build query|Build queries',
   buildQueryFor: 'Build query for|Build queries for',
+  cardinality: 'Cardinality|Cardinalities',
   category: 'Category|Categories',
   change: 'Change',
   clinical_impression: 'Clinical impression|Clinical impressions',
@@ -23,6 +24,7 @@ export default {
   copyiedToClipboard: 'The content has been copied to the clipboard.',
   copyFailed: 'The content could not be copied.',
   copyToClipboard: 'Copy to clipboard.',
+  count: 'Count|Counts',
   thingCreatedOrUpdated: '{thing} created or updated.',
   criterion: 'Criterion|Criteria',
   ctrl: 'CTRL',
@@ -182,7 +184,7 @@ export default {
   dismiss: 'Dismiss',
   notFound: 'Not found',
   negated: 'Negated',
-  quantor: 'Quantor|Quantors',
+  quantifier: 'Quantifier|Quantifiers',
   loading: 'Loading',
   logOut: 'Log out',
   logIn: 'Log in',
@@ -270,7 +272,7 @@ export default {
       + 'In this way, on the one hand, data from other sources can be read in and used for phenotyping. '
       + 'On the other hand, results can be fed back to external IT systems.',
     formulaHelp: 'Mathematical formulas can be entered here to calculate the values of the phenotype. Formulas can contain other phenotypes as well as constants.',
-    restrictionHelp: 'Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantor. '
+    restrictionHelp: 'Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantifier. '
       + 'Then you have to choose between value range (with minimum and/or maximum) or enumeration (any number of predefined values) for the type of restriction. '
       + 'No restriction type can be selected for the quantifiers "Values present" and "No values present" because the restriction of the values is implicit.',
     expressionHelp: 'To define restrictions for combined phenotypes. A Boolean expression must be specified. '
@@ -307,10 +309,10 @@ export default {
   ucumCard: {
     help: 'Enter a unit or a unit designation. A list of suggestions will then be displayed from which you can select the appropriate UCUM unit.'
   },
-  quantorType: {
-    none: 'No values present',
-    exists: 'Values present',
-    some: 'At least one value in range',
+  quantifierType: {
     all: 'All values in range',
+    exact: 'Exactly X values in range',
+    min: 'At least X values in range',
+    max: 'No more than X values in range'
   }
 };
