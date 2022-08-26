@@ -9,28 +9,28 @@
     <template #default>
       <div class="row q-mb-md q-gutter-md">
         <q-select
-          v-model="state.quantor"
+          v-model="state.quantifier"
           stack-label
           emit-value
           map-options
           outlined
           hide-bottom-space
           :readonly="readonly"
-          :label="t('quantor')"
-          :options="quantors || defaultQuantors"
+          :label="t('quantifier')"
+          :options="quantifiers || defaultQuantifiers"
         />
 
         <q-input
-          v-if="[Quantor.Exact, Quantor.Min, Quantor.Max].includes(state.quantor)"
-          v-model="state.count"
+          v-if="[Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier)"
+          v-model="state.cardinality"
           type="number"
-          :error="!state.count"
-          :label="t('count')"
+          :error="state.cardinality === undefined"
+          :label="t('cardinality')"
         />
       </div>
 
       <q-slide-transition>
-        <div v-show="![Quantor.None, Quantor.Exists].includes(state.quantor)">
+        <div>
           <div class="row">
             <q-btn-toggle
               v-if="canHaveRange"
@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantor, Restriction, StringRestriction } from '@onto-med/top-api'
+import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantifier, Restriction, StringRestriction } from '@onto-med/top-api'
 import { defineComponent, ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
@@ -108,7 +108,7 @@ export default defineComponent({
     name: String,
     label: String,
     operators: Array,
-    quantors: Array,
+    quantifiers: Array,
     expanded: Boolean,
     showHelp: Boolean,
     readonly: Boolean
@@ -127,8 +127,8 @@ export default defineComponent({
       )
     )
 
-    const defaultQuantors = computed(() =>
-      Object.values(Quantor).map(d => { return { label: t('quantorType.' + d), value: d } })
+    const defaultQuantifiers = computed(() =>
+      Object.values(Quantifier).map(d => { return { label: t('quantifierType.' + d), value: d } })
     )
 
     if (!state.values) {
@@ -136,23 +136,14 @@ export default defineComponent({
       hasRange.value = canHaveRange.value
     }
     if (state.negated === undefined) state.negated = false
-    if (!state.quantor) state.quantor = Quantor.Some
-
+    if (!state.quantifier) {
+      state.quantifier = Quantifier.Min
+      state.cardinality = 1
+    }
 
     watch(
       () => state,
-      () => {
-        const newState = JSON.parse(JSON.stringify(state)) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
-        if (newState.quantor && [Quantor.None, Quantor.Exists].includes(newState.quantor)) {
-          if (newState.type === DataType.Number || newState.type === DataType.DateTime) {
-            {(newState as NumberRestriction|DateTimeRestriction).minOperator = undefined}
-            (newState as NumberRestriction|DateTimeRestriction).maxOperator = undefined
-          }
-          newState.negated = undefined
-          newState.values = []
-        }
-        emit('update:modelValue', newState)
-      },
+      () => emit('update:modelValue', state),
       { deep: true }
     )
 
@@ -169,14 +160,16 @@ export default defineComponent({
 
     return {
       t,
-      defaultQuantors,
+      defaultQuantifiers,
       state,
       hasRange,
       canHaveRange,
       handleHasRangeChanged,
-      Quantor,
+      Quantifier,
 
-      isValid: computed(() => ![Quantor.Exact, Quantor.Min, Quantor.Max].includes(state.quantor) || state.count),
+      isValid: computed(() =>
+        state.quantifier && (![Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier) || state.cardinality !== undefined)
+      ),
       addValue () {
         if (!state.values) state.values = []
         state.values.push(null as never)

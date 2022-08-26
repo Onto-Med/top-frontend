@@ -12,6 +12,7 @@ export default {
   back: 'Zurück',
   buildQuery: 'Abfrage erstellen|Abfragen erstellen',
   buildQueryFor: 'Abfrage erstellen für|Abfragen erstellen für',
+  cardinality: 'Cardinalität|Cardinalitäten',
   category: 'Kategorie|Kategorien',
   change: 'Ändern',
   clinical_impression: 'Klinischer Eindruck|Klinische Eindrücke',
@@ -186,7 +187,7 @@ export default {
   dismiss: 'Verwerfen',
   notFound: 'Nicht gefunden',
   negated: 'Negiert',
-  quantor: 'Quantor|Quantoren',
+  quantifier: 'Quantor|Quantoren',
   loading: 'Laden',
   unnamedCategory: 'Unbenannte Kategorie',
   unnamedPhenotype: 'Unbenannter Phänotyp',
@@ -313,10 +314,10 @@ export default {
   ucumCard: {
     help: 'Geben Sie eine Einheit oder eine Einheitenbezeichnung ein. Es wird Ihnen anschließend eine Liste mit Vorschlägen angezeigt, aus der Sie die passende UCUM Einheit auswählen können.'
   },
-  quantorType: {
-    none: 'Keine Werte vorhanden',
-    exists: 'Werte vorhanden',
-    some: 'Mindestens ein Wert in Bereich',
+  quantifierType: {
     all: 'Alle Werte in Bereich',
+    exact: 'Exakt X Werte in Bereich',
+    min: 'Mindestens X Werte in Bereich',
+    max: 'Nicht mehr als X Werte in Bereich'
   }
 };

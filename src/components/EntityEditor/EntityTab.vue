@@ -275,7 +275,7 @@ export default defineComponent({
       result &&= !hasItemType(props.entity) || !!(local.value as Phenotype).itemType
       result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
       result &&= !hasDataType(props.entity) || (local.value as Phenotype).dataType !== DataType.Number || !!(local.value as Phenotype).unit?.unit
-      result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined || local.value.entityType === EntityType.CombinedRestriction
+      result &&= !isRestricted(local.value) || local.value.restriction?.quantifier !== undefined || local.value.entityType === EntityType.CombinedRestriction
       result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
       return result
