@@ -2,7 +2,11 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.1/containers/typescript-node
 {
 	"name": "Node.js & TypeScript",
-	"runArgs": ["--init"],
+	"runArgs": [
+		"--init",
+		"--env-file",
+		"${localWorkspaceFolder}/.devcontainer/.env"
+	],
 	"build": {
 		"dockerfile": "Dockerfile",
 		// Update 'VARIANT' to pick a Node version: 16, 14, 12.
@@ -11,10 +15,6 @@
 		"args": { 
 			"VARIANT": "16-bullseye"
 		}
-	},
-
-	"remoteEnv": {
-		"NPM_AUTH_TOKEN": "${localEnv:NPM_AUTH_TOKEN}"
 	},
 
 	// Set *default* container specific settings.json values on container create.
