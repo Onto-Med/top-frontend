@@ -14,9 +14,9 @@ export default boot(async ({ app }) => {
           'public-client': true
         },
         config: {
-          url: 'http://127.0.0.1:8081/',
-          realm: 'top-realm',
-          clientId: 'top-frontend'
+          url:      process.env.OAUTH2_URL,
+          realm:    process.env.OAUTH2_REALM,
+          clientId: process.env.OAUTH2_CLIENT_ID
         },
         onReady: (keycloak: KeycloakInstance) => {
           const entityStore = useEntity()
