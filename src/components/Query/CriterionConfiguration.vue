@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-btn flat icon="settings" :color="hasContent ? 'primary' : ''" :title="t('setting', 2)" @click="showDialog = true" />
+    <q-btn flat icon="settings" :title="t('setting', 2)" @click="showDialog = true" />
     <q-dialog v-model="showDialog">
       <q-card class="criterion-config">
         <q-card-section class="row items-center">
@@ -36,18 +36,23 @@
 
         <q-card-section>
           <div v-t="'dateTimeRestrictionDescription'" />
-          <div v-for="(restriction, index) in dateTimeRestrictions" :key="index" class="row">
+          <div class="row q-mt-sm">
             <range-input
-              v-model:minimum="restriction.values[0]"
-              v-model:maximum="restriction.values[1]"
-              v-model:min-operator="restriction.minOperator"
-              v-model:max-operator="restriction.maxOperator"
+              v-model:minimum="state.values[0]"
+              v-model:maximum="state.values[1]"
+              v-model:min-operator="state.minOperator"
+              v-model:max-operator="state.maxOperator"
               :type="DataType.DateTime"
               class="col"
             />
-            <q-btn flat icon="remove" :title="t('removeThing', { thing: t('dateTimeRestriction') })" class="col-auto" @click="removeDateTimeRestriction(index)" />
+            <q-btn
+              flat
+              icon="clear"
+              :title="t('clearThing', { thing: t('dateTimeRestriction') })"
+              class="col-auto"
+              @click="clearDateTimeRestriction()"
+            />
           </div>
-          <q-btn flat icon="add" class="q-mt-md" :label="t('addThing', { thing: t('dateTimeRestriction') })" @click="addDateTimeRestriction()" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -55,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DateTimeRestriction, DataType, ExpressionFunction } from '@onto-med/top-api'
 import RangeInput from '../EntityEditor/RangeInput.vue'
@@ -63,9 +68,9 @@ import RangeInput from '../EntityEditor/RangeInput.vue'
 export default defineComponent({
   components: { RangeInput },
   props: {
-    dateTimeRestrictions: {
-      type: Array as () => DateTimeRestriction[],
-      default: () => []
+    dateTimeRestriction: {
+      type: Object as () => DateTimeRestriction,
+      default: () => { return { values: [] } }
     },
     defaultAggregationFunction: {
       type: Object as () => ExpressionFunction,
@@ -76,29 +81,28 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['update:dateTimeRestrictions', 'update:default-aggregation-function'],
+  emits: ['update:dateTimeRestriction', 'update:default-aggregation-function'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
+    const state = reactive(JSON.parse(JSON.stringify(props.dateTimeRestriction)) as DateTimeRestriction)
 
+    watch(
+      () => state,
+      () => emit('update:dateTimeRestriction', state),
+      { deep: true }
+    )
     return {
       t,
       te,
+      state,
       DataType,
       showDialog: ref(false),
 
-      hasContent: computed(() => props.dateTimeRestrictions.length > 0),
-
-      addDateTimeRestriction: () => {
-        const newValue = JSON.parse(JSON.stringify(props.dateTimeRestrictions)) as DateTimeRestriction[]
-        newValue.push({ type: DataType.DateTime, values: [] })
-        emit('update:dateTimeRestrictions', newValue)
-      },
-
-      removeDateTimeRestriction: (index: number) => {
-        const newValue = JSON.parse(JSON.stringify(props.dateTimeRestrictions)) as DateTimeRestriction[]
-        newValue.splice(index, 1)
-        emit('update:dateTimeRestrictions', newValue)
+      clearDateTimeRestriction () {
+        state.minOperator = undefined
+        state.maxOperator = undefined
+        state.values = []
       }
     }
   }

@@ -15,6 +15,7 @@ export default {
   cardinality: 'Cardinality|Cardinalities',
   category: 'Category|Categories',
   change: 'Change',
+  clearThing: 'Clear {thing}',
   clinical_impression: 'Clinical impression|Clinical impressions',
   'clinical_impression.description': 'A record of a clinical assessment performed to determine what problem(s) may affect the patient and before '
     + "planning the treatments that is best to manage a patient's condition.",

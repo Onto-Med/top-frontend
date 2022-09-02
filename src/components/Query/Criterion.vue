@@ -13,18 +13,25 @@
       <div class="row items-center fit non-selectable">
         <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
         {{ getTitle(subject) }}
-        <small v-if="defaultAggregationFunction" :title="t('aggregationFunction')" class="q-ml-md">
-          ({{ te('functions.' + defaultAggregationFunction.title) ? t('functions.' + defaultAggregationFunction.title) : defaultAggregationFunction.title }})
+        <small class="q-ml-md">
+          (
+          <span v-if="defaultAggregationFunction" :title="t('aggregationFunction')">
+            {{ te('functions.' + defaultAggregationFunction.title) ? t('functions.' + defaultAggregationFunction.title) : defaultAggregationFunction.title }}
+          </span>
+          <span v-if="dateTimeRestriction && dateTimeRestriction.values.length" :title="t('dateTimeRestriction')">
+            , {{ dateTimeRestriction.values.map(e => e ? d(e, 'long') : 'NA').join(' - ') }}
+          </span>
+          )
         </small>
       </div>
     </q-item-section>
     <q-item-section side>
       <q-btn-group flat>
         <criterion-configuration
-          :date-time-restrictions="dateTimeRestrictions"
+          :date-time-restriction="dateTimeRestriction"
           :default-aggregation-function="defaultAggregationFunction"
           :aggregation-function-options="aggregationFunctionOptions"
-          @update:date-time-restrictions="$emit('update:dateTimeRestrictions', $event)"
+          @update:date-time-restriction="$emit('update:dateTimeRestriction', $event)"
           @update:default-aggregation-function="$emit('update:defaultAggregationFunction', $event)"
         />
         <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="$emit('removeClicked')" />
@@ -47,8 +54,8 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    dateTimeRestrictions: {
-      type: Array as () => DateTimeRestriction[]
+    dateTimeRestriction: {
+      type: Object as () => DateTimeRestriction
     },
     defaultAggregationFunction: {
       type: Object as () => ExpressionFunction,
@@ -62,15 +69,16 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['removeClicked', 'update:exclusion', 'update:dateTimeRestrictions', 'update:defaultAggregationFunction'],
+  emits: ['removeClicked', 'update:exclusion', 'update:dateTimeRestriction', 'update:defaultAggregationFunction'],
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, te } = useI18n()
+    const { t, te, d } = useI18n()
     const { getSynonyms, isRestricted, getIcon, getTitle } = useEntityFormatter()
 
     return {
       t,
       te,
+      d,
       getSynonyms,
       isRestricted,
       getIcon,

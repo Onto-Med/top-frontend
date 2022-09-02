@@ -108,7 +108,7 @@
                   <template v-for="(criterion, index) in query.criteria" :key="index">
                     <criterion
                       v-model:exclusion="criterion.exclusion"
-                      v-model:date-time-restrictions="criterion.dateTimeRestrictions"
+                      v-model:date-time-restriction="criterion.dateTimeRestriction"
                       v-model:default-aggregation-function="criterion.defaultAggregationFunction"
                       :aggregation-function-options="aggregationFunctionOptions"
                       :subject="criterion.subject"

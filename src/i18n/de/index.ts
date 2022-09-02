@@ -15,6 +15,7 @@ export default {
   cardinality: 'Cardinalität|Cardinalitäten',
   category: 'Kategorie|Kategorien',
   change: 'Ändern',
+  clearThing: '{thing} leeren',
   clinical_impression: 'Klinischer Eindruck|Klinische Eindrücke',
   'clinical_impression.description': 'Eine Aufzeichnung einer klinischen Bewertung, die durchgeführt wird, um festzustellen, '
     + 'welche Probleme den Patienten betreffen könnten, und bevor die Behandlung geplant wird, die am besten für den Zustand des Patienten geeignet ist.',
