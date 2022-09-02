@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkUpdateInstruction } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -143,7 +143,7 @@ export const useEntity = defineStore('entity', {
       return duplicate
     },
 
-    async forkEntity (entity: Entity, forkInstruction: ForkUpdateInstruction): Promise<number> {
+    async forkEntity (entity: Entity, forkingInstruction: ForkingInstruction): Promise<number> {
       if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return 0
 
       const organisationId = this.organisationId
@@ -154,10 +154,10 @@ export const useEntity = defineStore('entity', {
         entity.repository.id,
         entity.id,
         {
+          ...forkingInstruction,
           organisationId: organisationId,
-          repositoryId: repositoryId,
-          ...forkInstruction
-        } as ForkCreateInstruction,
+          repositoryId: repositoryId
+        } as ForkingInstruction,
         undefined,
         undefined
       ).then(r => {
