@@ -312,5 +312,7 @@ export default {
     exists: 'Values present',
     some: 'At least one value in range',
     all: 'All values in range',
-  }
+  },
+  document: 'Document|Documents',
+  documentSearch: 'Search Document|Search Documents'
 };

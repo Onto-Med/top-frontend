@@ -207,6 +207,13 @@ export default defineComponent({
         caption: t('developPhenotype', 2),
         routeName: 'repositories',
         isHidden: keycloak && !keycloak.authenticated
+      },
+      {
+        title: t('document', 2),
+        icon: 'tab',
+        caption: t('documentSearch', 2),
+        routeName: 'documentSearch',
+        isHidden: keycloak && !keycloak.authenticated
       }
     ])
 

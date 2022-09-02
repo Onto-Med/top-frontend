@@ -15,6 +15,8 @@ yarn
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
 quasar dev
+
+$Env:AUTH_ENABLED='false' ; quasar dev --hostname 127.0.0.1
 ```
 
 ### Lint the files

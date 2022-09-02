@@ -30,7 +30,8 @@ const routes: RouteRecordRaw[] = [
       },
       { name: 'organisations', path: '/organisation', component: () => import('pages/OrganisationOverview.vue') },
       { name: 'repositories', path: '/repository', component: () => import('pages/RepositoryOverview.vue') },
-      { name: 'showOrganisation', path: '/:organisationId', props: true, component: () => import('pages/Organisation.vue') }
+      { name: 'showOrganisation', path: '/:organisationId', props: true, component: () => import('pages/Organisation.vue') },
+      { name: 'documentSearch', path: '/documents', component: () => import('pages/DocumentSearch.vue') }
     ],
   },
 

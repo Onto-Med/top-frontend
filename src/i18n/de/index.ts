@@ -317,5 +317,7 @@ export default {
     exists: 'Werte vorhanden',
     some: 'Mindestens ein Wert in Bereich',
     all: 'Alle Werte in Bereich',
-  }
+  },
+  document: 'Dokument|Dokumente',
+  documentSearch: 'Dokument suchen|Dokumente suchen'
 };
