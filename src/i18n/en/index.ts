@@ -34,6 +34,7 @@ export default {
   dateTimeRestriction: 'Time restriction|Time restrictions',
   dateTimeRestrictionDescription: 'Restrict the time range, when this phenotype must have been observed.',
   defaultValue: 'Default value|Default values',
+  defaultValueHint: 'If none of the mappings match.',
   defineThing: 'Define {thing}',
   desc: 'Descending',
   duplicate: 'Duplicate',

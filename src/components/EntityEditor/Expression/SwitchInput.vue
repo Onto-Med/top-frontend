@@ -55,6 +55,7 @@
         <q-input
           :model-value="defaultValue"
           :label="t('defaultValue')"
+          :hint="t('defaultValueHint')"
           :readonly="readonly"
           type="number"
           debounce="500"
