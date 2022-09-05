@@ -115,7 +115,7 @@ export default defineComponent({
       default: 'close'
     },
     entityTypes: Array as () => EntityType[],
-    dataTypes: Array as () => DataType[],
+    dataType: String as () => DataType,
     clearOnSelect: {
       type: Boolean,
       default: false
@@ -155,11 +155,11 @@ export default defineComponent({
         loading.value = true
         let promise: Promise<AxiosResponse<Entity[]>>
         if (props.organisationId && props.repositoryId) {
-          promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, val, props.entityTypes, props.dataTypes)
+          promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, val, props.entityTypes, props.dataType)
         } else if (repository.value && repository.value.organisation) {
-          promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, val, props.entityTypes, props.dataTypes)
+          promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, val, props.entityTypes, props.dataType)
         } else {
-          promise = entityApi.getEntities(undefined, val, props.entityTypes, props.dataTypes)
+          promise = entityApi.getEntities(undefined, val, props.entityTypes, props.dataType)
         }
         await promise
           .then((r) => update(() => options.value = r.data))

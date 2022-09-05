@@ -8,7 +8,7 @@
           :repository-id="repositoryId"
           :disable="readonly"
           :entity-types="entityTypes"
-          :data-types="dataTypes"
+          :data-type="dataType"
           :label="t('selectThing', { thing: t('phenotype') }) + '...'"
           show-change
           @entity-clicked="$emit('entityClicked', $event)"
@@ -114,9 +114,9 @@ export default defineComponent({
       repositoryId,
       entityId,
       score,
-      entityTypes: [EntityType.SingleRestriction, EntityType.CombinedPhenotype, EntityType.CombinedRestriction, EntityType.DerivedRestriction],
+      entityTypes: [EntityType.SinglePhenotype, EntityType.SingleRestriction, EntityType.CombinedPhenotype, EntityType.CombinedRestriction, EntityType.DerivedRestriction],
+      dataType: DataType.Boolean,
       isValid,
-      dataTypes: [DataType.Boolean],
 
       isSwitchExpression: computed(() => props.modelValue.function === 'switch'),
 
