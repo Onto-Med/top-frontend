@@ -9,7 +9,7 @@
           :disable="readonly"
           :entity-types="entityTypes"
           :label="t('selectThing', { thing: t('phenotype') }) + '...'"
-          show-change
+          changeable
           @entity-clicked="$emit('entityClicked', $event)"
           @entity-set="setMappingEntity(index, $event?.id)"
         />

@@ -14,6 +14,7 @@
               :entity-id="category ? category.id : undefined"
               :disable="readonly"
               :label="t('selectThing', { thing: t('category') }) + '...'"
+              removeable
               @removeClicked="$emit('removeSuperCategory', index)"
               @entity-set="$emit('setSuperCategory', index, $event)"
               @entityClicked="$emit('entityClicked', $event)"

@@ -18,7 +18,7 @@
         <q-item-section v-t="'encloseWithExpression'" />
       </q-item>
       <q-item
-        v-if="removable"
+        v-if="removeable"
         v-close-popup
         clickable
         @click="$emit('remove', undefined)"
@@ -41,7 +41,7 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
-    removable: {
+    removeable: {
       type: Boolean,
       default: true
     },

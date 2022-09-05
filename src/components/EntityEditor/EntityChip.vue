@@ -26,7 +26,7 @@
       />
       <q-list dense>
         <slot name="additionalOptions" />
-        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked')">
+        <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
           <q-item-section v-t="'remove'" />
         </q-item>
       </q-list>
@@ -50,10 +50,10 @@
         </q-item>
         <q-separator />
         <slot name="additionalOptions" />
-        <q-item v-if="showChange && state" v-close-popup clickable @click="setEntity(undefined)">
+        <q-item v-if="changeable && state" v-close-popup clickable @click="setEntity(undefined)">
           <q-item-section v-t="'change'" />
         </q-item>
-        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked')">
+        <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
           <q-item-section v-t="'remove'" />
         </q-item>
       </q-list>
@@ -84,10 +84,8 @@ export default defineComponent({
     organisationId: String,
     repositoryId: String,
     disable: Boolean,
-    showChange: {
-      type: Boolean,
-      default: false
-    }
+    changeable: Boolean,
+    removeable: Boolean
   },
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {
