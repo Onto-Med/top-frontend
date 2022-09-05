@@ -114,7 +114,11 @@ export default defineComponent({
       repositoryId,
       entityId,
       score,
-      entityTypes: [EntityType.SinglePhenotype, EntityType.SingleRestriction, EntityType.CombinedPhenotype, EntityType.CombinedRestriction, EntityType.DerivedRestriction],
+      entityTypes: [
+        EntityType.SinglePhenotype, EntityType.SingleRestriction,
+        EntityType.CombinedPhenotype, EntityType.CombinedRestriction,
+        EntityType.DerivedPhenotype, EntityType.DerivedRestriction
+      ],
       dataType: DataType.Boolean,
       isValid,
 
