@@ -92,7 +92,7 @@
 import { defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useAlert from 'src/mixins/useAlert'
-import { EntityType, Entity, Repository } from '@onto-med/top-api'
+import { EntityType, Entity, Repository, DataType } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -115,6 +115,7 @@ export default defineComponent({
       default: 'close'
     },
     entityTypes: Array as () => EntityType[],
+    dataTypes: Array as () => DataType[],
     clearOnSelect: {
       type: Boolean,
       default: false
@@ -154,11 +155,11 @@ export default defineComponent({
         loading.value = true
         let promise: Promise<AxiosResponse<Entity[]>>
         if (props.organisationId && props.repositoryId) {
-          promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, val, props.entityTypes)
+          promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, val, props.entityTypes, props.dataTypes)
         } else if (repository.value && repository.value.organisation) {
-          promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, val, props.entityTypes)
+          promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, val, props.entityTypes, props.dataTypes)
         } else {
-          promise = entityApi.getEntities(undefined, val, props.entityTypes)
+          promise = entityApi.getEntities(undefined, val, props.entityTypes, props.dataTypes)
         }
         await promise
           .then((r) => update(() => options.value = r.data))
