@@ -1,5 +1,29 @@
 <template>
   <table>
+    <tr>
+      <td colspan="2" class="q-pb-md">
+        <q-btn
+          icon="add"
+          color="primary"
+          class="q-mr-md"
+          :label="t('addThing', { thing: t('mapping') })"
+          @click="addMapping()"
+        />
+      </td>
+
+      <td class="q-pb-md">
+        <q-input
+          :model-value="defaultValue"
+          :label="t('defaultValue')"
+          :hint="t('defaultValueHint')"
+          :readonly="readonly"
+          type="number"
+          debounce="500"
+          @update:model-value="setDefaultValue($event)"
+        />
+      </td>
+    </tr>
+
     <tr v-for="(mapping, index) in mappings" :key="index">
       <td>
         <entity-chip
@@ -37,29 +61,6 @@
           :disable="readonly"
           :title="t('remove')"
           @click="removeMappingByIndex(index)"
-        />
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2">
-        <q-btn
-          icon="add"
-          color="primary"
-          class="q-mr-md"
-          :label="t('addThing', { thing: t('mapping') })"
-          @click="addMapping()"
-        />
-      </td>
-
-      <td>
-        <q-input
-          :model-value="defaultValue"
-          :label="t('defaultValue')"
-          :hint="t('defaultValueHint')"
-          :readonly="readonly"
-          type="number"
-          debounce="500"
-          @update:model-value="setDefaultValue($event)"
         />
       </td>
     </tr>
