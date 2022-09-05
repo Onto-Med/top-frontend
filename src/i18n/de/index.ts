@@ -159,7 +159,7 @@ export default {
   logIn: 'Anmelden',
   remove: 'Entfernen',
   delete: 'Löschen',
-  score: 'Ergebnis',
+  score: 'Score|Scores',
   component: 'Komponente',
   restriction: 'Restriktion|Restriktionen',
   expression: 'Ausdruck',

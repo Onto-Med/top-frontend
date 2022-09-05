@@ -156,7 +156,7 @@ export default {
   lightMode: 'Light mode',
   remove: 'Remove',
   delete: 'Delete',
-  score: 'Score',
+  score: 'Score|Scores',
   component: 'Component',
   restriction: 'Restriction|Restrictions',
   expression: 'Expression',
