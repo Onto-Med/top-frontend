@@ -225,7 +225,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean =>
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted, hasDataType, hasItemType, hasExpression } = useEntityFormatter()
+    const { getTitle, isRestricted, isPhenotype, hasDataType, hasItemType, hasExpression } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -283,6 +283,8 @@ export default defineComponent({
     const save = () => {
       if ((isNew.value || hasUnsavedChanges.value)) {
         if (isValid.value) {
+          if (isPhenotype(local.value) && local.value.expression.function === 'switch' && hasDataType(local.value))
+            local.value.dataType = DataType.Number
           emit('update:entity', local.value)
           versionHistoryDialogKey.value++
         } else {
