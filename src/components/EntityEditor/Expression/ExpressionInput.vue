@@ -1,14 +1,35 @@
 <template>
   <expandable-card
-    :title="label"
     :error="modelValue === undefined || modelValue.function === undefined"
     :help-text="helpText"
     :expanded="expanded"
     :show-help="showHelp"
   >
+    <template #title>
+      <q-toolbar-title class="row items-center">
+        {{ label }}
+        <span class="text-subtitle1 q-ml-md">
+          <q-toggle
+            :model-value="scores"
+            :label="scores ? t('score', 2) : t('expression')"
+            color="primary"
+            size="sm"
+            @update:model-value="$emit('update:modelValue', { function: $event ? 'switch' : undefined })"
+          />
+        </span>
+      </q-toolbar-title>
+    </template>
+
     <template #default>
+      <switch-input
+        v-if="scores"
+        :model-value="modelValue"
+        :readonly="readonly"
+        @entity-clicked="$emit('entityClicked', $event)"
+        @update:model-value="$emit('update:modelValue', $event)"
+      />
       <expression-argument-input
-        v-if="functions"
+        v-else-if="functions"
         class="text-subtitle1"
         :functions="functions"
         :readonly="readonly"
@@ -81,17 +102,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import ExpressionArgumentInput from 'src/components/EntityEditor/Expression/ExpressionArgumentInput.vue'
+import SwitchInput from 'src/components/EntityEditor/Expression/SwitchInput.vue'
 import { EntityType, Expression, ExpressionFunction } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   components: {
     ExpressionArgumentInput,
-    ExpandableCard
+    ExpandableCard,
+    SwitchInput
   },
   props: {
     modelValue: {
@@ -134,7 +157,8 @@ export default defineComponent({
       expandExpression: ref(false),
       indent: ref(2),
       showClearDialog: ref(false),
-      functions
+      functions,
+      scores: computed(() => props.modelValue && props.modelValue.function === 'switch')
     }
   }
 })
