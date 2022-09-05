@@ -10,7 +10,6 @@
       :model-value="modelValue ? modelValue.unit : undefined"
       :options="options"
       :display-value="displayValue"
-      :error="validation.status !== 'valid'"
       @filter="filterFn"
       @update:model-value="$emit('update:modelValue', { unit: $event })"
     >
