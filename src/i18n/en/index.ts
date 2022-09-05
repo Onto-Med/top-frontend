@@ -33,6 +33,7 @@ export default {
   dataSourceDescription: 'Select at least one data source on which the query shall be executed.',
   dateTimeRestriction: 'Time restriction|Time restrictions',
   dateTimeRestrictionDescription: 'Restrict the time range, when this phenotype must have been observed.',
+  defaultValue: 'Default value|Default values',
   defineThing: 'Define {thing}',
   desc: 'Descending',
   duplicate: 'Duplicate',
@@ -81,6 +82,7 @@ export default {
   'itemType.description': 'Item types are used to further describe a phenotype and its assignment to an individual. '
     + 'They can only be defined for single phenotypes, as these phenotypes are directly linked to the underlying data elements. '
     + 'Depending on the data source, data retrieval can differ dramatically between item types.',
+  mapping: 'Mapping|Mappings',
   maximum: 'Maximum',
   medication_administration: 'Medication administration|Medication administrations',
   'medication_administration.description': 'Describes the event of an individual consuming or otherwise being administered a medication.',

@@ -18,6 +18,7 @@
         dense
         :label="label"
         :entity-types="entityTypes"
+        :data-type="dataType"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         @entity-selected="setEntity($event)"
@@ -63,7 +64,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Entity, EntityType } from '@onto-med/top-api'
+import { DataType, Entity, EntityType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
@@ -79,6 +80,7 @@ export default defineComponent({
     label: String,
     entity: Object as () => Entity,
     entityTypes: Array as () => EntityType[],
+    dataType: String as () => DataType,
     organisationId: String,
     repositoryId: String,
     disable: Boolean,

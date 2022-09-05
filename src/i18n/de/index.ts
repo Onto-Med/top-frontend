@@ -33,6 +33,7 @@ export default {
   dataSourceDescription: 'Wählen Sie mindestens eine Datenquelle aus, auf der die Abfrage ausgeführt werden soll.',
   dateTimeRestriction: 'Zeitbegrenzung|Zeitbegrenzungen',
   dateTimeRestrictionDescription: 'Begrenzen Sie den Zeitraum, in dem dieser Phänotyp beobachtet werden musste.',
+  defaultValue: 'Standardwert|Standartwerte',
   defineThing: '{thing} definieren',
   desc: 'Absteigend',
   duplicate: 'Duplizieren',
@@ -81,6 +82,7 @@ export default {
   'itemType.description': 'Item Typen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. '
     + 'Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. '
     + 'Je nach Datenquelle kann sich der Datenabruf zwischen den Item Typen drastisch unterscheiden.',
+  mapping: 'Mapping|Mappings',
   maximum: 'Maximum',
   medication_administration: 'Medikamentenverabreichung|Medikamentenverabreichungen',
   'medication_administration.description': 'Beschreibt das Ereignis, bei dem ein Individuum ein Medikament einnimmt oder auf andere Weise verabreicht bekommt.',
