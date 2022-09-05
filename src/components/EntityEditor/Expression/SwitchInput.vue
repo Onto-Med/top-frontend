@@ -15,7 +15,8 @@
         />
       </td>
       <td>
-        <q-icon name="arrow_right_alt" size="md" />
+        <q-icon v-if="!mapping.entityId || !mapping.value" :title="t('invalid', { thing: t('mapping') })" color="negative" name="dangerous" size="sm" />
+        <q-icon v-else name="arrow_right_alt" size="md" />
       </td>
       <td>
         <q-input
@@ -65,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { DataType, EntityType, Expression, NumberValue } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
@@ -94,8 +95,6 @@ export default defineComponent({
   setup (props, { emit }) {
     const { t } = useI18n()
     const { organisationId, repositoryId } = storeToRefs(useEntity())
-    const entityId = ref(undefined as string|undefined)
-    const score    = ref(undefined as number|undefined)
 
     const hasDefaultValue = computed(() => props.modelValue.arguments && props.modelValue.arguments.length % 2 !== 0)
     const clone = <T>(obj: T): T => JSON.parse(JSON.stringify(obj)) as T
@@ -105,20 +104,16 @@ export default defineComponent({
         value: { value: { dataType: DataType.Number, value: value } as NumberValue }
       }
     }
-    const isValid = computed(() => !!entityId.value && !!score.value)
 
     return {
       t,
       organisationId,
       repositoryId,
-      entityId,
-      score,
       entityTypes: [
         EntityType.SingleRestriction,
         EntityType.CombinedPhenotype, EntityType.CombinedRestriction,
         EntityType.DerivedRestriction
       ],
-      isValid,
 
       isSwitchExpression: computed(() => props.modelValue.function === 'switch'),
 
