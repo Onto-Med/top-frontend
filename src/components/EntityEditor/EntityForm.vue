@@ -84,7 +84,7 @@
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :entity-types="[EntityType.SinglePhenotype, EntityType.CompositePhenotype]"
+        :entity-types="[EntityType.SinglePhenotype, EntityType.CompositePhenotype, EntityType.CompositeRestriction]"
         function-type="math"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
