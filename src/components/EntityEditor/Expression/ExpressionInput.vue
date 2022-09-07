@@ -1,6 +1,6 @@
 <template>
   <expandable-card
-    :error="modelValue === undefined || modelValue.function === undefined"
+    :error="!modelValue || !modelValue.function"
     :help-text="helpText"
     :expanded="expanded"
     :show-help="showHelp"

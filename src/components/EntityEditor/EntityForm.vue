@@ -56,14 +56,6 @@
               tooltip
               @update:model-value="$emit('update:itemType', $event)"
             />
-            <q-input
-              v-if="hasScore(entityType)"
-              :model-value="score"
-              type="number"
-              :readonly="readonly"
-              :label="t('score')"
-              @update:model-value="$emit('update:score', $event)"
-            />
 
             <data-type-select
               v-if="hasDataType(entityType)"
@@ -73,7 +65,7 @@
             />
 
             <unit-input
-              v-if="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(entityType) && dataType === DataType.Number"
+              v-if="[EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entityType) && dataType === DataType.Number"
               :model-value="unit"
               :readonly="readonly"
               show-label
@@ -84,7 +76,7 @@
       </div>
 
       <expression-input
-        v-if="entityType === EntityType.DerivedPhenotype"
+        v-if="entityType === EntityType.CompositePhenotype"
         :model-value="expression"
         expanded
         :readonly="readonly"
@@ -92,7 +84,7 @@
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :entity-types="[EntityType.SinglePhenotype, EntityType.DerivedPhenotype]"
+        :entity-types="[EntityType.SinglePhenotype, EntityType.CompositePhenotype]"
         function-type="math"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
@@ -105,21 +97,6 @@
         expanded
         :readonly="readonly"
         @update:model-value="$emit('update:restriction', $event)"
-      />
-
-      <expression-input
-        v-if="entityType === EntityType.CombinedRestriction"
-        :model-value="expression"
-        expanded
-        :readonly="readonly"
-        :label="t('expression')"
-        :organisation-id="organisationId"
-        :repository-id="repositoryId"
-        :help-text="t('entityEditor.expressionHelp')"
-        :entity-types="restrictionEntityTypes()"
-        function-type="boolean"
-        @entity-clicked="$emit('entityClicked', $event)"
-        @update:model-value="$emit('update:expression', $event)"
       />
 
       <localized-text-input
@@ -248,7 +225,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const { isRestricted, hasDataType, hasScore, hasItemType, restrictionEntityTypes } = useEntityFormatter()
+    const { isRestricted, hasDataType, hasItemType, restrictionEntityTypes } = useEntityFormatter()
     const restrictionKey = ref(0)
     const showSuperCategoryInput = ref(false)
 
@@ -257,7 +234,6 @@ export default defineComponent({
       isRestricted,
       hasDataType,
       restrictionEntityTypes,
-      hasScore,
       hasItemType,
 
       restrictionKey,

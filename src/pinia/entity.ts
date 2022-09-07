@@ -41,7 +41,7 @@ export const useEntity = defineStore('entity', {
     },
 
     async reloadConstants () {
-      await this.expressionConstantApi?.getConstants()
+      await this.expressionConstantApi?.getExpressionConstants()
         .then(r => this.constants = r.data)
     },
 
@@ -113,7 +113,7 @@ export const useEntity = defineStore('entity', {
       const entity = { id: (uuidv4 as () => string)(), entityType: entityType } as Entity
 
       const superClass = this.getEntity(superClassId)
-      if (superClass && [ EntityType.SinglePhenotype, EntityType.DerivedPhenotype ].includes(superClass.entityType)) {
+      if (superClass && [ EntityType.CompositePhenotype, EntityType.SinglePhenotype ].includes(superClass.entityType)) {
         (entity as Phenotype).dataType = (superClass as Phenotype).dataType || DataType.Number
         if (this.hasRestriction(entity))
           entity.restriction = { type: entity.dataType } as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
@@ -270,11 +270,11 @@ export const useEntity = defineStore('entity', {
     },
 
     isPhenotype (entity: Entity): entity is Phenotype {
-      return [EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)
+      return [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entity.entityType)
     },
 
     hasRestriction (entity: Entity): entity is Phenotype {
-      return [EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)
+      return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
     }
   }
 })
