@@ -22,6 +22,10 @@ export default boot(async ({ app }) => {
           const entityStore = useEntity()
           entityStore.keycloak = keycloak
           resolve()
+        },
+        onInitError: () => {
+          console.log('Keycloak initialisation failed!')
+          resolve()
         }
       })
     } else {
