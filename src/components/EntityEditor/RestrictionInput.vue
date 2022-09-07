@@ -31,18 +31,15 @@
 
       <q-slide-transition>
         <div>
-          <div class="row">
-            <q-btn-toggle
-              v-if="canHaveRange"
-              v-model="hasRange"
-              no-caps
-              class="q-mb-md"
-              :disable="readonly"
-              :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
-              @update:model-value="handleHasRangeChanged"
-            />
-            <q-checkbox v-model="state.negated" :label="t('negated')" class="q-mb-sm" />
-          </div>
+          <q-btn-toggle
+            v-if="canHaveRange"
+            v-model="hasRange"
+            no-caps
+            class="q-mb-md"
+            :disable="readonly"
+            :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
+            @update:model-value="handleHasRangeChanged"
+          />
 
           <range-input
             v-show="hasRange"
@@ -135,7 +132,7 @@ export default defineComponent({
       state.values = []
       hasRange.value = canHaveRange.value
     }
-    if (state.negated === undefined) state.negated = false
+
     if (!state.quantifier) {
       state.quantifier = Quantifier.Min
       state.cardinality = 1
