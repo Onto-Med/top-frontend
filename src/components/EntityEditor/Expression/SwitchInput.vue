@@ -112,9 +112,8 @@ export default defineComponent({
       organisationId,
       repositoryId,
       entityTypes: [
-        EntityType.SingleRestriction,
-        EntityType.CombinedPhenotype, EntityType.CombinedRestriction,
-        EntityType.DerivedRestriction
+        EntityType.SinglePhenotype, EntityType.SingleRestriction,
+        EntityType.CompositePhenotype, EntityType.CompositeRestriction
       ],
 
       isSwitchExpression: computed(() => props.modelValue.function === 'switch'),
