@@ -52,7 +52,6 @@ export const useEntity = defineStore('entity', {
 
     async reloadFunctions () {
       await this.reloadFunctionsByType('math')
-      await this.reloadFunctionsByType('boolean')
     },
 
     async setOrganisation (organisationId: string|undefined) {
