@@ -91,7 +91,7 @@
       />
 
       <restriction-input
-        v-if="[EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entityType)"
+        v-if="[EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entityType)"
         :key="restrictionKey"
         :model-value="restriction"
         expanded
