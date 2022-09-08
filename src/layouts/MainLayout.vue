@@ -210,7 +210,7 @@ export default defineComponent({
       },
       {
         title: t('document', 2),
-        icon: 'tab',
+        icon: 'article',
         caption: t('documentSearch', 2),
         routeName: 'documentSearch',
         isHidden: keycloak && !keycloak.authenticated

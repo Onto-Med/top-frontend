@@ -319,5 +319,8 @@ export default {
     all: 'Alle Werte in Bereich',
   },
   document: 'Dokument|Dokumente',
-  documentSearch: 'Dokument suchen|Dokumente suchen'
+  documentSearch: 'Dokument suchen|Dokumente suchen',
+  documentPage: {
+    description: ''
+  }
 };

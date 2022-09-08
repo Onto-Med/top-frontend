@@ -314,5 +314,8 @@ export default {
     all: 'All values in range',
   },
   document: 'Document|Documents',
-  documentSearch: 'Search Document|Search Documents'
+  documentSearch: 'Search Document|Search Documents',
+  documentPage: {
+    description: ''
+  }
 };
