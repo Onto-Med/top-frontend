@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { Entity, ForkUpdateInstruction } from '@onto-med/top-api'
+import { Entity, ForkingInstruction } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useI18n } from 'vue-i18n'
 import { useEntity } from 'src/pinia/entity'
@@ -89,7 +89,7 @@ export default defineComponent({
         emit('createFork', {
           cascade: cascade.value,
           update:  update.value
-        } as ForkUpdateInstruction)
+        } as ForkingInstruction)
         reset()
       }
     }

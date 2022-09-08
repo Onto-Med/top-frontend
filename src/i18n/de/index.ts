@@ -12,8 +12,10 @@ export default {
   back: 'Zurück',
   buildQuery: 'Abfrage erstellen|Abfragen erstellen',
   buildQueryFor: 'Abfrage erstellen für|Abfragen erstellen für',
+  cardinality: 'Cardinalität|Cardinalitäten',
   category: 'Kategorie|Kategorien',
   change: 'Ändern',
+  clearThing: '{thing} leeren',
   clinical_impression: 'Klinischer Eindruck|Klinische Eindrücke',
   'clinical_impression.description': 'Eine Aufzeichnung einer klinischen Bewertung, die durchgeführt wird, um festzustellen, '
     + 'welche Probleme den Patienten betreffen könnten, und bevor die Behandlung geplant wird, die am besten für den Zustand des Patienten geeignet ist.',
@@ -23,6 +25,7 @@ export default {
   copyiedToClipboard: 'Der Inhalt wurde in die Zwischenablage kopiert.',
   copyFailed: 'Der Inhalt konnte nicht kopiert werden.',
   copyToClipboard: 'In Zwischenablage kopieren.',
+  count: 'Anzahl|Anzahlen',
   thingCreatedOrUpdated: '{thing} erzeugt oder aktualisiert.',
   criterion: 'Kriterium|Kriterien',
   ctrl: 'STRG',
@@ -30,6 +33,8 @@ export default {
   dataSourceDescription: 'Wählen Sie mindestens eine Datenquelle aus, auf der die Abfrage ausgeführt werden soll.',
   dateTimeRestriction: 'Zeitbegrenzung|Zeitbegrenzungen',
   dateTimeRestrictionDescription: 'Begrenzen Sie den Zeitraum, in dem dieser Phänotyp beobachtet werden musste.',
+  defaultValue: 'Standardwert|Standartwerte',
+  defaultValueHint: 'Falls keine der Zuordnungen passt.',
   defineThing: '{thing} definieren',
   desc: 'Absteigend',
   duplicate: 'Duplizieren',
@@ -78,6 +83,7 @@ export default {
   'itemType.description': 'Item Typen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. '
     + 'Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. '
     + 'Je nach Datenquelle kann sich der Datenabruf zwischen den Item Typen drastisch unterscheiden.',
+  mapping: 'Zuordnung|Zuordnungen',
   maximum: 'Maximum',
   medication_administration: 'Medikamentenverabreichung|Medikamentenverabreichungen',
   'medication_administration.description': 'Beschreibt das Ereignis, bei dem ein Individuum ein Medikament einnimmt oder auf andere Weise verabreicht bekommt.',
@@ -124,11 +130,9 @@ export default {
   phenotype: 'Phänotyp|Phänotypen',
   phenotype_group: 'Phänotypgruppe|Phänotypgruppen',
   single_phenotype: 'Einzelner Phänotyp|Einzelne Phänotypen',
-  combined_phenotype: 'Kombinierter Phänotyp|Kombinierte Phänotypen',
-  derived_phenotype: 'Abgeleiteter Phänotyp|Abgeleitete Phänotypen',
+  composite_phenotype: 'Zusammengesetzter Phänotyp|Zusammengesetzte Phänotypen',
   single_restriction: 'Einzelne Restriktion|Einzelne Restriktionen',
-  combined_restriction: 'Kombinierte Restriktion|Kombinierte Restriktionen',
-  derived_restriction: 'Abgeleitete Restriktion|Abgeleitete Restriktionen',
+  composite_restriction: 'Zusammengesetzte Restriktion|Zusammengesetzte Restriktionen',
   id: 'ID',
   account: 'Nutzerkonto',
   darkMode: 'Dunkelmodus',
@@ -154,7 +158,7 @@ export default {
   logIn: 'Anmelden',
   remove: 'Entfernen',
   delete: 'Löschen',
-  score: 'Ergebnis',
+  score: 'Score|Scores',
   component: 'Komponente',
   restriction: 'Restriktion|Restriktionen',
   expression: 'Ausdruck',
@@ -185,7 +189,7 @@ export default {
   dismiss: 'Verwerfen',
   notFound: 'Nicht gefunden',
   negated: 'Negiert',
-  quantor: 'Quantor|Quantoren',
+  quantifier: 'Quantor|Quantoren',
   loading: 'Laden',
   unnamedCategory: 'Unbenannte Kategorie',
   unnamedPhenotype: 'Unbenannter Phänotyp',
@@ -312,11 +316,11 @@ export default {
   ucumCard: {
     help: 'Geben Sie eine Einheit oder eine Einheitenbezeichnung ein. Es wird Ihnen anschließend eine Liste mit Vorschlägen angezeigt, aus der Sie die passende UCUM Einheit auswählen können.'
   },
-  quantorType: {
-    none: 'Keine Werte vorhanden',
-    exists: 'Werte vorhanden',
-    some: 'Mindestens ein Wert in Bereich',
+  quantifierType: {
     all: 'Alle Werte in Bereich',
+    exact: 'Exakt X Werte in Bereich',
+    min: 'Mindestens X Werte in Bereich',
+    max: 'Nicht mehr als X Werte in Bereich'
   },
   document: 'Dokument|Dokumente',
   documentSearch: 'Dokument suchen|Dokumente suchen',

@@ -19,6 +19,16 @@ quasar dev
 $Env:AUTH_ENABLED='false' ; quasar dev --hostname 127.0.0.1
 ```
 
+You can specify the following environment variables via `.env` file or command line:
+
+| variable name    | default value          | description                                   |
+| ---------------- | ---------------------- | --------------------------------------------- |
+| AUTH_ENABLED     | false                  | Enable or disable authentication via Keycloak |
+| OAUTH2_URL       | http://127.0.0.1:8081/ | Keycloak URL                                  |
+| OAUTH2_REALM     | top-realm              | Keycloak realm name                           |
+| OAUTH2_CLIENT_ID | top-frontend           | Keycloak client id                            |
+| API_URL          | http://127.0.0.1:8080  | URL of top-backend                            |
+
 ### Lint the files
 ```bash
 yarn run lint

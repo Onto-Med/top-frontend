@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, ForkCreateInstruction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkUpdateInstruction } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -41,7 +41,7 @@ export const useEntity = defineStore('entity', {
     },
 
     async reloadConstants () {
-      await this.expressionConstantApi?.getConstants()
+      await this.expressionConstantApi?.getExpressionConstants()
         .then(r => this.constants = r.data)
     },
 
@@ -52,7 +52,6 @@ export const useEntity = defineStore('entity', {
 
     async reloadFunctions () {
       await this.reloadFunctionsByType('math')
-      await this.reloadFunctionsByType('boolean')
     },
 
     async setOrganisation (organisationId: string|undefined) {
@@ -113,7 +112,7 @@ export const useEntity = defineStore('entity', {
       const entity = { id: (uuidv4 as () => string)(), entityType: entityType } as Entity
 
       const superClass = this.getEntity(superClassId)
-      if (superClass && [ EntityType.SinglePhenotype, EntityType.DerivedPhenotype ].includes(superClass.entityType)) {
+      if (superClass && [ EntityType.CompositePhenotype, EntityType.SinglePhenotype ].includes(superClass.entityType)) {
         (entity as Phenotype).dataType = (superClass as Phenotype).dataType || DataType.Number
         if (this.hasRestriction(entity))
           entity.restriction = { type: entity.dataType } as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
@@ -143,7 +142,7 @@ export const useEntity = defineStore('entity', {
       return duplicate
     },
 
-    async forkEntity (entity: Entity, forkInstruction: ForkUpdateInstruction): Promise<number> {
+    async forkEntity (entity: Entity, forkingInstruction: ForkingInstruction): Promise<number> {
       if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return 0
 
       const organisationId = this.organisationId
@@ -154,10 +153,10 @@ export const useEntity = defineStore('entity', {
         entity.repository.id,
         entity.id,
         {
+          ...forkingInstruction,
           organisationId: organisationId,
-          repositoryId: repositoryId,
-          ...forkInstruction
-        } as ForkCreateInstruction,
+          repositoryId: repositoryId
+        } as ForkingInstruction,
         undefined,
         undefined
       ).then(r => {
@@ -270,11 +269,11 @@ export const useEntity = defineStore('entity', {
     },
 
     isPhenotype (entity: Entity): entity is Phenotype {
-      return [EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)
+      return [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entity.entityType)
     },
 
     hasRestriction (entity: Entity): entity is Phenotype {
-      return [EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(entity.entityType)
+      return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
     }
   }
 })

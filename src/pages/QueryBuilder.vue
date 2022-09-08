@@ -80,7 +80,7 @@
                 :nodes="entities"
                 :loading="treeLoading"
                 class="col column"
-                :exclude-type-if-empty="[EntityType.Category, EntityType.CombinedPhenotype]"
+                :exclude-type-if-empty="[EntityType.Category]"
                 @refresh-clicked="reloadEntities"
                 @update:selected="addCriterion"
               />
@@ -108,7 +108,7 @@
                   <template v-for="(criterion, index) in query.criteria" :key="index">
                     <criterion
                       v-model:exclusion="criterion.exclusion"
-                      v-model:date-time-restrictions="criterion.dateTimeRestrictions"
+                      v-model:date-time-restriction="criterion.dateTimeRestriction"
                       v-model:default-aggregation-function="criterion.defaultAggregationFunction"
                       :aggregation-function-options="aggregationFunctionOptions"
                       :subject="criterion.subject"
@@ -141,7 +141,7 @@
               <entity-tree
                 :nodes="entities"
                 :loading="treeLoading"
-                :exclude-type-if-empty="[EntityType.Category, EntityType.CombinedPhenotype]"
+                :exclude-type-if-empty="[EntityType.Category]"
                 class="col column"
                 @refresh-clicked="reloadEntities"
                 @update:selected="addSelection"
@@ -380,7 +380,7 @@ export default defineComponent({
       ),
 
       addCriterion: (subject: Phenotype) => {
-        if (!subject || (!isPhenotype(subject) && !isRestricted(subject)) || subject.entityType === EntityType.CombinedPhenotype) return
+        if (!subject || !isPhenotype(subject) && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
           defaultAggregationFunction: { id: 'last', title: 'last' },
@@ -394,7 +394,7 @@ export default defineComponent({
         if (!query.value.projection.select) query.value.projection.select = []
         if (
           !subject
-          || ![EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedRestriction].includes(subject.entityType)
+          || ![EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(subject.entityType)
           || query.value.projection.select.findIndex(r => r.subject.id === subject.id) !== -1
         ) return
         query.value.projection.select.push({ subject: subject, sorting: Sorting.Asc })

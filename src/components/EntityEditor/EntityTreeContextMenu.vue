@@ -2,7 +2,7 @@
   <q-menu context-menu>
     <q-list v-if="!entity || entity.createdAt && entity.entityType === EntityType.Category" dense>
       <q-item
-        v-for="entityType in [EntityType.Category, EntityType.SinglePhenotype, EntityType.DerivedPhenotype, EntityType.CombinedPhenotype]"
+        v-for="entityType in [EntityType.Category, EntityType.SinglePhenotype, EntityType.CompositePhenotype]"
         :key="entityType"
         v-close-popup
         clickable
@@ -86,8 +86,7 @@ export default defineComponent({
 
       entries: [
         { phenotype: EntityType.SinglePhenotype, restriction: EntityType.SingleRestriction },
-        { phenotype: EntityType.DerivedPhenotype, restriction: EntityType.DerivedRestriction },
-        { phenotype: EntityType.CombinedPhenotype, restriction: EntityType.CombinedRestriction },
+        { phenotype: EntityType.CompositePhenotype, restriction: EntityType.CompositeRestriction }
       ],
 
       EntityType,

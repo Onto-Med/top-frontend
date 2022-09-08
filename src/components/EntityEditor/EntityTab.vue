@@ -225,7 +225,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean =>
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted, hasDataType, hasItemType, hasExpression } = useEntityFormatter()
+    const { getTitle, isRestricted, isPhenotype, hasDataType, hasItemType, hasExpression } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -274,8 +274,7 @@ export default defineComponent({
 
       result &&= !hasItemType(props.entity) || !!(local.value as Phenotype).itemType
       result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
-      result &&= !hasDataType(props.entity) || (local.value as Phenotype).dataType !== DataType.Number || !!(local.value as Phenotype).unit?.unit
-      result &&= !isRestricted(local.value) || local.value.restriction?.quantor !== undefined || local.value.entityType === EntityType.CombinedRestriction
+      result &&= !isRestricted(local.value) || local.value.restriction?.quantifier !== undefined
       result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
       return result
@@ -284,6 +283,8 @@ export default defineComponent({
     const save = () => {
       if ((isNew.value || hasUnsavedChanges.value)) {
         if (isValid.value) {
+          if (isPhenotype(local.value) && local.value.expression?.function === 'switch' && hasDataType(local.value))
+            local.value.dataType = DataType.Number
           emit('update:entity', local.value)
           versionHistoryDialogKey.value++
         } else {

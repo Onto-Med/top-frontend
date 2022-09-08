@@ -10,7 +10,8 @@
         :repository-id="repositoryId"
         :label="t('selectThing', { thing: t(fun.title) }) + '...'"
         :disable="readonly"
-        show-change
+        changeable
+        removeable
         @entity-clicked="$emit('entityClicked', $event)"
         @entity-set="setEntity($event)"
         @remove-clicked="$emit('update:modelValue', undefined)"
@@ -116,7 +117,7 @@
             v-if="!readonly"
             :enclosable="false"
             :functions="functions"
-            :removable="false"
+            :removeable="false"
             @select="handleArgumentUpdate(argumentCount, { function: $event, arguments: [] })"
           />
         </q-chip>

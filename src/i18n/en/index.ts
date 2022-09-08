@@ -12,8 +12,10 @@ export default {
   back: 'Back',
   buildQuery: 'Build query|Build queries',
   buildQueryFor: 'Build query for|Build queries for',
+  cardinality: 'Cardinality|Cardinalities',
   category: 'Category|Categories',
   change: 'Change',
+  clearThing: 'Clear {thing}',
   clinical_impression: 'Clinical impression|Clinical impressions',
   'clinical_impression.description': 'A record of a clinical assessment performed to determine what problem(s) may affect the patient and before '
     + "planning the treatments that is best to manage a patient's condition.",
@@ -23,6 +25,7 @@ export default {
   copyiedToClipboard: 'The content has been copied to the clipboard.',
   copyFailed: 'The content could not be copied.',
   copyToClipboard: 'Copy to clipboard.',
+  count: 'Count|Counts',
   thingCreatedOrUpdated: '{thing} created or updated.',
   criterion: 'Criterion|Criteria',
   ctrl: 'CTRL',
@@ -30,6 +33,8 @@ export default {
   dataSourceDescription: 'Select at least one data source on which the query shall be executed.',
   dateTimeRestriction: 'Time restriction|Time restrictions',
   dateTimeRestrictionDescription: 'Restrict the time range, when this phenotype must have been observed.',
+  defaultValue: 'Default value|Default values',
+  defaultValueHint: 'If none of the mappings match.',
   defineThing: 'Define {thing}',
   desc: 'Descending',
   duplicate: 'Duplicate',
@@ -78,6 +83,7 @@ export default {
   'itemType.description': 'Item types are used to further describe a phenotype and its assignment to an individual. '
     + 'They can only be defined for single phenotypes, as these phenotypes are directly linked to the underlying data elements. '
     + 'Depending on the data source, data retrieval can differ dramatically between item types.',
+  mapping: 'Mapping|Mappings',
   maximum: 'Maximum',
   medication_administration: 'Medication administration|Medication administrations',
   'medication_administration.description': 'Describes the event of an individual consuming or otherwise being administered a medication.',
@@ -123,11 +129,9 @@ export default {
   phenotype: 'Phenotype|Phenotypes',
   phenotype_group: 'Phenotype group|Phenotype groups',
   single_phenotype: 'Single phenotype|Single phenotypes',
-  combined_phenotype: 'Combined phenotype|Combined phenotypes',
-  derived_phenotype: 'Derived phenotype|Derived phenotypes',
+  composite_phenotype: 'Composite phenotype|Composite phenotypes',
   single_restriction: 'Single restriction|Single restrictions',
-  combined_restriction: 'Combined restriction|Combined restrictions',
-  derived_restriction: 'Derived restriction|Derived restrictions',
+  composite_restriction: 'Composite restriction|Composite restrictions',
   id: 'ID',
   account: 'Account',
   dataType: 'Data Type|Data Types',
@@ -151,7 +155,7 @@ export default {
   lightMode: 'Light mode',
   remove: 'Remove',
   delete: 'Delete',
-  score: 'Score',
+  score: 'Score|Scores',
   component: 'Component',
   restriction: 'Restriction|Restrictions',
   expression: 'Expression',
@@ -182,7 +186,7 @@ export default {
   dismiss: 'Dismiss',
   notFound: 'Not found',
   negated: 'Negated',
-  quantor: 'Quantor|Quantors',
+  quantifier: 'Quantifier|Quantifiers',
   loading: 'Loading',
   logOut: 'Log out',
   logIn: 'Log in',
@@ -270,7 +274,7 @@ export default {
       + 'In this way, on the one hand, data from other sources can be read in and used for phenotyping. '
       + 'On the other hand, results can be fed back to external IT systems.',
     formulaHelp: 'Mathematical formulas can be entered here to calculate the values of the phenotype. Formulas can contain other phenotypes as well as constants.',
-    restrictionHelp: 'Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantor. '
+    restrictionHelp: 'Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantifier. '
       + 'Then you have to choose between value range (with minimum and/or maximum) or enumeration (any number of predefined values) for the type of restriction. '
       + 'No restriction type can be selected for the quantifiers "Values present" and "No values present" because the restriction of the values is implicit.',
     expressionHelp: 'To define restrictions for combined phenotypes. A Boolean expression must be specified. '
@@ -307,11 +311,11 @@ export default {
   ucumCard: {
     help: 'Enter a unit or a unit designation. A list of suggestions will then be displayed from which you can select the appropriate UCUM unit.'
   },
-  quantorType: {
-    none: 'No values present',
-    exists: 'Values present',
-    some: 'At least one value in range',
+  quantifierType: {
     all: 'All values in range',
+    exact: 'Exactly X values in range',
+    min: 'At least X values in range',
+    max: 'No more than X values in range'
   },
   document: 'Document|Documents',
   documentSearch: 'Search Document|Search Documents',

@@ -18,6 +18,7 @@
         dense
         :label="label"
         :entity-types="entityTypes"
+        :data-type="dataType"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         @entity-selected="setEntity($event)"
@@ -25,7 +26,7 @@
       />
       <q-list dense>
         <slot name="additionalOptions" />
-        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked')">
+        <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
           <q-item-section v-t="'remove'" />
         </q-item>
       </q-list>
@@ -49,10 +50,10 @@
         </q-item>
         <q-separator />
         <slot name="additionalOptions" />
-        <q-item v-if="showChange && state" v-close-popup clickable @click="setEntity(undefined)">
+        <q-item v-if="changeable && state" v-close-popup clickable @click="setEntity(undefined)">
           <q-item-section v-t="'change'" />
         </q-item>
-        <q-item v-if="!disable" v-close-popup clickable @click="$emit('removeClicked')">
+        <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
           <q-item-section v-t="'remove'" />
         </q-item>
       </q-list>
@@ -63,7 +64,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Entity, EntityType } from '@onto-med/top-api'
+import { DataType, Entity, EntityType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
@@ -79,13 +80,12 @@ export default defineComponent({
     label: String,
     entity: Object as () => Entity,
     entityTypes: Array as () => EntityType[],
+    dataType: String as () => DataType,
     organisationId: String,
     repositoryId: String,
     disable: Boolean,
-    showChange: {
-      type: Boolean,
-      default: false
-    }
+    changeable: Boolean,
+    removeable: Boolean
   },
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {

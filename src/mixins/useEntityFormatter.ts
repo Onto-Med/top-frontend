@@ -22,7 +22,7 @@ export default function (this: void) {
      * @returns true if entity is a phenotype
      */
   const isPhenotype = (entity: Entity): entity is Phenotype => {
-    return [EntityType.SinglePhenotype, EntityType.CombinedPhenotype, EntityType.DerivedPhenotype].includes(entity.entityType)
+    return [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(entity.entityType)
   }
 
   const isCategory = (entity: Entity): entity is Category => {
@@ -35,7 +35,7 @@ export default function (this: void) {
      * @returns true if entity is restricted
      */
   const isRestricted = (entity: Entity|EntityType): entity is Phenotype => {
-    return [EntityType.CombinedRestriction, EntityType.SingleRestriction, EntityType.DerivedRestriction].includes(
+    return [EntityType.CompositeRestriction, EntityType.SingleRestriction].includes(
       entity.hasOwnProperty('id') ? (entity as Entity).entityType : (entity as EntityType)
     )
   }
@@ -75,13 +75,7 @@ export default function (this: void) {
     getTitle,
 
     hasDataType: (entity: Entity|EntityType) => {
-      return [EntityType.SinglePhenotype, EntityType.DerivedPhenotype].includes(
-        entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
-      )
-    },
-
-    hasScore: (entity: Entity|EntityType) => {
-      return [EntityType.CombinedRestriction].includes(
+      return [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(
         entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
       )
     },
@@ -99,10 +93,8 @@ export default function (this: void) {
      * @returns Material icon name as string
      */
     getIcon (this: void, entity: Entity): string {
-      if ([EntityType.CombinedPhenotype, EntityType.CombinedRestriction].includes(entity.entityType)) {
-        return 'merge_type'
-      } else if ([EntityType.DerivedPhenotype, EntityType.DerivedRestriction].includes(entity.entityType)) {
-        return 'calculate'
+      if ([EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(entity.entityType)) {
+        return 'apps'
       } else if ([EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(entity.entityType)) {
         switch ((entity as Phenotype).dataType) {
           case DataType.Number:
@@ -154,26 +146,23 @@ export default function (this: void) {
 
     hasExpression (this: void, entity: Entity|EntityType): entity is Phenotype {
       const entityType = entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity
-      return entityType === EntityType.CombinedRestriction || entityType === EntityType.DerivedPhenotype
+      return entityType === EntityType.CompositeRestriction
     },
 
     restrictionEntityTypes (this: void): EntityType[] {
       return [
         EntityType.SinglePhenotype,
-        EntityType.CombinedRestriction,
-        EntityType.DerivedRestriction,
+        EntityType.CompositeRestriction,
         EntityType.SingleRestriction
       ]
     },
 
     phenotypeEntityTypes (this: void): EntityType[] {
       return [
+        EntityType.CompositePhenotype,
         EntityType.SinglePhenotype,
-        EntityType.CombinedPhenotype,
-        EntityType.DerivedPhenotype,
         EntityType.SingleRestriction,
-        EntityType.CombinedRestriction,
-        EntityType.DerivedRestriction
+        EntityType.CompositeRestriction
       ]
     }
   }

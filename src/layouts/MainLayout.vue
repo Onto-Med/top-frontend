@@ -165,7 +165,7 @@ import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue
 import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDialog.vue'
 import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
-import { Entity, ForkUpdateInstruction } from '@onto-med/top-api'
+import { Entity, ForkingInstruction } from '@onto-med/top-api'
 import { useQuasar } from 'quasar'
 import { fabGithub } from '@quasar/extras/fontawesome-v5'
 import useAlert from 'src/mixins/useAlert'
@@ -243,8 +243,8 @@ export default defineComponent({
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
       },
 
-      forkEntity (entity: Entity, forkInstruction: ForkUpdateInstruction) {
-        entityStore.forkEntity(entity, forkInstruction)
+      forkEntity (entity: Entity, forkingInstruction: ForkingInstruction) {
+        entityStore.forkEntity(entity, forkingInstruction)
           .then((count) => {
             forkOrigin.value = undefined
             alert(t('thingCreatedOrUpdated', { thing: `${count} ` + t('fork', count) }), 'positive')

@@ -3,11 +3,13 @@
     <q-card-section class="q-pa-sm cursor-pointer" @click="isExpanded = !isExpanded">
       <q-toolbar>
         <q-btn color="grey" round flat dense :icon="isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
-        <q-toolbar-title class="row items-center">
-          <span v-if="title">{{ title }}</span>
-          <q-icon v-show="error" name="error" color="negative" class="q-px-sm" />
-          <small><slot name="error" /></small>
-        </q-toolbar-title>
+        <slot name="title">
+          <q-toolbar-title class="row items-center">
+            <span v-if="title">{{ title }}</span>
+            <q-icon v-show="error" name="error" color="negative" class="q-px-sm" />
+            <small><slot name="error" /></small>
+          </q-toolbar-title>
+        </slot>
         <slot name="toolbar" />
         <q-btn
           v-if="helpText"

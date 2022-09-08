@@ -11,16 +11,17 @@
       @update:model-value="$emit('update:minOperator', $event)"
     />
     <q-input
-      :model-value="minimum"
+      :model-value="minimumValue"
       :label="t('minimum')"
+      stack-label
       outlined
-      :type="type"
+      :type="inputType"
       class="q-mr-md"
       @update:model-value="updateMinimum($event)"
     />
 
     <q-select
-      :model-value="maxOperator ||maxOperators[0]"
+      :model-value="maxOperator || maxOperators[0]"
       :options="maxOperators"
       :readonly="readonly"
       emit-value
@@ -30,18 +31,19 @@
       @update:model-value="$emit('update:maxOperator', $event)"
     />
     <q-input
-      :model-value="maximum"
+      :model-value="maximumValue"
       :label="t('maximum')"
+      stack-label
       outlined
-      :type="type"
-      @update:model-value="$emit('update:maximum', $event)"
+      :type="inputType"
+      @update:model-value="updateMaximum($event)"
     />
   </div>
 </template>
 
 <script lang="ts">
 import { DataType, RestrictionOperator } from '@onto-med/top-api'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -75,18 +77,36 @@ export default defineComponent({
     return {
       t,
 
+      minimumValue: computed(() => {
+        if (props.type === DataType.DateTime && props.minimum instanceof Date)
+          return props.minimum.toISOString().substr(0, 16)
+        return props.minimum
+      }),
+
+      maximumValue: computed(() => {
+        if (props.type === DataType.DateTime && props.maximum instanceof Date)
+          return props.maximum.toISOString().substr(0, 16)
+        return props.maximum
+      }),
+
+      inputType: computed(() => {
+        if (props.type === DataType.DateTime) return 'datetime-local'
+        return props.type
+      }),
+
       updateMinimum: (value: number|Date) => {
         if (props.type === DataType.Number) {
           emit('update:minimum', value as number)
         } else if (props.type === DataType.DateTime) {
-          emit('update:minimum', new Date(value))
+          emit('update:minimum', value ? new Date(value) : undefined)
         }
       },
+
       updateMaximum: (value: number|Date) => {
         if (props.type === DataType.Number) {
-          emit('update:minimum', value as number)
+          emit('update:maximum', value as number)
         } else if (props.type === DataType.DateTime) {
-          emit('update:minimum', new Date(value))
+          emit('update:maximum', value ? new Date(value) : undefined)
         }
       }
     }
