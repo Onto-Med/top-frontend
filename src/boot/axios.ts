@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
-import { DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, RepositoryApi } from '@onto-med/top-api'
+import { DataSourceApi, DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, RepositoryApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 
@@ -18,6 +18,7 @@ export const RepositoryApiKey: InjectionKey<RepositoryApi> = Symbol('repositoryA
 export const ExpressionConstantApiKey: InjectionKey<ExpressionConstantApi> = Symbol('expressionConstantApi')
 export const ExpressionFunctionApiKey: InjectionKey<ExpressionFunctionApi> = Symbol('expressionFunctionApi')
 export const ForkApiKey: InjectionKey<ForkApi> = Symbol('forkApi')
+export const DataSourceApiKey: InjectionKey<DataSourceApi> = Symbol('dataSourceApi')
 
 export default boot(({ app }) => {
   const axiosInstance = axios.create({
@@ -42,5 +43,6 @@ export default boot(({ app }) => {
   app.provide(ExpressionConstantApiKey, new ExpressionConstantApi(undefined, '', axiosInstance))
   app.provide(ExpressionFunctionApiKey, new ExpressionFunctionApi(undefined, '', axiosInstance))
   app.provide(ForkApiKey, new ForkApi(undefined, '', axiosInstance))
+  app.provide(DataSourceApiKey, new DataSourceApi(undefined, '', axiosInstance))
 });
 

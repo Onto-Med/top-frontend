@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -12,6 +12,7 @@ export const useEntity = defineStore('entity', {
       organisation: undefined as Organisation|undefined,
       repository: undefined as Repository|undefined,
       entities: [] as Entity[],
+      dataSources: undefined as DataSource[]|undefined,
       constants: undefined as Constant[]|undefined,
       functions: new Map<string, ExpressionFunction[]>(),
       keycloak: undefined as KeycloakInstance|undefined,
@@ -20,7 +21,8 @@ export const useEntity = defineStore('entity', {
       expressionFunctionApi: undefined as ExpressionFunctionApi|undefined,
       organisationApi: undefined as OrganisationApi|undefined,
       repositoryApi: undefined as RepositoryApi|undefined,
-      forkApi: undefined as ForkApi|undefined
+      forkApi: undefined as ForkApi|undefined,
+      dataSourceApi: undefined as DataSourceApi|undefined
     }
   },
   actions: {
@@ -38,6 +40,11 @@ export const useEntity = defineStore('entity', {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
             this.entities = r.data
         })
+    },
+
+    async reloadDataSources () {
+      await this.dataSourceApi?.getDataSources()
+        .then(r => this.dataSources = r.data)
     },
 
     async reloadConstants () {
@@ -84,6 +91,12 @@ export const useEntity = defineStore('entity', {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
           this.repository = r.data
         })
+    },
+
+    async getDataSources (): Promise<DataSource[]> {
+      if (!this.dataSources)
+        await this.reloadDataSources()
+      return this.dataSources || []
     },
 
     async getConstants (): Promise<Constant[]> {
