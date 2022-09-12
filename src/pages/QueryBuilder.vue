@@ -29,10 +29,11 @@
             <q-input v-model="query.name" :label="t('queryName')" type="text" />
             <q-select
               v-model="query.configuration.sources"
-              :options="sources"
+              :options="dataSources"
               :label="t('dataSource', 2)"
               :error-message="t('dataSourceDescription')"
               :error="query.configuration.sources.length == 0"
+              option-label="title"
               multiple
               counter
               use-chips
@@ -284,7 +285,7 @@
 </template>
 
 <script lang="ts">
-import { EntityType, ExpressionFunction, Phenotype, Query, Sorting } from '@onto-med/top-api'
+import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, Sorting } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import Criterion from 'src/components/Query/Criterion.vue'
@@ -336,6 +337,11 @@ export default defineComponent({
       .then(r => aggregationFunctionOptions.value = r)
       .catch((e: Error) => alert(e.message))
 
+    const dataSources = ref([] as DataSource[])
+    entityStore.getDataSources()
+      .then(r => dataSources.value = r)
+      .catch((e: Error) => alert(e.message))
+
     const getRunIndex = (id: number) => runs.value.findIndex(r => r.id === id)
 
     onMounted(() => reloadEntities())
@@ -364,7 +370,7 @@ export default defineComponent({
       reloadEntities,
       treeLoading,
       Sorting,
-      sources: [ 'source1', 'source2' ],
+      dataSources,
       importFile,
       aggregationFunctionOptions,
 
