@@ -104,7 +104,11 @@ export default defineComponent({
 
       setConstant (constant: Constant) {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as ExpressionValue
-        newModelValue.constant = constant
+        newModelValue.constant = {
+          id: constant.id,
+          title: constant.title,
+          dataType: DataType.String
+        }
         newModelValue.value = undefined
         emit('update:modelValue', newModelValue)
       },
