@@ -18,6 +18,7 @@ export const RepositoryApiKey: InjectionKey<RepositoryApi> = Symbol('repositoryA
 export const ExpressionConstantApiKey: InjectionKey<ExpressionConstantApi> = Symbol('expressionConstantApi')
 export const ExpressionFunctionApiKey: InjectionKey<ExpressionFunctionApi> = Symbol('expressionFunctionApi')
 export const ForkApiKey: InjectionKey<ForkApi> = Symbol('forkApi')
+export const DocumentApiKey: InjectionKey<OrganisationApi> = Symbol('documentApi')
 
 export default boot(({ app }) => {
   const axiosInstance = axios.create({
@@ -42,5 +43,6 @@ export default boot(({ app }) => {
   app.provide(ExpressionConstantApiKey, new ExpressionConstantApi(undefined, '', axiosInstance))
   app.provide(ExpressionFunctionApiKey, new ExpressionFunctionApi(undefined, '', axiosInstance))
   app.provide(ForkApiKey, new ForkApi(undefined, '', axiosInstance))
+  app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))  //Todo: frontend needs to import top-api dependency with Document stuff as well; but it doesn't it via Maven and as such my local install is naught
 });
 
