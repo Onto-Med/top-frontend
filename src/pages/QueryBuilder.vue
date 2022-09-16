@@ -238,7 +238,6 @@
                 icon="play_arrow"
                 color="secondary"
                 :label="t('execute')"
-                :disable="running"
                 @click="execute()"
               />
               <q-btn
@@ -271,57 +270,51 @@
       </template>
     </q-stepper>
 
-    <query-result
+    <query-result-view
       v-for="run in runs.slice().reverse()"
-      :key="run.id"
+      :key="run.query.id"
       show-timer
-      :running="run.running"
       :result="run.result"
-      :label="t('queryResult') + ' #' + run.id"
-      :title="run.title"
-      @remove-clicked="removeRun(run.id)"
+      :title="run.query.name"
+      @remove-clicked="removeRun(run.query.id)"
     />
   </q-page>
 </template>
 
 <script lang="ts">
-import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, Sorting } from '@onto-med/top-api'
+import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, Sorting } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import Criterion from 'src/components/Query/Criterion.vue'
-import QueryResult from 'src/components/Query/QueryResult.vue'
+import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
-import { defineComponent, onMounted, ref, computed } from 'vue'
+import { defineComponent, onMounted, ref, computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useFile from 'src/mixins/useFile'
-
-interface QueryResult {
-  message?: string,
-  rows?: Record<string, unknown>[]
-}
+import { v4 as uuidv4 } from 'uuid'
+import { QueryApiKey } from 'src/boot/axios'
 
 interface Run {
-  id: number,
-  title?: string,
-  running: boolean,
-  result?: QueryResult
+  query: Query,
+  result?: QueryResult,
+  timer?: number
 }
 
 export default defineComponent({
-  components: { EntityTree, Criterion, QueryResult },
+  components: { EntityTree, Criterion, QueryResultView },
   setup () {
     const { t } = useI18n()
     const { getTitle, getSynonyms, getIcon, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
     const { saveToFile } = useFile()
     const { entities, repository, organisation } = storeToRefs(entityStore)
-    const query = ref({ configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
+    const query = ref({ id: (uuidv4 as () => string)(), configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
     const treeLoading = ref(false)
     const runs = ref([] as Run[])
-    const runId = ref(1)
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
+    const queryApi = inject(QueryApiKey)
     fileReader.onload = (e) => query.value = JSON.parse(e.target?.result as string) as Query
 
     const reloadEntities = async () => {
@@ -342,16 +335,16 @@ export default defineComponent({
       .then(r => dataSources.value = r)
       .catch((e: Error) => alert(e.message))
 
-    const getRunIndex = (id: number) => runs.value.findIndex(r => r.id === id)
+    const getRunIndex = (queryId: string) => runs.value.findIndex(r => r.query.id === queryId)
+
+    const updateRun = (run: Run) => {
+      if (!queryApi || !organisation.value?.id || !repository.value?.id || run.result?.finishedAt) return
+      queryApi?.getQueryResult(organisation.value.id, repository.value.id, run.query.id)
+        .then(r => run.result = r.data)
+        .catch((e: Error) => alert(e.message))
+    }
 
     onMounted(() => reloadEntities())
-
-    const dummyResult = {
-      message: 'result',
-      rows: [
-        { sex: 'female', bmi: 15 }
-      ]
-    }
 
     return {
       t,
@@ -412,21 +405,21 @@ export default defineComponent({
       },
 
       execute: () => {
-        const id = runId.value++
-        runs.value.push({
-          id: id,
-          running: true,
-          title: query.value.name
-        })
-        new Promise((r) => setTimeout(r, 5000))
-          .then(() => {
-            const index = getRunIndex(id)
-            if (index !== -1) runs.value[index].result = dummyResult
+        if (!queryApi || !organisation.value || !repository.value) return
+        query.value.id = (uuidv4 as () => string)()
+        runs.value.push({ query: query.value })
+
+        queryApi.enqueueQuery(organisation.value.id, repository.value.id, query.value)
+          .then(r => {
+            const index = getRunIndex(r.data.id)
+            runs.value[index].result = r.data
+            runs.value[index].timer = window.setInterval(() => {
+              updateRun(runs.value[index])
+              if (runs.value[index].result?.finishedAt)
+                clearInterval(runs.value[index].timer)
+            }, 5000)
           })
-          .finally(() => {
-            const index = getRunIndex(id)
-            if (index !== -1) runs.value[index].running = false
-          })
+          .catch((e: Error) => alert(e.message))
       },
 
       exportQuery: () => {
@@ -439,12 +432,16 @@ export default defineComponent({
         importFile.value = undefined
       },
 
-      removeRun: (id: number) => {
-        const index = getRunIndex(id)
-        if (index !== -1) runs.value.splice(index, 1)
-      },
+      removeRun: (queryId: string) => {
+        if (!queryApi || !organisation.value || !repository.value) return
 
-      running: computed(() => runs.value.findIndex(r => r.running) !== -1)
+        queryApi?.deleteQuery(organisation.value.id, repository.value.id, queryId)
+          .then(() => {
+            const index = getRunIndex(queryId)
+            if (index !== -1) runs.value.splice(index, 1)
+          })
+          .catch((e: Error) => alert(e.message))
+      }
     }
   }
 })
