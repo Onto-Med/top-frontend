@@ -28,6 +28,7 @@ export default defineComponent({
     const documents   = ref<Document[]>([])
     const loading   = ref(false)
 
+    // I don't know why I don't see it in git...
     const reload = async () => {
       if (!documentApi) return
       loading.value = true

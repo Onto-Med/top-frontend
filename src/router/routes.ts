@@ -32,6 +32,7 @@ const routes: RouteRecordRaw[] = [
       { name: 'repositories', path: '/repository', component: () => import('pages/RepositoryOverview.vue') },
       { name: 'showOrganisation', path: '/:organisationId', props: true, component: () => import('pages/Organisation.vue') },
       { name: 'documentSearch', path: '/documents', component: () => import('pages/DocumentSearch.vue') }
+      // I don't know why I don't see it in git...
     ],
   },
 

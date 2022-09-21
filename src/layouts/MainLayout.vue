@@ -208,7 +208,7 @@ export default defineComponent({
         routeName: 'repositories',
         isHidden: keycloak && !keycloak.authenticated
       },
-      {
+      {// I don't know why I don't see it in git...
         title: t('document', 2),
         icon: 'article',
         caption: t('documentSearch', 2),

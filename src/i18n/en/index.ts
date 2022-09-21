@@ -322,4 +322,5 @@ export default {
   documentPage: {
     description: ''
   }
+  // I don't know why I don't see it in git...
 };
