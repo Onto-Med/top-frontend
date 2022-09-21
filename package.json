@@ -23,7 +23,7 @@
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "^2.1.5-beta",
     "@lhncbc/ucum-lhc": "^4.1.5",
-    "@onto-med/top-api": "^0.4.2-d5fa60c",
+    "@onto-med/top-api": "^0.4.4-16d0c46",
     "@quasar/extras": "^1.15.1",
     "axios": "^0.21.4",
     "core-js": "^3.24.1",
