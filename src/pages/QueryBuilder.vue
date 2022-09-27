@@ -28,11 +28,11 @@
           <div class="col-7">
             <q-input v-model="query.name" :label="t('queryName')" type="text" />
             <q-select
-              v-model="query.configuration.sources"
+              v-model="query.dataSources"
               :options="dataSources"
               :label="t('dataSource', 2)"
               :error-message="t('dataSourceDescription')"
-              :error="query.configuration.sources.length == 0"
+              :error="query.dataSources.length == 0"
               option-label="title"
               multiple
               counter
@@ -368,7 +368,7 @@ export default defineComponent({
       aggregationFunctionOptions,
 
       configurationComplete: computed(() =>
-        query.value.configuration && query.value.configuration.sources.length > 0
+        query.value.dataSources && query.value.dataSources.length > 0
       ),
       criteriaComplete: computed(() =>
         query.value.criteria && query.value.criteria.length > 0
