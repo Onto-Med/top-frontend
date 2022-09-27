@@ -161,7 +161,7 @@
       :readonly="isOtherVersion"
       :autofocus-title="isNew"
       @entity-clicked="$emit('entityClicked', $event)"
-      @add-super-category="local.superCategories.push(undefined)"
+      @add-super-category="addSuperCategory(undefined)"
       @set-super-category="setSuperCategory"
       @remove-super-category="removeSuperCategory"
     />
@@ -338,6 +338,13 @@ export default defineComponent({
       save,
 
       prefillFromVersion,
+
+      addSuperCategory (category: Category): void {
+        const casted = local.value as Category|Phenotype
+        if (!casted.superCategories) casted.superCategories = []
+        if (!category || casted.superCategories.findIndex(c => c && c.id === category.id) === -1)
+          if (casted.id !== category?.id) casted.superCategories.push(category)
+      },
 
       setSuperCategory (index: number, category: Category): void {
         const casted = local.value as Category|Phenotype
