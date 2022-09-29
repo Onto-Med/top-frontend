@@ -131,7 +131,7 @@
 <script lang="ts">
 import { ref, defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, LocalisableText, Unit, Code, Expression, Restriction, Category, ItemType } from '@onto-med/top-api'
+import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, ItemType } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
@@ -184,8 +184,7 @@ export default defineComponent({
       type: Number
     },
     unit: {
-      type: Object as () => Unit,
-      default: () => { {} }
+      type: String
     },
     titles: {
       type: Array as () => LocalisableText[],

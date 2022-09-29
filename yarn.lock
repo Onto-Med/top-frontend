@@ -1554,12 +1554,12 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@onto-med/top-api@^0.4.4-16d0c46":
-  version "0.4.4-16d0c46"
-  resolved "https://npm.pkg.github.com/download/@Onto-Med/top-api/0.4.4-16d0c46/be0c23bc14d303b4398b5b5be7e5b91954acc4b4#be0c23bc14d303b4398b5b5be7e5b91954acc4b4"
-  integrity sha512-I3ctuenCf3/GBc4bc8D+m0n4rBeVZ5IJtsnF9B1GJBGAGv3QHbAh+lR43XMZjQuAUTKtkMseEToj3zQ6Vpbvmg==
+"@onto-med/top-api@^0.5.0":
+  version "0.5.0"
+  resolved "https://npm.pkg.github.com/download/@Onto-Med/top-api/0.5.0/5b48ba520b7224187d0bb0941e5847e082aa09f3#5b48ba520b7224187d0bb0941e5847e082aa09f3"
+  integrity sha512-X4552ccVHj+zpgBDWlRMPhnOsiEMgJKBYAjb/qW82yQcv9KEk+vOSd8J7DbXZy3/uc3IqBpOydTe/tYlpkmyBA==
   dependencies:
-    axios "^0.26.1"
+    axios "^0.21.4"
 
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
@@ -2708,13 +2708,6 @@ axios@^0.21.4:
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
     follow-redirects "^1.14.0"
-
-axios@^0.26.1:
-  version "0.26.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.26.1.tgz#1ede41c51fcf51bbbd6fd43669caaa4f0495aaa9"
-  integrity sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==
-  dependencies:
-    follow-redirects "^1.14.8"
 
 babel-core@7.0.0-bridge.0:
   version "7.0.0-bridge.0"
@@ -4615,11 +4608,6 @@ follow-redirects@^1.14.0:
   version "1.14.9"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.9.tgz#dd4ea157de7bfaf9ea9b3fbd85aa16951f78d8d7"
   integrity sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==
-
-follow-redirects@^1.14.8:
-  version "1.15.2"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
-  integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
 
 for-in@^1.0.2:
   version "1.0.2"

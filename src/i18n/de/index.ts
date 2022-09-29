@@ -112,6 +112,7 @@ export default {
   removeThing: '{thing} entfernen',
   resultSet: 'Ergebnismenge|Ergebnismengen',
   rScript: 'R-Skript|R-Skripte',
+  running: 'Läuft',
   selection: 'Selektion|Selektionen',
   sorting: 'Sortierung|Sortierungen',
   source: 'Quelle|Quellen',

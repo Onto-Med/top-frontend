@@ -111,6 +111,7 @@ export default {
   removeThing: 'Remove {thing}',
   resultSet: 'Result set|Result sets',
   rScript: 'R script|R scripts',
+  running: 'Running',
   selection: 'Selection|Selections',
   sorting: 'Sorting|Sortings',
   source: 'Source|Sources',

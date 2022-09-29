@@ -7,11 +7,11 @@
       :class="{ 'ucum-select-field': fixedWidth }"
       :label="showLabel ? t('unit') : undefined"
       :readonly="readonly"
-      :model-value="modelValue ? modelValue.unit : undefined"
+      :model-value="modelValue"
       :options="options"
       :display-value="displayValue"
       @filter="filterFn"
-      @update:model-value="$emit('update:modelValue', { unit: $event })"
+      @update:model-value="$emit('update:modelValue', $event)"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
@@ -38,12 +38,11 @@
 import { defineComponent, ref, computed } from 'vue'
 import * as ucumLhc from '@lhncbc/ucum-lhc'
 import { useI18n } from 'vue-i18n'
-import { Unit } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'UcumInput',
   props: {
-    modelValue: Object as () => Unit,
+    modelValue: String,
     readonly: Boolean,
     showLabel: Boolean,
     fixedWidth: Boolean
@@ -56,7 +55,7 @@ export default defineComponent({
     const options = ref(null as unknown as Array<Record<string, string>>)
 
     const validation = computed(() =>
-      utils.validateUnitString(props.modelValue ? props.modelValue.unit : undefined) as Record<string, unknown>
+      utils.validateUnitString(props.modelValue) as Record<string, unknown>
     )
     const displayValue = computed(() => {
       if (validation.value && validation.value.status === 'valid') {
