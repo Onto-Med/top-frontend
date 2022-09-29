@@ -16,8 +16,8 @@
 <script lang="ts">
 import {defineComponent, inject, onMounted, ref} from 'vue'
 import { useI18n } from 'vue-i18n'
-import {DocumentApiKey, OrganisationApiKey} from 'src/boot/axios'
-import {Document} from "@onto-med/top-api";
+import { DocumentApiKey } from 'src/boot/axios'
+import { Document } from '@onto-med/top-api';
 
 export default defineComponent({
   name: 'DocumentSearch',

@@ -1,15 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
-import {
-  DefaultApi,
-  DocumentApi,
-  EntityApi,
-  ExpressionConstantApi,
-  ExpressionFunctionApi,
-  ForkApi,
-  OrganisationApi,
-  RepositoryApi
-} from '@onto-med/top-api'
+import { DataSourceApi, DocumentApi, DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, QueryApi, RepositoryApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 
@@ -27,6 +18,8 @@ export const RepositoryApiKey: InjectionKey<RepositoryApi> = Symbol('repositoryA
 export const ExpressionConstantApiKey: InjectionKey<ExpressionConstantApi> = Symbol('expressionConstantApi')
 export const ExpressionFunctionApiKey: InjectionKey<ExpressionFunctionApi> = Symbol('expressionFunctionApi')
 export const ForkApiKey: InjectionKey<ForkApi> = Symbol('forkApi')
+export const DataSourceApiKey: InjectionKey<DataSourceApi> = Symbol('dataSourceApi')
+export const QueryApiKey: InjectionKey<QueryApi> = Symbol('queryApi')
 export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 
 export default boot(({ app }) => {
@@ -52,6 +45,8 @@ export default boot(({ app }) => {
   app.provide(ExpressionConstantApiKey, new ExpressionConstantApi(undefined, '', axiosInstance))
   app.provide(ExpressionFunctionApiKey, new ExpressionFunctionApi(undefined, '', axiosInstance))
   app.provide(ForkApiKey, new ForkApi(undefined, '', axiosInstance))
-  app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))  //Todo: frontend needs to import top-api dependency with Document stuff as well; but it doesn't it via Maven and as such my local install is naught
+  app.provide(DataSourceApiKey, new DataSourceApi(undefined, '', axiosInstance))
+  app.provide(QueryApiKey, new QueryApi(undefined, '', axiosInstance))
+  app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))
 });
 
