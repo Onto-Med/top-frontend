@@ -34,6 +34,9 @@ export default boot(({ app }) => {
   }, error => {
     return Promise.reject(error)
   })
+  // const nlpAxiosInstance = axios.create({
+  //   baseURL: process.env.NLP_URL
+  // })
 
   app.config.globalProperties.$axios = axiosInstance
 

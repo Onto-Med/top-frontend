@@ -10,25 +10,47 @@
         {{ t('documentPage.description') }}
       </q-card-section>
     </q-card>
+
+    <table-with-actions
+      :rows="documents"
+      :columns="columns"
+      :loading="loading"
+      @reload-clicked="reload()"
+    >
+      <template #row-cells="{ row }">
+        <q-td auto-width>
+          {{ row.id }}
+        </q-td>
+        <q-td>{{ row.text }}</q-td>
+      </template>
+    </table-with-actions>
   </q-page>
 </template>
 
 <script lang="ts">
-import {defineComponent, inject, onMounted, ref} from 'vue'
+import {computed, defineComponent, inject, onMounted, ref} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DocumentApiKey } from 'src/boot/axios'
 import { Document } from '@onto-med/top-api';
+import TableWithActions from 'components/TableWithActions.vue';
 
 export default defineComponent({
   name: 'DocumentSearch',
+  components: {
+    TableWithActions,
+  },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const documentApi = inject(DocumentApiKey)
     const documents   = ref<Document[]>([])
     const loading   = ref(false)
+    const columns = computed(() => [
+      { name: 'actions', sortable: false },
+      { name: 'docId', label: t('document'), align: 'left', required: true, sortable: true },
+      { name: 'docText', label: t('string'), align: 'left', sortable: false },
+    ])
 
-    // I don't know why I don't see it in git...
     const reload = async () => {
       if (!documentApi) return
       loading.value = true
@@ -44,6 +66,11 @@ export default defineComponent({
 
     return {
       t,
+      documents,
+      loading,
+      columns,
+      reload,
+      alert
     }
   }
 })
