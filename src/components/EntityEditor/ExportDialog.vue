@@ -71,6 +71,8 @@ import { Entity } from '@onto-med/top-api'
 import useAlert from 'src/mixins/useAlert'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { copyToClipboard } from 'quasar'
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -92,6 +94,7 @@ export default defineComponent({
     const loading      = ref(false)
     const result       = ref(undefined as string|undefined)
     const { getTitle } = useEntityFormatter()
+    const { repository, organisation } = storeToRefs(useEntity())
 
     watch(
       () => props.entity,
@@ -111,10 +114,10 @@ export default defineComponent({
       options: computed(() => [ { label: t('rScript'), value: 'vnd.r-project.r' } ]),
 
       doExport: async () => {
-        if (loading.value || !format.value || !entityApi || !props.entity || !props.entity.id || !props.entity.repository || !props.entity.repository.organisation) return
+        if (loading.value || !format.value || !entityApi || !props.entity || !props.entity.id || !repository.value || !organisation.value) return
         loading.value = true
 
-        await entityApi.exportEntity(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id, format.value)
+        await entityApi.exportEntity(organisation.value.id, repository.value.id, props.entity.id, format.value)
           .then(r => result.value = r.data)
           .catch((e: Error) => alert(e.message))
           .finally(() => loading.value = false)
