@@ -322,6 +322,7 @@ export default {
   documentSearch: 'Search Document|Search Documents',
   documentPage: {
     description: ''
-  }
-  // I don't know why I don't see it in git...
+  },
+  concept: 'Concept|Concepts',
+  phrase: 'Phrase|Phrases'
 };

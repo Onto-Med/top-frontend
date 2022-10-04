@@ -11,6 +11,33 @@
       </q-card-section>
     </q-card>
 
+    <q-card>
+      <q-card-section>
+        <div class="text-h6">
+          {{ t('concept', 2) }}
+        </div>
+      </q-card-section>
+
+      <q-separator />
+
+      <div class="fit row wrap justify-center items-start content-start">
+        <q-card>
+          <q-card-section>
+            Hello
+          </q-card-section>
+        </q-card>
+        <q-card>
+          <q-card-section>
+            you
+          </q-card-section>
+        </q-card>
+      </div>
+<!--      <q-card-actions align="right">-->
+<!--        <q-btn flat>Action 1</q-btn>-->
+<!--        <q-btn flat>Action 2</q-btn>-->
+<!--      </q-card-actions>-->
+    </q-card>
+
     <table-with-actions
       :rows="documents"
       :columns="columns"
@@ -48,13 +75,13 @@ export default defineComponent({
     const columns = computed(() => [
       { name: 'actions', sortable: false },
       { name: 'docId', label: t('document'), align: 'left', required: true, sortable: true },
-      { name: 'docText', label: t('string'), align: 'left', sortable: false },
+      { name: 'docPhrases', label: t('phrase'), align: 'left', sortable: false },
     ])
 
     const reload = async () => {
       if (!documentApi) return
       loading.value = true
-      await documentApi.getDocuments()
+      await documentApi.getDocuments(undefined, undefined, 0, 20) // ToDo: Read these numbers from table values
         .then(r => documents.value = r.data)
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
