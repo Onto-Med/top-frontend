@@ -108,11 +108,11 @@
                 <q-list v-show="query.criteria.length" dense>
                   <template v-for="(criterion, index) in query.criteria" :key="index">
                     <criterion
-                      v-model:exclusion="criterion.exclusion"
+                      v-model:inclusion="criterion.inclusion"
                       v-model:date-time-restriction="criterion.dateTimeRestriction"
-                      v-model:default-aggregation-function="criterion.defaultAggregationFunction"
+                      v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
                       :aggregation-function-options="aggregationFunctionOptions"
-                      :subject="criterion.subject"
+                      :subject-id="criterion.subjectId"
                       @remove-clicked="query.criteria.splice(index, 1)"
                     />
                     <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
@@ -164,8 +164,8 @@
               <q-separator />
 
               <q-card-section>
-                <q-list v-if="query.projection && query.projection.select.length" dense separator>
-                  <q-item v-for="(select, index) in query.projection.select" :key="index">
+                <q-list v-if="query.projection && query.projection.length" dense separator>
+                  <q-item v-for="(select, index) in query.projection" :key="index">
                     <q-item-section avatar>
                       <q-btn-group flat class="column">
                         <q-btn
@@ -178,7 +178,7 @@
                         />
                         <q-btn
                           dense
-                          :disable="index == query.projection.select.length - 1"
+                          :disable="index == query.projection.length - 1"
                           icon="keyboard_arrow_down"
                           size="sm"
                           class="q-pa-none"
@@ -200,7 +200,7 @@
                           :title="t('sorting')"
                           @click="select.sorting = select.sorting === Sorting.Asc ? Sorting.Desc : Sorting.Asc"
                         />
-                        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.select.splice(index, 1)" />
+                        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.splice(index, 1)" />
                       </q-btn-group>
                     </q-item-section>
                   </q-item>
@@ -309,7 +309,12 @@ export default defineComponent({
     const entityStore = useEntity()
     const { saveToFile } = useFile()
     const { entities, repository, organisation } = storeToRefs(entityStore)
-    const query = ref({ id: (uuidv4 as () => string)(), configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
+    const query = ref({
+      id: (uuidv4 as () => string)(),
+      dataSources: [],
+      criteria: [],
+      projection: []
+    } as Query)
     const treeLoading = ref(false)
     const runs = ref([] as Run[])
     const importFile = ref(undefined as Blob|undefined)
@@ -320,7 +325,7 @@ export default defineComponent({
     const reloadEntities = async () => {
       treeLoading.value = true
       await entityStore.reloadEntities()
-        .then(() => query.value.criteria = query.value.criteria?.filter(c => entities.value.findIndex(e => e.id === c.subject.id) !== -1))
+        .then(() => query.value.criteria = query.value.criteria?.filter(c => entities.value.findIndex(e => e.id === c.subjectId) !== -1))
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
@@ -375,33 +380,32 @@ export default defineComponent({
       ),
 
       projectionComplete: computed(() =>
-        query.value.projection && query.value.projection.select && query.value.projection.select.length > 0
+        query.value.projection && query.value.projection.length > 0
       ),
 
       addCriterion: (subject: Phenotype) => {
         if (!subject || !isPhenotype(subject) && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
-          defaultAggregationFunction: { id: 'last', title: 'last' },
-          exclusion: false,
-          subject: subject
+          defaultAggregationFunctionId: 'last',
+          inclusion: true,
+          subjectId: subject.id as string
         })
       },
 
       addSelection: (subject: Phenotype) => {
-        if (!query.value.projection) query.value.projection = { select: [] }
-        if (!query.value.projection.select) query.value.projection.select = []
+        if (!query.value.projection) query.value.projection = []
         if (
           !subject
           || ![EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(subject.entityType)
-          || query.value.projection.select.findIndex(r => r.subject.id === subject.id) !== -1
+          || query.value.projection.findIndex(r => r.subjectId === subject.id) !== -1
         ) return
-        query.value.projection.select.push({ subject: subject, sorting: Sorting.Asc })
+        query.value.projection.push({ subjectId: subject.id as string, sorting: Sorting.Asc })
       },
 
       moveSelectEntry: (oldIndex: number, newIndex: number) => {
-        if (!query.value.projection || !query.value.projection.select || newIndex < 0 || newIndex >= query.value.projection.select.length) return
-        query.value.projection.select.splice(newIndex, 0, query.value.projection.select.splice(oldIndex, 1)[0])
+        if (!query.value.projection || newIndex < 0 || newIndex >= query.value.projection.length) return
+        query.value.projection.splice(newIndex, 0, query.value.projection.splice(oldIndex, 1)[0])
       },
 
       execute: () => {
