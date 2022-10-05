@@ -26,12 +26,14 @@
     </div>
     <div v-else-if="fun && (fun.id === 'constant' || fun.id === 'value')">
       <expression-value-input
-        :model-value="modelValue.value"
+        :value="modelValue.value"
+        :constant-id="modelValue.constantId"
         :readonly="readonly"
         :indent-level="indentLevel"
         :indent="indent"
         :expand="expand"
-        @update:modelValue="setValue($event)"
+        @update:value="setValue($event)"
+        @update:constant-id="setConstantId($event)"
         @enclose="enclose()"
         @remove="$emit('update:modelValue', undefined)"
       />
@@ -172,8 +174,8 @@ import {
   EntityType,
   Expression,
   ExpressionFunction,
-  ExpressionValue,
-  NotationEnum
+  NotationEnum,
+  Value
 } from '@onto-med/top-api';
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
@@ -220,7 +222,7 @@ export default defineComponent({
       if (fun) return fun
       return { id: functionId, title: t('invalid').toUpperCase(), notation: NotationEnum.Prefix } as ExpressionFunction
     }
-    const fun = computed(() => getFunction(props.modelValue?.function))
+    const fun = computed(() => getFunction(props.modelValue?.functionId))
 
     const blink = () => {
       flash.value = true
@@ -284,9 +286,9 @@ export default defineComponent({
         const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
         ) || {}) as Expression
-        newModelValue.function = functionId
+        newModelValue.functionId = functionId
         if (!newModelValue.arguments) newModelValue.arguments = []
-        const count = countArguments(newModelValue, getFunction(newModelValue.function))
+        const count = countArguments(newModelValue, getFunction(newModelValue.functionId))
         newModelValue.arguments.splice(count, newModelValue.arguments.length - count)
         emit('update:modelValue', newModelValue)
         blink()
@@ -298,9 +300,17 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
 
-      setValue (value: ExpressionValue|undefined): void {
+      setValue (value: Value|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.value = value
+        newModelValue.constantId = undefined
+        emit('update:modelValue', newModelValue)
+      },
+
+      setConstantId (constantId: string|undefined): void {
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        newModelValue.value = undefined
+        newModelValue.constantId = constantId
         emit('update:modelValue', newModelValue)
       },
 

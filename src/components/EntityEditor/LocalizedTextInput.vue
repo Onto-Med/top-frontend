@@ -116,7 +116,7 @@ export default defineComponent({
       hasError: computed(() =>
         (props.required && empty.value)
         || props.unique && duplicatedLangs.value.length > 0
-        || props.modelValue.findIndex(x => !x.lang || !x.text) !== -1
+        || (props.modelValue && props.modelValue?.findIndex(x => !x.lang || !x.text) !== -1)
       ),
 
       removeEntryByIndex (index: number) {

@@ -283,7 +283,7 @@ export default defineComponent({
     const save = () => {
       if ((isNew.value || hasUnsavedChanges.value)) {
         if (isValid.value) {
-          if (isPhenotype(local.value) && local.value.expression?.function === 'switch' && hasDataType(local.value))
+          if (isPhenotype(local.value) && local.value.expression?.functionId === 'switch' && hasDataType(local.value))
             local.value.dataType = DataType.Number
           emit('update:entity', local.value)
           versionHistoryDialogKey.value++
