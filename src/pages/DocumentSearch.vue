@@ -48,7 +48,11 @@
         <q-td auto-width>
           {{ row.id }}
         </q-td>
-        <q-td>{{ row.text }}</q-td>
+        <q-td v-for="phrase in row.phrases" :key="phrase">
+          <q-badge>
+            {{ phrase }}
+          </q-badge>
+        </q-td>
       </template>
     </table-with-actions>
   </q-page>
@@ -57,8 +61,8 @@
 <script lang="ts">
 import {computed, defineComponent, inject, onMounted, ref} from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DocumentApiKey } from 'src/boot/axios'
-import { Document } from '@onto-med/top-api';
+import { DocumentApiKey, PhraseApiKey } from 'src/boot/axios'
+import { Document, Phrase } from '@onto-med/top-api';
 import TableWithActions from 'components/TableWithActions.vue';
 
 export default defineComponent({
@@ -70,18 +74,21 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const documentApi = inject(DocumentApiKey)
+    const phraseApi = inject(PhraseApiKey)
     const documents   = ref<Document[]>([])
     const loading   = ref(false)
     const columns = computed(() => [
       { name: 'actions', sortable: false },
       { name: 'docId', label: t('document'), align: 'left', required: true, sortable: true },
-      { name: 'docPhrases', label: t('phrase'), align: 'left', sortable: false },
+      { name: 'docPhrases', label: t('phrase',2), align: 'left', sortable: false },
     ])
 
     const reload = async () => {
-      if (!documentApi) return
+      if (!documentApi || !phraseApi) return
       loading.value = true
-      await documentApi.getDocuments(undefined, undefined, 0, 20) // ToDo: Read these numbers from table values
+      await phraseApi.getPhrases()
+        .catch((e: Error) => alert(e.message))
+      await documentApi.getDocuments(undefined, undefined, undefined, 10) // ToDo: Read these numbers from table values
         .then(r => documents.value = r.data)
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)

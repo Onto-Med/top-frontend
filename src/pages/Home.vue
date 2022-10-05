@@ -42,6 +42,13 @@
           <q-badge v-if="statistic" :label="statistic.phenotypes" />
         </div>
       </div>
+      <div class="col">
+        <q-avatar icon="article" size="8rem" />
+        <div class="text-h6">
+          {{ t('document', 2) }}
+          <q-badge v-if="statistic" :label="statistic.documents" />
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
