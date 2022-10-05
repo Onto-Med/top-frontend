@@ -32,7 +32,7 @@
               :options="dataSources"
               :label="t('dataSource', 2)"
               :error-message="t('dataSourceDescription')"
-              :error="query.dataSources.length == 0"
+              :error="query.dataSources?.length == 0"
               option-label="title"
               multiple
               counter
