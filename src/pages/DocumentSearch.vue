@@ -20,12 +20,12 @@
 
       <q-separator />
 
-      <div class="q-pa-md row items-start q-gutter-md">
+      <div class="q-pa-sm row items-start q-gutter-sm">
         <q-card
           v-for="(concept, index) in concepts"
           :key="concept"
           :style="{ background: distinctColors[index], color: distinctColorsFont[index]}">
-          <q-card-section>
+          <q-card-section v-ripple class="cursor-pointer relative-position" @click="chooseConcept(concept.text)">
             {{ concept.text }}
           </q-card-section>
         </q-card>
@@ -43,9 +43,9 @@
           {{ row.id }}
         </q-td>
         <q-td class="q-gutter-md">
-          <q-chip v-for="phrase in row.phrases" :key="phrase" size="md">
+          <q-btn v-for="phrase in row.phrases" :key="phrase" size="md" @click.capture.stop="alert(phrase)">
             {{ phrase }}
-          </q-chip>
+          </q-btn>
         </q-td>
       </template>
     </table-with-actions>
@@ -54,6 +54,7 @@
 
 <script lang="ts">
 import {computed, defineComponent, inject, onMounted, ref} from 'vue'
+import { Notify } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { DocumentApiKey, PhraseApiKey, ConceptApiKey } from 'src/boot/axios'
 import { Document, Phrase, Concept } from '@onto-med/top-api';
@@ -97,6 +98,7 @@ export default defineComponent({
       '#000000', '#000000', '#000000', '#000000',
       '#000000', '#000000'
     ]
+    const phraseText: string[] = [];
 
     const reload = async () => {
       if (!documentApi || !phraseApi || !conceptApi) return
@@ -124,6 +126,25 @@ export default defineComponent({
       alert,
       distinctColors,
       distinctColorsFont,
+      async chooseConcept (concept: string) {
+        if (!phraseApi) return
+        await phraseApi.getPhrases(undefined, undefined, undefined, concept)
+          .then(r => {
+            phraseText.splice(0)
+            r.data.forEach( phrase => phraseText.push(phrase.text !== undefined ? phrase.text : ''))
+            Notify.create(phraseText.join(', '))
+          })
+      },
+      phraseText,
+      async choosePhrase(text: string) {
+        if (!phraseApi) return
+        await phraseApi.getPhrases(undefined, undefined, text, undefined)
+          .then(r => {
+            phraseText.splice(0)
+            r.data.forEach( phrase => phraseText.push(phrase.text !== undefined ? phrase.text : ''))
+            Notify.create(phraseText.join(', '))
+          })
+      },
     }
   }
 })
