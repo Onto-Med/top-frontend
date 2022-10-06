@@ -1554,12 +1554,12 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@onto-med/top-api@^0.5.1-a77f35d":
-  version "0.5.1-a77f35d"
-  resolved "https://npm.pkg.github.com/download/@Onto-Med/top-api/0.5.1-a77f35d/d502bb42884d6cacb424d27d4a738b8539ceaee8#d502bb42884d6cacb424d27d4a738b8539ceaee8"
-  integrity sha512-+nimHxjOSIuDYXvWX6m/b1znP9tpRUuJJrRddI0j+BCh36p6Ax5Uh4Wq52tuSUhbjDEpBsLiEfQoHBtOXEsFrg==
+"@onto-med/top-api@^0.5.1-c8e3541":
+  version "0.5.1-c8e3541"
+  resolved "https://npm.pkg.github.com/download/@Onto-Med/top-api/0.5.1-c8e3541/b016eed46fef708a06df17d6c93454e7e761619a#b016eed46fef708a06df17d6c93454e7e761619a"
+  integrity sha512-Z9qMY0fOp3evzXRDTj8JzCD4pSfUHuEJuTZkGgMzbrCaWbzCzbCVVnBajSW+xCZpoMNcxGXtHANgaYywkCCOLA==
   dependencies:
-    axios "^0.26.1"
+    axios "^0.21.4"
 
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
@@ -2702,12 +2702,12 @@ autoprefixer@10.4.7:
     picocolors "^1.0.0"
     postcss-value-parser "^4.2.0"
 
-axios@^0.26.1:
-  version "0.26.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.26.1.tgz#1ede41c51fcf51bbbd6fd43669caaa4f0495aaa9"
-  integrity sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==
+axios@^0.21.4:
+  version "0.21.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
+  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
-    follow-redirects "^1.14.8"
+    follow-redirects "^1.14.0"
 
 babel-core@7.0.0-bridge.0:
   version "7.0.0-bridge.0"
@@ -4604,7 +4604,7 @@ follow-redirects@^1.0.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
   integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
-follow-redirects@^1.14.8:
+follow-redirects@^1.14.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
