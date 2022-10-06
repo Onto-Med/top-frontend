@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
-import { DataSourceApi, DocumentApi, PhraseApi, DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, QueryApi, RepositoryApi } from '@onto-med/top-api'
+import { DataSourceApi, DocumentApi, PhraseApi, ConceptApi, DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, QueryApi, RepositoryApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 
@@ -22,6 +22,7 @@ export const DataSourceApiKey: InjectionKey<DataSourceApi> = Symbol('dataSourceA
 export const QueryApiKey: InjectionKey<QueryApi> = Symbol('queryApi')
 export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 export const PhraseApiKey: InjectionKey<PhraseApi> = Symbol('phraseApi')
+export const ConceptApiKey: InjectionKey<ConceptApi> = Symbol('conceptApi')
 
 export default boot(({ app }) => {
   const axiosInstance = axios.create({
@@ -53,5 +54,6 @@ export default boot(({ app }) => {
   app.provide(QueryApiKey, new QueryApi(undefined, '', axiosInstance))
   app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))
   app.provide(PhraseApiKey, new PhraseApi(undefined, '', axiosInstance))
+  app.provide(ConceptApiKey, new ConceptApi(undefined, '', axiosInstance))
 });
 
