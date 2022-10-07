@@ -85,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantifier, Restriction, StringRestriction } from '@onto-med/top-api'
+import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantifier, Restriction, RestrictionOperator, StringRestriction } from '@onto-med/top-api'
 import { defineComponent, ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
@@ -131,6 +131,13 @@ export default defineComponent({
     if (!state.values) {
       state.values = []
       hasRange.value = canHaveRange.value
+    }
+
+    if (hasRange.value) {
+      if ((state as NumberRestriction).minOperator === undefined)
+        (state as NumberRestriction).minOperator = RestrictionOperator.GreaterThanOrEqualTo;
+      if ((state as NumberRestriction).maxOperator === undefined)
+        (state as NumberRestriction).maxOperator = RestrictionOperator.LessThan
     }
 
     if (!state.quantifier) {
