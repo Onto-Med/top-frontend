@@ -73,7 +73,9 @@ export default defineComponent({
   props: {
     dateTimeRestriction: {
       type: Object as () => DateTimeRestriction,
-      default: () => { return { values: [] } }
+      default: () => {
+        return { type: DataType.DateTime, values: [] }
+      }
     },
     defaultAggregationFunctionId: {
       type: String,
