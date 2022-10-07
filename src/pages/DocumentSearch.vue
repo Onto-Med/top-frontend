@@ -25,7 +25,7 @@
           v-for="(concept, index) in concepts"
           :key="concept"
           :style="{ background: distinctColors[index], color: distinctColorsFont[index]}">
-          <q-card-section v-ripple class="cursor-pointer relative-position" @click="chooseConcept(concept.text)">
+          <q-card-section v-ripple class="cursor-pointer relative-position" @click="chooseConcept(concept.id)">
             {{ concept.text }}
           </q-card-section>
         </q-card>
@@ -37,15 +37,16 @@
       :columns="columns"
       :loading="loading"
       @reload-clicked="reload()"
+      @row-clicked="routeToDocument($event)"
     >
       <template #row-cells="{ row }">
         <q-td auto-width>
           {{ row.id }}
         </q-td>
         <q-td class="q-gutter-md">
-          <q-btn v-for="phrase in row.phrases" :key="phrase" size="md" @click.capture.stop="alert(phrase)">
+          <q-chip v-for="phrase in row.phrases" :key="phrase" size="md" @click.stop="alert(phrase)">
             {{ phrase }}
-          </q-btn>
+          </q-chip>
         </q-td>
       </template>
     </table-with-actions>
@@ -56,8 +57,9 @@
 import {computed, defineComponent, inject, onMounted, ref} from 'vue'
 import { Notify } from 'quasar'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { DocumentApiKey, PhraseApiKey, ConceptApiKey } from 'src/boot/axios'
-import { Document, Phrase, Concept } from '@onto-med/top-api';
+import {Document, Phrase, Concept} from '@onto-med/top-api';
 import TableWithActions from 'components/TableWithActions.vue';
 
 export default defineComponent({
@@ -68,6 +70,7 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const router    = useRouter()
     const documentApi = inject(DocumentApiKey)
     const phraseApi = inject(PhraseApiKey)
     const conceptApi = inject(ConceptApiKey)
@@ -126,9 +129,9 @@ export default defineComponent({
       alert,
       distinctColors,
       distinctColorsFont,
-      async chooseConcept (concept: string) {
+      async chooseConcept (conceptId: string) {
         if (!phraseApi) return
-        await phraseApi.getPhrases(undefined, undefined, undefined, concept)
+        await phraseApi.getPhrases(undefined, undefined, undefined, conceptId)
           .then(r => {
             phraseText.splice(0)
             r.data.forEach( phrase => phraseText.push(phrase.text !== undefined ? phrase.text : ''))
@@ -144,6 +147,10 @@ export default defineComponent({
             r.data.forEach( phrase => phraseText.push(phrase.text !== undefined ? phrase.text : ''))
             Notify.create(phraseText.join(', '))
           })
+      },
+      routeToDocument (document: Document) {
+        alert(document.text)
+        void router.push({ name: 'showDocument', params: { documentId: document.id } })
       },
     }
   }

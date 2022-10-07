@@ -321,7 +321,7 @@ export default {
   document: 'Document|Documents',
   documentSearch: 'Search Document|Search Documents',
   documentPage: {
-    description: ''
+    description: 'Search Documents'
   },
   concept: 'Concept|Concepts',
   phrase: 'Phrase|Phrases'
