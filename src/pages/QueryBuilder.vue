@@ -407,10 +407,11 @@ export default defineComponent({
 
       execute: () => {
         if (!queryApi || !organisation.value || !repository.value) return
-        query.value.id = (uuidv4 as () => string)()
-        runs.value.push({ query: query.value })
+        const currentQuery = JSON.parse(JSON.stringify(query.value)) as Query
+        currentQuery.id = (uuidv4 as () => string)()
+        runs.value.push({ query: currentQuery })
 
-        queryApi.enqueueQuery(organisation.value.id, repository.value.id, query.value)
+        queryApi.enqueueQuery(organisation.value.id, repository.value.id, currentQuery)
           .then(r => {
             const index = getRunIndex(r.data.id)
             runs.value[index].result = r.data
