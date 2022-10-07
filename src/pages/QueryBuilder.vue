@@ -248,7 +248,8 @@
       show-timer
       :result="run.result"
       :title="run.query.name"
-      @remove-clicked="removeRun(run.query.id)"
+      @remove="removeRun(run.query.id)"
+      @prefill="prefillQuery(run.query)"
     />
   </q-page>
 </template>
@@ -293,7 +294,14 @@ export default defineComponent({
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
     const queryApi = inject(QueryApiKey)
-    fileReader.onload = (e) => query.value = JSON.parse(e.target?.result as string) as Query
+    const step = ref(1)
+
+    const prefillQuery = (oldQuery: Query) => {
+      query.value = JSON.parse(JSON.stringify(oldQuery)) as Query
+      step.value = 1
+    }
+
+    fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as Query)
 
     const reloadEntities = async () => {
       treeLoading.value = true
@@ -315,19 +323,39 @@ export default defineComponent({
 
     const getRunIndex = (queryId: string) => runs.value.findIndex(r => r.query.id === queryId)
 
-    const updateRun = (run: Run) => {
-      if (!queryApi || !organisation.value?.id || !repository.value?.id || run.result?.finishedAt) return
-      queryApi?.getQueryResult(organisation.value.id, repository.value.id, run.query.id)
+    const buildQueryRunTimer = (run: Run) =>
+      window.setInterval(() => {
+        void updateRun(run).then(() => {
+          if (run.result?.finishedAt) clearInterval(run.timer)
+        })
+      }, 5000)
+
+    const updateRun = async (run: Run) => {
+      if (!queryApi || !organisation.value?.id || !repository.value?.id || run.result?.finishedAt)
+        return new Promise<void>(resolve => resolve())
+      return queryApi.getQueryResult(organisation.value.id, repository.value.id, run.query.id)
         .then(r => run.result = r.data)
         .catch((e: Error) => alert(e.message))
     }
 
-    onMounted(() => reloadEntities())
+    onMounted(() => {
+      reloadEntities().catch((e: Error) => alert(e.message))
+      if (queryApi && organisation.value && repository.value)
+        queryApi.getQueries(organisation.value.id, repository.value.id)
+          .then(r => r.data.forEach(q => {
+            const run = { query: q } as Run
+            void updateRun(run).then(() => {
+              if (!run.result) run.timer = buildQueryRunTimer(run)
+              runs.value.push(run)
+            })
+          }))
+          .catch((e: Error) => alert(e.message))
+    })
 
     return {
       t,
       EntityType,
-      step: ref(1),
+      step,
       query,
       organisation,
       repository,
@@ -339,6 +367,7 @@ export default defineComponent({
       dataSources,
       importFile,
       aggregationFunctionOptions,
+      prefillQuery,
 
       configurationComplete: computed(() =>
         query.value.dataSources && query.value.dataSources.length > 0
@@ -385,11 +414,7 @@ export default defineComponent({
           .then(r => {
             const index = getRunIndex(r.data.id)
             runs.value[index].result = r.data
-            runs.value[index].timer = window.setInterval(() => {
-              updateRun(runs.value[index])
-              if (runs.value[index].result?.finishedAt)
-                clearInterval(runs.value[index].timer)
-            }, 5000)
+            runs.value[index].timer = buildQueryRunTimer(runs.value[index])
           })
           .catch((e: Error) => alert(e.message))
       },

@@ -11,13 +11,18 @@
         <small class="col-auto text-grey" :title="t('elapsedTime')">
           {{ elapsedTime }}
         </small>
-        <q-btn
-          flat
-          round
-          icon="clear"
-          :title="t('removeThing', { thing: t('queryResult') })"
-          @click="$emit('removeClicked')"
-        />
+        <q-btn-group flat class="q-ml-sm">
+          <q-btn
+            icon="file_upload"
+            :title="t('loadThing', { thing: t('query') })"
+            @click="$emit('prefill')"
+          />
+          <q-btn
+            icon="clear"
+            :title="t('removeThing', { thing: t('queryResult') })"
+            @click="$emit('remove')"
+          />
+        </q-btn-group>
       </div>
     </q-card-section>
     <q-separator />
@@ -46,19 +51,26 @@ export default defineComponent({
       type: String
     }
   },
-  emits: ['removeClicked'],
+  emits: ['remove', 'prefill'],
   setup(props) {
     const { t } = useI18n()
     const timer = ref(undefined as undefined|number)
     const elapsedTime = ref(undefined as undefined|string)
     const running = computed(() => !props.result?.finishedAt)
 
+    const setElapsedTime = (result: QueryResult) => {
+      const finishedAt = result.finishedAt
+        ? new Date(result.finishedAt).getTime()
+        : new Date().getTime()
+      elapsedTime.value = new Date(finishedAt - new Date(result.createdAt).getTime())
+        .toISOString().slice(11, 19)
+    }
+
     onMounted(() => {
       if (!props.showTimer) return
       timer.value = window.setInterval(() => {
         if (!props.result?.createdAt) return
-        elapsedTime.value = new Date(new Date().getTime() - new Date(props.result.createdAt).getTime())
-          .toISOString().slice(11, 19)
+        setElapsedTime(props.result)
       }, 10)
     })
 
@@ -67,8 +79,7 @@ export default defineComponent({
       (newVal) => {
         if (!newVal?.finishedAt) return
         clearInterval(timer.value)
-        elapsedTime.value = new Date(new Date(newVal.finishedAt).getTime() - new Date(newVal.createdAt).getTime())
-          .toISOString().slice(11, 19)
+        setElapsedTime(newVal)
       }
     )
 

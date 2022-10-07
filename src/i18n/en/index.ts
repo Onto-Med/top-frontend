@@ -83,6 +83,7 @@ export default {
   'itemType.description': 'Item types are used to further describe a phenotype and its assignment to an individual. '
     + 'They can only be defined for single phenotypes, as these phenotypes are directly linked to the underlying data elements. '
     + 'Depending on the data source, data retrieval can differ dramatically between item types.',
+  loadThing: 'Load {thing}',
   mapping: 'Mapping|Mappings',
   maximum: 'Maximum',
   medication_administration: 'Medication administration|Medication administrations',
