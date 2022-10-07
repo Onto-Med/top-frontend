@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DateTimeRestriction, ExpressionFunction } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -81,7 +81,7 @@ export default defineComponent({
       t,
       te,
       d,
-      subject: entityStore.getEntity(props.subjectId),
+      subject: computed(() => entityStore.getEntity(props.subjectId)),
       getSynonyms,
       isRestricted,
       getIcon,

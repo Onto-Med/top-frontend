@@ -165,45 +165,17 @@
 
               <q-card-section>
                 <q-list v-if="query.projection && query.projection.length" dense separator>
-                  <q-item v-for="(select, index) in query.projection" :key="index">
-                    <q-item-section avatar>
-                      <q-btn-group flat class="column">
-                        <q-btn
-                          dense
-                          :disable="index == 0"
-                          icon="keyboard_arrow_up"
-                          size="sm"
-                          class="q-pa-none"
-                          @click="moveSelectEntry(index, index - 1)"
-                        />
-                        <q-btn
-                          dense
-                          :disable="index == query.projection.length - 1"
-                          icon="keyboard_arrow_down"
-                          size="sm"
-                          class="q-pa-none"
-                          @click="moveSelectEntry(index, index + 1)"
-                        />
-                      </q-btn-group>
-                    </q-item-section>
-                    <q-item-section :title="getSynonyms(select.subject)">
-                      <div class="row items-center fit non-selectable">
-                        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(select.subject)" />
-                        {{ getTitle(select.subject) }}
-                      </div>
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-btn-group flat>
-                        <q-btn
-                          :icon="select.sorting === Sorting.Desc ? 'arrow_downward' : 'arrow_upward'"
-                          :label="t(select.sorting)"
-                          :title="t('sorting')"
-                          @click="select.sorting = select.sorting === Sorting.Asc ? Sorting.Desc : Sorting.Asc"
-                        />
-                        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.splice(index, 1)" />
-                      </q-btn-group>
-                    </q-item-section>
-                  </q-item>
+                  <projection-entry
+                    v-for="(entry, index) in query.projection"
+                    :key="index"
+                    v-model:sorting="entry.sorting"
+                    :subject-id="entry.subjectId"
+                    :up-disabled="index == 0"
+                    :down-disabled="index == query.projection.length - 1"
+                    @move-up="moveSelectEntry(index, index - 1)"
+                    @move-down="moveSelectEntry(index, index + 1)"
+                    @remove="query.projection.splice(index, 1)"
+                  />
                 </q-list>
                 <div v-else>
                   {{ t('nothingSelectedYet') }}
@@ -286,6 +258,7 @@ import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, QueryResu
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import Criterion from 'src/components/Query/Criterion.vue'
+import ProjectionEntry from 'src/components/Query/ProjectionEntry.vue'
 import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
@@ -302,10 +275,10 @@ interface Run {
 }
 
 export default defineComponent({
-  components: { EntityTree, Criterion, QueryResultView },
+  components: { EntityTree, Criterion, QueryResultView, ProjectionEntry },
   setup () {
     const { t } = useI18n()
-    const { getTitle, getSynonyms, getIcon, isPhenotype, isRestricted } = useEntityFormatter()
+    const { isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
     const { saveToFile } = useFile()
     const { entities, repository, organisation } = storeToRefs(entityStore)
@@ -353,10 +326,6 @@ export default defineComponent({
 
     return {
       t,
-      getTitle,
-      getSynonyms,
-      getIcon,
-      isRestricted,
       EntityType,
       step: ref(1),
       query,
@@ -367,7 +336,6 @@ export default defineComponent({
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
-      Sorting,
       dataSources,
       importFile,
       aggregationFunctionOptions,
