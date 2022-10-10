@@ -146,7 +146,6 @@
       v-model:synonyms="local.synonyms"
       v-model:descriptions="local.descriptions"
       v-model:data-type="local.dataType"
-      v-model:item-type="local.itemType"
       v-model:restriction="local.restriction"
       v-model:expression="local.expression"
       v-model:unit="local.unit"
@@ -225,7 +224,7 @@ export default defineComponent({
     const equals = (expected: unknown, actual: unknown): boolean =>
       JSON.stringify(expected) === JSON.stringify(actual)
 
-    const { getTitle, isRestricted, isPhenotype, hasDataType, hasItemType, hasExpression } = useEntityFormatter()
+    const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression } = useEntityFormatter()
     const { alert } = useAlert()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -272,7 +271,6 @@ export default defineComponent({
       result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
       result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
 
-      result &&= !hasItemType(props.entity) || !!(local.value as Phenotype).itemType
       result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
       result &&= !isRestricted(local.value) || local.value.restriction?.quantifier !== undefined
       result &&= !hasExpression(local.value) || local.value.expression !== undefined

@@ -48,15 +48,6 @@
 
         <q-card v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-4">
           <q-card-section>
-            <item-type-select
-              v-if="hasItemType(entityType)"
-              :model-value="itemType"
-              :readonly="readonly"
-              description
-              tooltip
-              @update:model-value="$emit('update:itemType', $event)"
-            />
-
             <data-type-select
               v-if="hasDataType(entityType)"
               :model-value="dataType"
@@ -131,10 +122,9 @@
 <script lang="ts">
 import { ref, defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, ItemType } from '@onto-med/top-api'
+import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category  } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
-import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
@@ -146,7 +136,6 @@ export default defineComponent({
   components: {
     LocalizedTextInput,
     DataTypeSelect,
-    ItemTypeSelect,
     RestrictionInput,
     ExpressionInput,
     UnitInput,
@@ -173,9 +162,6 @@ export default defineComponent({
     },
     entityType: {
       type: String as PropType<EntityType>
-    },
-    itemType: {
-      type: String as PropType<ItemType>
     },
     dataType: {
       type: String as PropType<DataType>
@@ -219,12 +205,12 @@ export default defineComponent({
   },
   emits: [
     'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
-    'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory', 'update:itemType'
+    'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory'
   ],
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const { isRestricted, hasDataType, hasItemType, restrictionEntityTypes } = useEntityFormatter()
+    const { isRestricted, hasDataType, restrictionEntityTypes } = useEntityFormatter()
     const restrictionKey = ref(0)
     const showSuperCategoryInput = ref(false)
 
@@ -233,7 +219,6 @@ export default defineComponent({
       isRestricted,
       hasDataType,
       restrictionEntityTypes,
-      hasItemType,
 
       restrictionKey,
       EntityType,

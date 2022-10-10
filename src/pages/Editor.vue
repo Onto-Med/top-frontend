@@ -128,7 +128,7 @@ import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/EntityEditor/ExportDialog.vue'
-import { Entity, EntityType, LocalisableText, Phenotype, DataType, ItemType } from '@onto-med/top-api'
+import { Entity, EntityType, LocalisableText, Phenotype, DataType } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
@@ -146,7 +146,7 @@ export default defineComponent({
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, locale } = useI18n()
-    const { getIcon, getTitle, isRestricted, isPhenotype, hasDataType, hasItemType } = useEntityFormatter()
+    const { getIcon, getTitle, isRestricted, isPhenotype, hasDataType } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { alert }        = useAlert()
@@ -320,8 +320,6 @@ export default defineComponent({
         entity.titles = [ { lang: locale.value } as LocalisableText ]
         if (hasDataType(entity))
           (entity as Phenotype).dataType = DataType.Number
-        if (hasItemType(entity))
-          (entity as Phenotype).itemType = ItemType.Observation
         if (entity) selectTabByKey(entity.id)
       },
 
