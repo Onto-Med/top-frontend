@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" :class="{ 'bg-grey-1': !isDarkModeActive }">
+  <q-layout view="hHh Lpr fFf" :class="{ 'bg-grey-1': !isDarkModeActive }">
     <q-header elevated :class="{ 'bg-white text-grey-8': !isDarkModeActive, 'bg-dark text-grey-2': isDarkModeActive }" class="q-py-xs" height-hint="58">
       <q-toolbar>
         <q-btn
