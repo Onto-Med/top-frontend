@@ -302,6 +302,7 @@ export default defineComponent({
 
       setValue (value: Value|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        newModelValue.functionId = 'value'
         newModelValue.value = value
         newModelValue.constantId = undefined
         emit('update:modelValue', newModelValue)
@@ -309,6 +310,7 @@ export default defineComponent({
 
       setConstantId (constantId: string|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        newModelValue.functionId = 'constant'
         newModelValue.value = undefined
         newModelValue.constantId = constantId
         emit('update:modelValue', newModelValue)
