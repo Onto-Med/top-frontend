@@ -208,7 +208,7 @@
               icon="play_arrow"
               color="secondary"
               :label="t('execute')"
-              :disable="configurationComplete && criteriaComplete && projectionComplete"
+              :disable="!(configurationComplete && criteriaComplete && projectionComplete)"
               @click="execute()"
             />
             <q-btn
