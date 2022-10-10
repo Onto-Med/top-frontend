@@ -145,7 +145,11 @@ export const useEntity = defineStore('entity', {
       }
 
       if (superClass) {
-        const short = { id: superClass.id, entityType: superClass.entityType } as Entity
+        const short = {
+          id: superClass.id,
+          entityType: superClass.entityType,
+          titles: superClass.titles
+        } as Entity
         if (this.isPhenotype(superClass)) {
           (entity as Phenotype).superPhenotype = short
         } else {
