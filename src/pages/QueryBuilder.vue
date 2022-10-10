@@ -263,6 +263,7 @@ import ProjectionEntry from 'src/components/Query/ProjectionEntry.vue'
 import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
+import useAlert from 'src/mixins/useAlert'
 import { defineComponent, onMounted, ref, computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useFile from 'src/mixins/useFile'
@@ -281,6 +282,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
+    const { alert } = useAlert()
     const { saveToFile } = useFile()
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({
@@ -335,7 +337,10 @@ export default defineComponent({
         return new Promise<void>(resolve => resolve())
       return queryApi.getQueryResult(organisation.value.id, repository.value.id, run.query.id)
         .then(r => run.result = r.data)
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => {
+          clearInterval(run.timer)
+          alert(e.message)
+        })
     }
 
     onMounted(() => {
@@ -434,11 +439,11 @@ export default defineComponent({
         if (!queryApi || !organisation.value || !repository.value) return
 
         queryApi?.deleteQuery(organisation.value.id, repository.value.id, queryId)
-          .then(() => {
+          .catch((e: Error) => alert(e.message))
+          .finally(() => {
             const index = getRunIndex(queryId)
             if (index !== -1) runs.value.splice(index, 1)
           })
-          .catch((e: Error) => alert(e.message))
       }
     }
   }
