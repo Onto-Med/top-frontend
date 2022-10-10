@@ -14,7 +14,7 @@
         removeable
         @entity-clicked="$emit('entityClicked', $event)"
         @entity-set="setEntity($event)"
-        @remove-clicked="$emit('update:modelValue', undefined)"
+        @remove-clicked="clear()"
       >
         <template v-if="!readonly" #additionalOptions>
           <q-item v-close-popup clickable @click="enclose()">
@@ -24,7 +24,7 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="modelValue.value || modelValue.constantId || isConstant">
+    <div v-else-if="modelValue?.value || modelValue?.constantId || isConstant">
       <expression-value-input
         :value="modelValue.value"
         :constant-id="modelValue.constantId"
@@ -35,7 +35,7 @@
         @update:value="setValue($event)"
         @update:constant-id="setConstantId($event)"
         @enclose="enclose()"
-        @remove="$emit('update:modelValue', undefined)"
+        @remove="clear()"
       />
       <slot name="append" />
     </div>
@@ -52,7 +52,7 @@
           v-if="!readonly"
           :functions="functions"
           @enclose="enclose()"
-          @remove="$emit('update:modelValue', undefined)"
+          @remove="clear()"
           @select="setFunction($event)"
         />
       </div>
@@ -78,7 +78,7 @@
             v-if="!readonly"
             :functions="functions"
             @enclose="enclose()"
-            @remove="$emit('update:modelValue', undefined)"
+            @remove="clear()"
             @select="setFunction($event)"
           />
         </div>
@@ -114,15 +114,8 @@
           clickable
           :label="t('more')"
           :title="t('addMoreArguments')"
-        >
-          <expression-context-menu
-            v-if="!readonly"
-            :enclosable="false"
-            :functions="functions"
-            :removeable="false"
-            @select="handleArgumentUpdate(argumentCount, { functionId: $event, arguments: [] })"
-          />
-        </q-chip>
+          @click="handleArgumentUpdate(argumentCount, { })"
+        />
       </template>
 
       <div
@@ -138,7 +131,7 @@
           v-if="!readonly"
           :functions="functions"
           @enclose="enclose()"
-          @remove="$emit('update:modelValue', undefined)"
+          @remove="clear()"
           @select="setFunction($event)"
         />
       </div>
@@ -159,7 +152,7 @@
         :enclosable="false"
         :functions="functions"
         @select="setFunction($event)"
-        @remove="$emit('update:modelValue', null)"
+        @remove="clear()"
       />
       <slot name="append" />
     </div>
@@ -314,6 +307,8 @@ export default defineComponent({
       setEntity (entity: Entity|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.entityId = entity?.id
+        isEntity.value = true
+        isConstant.value = false
         emit('update:modelValue', newModelValue)
       },
 
@@ -321,6 +316,8 @@ export default defineComponent({
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.value = value
         newModelValue.constantId = undefined
+        isEntity.value = false
+        isConstant.value = true
         emit('update:modelValue', newModelValue)
       },
 
@@ -328,6 +325,8 @@ export default defineComponent({
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.value = undefined
         newModelValue.constantId = constantId
+        isEntity.value = false
+        isConstant.value = true
         emit('update:modelValue', newModelValue)
       },
 
@@ -338,6 +337,12 @@ export default defineComponent({
         isEntity.value = false
         isConstant.value = false
         emit('update:modelValue', newModelValue)
+      },
+
+      clear (): void {
+        isEntity.value = false
+        isConstant.value = false
+        emit('update:modelValue', undefined)
       }
     };
   },
