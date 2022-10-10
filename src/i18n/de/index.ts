@@ -120,6 +120,7 @@ export default {
   'subject_sex.description': 'Die Phänotypklasse für das Geschlecht eines Individuums bedarf unter Umständen einer speziellen Behandlung '
     + 'beim Zugriff auf Datenquellen und muss daher gesondert markiert werden.',
   superCategory: 'Super-Kategorie|Super-Kategorien',
+  thingIsInvalid: '{thing} ist ungültig',
   thingIsRunning: '{thing} läuft',
   updateExistingThing: 'Existierende {thing} aktualisieren',
   origin: 'Ursprung|Ursprünge',

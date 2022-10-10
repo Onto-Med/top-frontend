@@ -9,7 +9,10 @@
         @update:model-value="$emit('update:inclusion', $event)"
       />
     </q-item-section>
-    <q-item-section :title="getSynonyms(subject)">
+    <q-item-section v-if="!subject" class="text-bold text-negative">
+      {{ t('thingIsInvalid', { thing: t('entity') }) }}
+    </q-item-section>
+    <q-item-section v-else :title="getSynonyms(subject)">
       <div class="row items-center fit non-selectable">
         <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
         {{ getTitle(subject) }}

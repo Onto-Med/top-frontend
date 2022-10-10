@@ -119,6 +119,7 @@ export default {
   'subject_sex.description': 'The phenotype class for the sex of a subject may require special handling when accessing data sources '
     + 'and must therefore be marked separately.',
   superCategory: 'Super category|Super categories',
+  thingIsInvalid: '{thing} is invalid',
   thingIsRunning: '{thing} is running',
   updateExistingThing: 'Update existing {thing}',
   origin: 'Origin|Origins',
