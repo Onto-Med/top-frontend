@@ -51,6 +51,10 @@ export default {
   forkEntityToRepository: 'Möchten Sie {entity} in das Repositorium {repository} übernehmen?',
   format: 'Format|Formate',
   function: 'Funktion',
+  functionDescriptions: {
+    date: 'Ermittelt das Datum, zu dem das Argument beobachtet wurde.',
+    minTrue: 'Gibt true zurück, falls mindestens X Argumente den Wert true besitzen. X muss als erstes Argument übergeben werden.',
+  },
   functions: {
     '<=': '≤',
     '>=': '≥',

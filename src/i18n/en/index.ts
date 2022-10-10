@@ -51,6 +51,10 @@ export default {
   forkEntityToRepository: 'Do you want to transfer {entity} to the repository {repository}?',
   format: 'Format|Formats',
   function: 'Function',
+  functionDescriptions: {
+    date: 'Determines the date when the argument was observed.',
+    minTrue: 'Returns true if at least X arguments have the value true. X must be passed as the first argument.',
+  },
   functions: {
     '<=': '≤',
     '>=': '≥',

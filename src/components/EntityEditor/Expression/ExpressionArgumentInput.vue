@@ -47,7 +47,7 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ functionTitle }}</b> (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b :title="functionTooltip">{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
           :functions="functions"
@@ -73,7 +73,7 @@
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          <span>{{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}</span>
+          <span>{{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b :title="functionTooltip">{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}</span>
           <expression-context-menu
             v-if="!readonly"
             :functions="functions"
@@ -125,7 +125,7 @@
         @mouseleave="hover = false"
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-        <b>{{ functionTitle }}</b>
+        <b :title="functionTooltip">{{ functionTitle }}</b>
         <slot name="append" />
         <expression-context-menu
           v-if="!readonly"
@@ -249,6 +249,12 @@ export default defineComponent({
       functionTitle: computed(() => {
         if (!fun.value || !fun.value.title) return ''
         return te('functions.' + fun.value.title) ? t('functions.' + fun.value.title) : fun.value.title
+      }),
+
+      functionTooltip: computed(() => {
+         if (!fun.value || !fun.value.title || !te('functionDescriptions.' + fun.value.title))
+          return undefined
+         return t('functionDescriptions.' + fun.value.title)
       }),
 
       prefix: computed(
