@@ -186,58 +186,39 @@
         </q-splitter>
       </q-step>
 
-      <q-step
-        :name="4"
-        icon="flag"
-        :title="t('closure')"
-      >
-        <q-list>
-          <q-item>
-            <q-item-section top avatar class="col-2">
-              <q-btn
-                icon="save"
-                color="primary"
-                :label="t('export')"
-                @click="exportQuery"
-              />
-            </q-item-section>
-            <q-item-section v-t="'queryExportDescription'" />
-          </q-item>
-          <q-item>
-            <q-item-section top avatar class="col-2">
-              <q-btn
-                v-if="configurationComplete && criteriaComplete && projectionComplete"
-                icon="play_arrow"
-                color="secondary"
-                :label="t('execute')"
-                @click="execute()"
-              />
-              <q-btn
-                v-else
-                icon="play_arrow"
-                color="secondary"
-                :label="t('execute')"
-                :title="t('finishPreviousStep', 2)"
-                disable
-              />
-            </q-item-section>
-            <q-item-section v-t="'queryExecuteDescription'" />
-          </q-item>
-        </q-list>
-      </q-step>
-
       <template #navigation>
         <q-separator class="q-mb-md" />
         <q-stepper-navigation>
-          <q-btn v-show="step < 4" color="primary" :label="t('continue')" @click="$refs.stepper.next()" />
-          <q-btn
-            v-show="step > 1"
-            flat
-            color="primary"
-            :label="t('back')"
-            class="q-ml-sm"
-            @click="$refs.stepper.previous()"
-          />
+          <q-btn-group flat>
+            <q-btn
+              :disable="step == 1"
+              :label="t('back')"
+              class="q-ml-sm"
+              @click="$refs.stepper.previous()"
+            />
+            <q-btn
+              :disable="step >= 3"
+              :label="t('continue')"
+              @click="$refs.stepper.next()"
+            />
+          </q-btn-group>
+
+          <q-btn-group class="float-right">
+            <q-btn
+              icon="play_arrow"
+              color="secondary"
+              :label="t('execute')"
+              :disable="configurationComplete && criteriaComplete && projectionComplete"
+              @click="execute()"
+            />
+            <q-btn
+              icon="save"
+              color="primary"
+              :label="t('export')"
+              :title="t('queryExportDescription')"
+              @click="exportQuery"
+            />
+          </q-btn-group>
         </q-stepper-navigation>
       </template>
     </q-stepper>
