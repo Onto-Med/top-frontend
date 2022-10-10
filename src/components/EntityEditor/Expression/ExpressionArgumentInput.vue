@@ -1,14 +1,14 @@
 <template>
   <div class="expression-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
     <slot name="prepend" />
-    <div v-if="fun && fun.id === 'entity'">
+    <div v-if="modelValue?.entityId || isEntity">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
    --><entity-chip
         :entity-id="modelValue.entityId"
         :entity-types="entityTypes"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :label="t('selectThing', { thing: t(fun.title) }) + '...'"
+        :label="t('selectThing', { thing: t('entity') }) + '...'"
         :disable="readonly"
         changeable
         removeable
@@ -24,7 +24,7 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="fun && (fun.id === 'constant' || fun.id === 'value')">
+    <div v-else-if="modelValue.value || modelValue.constantId || isConstant">
       <expression-value-input
         :value="modelValue.value"
         :constant-id="modelValue.constantId"
@@ -215,6 +215,8 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
     const flash = ref(false)
+    const isEntity = ref(false)
+    const isConstant = ref(false)
 
     const getFunction = (functionId: string|undefined) => {
       if (!functionId) return undefined
@@ -244,6 +246,8 @@ export default defineComponent({
       hover: ref(false),
       flash,
       argumentCount,
+      isEntity,
+      isConstant,
 
       showMoreBtn: computed(() =>
         fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
@@ -286,7 +290,20 @@ export default defineComponent({
         const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
         ) || {}) as Expression
-        newModelValue.functionId = functionId
+
+        if (functionId === 'entity') {
+          isEntity.value = true
+          isConstant.value = false
+          newModelValue.functionId = undefined
+        } else if (functionId === 'constant') {
+          isEntity.value = false
+          isConstant.value = true
+          newModelValue.functionId = undefined
+        } else {
+          isEntity.value = false
+          isConstant.value = false
+          newModelValue.functionId = functionId
+        }
         if (!newModelValue.arguments) newModelValue.arguments = []
         const count = countArguments(newModelValue, getFunction(newModelValue.functionId))
         newModelValue.arguments.splice(count, newModelValue.arguments.length - count)
@@ -302,7 +319,6 @@ export default defineComponent({
 
       setValue (value: Value|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.functionId = 'value'
         newModelValue.value = value
         newModelValue.constantId = undefined
         emit('update:modelValue', newModelValue)
@@ -310,7 +326,6 @@ export default defineComponent({
 
       setConstantId (constantId: string|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.functionId = 'constant'
         newModelValue.value = undefined
         newModelValue.constantId = constantId
         emit('update:modelValue', newModelValue)

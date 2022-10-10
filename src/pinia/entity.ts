@@ -108,7 +108,20 @@ export const useEntity = defineStore('entity', {
     async getFunctions (type: string): Promise<ExpressionFunction[]> {
       if (!this.functions.get(type))
         await this.reloadFunctionsByType(type)
-      return this.functions.get(type) || []
+      return [
+        {
+          id: 'entity',
+          title: 'entity',
+          minArgumentNumber: 1,
+          maxArgumentNumber: 1
+        } as ExpressionFunction,
+        {
+          id: 'constant',
+          title: 'constant',
+          minArgumentNumber: 1,
+          maxArgumentNumber: 1
+        } as ExpressionFunction
+      ].concat(this.functions.get(type) || [])
     },
 
     async getFunction (type: string, ...id: string[]): Promise<ExpressionFunction[]> {
