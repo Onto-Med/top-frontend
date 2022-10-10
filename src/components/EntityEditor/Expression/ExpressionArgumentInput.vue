@@ -335,6 +335,8 @@ export default defineComponent({
         const newModelValue = {
           arguments: [ JSON.parse(JSON.stringify(props.modelValue)) ]
         } as Expression
+        isEntity.value = false
+        isConstant.value = false
         emit('update:modelValue', newModelValue)
       }
     };
