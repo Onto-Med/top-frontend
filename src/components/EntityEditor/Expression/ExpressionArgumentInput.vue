@@ -120,7 +120,7 @@
             :enclosable="false"
             :functions="functions"
             :removeable="false"
-            @select="handleArgumentUpdate(argumentCount, { function: $event, arguments: [] })"
+            @select="handleArgumentUpdate(argumentCount, { functionId: $event, arguments: [] })"
           />
         </q-chip>
       </template>
