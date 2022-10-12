@@ -201,13 +201,6 @@ export default defineComponent({
         caption: t('collaborativeWork'),
         routeName: 'organisations',
         isHidden: keycloak && !keycloak.authenticated
-      },
-      {
-        title: t('repository', 2),
-        icon: 'tab',
-        caption: t('developPhenotype', 2),
-        routeName: 'repositories',
-        isHidden: keycloak && !keycloak.authenticated
       }
     ])
 
