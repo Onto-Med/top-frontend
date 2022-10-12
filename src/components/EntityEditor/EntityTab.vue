@@ -4,7 +4,7 @@
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           {{ getTitle(local) }}
-          <small v-if="!isNew" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
+          <small v-if="!isNew" class="gt-xs" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
             {{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})
           </small>
           <small v-else class="text-accent">{{ t('notSavedYet') }}</small>
@@ -45,36 +45,38 @@
           :disable="!hasUnsavedChanges"
           @click="showClearDialog = true"
         />
-        <q-separator vertical />
-        <q-btn
-          flat
-          round
-          dense
-          icon="history"
-          color="primary"
-          :disabled="isNew"
-          :title="t('versionHistory')"
-          @click="showVersionHistory = true"
-        />
-        <q-btn
-          v-show="isForking"
-          flat
-          round
-          dense
-          icon="fork_right"
-          color="primary"
-          :title="t('forkingState')"
-          @click="showForking = true"
-        />
-        <q-btn
-          flat
-          round
-          dense
-          icon="raw_on"
-          color="primary"
-          :title="t('entityEditor.rawBtn.label')"
-          @click="showJson = true"
-        />
+        <q-separator vertical class="gt-xs" />
+        <div class="gt-xs">
+          <q-btn
+            flat
+            round
+            dense
+            icon="history"
+            color="primary"
+            :disabled="isNew"
+            :title="t('versionHistory')"
+            @click="showVersionHistory = true"
+          />
+          <q-btn
+            v-show="isForking"
+            flat
+            round
+            dense
+            icon="fork_right"
+            color="primary"
+            :title="t('forkingState')"
+            @click="showForking = true"
+          />
+          <q-btn
+            flat
+            round
+            dense
+            icon="raw_on"
+            color="primary"
+            :title="t('entityEditor.rawBtn.label')"
+            @click="showJson = true"
+          />
+        </div>
       </q-toolbar>
 
       <q-separator />

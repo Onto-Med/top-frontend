@@ -9,7 +9,7 @@
               {{ repository.name || repository.id }}
             </div>
 
-            <div v-if="repository">
+            <div v-if="repository" class="gt-xs">
               <q-btn
                 dense
                 flat
@@ -95,7 +95,7 @@
               />
             </q-tab-panel>
           </q-tab-panels>
-          <div v-show="tabs.length === 0" class="col column entity-editor-tab text-grey">
+          <div v-show="tabs.length === 0" class="col column entity-editor-tab text-grey gt-xs">
             <div class="col-3 row q-pa-md">
               <q-icon name="arrow_back_ios" size="xl" />
               <p>
