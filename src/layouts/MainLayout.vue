@@ -8,6 +8,7 @@
           round
           icon="menu"
           aria-label="Menu"
+          class="gt-sm"
           @click="toggleLeftDrawer"
         />
 
