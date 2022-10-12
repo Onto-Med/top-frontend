@@ -16,9 +16,6 @@
             <q-item>
               <q-checkbox v-model="hideCategories" :label="t('hideThing', { thing: t('category', 2) })" />
             </q-item>
-            <q-item>
-              <item-type-select v-model="filterItemTypes" multiple clearable use-chips class="col" />
-            </q-item>
           </q-list>
         </q-menu>
       </q-btn>
@@ -100,12 +97,11 @@ import { defineComponent, computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
-import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
-import { Category, EntityType, Entity, ItemType } from '@onto-med/top-api'
+import { Category, EntityType, Entity } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTree',
-  components: { EntityTreeContextMenu, ItemTypeSelect },
+  components: { EntityTreeContextMenu },
   props: {
     nodes: Array as () => Entity[],
     selected: Object as () => Entity,
@@ -125,22 +121,16 @@ export default defineComponent({
   emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
   setup (props, { emit }) {
     const { t } = useI18n()
-    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted, isPhenotype } = useEntityFormatter()
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
     const expansion         = ref([] as string[])
     const filter            = ref('')
     const hideCategories    = ref(false)
-    const filterItemTypes   = ref([] as ItemType[])
     const showRefreshDialog = ref(false)
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
       return props.nodes.filter(n => {
         if (hideCategories.value && n.entityType === EntityType.Category) return false
-        if (filterItemTypes.value
-          && filterItemTypes.value.length > 0
-          && isPhenotype(n)
-          && (n.entityType !== EntityType.SinglePhenotype || !n.itemType || !filterItemTypes.value.includes(n.itemType))
-        ) return false
         return true
       })
     })
@@ -218,7 +208,6 @@ export default defineComponent({
       expansion,
       hideCategories,
       filter,
-      filterItemTypes,
       EntityType,
       showRefreshDialog,
       getIcon,

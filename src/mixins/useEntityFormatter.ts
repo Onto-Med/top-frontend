@@ -80,12 +80,6 @@ export default function (this: void) {
       )
     },
 
-    hasItemType: (entity: Entity|EntityType) => {
-      return [EntityType.SinglePhenotype].includes(
-        entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
-      )
-    },
-
     /**
      * Get an appropriate material icon name for the provided entity.
      * When building an icon, you should make restrictions visually distinguishable from phenotypes.
@@ -146,7 +140,7 @@ export default function (this: void) {
 
     hasExpression (this: void, entity: Entity|EntityType): entity is Phenotype {
       const entityType = entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity
-      return entityType === EntityType.CompositeRestriction
+      return entityType === EntityType.CompositePhenotype
     },
 
     restrictionEntityTypes (this: void): EntityType[] {

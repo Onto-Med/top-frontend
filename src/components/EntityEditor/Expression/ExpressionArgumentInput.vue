@@ -1,20 +1,20 @@
 <template>
   <div class="expression-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
     <slot name="prepend" />
-    <div v-if="fun && fun.id === 'entity'">
+    <div v-if="modelValue?.entityId || isEntity">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
    --><entity-chip
         :entity-id="modelValue.entityId"
         :entity-types="entityTypes"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :label="t('selectThing', { thing: t(fun.title) }) + '...'"
+        :label="t('selectThing', { thing: t('entity') }) + '...'"
         :disable="readonly"
         changeable
         removeable
         @entity-clicked="$emit('entityClicked', $event)"
         @entity-set="setEntity($event)"
-        @remove-clicked="$emit('update:modelValue', undefined)"
+        @remove-clicked="clear()"
       >
         <template v-if="!readonly" #additionalOptions>
           <q-item v-close-popup clickable @click="enclose()">
@@ -24,16 +24,18 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="fun && (fun.id === 'constant' || fun.id === 'value')">
+    <div v-else-if="modelValue?.value || modelValue?.constantId || isConstant">
       <expression-value-input
-        :model-value="modelValue.value"
+        :value="modelValue.value"
+        :constant-id="modelValue.constantId"
         :readonly="readonly"
         :indent-level="indentLevel"
         :indent="indent"
         :expand="expand"
-        @update:modelValue="setValue($event)"
+        @update:value="setValue($event)"
+        @update:constant-id="setConstantId($event)"
         @enclose="enclose()"
-        @remove="$emit('update:modelValue', undefined)"
+        @remove="clear()"
       />
       <slot name="append" />
     </div>
@@ -45,12 +47,12 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ functionTitle }}</b> (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b :title="functionTooltip">{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
           :functions="functions"
           @enclose="enclose()"
-          @remove="$emit('update:modelValue', undefined)"
+          @remove="clear()"
           @select="setFunction($event)"
         />
       </div>
@@ -71,12 +73,12 @@
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          <span>{{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b>{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}</span>
+          <span>{{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b :title="functionTooltip">{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}</span>
           <expression-context-menu
             v-if="!readonly"
             :functions="functions"
             @enclose="enclose()"
-            @remove="$emit('update:modelValue', undefined)"
+            @remove="clear()"
             @select="setFunction($event)"
           />
         </div>
@@ -112,15 +114,8 @@
           clickable
           :label="t('more')"
           :title="t('addMoreArguments')"
-        >
-          <expression-context-menu
-            v-if="!readonly"
-            :enclosable="false"
-            :functions="functions"
-            :removeable="false"
-            @select="handleArgumentUpdate(argumentCount, { function: $event, arguments: [] })"
-          />
-        </q-chip>
+          @click="handleArgumentUpdate(argumentCount, { })"
+        />
       </template>
 
       <div
@@ -130,13 +125,13 @@
         @mouseleave="hover = false"
       >
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-        <b>{{ functionTitle }}</b>
+        <b :title="functionTooltip">{{ functionTitle }}</b>
         <slot name="append" />
         <expression-context-menu
           v-if="!readonly"
           :functions="functions"
           @enclose="enclose()"
-          @remove="$emit('update:modelValue', undefined)"
+          @remove="clear()"
           @select="setFunction($event)"
         />
       </div>
@@ -157,7 +152,7 @@
         :enclosable="false"
         :functions="functions"
         @select="setFunction($event)"
-        @remove="$emit('update:modelValue', null)"
+        @remove="clear()"
       />
       <slot name="append" />
     </div>
@@ -172,8 +167,8 @@ import {
   EntityType,
   Expression,
   ExpressionFunction,
-  ExpressionValue,
-  NotationEnum
+  NotationEnum,
+  Value
 } from '@onto-med/top-api';
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
@@ -213,6 +208,8 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
     const flash = ref(false)
+    const isEntity = ref(false)
+    const isConstant = ref(false)
 
     const getFunction = (functionId: string|undefined) => {
       if (!functionId) return undefined
@@ -220,7 +217,7 @@ export default defineComponent({
       if (fun) return fun
       return { id: functionId, title: t('invalid').toUpperCase(), notation: NotationEnum.Prefix } as ExpressionFunction
     }
-    const fun = computed(() => getFunction(props.modelValue?.function))
+    const fun = computed(() => getFunction(props.modelValue?.functionId))
 
     const blink = () => {
       flash.value = true
@@ -242,6 +239,8 @@ export default defineComponent({
       hover: ref(false),
       flash,
       argumentCount,
+      isEntity,
+      isConstant,
 
       showMoreBtn: computed(() =>
         fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
@@ -250,6 +249,12 @@ export default defineComponent({
       functionTitle: computed(() => {
         if (!fun.value || !fun.value.title) return ''
         return te('functions.' + fun.value.title) ? t('functions.' + fun.value.title) : fun.value.title
+      }),
+
+      functionTooltip: computed(() => {
+         if (!fun.value || !fun.value.title || !te('functionDescriptions.' + fun.value.title))
+          return undefined
+         return t('functionDescriptions.' + fun.value.title)
       }),
 
       prefix: computed(
@@ -284,9 +289,22 @@ export default defineComponent({
         const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
         ) || {}) as Expression
-        newModelValue.function = functionId
+
+        if (functionId === 'entity') {
+          isEntity.value = true
+          isConstant.value = false
+          newModelValue.functionId = undefined
+        } else if (functionId === 'constant') {
+          isEntity.value = false
+          isConstant.value = true
+          newModelValue.functionId = undefined
+        } else {
+          isEntity.value = false
+          isConstant.value = false
+          newModelValue.functionId = functionId
+        }
         if (!newModelValue.arguments) newModelValue.arguments = []
-        const count = countArguments(newModelValue, getFunction(newModelValue.function))
+        const count = countArguments(newModelValue, getFunction(newModelValue.functionId))
         newModelValue.arguments.splice(count, newModelValue.arguments.length - count)
         emit('update:modelValue', newModelValue)
         blink()
@@ -295,12 +313,26 @@ export default defineComponent({
       setEntity (entity: Entity|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.entityId = entity?.id
+        isEntity.value = true
+        isConstant.value = false
         emit('update:modelValue', newModelValue)
       },
 
-      setValue (value: ExpressionValue|undefined): void {
+      setValue (value: Value|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
         newModelValue.value = value
+        newModelValue.constantId = undefined
+        isEntity.value = false
+        isConstant.value = true
+        emit('update:modelValue', newModelValue)
+      },
+
+      setConstantId (constantId: string|undefined): void {
+        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+        newModelValue.value = undefined
+        newModelValue.constantId = constantId
+        isEntity.value = false
+        isConstant.value = true
         emit('update:modelValue', newModelValue)
       },
 
@@ -308,7 +340,15 @@ export default defineComponent({
         const newModelValue = {
           arguments: [ JSON.parse(JSON.stringify(props.modelValue)) ]
         } as Expression
+        isEntity.value = false
+        isConstant.value = false
         emit('update:modelValue', newModelValue)
+      },
+
+      clear (): void {
+        isEntity.value = false
+        isConstant.value = false
+        emit('update:modelValue', undefined)
       }
     };
   },

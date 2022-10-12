@@ -4,8 +4,8 @@
     <span v-if="defaultConstant">
       {{ defaultConstant.title || defaultConstant.id }}
     </span>
-    <span v-else-if="modelValue.value">
-      {{ modelValue.value.value }}
+    <span v-else-if="value">
+      {{ value.value }}
     </span>
     <span v-else>
       {{ '[' + t('constant') + ']' }}
@@ -15,7 +15,7 @@
     v-if="!readonly"
     ref="popup"
     v-slot="scope"
-    :model-value="modelValue.value?.value"
+    :model-value="value?.value"
     :cover="false"
     auto-save
     @update:model-value="setValue($event)"
@@ -29,7 +29,7 @@
       </template>
     </q-input>
     <q-list v-if="constants" dense>
-      <q-item v-for="constant in constants" :key="constant.id" v-close-popup clickable @click="setConstant(constant)">
+      <q-item v-for="constant in constants" :key="constant.id" v-close-popup clickable @click="$emit('update:constantId', constant.id)">
         {{ constant.title || constant.id }}
       </q-item>
     </q-list>
@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { BooleanValue, Constant, DataType, DateTimeValue, ExpressionValue, NumberValue, StringValue, Value } from '@onto-med/top-api';
+import { BooleanValue, Constant, DataType, DateTimeValue, NumberValue, StringValue, Value } from '@onto-med/top-api';
 import { QPopupEdit } from 'quasar';
 import { useEntity } from 'src/pinia/entity';
 import { computed, defineComponent, onMounted, ref } from 'vue'
@@ -55,16 +55,14 @@ import { useI18n } from 'vue-i18n';
 export default defineComponent({
   name: 'ConstantInput',
   props: {
-    modelValue: {
-      type: Object as () => ExpressionValue,
-      default: () => { return { } }
-    },
+    value: Object as () => Value|undefined,
+    constantId: String,
     readonly: Boolean,
     expand: Boolean,
     indentLevel: Number,
     indent: Number
   },
-  emits: ['update:modelValue', 'enclose', 'remove'],
+  emits: ['update:value', 'update:constantId', 'enclose', 'remove'],
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
@@ -77,13 +75,13 @@ export default defineComponent({
       .then(o => constants.value = o)
 
     onMounted(() => {
-      if (!props.modelValue?.value && props.modelValue?.constant === undefined)
+      if (!props.value && !props.constantId)
         popup.value.show()
     })
 
-    const defaultConstant = computed(() => props.modelValue?.constant)
+    const defaultConstant = computed(() => constants.value?.find(c => c.id === props.constantId))
 
-    const toValue = (value: string|number|Date|boolean, dataType: DataType): Value|undefined => {
+    const toValue = (value: string|number|Date|boolean|undefined, dataType: DataType): Value|undefined => {
       if (dataType === DataType.String)
         return { value: value, dataType: dataType } as StringValue
       if (dataType === DataType.Number)
@@ -102,22 +100,8 @@ export default defineComponent({
       defaultConstant,
       dataType,
 
-      setConstant (constant: Constant) {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as ExpressionValue
-        newModelValue.constant = {
-          id: constant.id,
-          title: constant.title,
-          dataType: DataType.String
-        }
-        newModelValue.value = undefined
-        emit('update:modelValue', newModelValue)
-      },
-
-      setValue (value: string|number|Date|boolean) {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as ExpressionValue
-        newModelValue.value = toValue(value, dataType.value)
-        newModelValue.constant = undefined
-        emit('update:modelValue', newModelValue)
+      setValue (value: string|number|Date|boolean|undefined) {
+        emit('update:value', toValue(value, dataType.value))
       },
 
       toggleDataType () {

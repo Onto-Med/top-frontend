@@ -2,21 +2,24 @@
   <q-item>
     <q-item-section avatar>
       <q-toggle
-        :model-value="exclusion"
-        :icon="exclusion ? 'block' : 'check'"
-        color="red"
-        :title="exclusion ? t('exclusion') : t('inclusion')"
-        @update:model-value="$emit('update:exclusion', $event)"
+        :model-value="inclusion"
+        :icon="inclusion ? 'check' : 'block'"
+        color="positive"
+        :title="inclusion ? t('inclusion') : t('exclusion')"
+        @update:model-value="$emit('update:inclusion', $event)"
       />
     </q-item-section>
-    <q-item-section :title="getSynonyms(subject)">
+    <q-item-section v-if="!subject" class="text-bold text-negative">
+      {{ t('thingIsInvalid', { thing: t('entity') }) }}
+    </q-item-section>
+    <q-item-section v-else :title="getSynonyms(subject)">
       <div class="row items-center fit non-selectable">
         <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
         {{ getTitle(subject) }}
         <small class="q-ml-md">
           (
-          <span v-if="defaultAggregationFunction" :title="t('aggregationFunction')">
-            {{ te('functions.' + defaultAggregationFunction.title) ? t('functions.' + defaultAggregationFunction.title) : defaultAggregationFunction.title }}
+          <span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">
+            {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
           </span>
           <span v-if="dateTimeRestriction && dateTimeRestriction.values.length" :title="t('dateTimeRestriction')">
             , {{ dateTimeRestriction.values.map(e => e ? d(e, 'long') : 'NA').join(' - ') }}
@@ -29,10 +32,10 @@
       <q-btn-group flat>
         <criterion-configuration
           :date-time-restriction="dateTimeRestriction"
-          :default-aggregation-function="defaultAggregationFunction"
+          :default-aggregation-function-id="defaultAggregationFunctionId"
           :aggregation-function-options="aggregationFunctionOptions"
           @update:date-time-restriction="$emit('update:dateTimeRestriction', $event)"
-          @update:default-aggregation-function="$emit('update:defaultAggregationFunction', $event)"
+          @update:default-aggregation-function-id="$emit('update:defaultAggregationFunctionId', $event)"
         />
         <q-btn icon="remove" :title="t('removeThing', { thing: t('criterion') })" @click="$emit('removeClicked')" />
       </q-btn-group>
@@ -41,44 +44,47 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Phenotype, DateTimeRestriction, ExpressionFunction } from '@onto-med/top-api'
+import { DateTimeRestriction, ExpressionFunction } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import CriterionConfiguration from './CriterionConfiguration.vue'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   components: { CriterionConfiguration },
   props: {
-    exclusion: {
+    inclusion: {
       type: Boolean,
-      default: false
+      default: true
     },
     dateTimeRestriction: {
       type: Object as () => DateTimeRestriction
     },
-    defaultAggregationFunction: {
-      type: Object as () => ExpressionFunction,
+    defaultAggregationFunctionId: {
+      type: String,
       require: true
     },
     aggregationFunctionOptions: {
       type: Array as () => ExpressionFunction[]
     },
-    subject: {
-      type: Object as () => Phenotype,
+    subjectId: {
+      type: String,
       required: true
     }
   },
-  emits: ['removeClicked', 'update:exclusion', 'update:dateTimeRestriction', 'update:defaultAggregationFunction'],
-  setup () {
+  emits: ['removeClicked', 'update:inclusion', 'update:dateTimeRestriction', 'update:defaultAggregationFunctionId'],
+  setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te, d } = useI18n()
+    const entityStore = useEntity()
     const { getSynonyms, isRestricted, getIcon, getTitle } = useEntityFormatter()
 
     return {
       t,
       te,
       d,
+      subject: computed(() => entityStore.getEntity(props.subjectId)),
       getSynonyms,
       isRestricted,
       getIcon,

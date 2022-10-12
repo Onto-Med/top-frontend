@@ -102,8 +102,8 @@ export default defineComponent({
     const clone = <T>(obj: T): T => JSON.parse(JSON.stringify(obj)) as T
     const buildValueConstant = (value: number|undefined) => {
       return {
-        function: 'constant',
-        value: { value: { dataType: DataType.Number, value: value } as NumberValue }
+        functionId: 'value',
+        value: { dataType: DataType.Number, value: value } as NumberValue
       }
     }
 
@@ -116,11 +116,11 @@ export default defineComponent({
         EntityType.CompositePhenotype, EntityType.CompositeRestriction
       ],
 
-      isSwitchExpression: computed(() => props.modelValue.function === 'switch'),
+      isSwitchExpression: computed(() => props.modelValue.functionId === 'switch'),
 
       defaultValue: computed(() => {
         if (props.modelValue.arguments && hasDefaultValue.value)
-          return (props.modelValue.arguments[props.modelValue.arguments.length - 1].value?.value as NumberValue).value
+          return (props.modelValue.arguments[props.modelValue.arguments.length - 1].value as NumberValue).value
         return undefined
       }),
 
@@ -129,7 +129,7 @@ export default defineComponent({
         return props.modelValue.arguments
           .slice(0, props.modelValue.arguments.length - (hasDefaultValue.value ? 1 : 0))
           .reduce((prev, val, i, array) => {
-            if (i % 2 === 0) prev.push({ entityId: val.entityId, value: (array[i + 1].value?.value as NumberValue).value })
+            if (i % 2 === 0) prev.push({ entityId: val.entityId, value: (array[i + 1].value as NumberValue).value })
             return prev
           }, [] as Mapping[])
       }),
@@ -138,7 +138,7 @@ export default defineComponent({
         const newModelValue = clone(props.modelValue)
         if (!newModelValue.arguments) newModelValue.arguments = []
         const defaultValue = hasDefaultValue.value ? newModelValue.arguments.splice(newModelValue.arguments.length - 1) : undefined
-        newModelValue.arguments.push({ function: 'entity', entityId: undefined })
+        newModelValue.arguments.push({ functionId: 'entity', entityId: undefined })
         newModelValue.arguments.push(buildValueConstant(undefined))
         if (defaultValue) newModelValue.arguments.push(...defaultValue)
         emit('update:modelValue', newModelValue)
@@ -162,7 +162,7 @@ export default defineComponent({
       setMappingEntity (index: number, entityId: string|undefined) {
         const newModelValue = clone(props.modelValue)
         if (!newModelValue.arguments || !newModelValue.arguments[index * 2]) return
-        newModelValue.arguments[index * 2] = { function: 'entity', entityId: entityId }
+        newModelValue.arguments[index * 2] = { functionId: 'entity', entityId: entityId }
         emit('update:modelValue', newModelValue)
       },
 

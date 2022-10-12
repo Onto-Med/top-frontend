@@ -16,13 +16,16 @@
         <q-card-section>
           <div v-t="'aggregationFunctionDescription'" />
           <q-select
-            :model-value="defaultAggregationFunction"
+            :model-value="defaultAggregationFunctionId"
             :options="aggregationFunctionOptions"
             :label="t('aggregationFunction')"
-            @update:model-value="$emit('update:default-aggregation-function', $event)"
+            option-value="id"
+            emit-value
+            map-options
+            @update:model-value="$emit('update:defaultAggregationFunctionId', $event)"
           >
             <template #selected>
-              {{ te('functions.' + defaultAggregationFunction.title) ? t('functions.' + defaultAggregationFunction.title) : defaultAggregationFunction.title }}
+              {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
             </template>
             <template #option="scope">
               <q-item v-bind="scope.itemProps">
@@ -70,10 +73,12 @@ export default defineComponent({
   props: {
     dateTimeRestriction: {
       type: Object as () => DateTimeRestriction,
-      default: () => { return { values: [] } }
+      default: () => {
+        return { type: DataType.DateTime, values: [] }
+      }
     },
-    defaultAggregationFunction: {
-      type: Object as () => ExpressionFunction,
+    defaultAggregationFunctionId: {
+      type: String,
       require: true
     },
     aggregationFunctionOptions: {
@@ -81,7 +86,7 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['update:dateTimeRestriction', 'update:default-aggregation-function'],
+  emits: ['update:dateTimeRestriction', 'update:defaultAggregationFunctionId'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()

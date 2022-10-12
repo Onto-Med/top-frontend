@@ -32,7 +32,7 @@
               :options="dataSources"
               :label="t('dataSource', 2)"
               :error-message="t('dataSourceDescription')"
-              :error="query.dataSources.length == 0"
+              :error="query.dataSources?.length == 0"
               option-label="title"
               multiple
               counter
@@ -108,11 +108,11 @@
                 <q-list v-show="query.criteria.length" dense>
                   <template v-for="(criterion, index) in query.criteria" :key="index">
                     <criterion
-                      v-model:exclusion="criterion.exclusion"
+                      v-model:inclusion="criterion.inclusion"
                       v-model:date-time-restriction="criterion.dateTimeRestriction"
-                      v-model:default-aggregation-function="criterion.defaultAggregationFunction"
+                      v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
                       :aggregation-function-options="aggregationFunctionOptions"
-                      :subject="criterion.subject"
+                      :subject-id="criterion.subjectId"
                       @remove-clicked="query.criteria.splice(index, 1)"
                     />
                     <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
@@ -164,46 +164,18 @@
               <q-separator />
 
               <q-card-section>
-                <q-list v-if="query.projection && query.projection.select.length" dense separator>
-                  <q-item v-for="(select, index) in query.projection.select" :key="index">
-                    <q-item-section avatar>
-                      <q-btn-group flat class="column">
-                        <q-btn
-                          dense
-                          :disable="index == 0"
-                          icon="keyboard_arrow_up"
-                          size="sm"
-                          class="q-pa-none"
-                          @click="moveSelectEntry(index, index - 1)"
-                        />
-                        <q-btn
-                          dense
-                          :disable="index == query.projection.select.length - 1"
-                          icon="keyboard_arrow_down"
-                          size="sm"
-                          class="q-pa-none"
-                          @click="moveSelectEntry(index, index + 1)"
-                        />
-                      </q-btn-group>
-                    </q-item-section>
-                    <q-item-section :title="getSynonyms(select.subject)">
-                      <div class="row items-center fit non-selectable">
-                        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(select.subject)" />
-                        {{ getTitle(select.subject) }}
-                      </div>
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-btn-group flat>
-                        <q-btn
-                          :icon="select.sorting === Sorting.Desc ? 'arrow_downward' : 'arrow_upward'"
-                          :label="t(select.sorting)"
-                          :title="t('sorting')"
-                          @click="select.sorting = select.sorting === Sorting.Asc ? Sorting.Desc : Sorting.Asc"
-                        />
-                        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="query.projection.select.splice(index, 1)" />
-                      </q-btn-group>
-                    </q-item-section>
-                  </q-item>
+                <q-list v-if="query.projection && query.projection.length" dense separator>
+                  <projection-entry
+                    v-for="(entry, index) in query.projection"
+                    :key="index"
+                    v-model:sorting="entry.sorting"
+                    :subject-id="entry.subjectId"
+                    :up-disabled="index == 0"
+                    :down-disabled="index == query.projection.length - 1"
+                    @move-up="moveSelectEntry(index, index - 1)"
+                    @move-down="moveSelectEntry(index, index + 1)"
+                    @remove="query.projection.splice(index, 1)"
+                  />
                 </q-list>
                 <div v-else>
                   {{ t('nothingSelectedYet') }}
@@ -214,58 +186,39 @@
         </q-splitter>
       </q-step>
 
-      <q-step
-        :name="4"
-        icon="flag"
-        :title="t('closure')"
-      >
-        <q-list>
-          <q-item>
-            <q-item-section top avatar class="col-2">
-              <q-btn
-                icon="save"
-                color="primary"
-                :label="t('export')"
-                @click="exportQuery"
-              />
-            </q-item-section>
-            <q-item-section v-t="'queryExportDescription'" />
-          </q-item>
-          <q-item>
-            <q-item-section top avatar class="col-2">
-              <q-btn
-                v-if="configurationComplete && criteriaComplete && projectionComplete"
-                icon="play_arrow"
-                color="secondary"
-                :label="t('execute')"
-                @click="execute()"
-              />
-              <q-btn
-                v-else
-                icon="play_arrow"
-                color="secondary"
-                :label="t('execute')"
-                :title="t('finishPreviousStep', 2)"
-                disable
-              />
-            </q-item-section>
-            <q-item-section v-t="'queryExecuteDescription'" />
-          </q-item>
-        </q-list>
-      </q-step>
-
       <template #navigation>
         <q-separator class="q-mb-md" />
         <q-stepper-navigation>
-          <q-btn v-show="step < 4" color="primary" :label="t('continue')" @click="$refs.stepper.next()" />
-          <q-btn
-            v-show="step > 1"
-            flat
-            color="primary"
-            :label="t('back')"
-            class="q-ml-sm"
-            @click="$refs.stepper.previous()"
-          />
+          <q-btn-group flat>
+            <q-btn
+              :disable="step == 1"
+              :label="t('back')"
+              class="q-ml-sm"
+              @click="$refs.stepper.previous()"
+            />
+            <q-btn
+              :disable="step >= 3"
+              :label="t('continue')"
+              @click="$refs.stepper.next()"
+            />
+          </q-btn-group>
+
+          <q-btn-group class="float-right">
+            <q-btn
+              icon="play_arrow"
+              color="secondary"
+              :label="t('execute')"
+              :disable="!(configurationComplete && criteriaComplete && projectionComplete)"
+              @click="execute()"
+            />
+            <q-btn
+              icon="save"
+              color="primary"
+              :label="t('export')"
+              :title="t('queryExportDescription')"
+              @click="exportQuery"
+            />
+          </q-btn-group>
         </q-stepper-navigation>
       </template>
     </q-stepper>
@@ -276,7 +229,8 @@
       show-timer
       :result="run.result"
       :title="run.query.name"
-      @remove-clicked="removeRun(run.query.id)"
+      @remove="removeRun(run.query.id)"
+      @prefill="prefillQuery(run.query)"
     />
   </q-page>
 </template>
@@ -286,9 +240,11 @@ import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, QueryResu
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import Criterion from 'src/components/Query/Criterion.vue'
+import ProjectionEntry from 'src/components/Query/ProjectionEntry.vue'
 import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
+import useAlert from 'src/mixins/useAlert'
 import { defineComponent, onMounted, ref, computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useFile from 'src/mixins/useFile'
@@ -302,25 +258,38 @@ interface Run {
 }
 
 export default defineComponent({
-  components: { EntityTree, Criterion, QueryResultView },
+  components: { EntityTree, Criterion, QueryResultView, ProjectionEntry },
   setup () {
     const { t } = useI18n()
-    const { getTitle, getSynonyms, getIcon, isPhenotype, isRestricted } = useEntityFormatter()
+    const { isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
+    const { alert } = useAlert()
     const { saveToFile } = useFile()
     const { entities, repository, organisation } = storeToRefs(entityStore)
-    const query = ref({ id: (uuidv4 as () => string)(), configuration: { sources: [] }, criteria: [], projection: { select: [] } } as Query)
+    const query = ref({
+      id: (uuidv4 as () => string)(),
+      dataSources: [],
+      criteria: [],
+      projection: []
+    } as Query)
     const treeLoading = ref(false)
     const runs = ref([] as Run[])
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
     const queryApi = inject(QueryApiKey)
-    fileReader.onload = (e) => query.value = JSON.parse(e.target?.result as string) as Query
+    const step = ref(1)
+
+    const prefillQuery = (oldQuery: Query) => {
+      query.value = JSON.parse(JSON.stringify(oldQuery)) as Query
+      step.value = 1
+    }
+
+    fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as Query)
 
     const reloadEntities = async () => {
       treeLoading.value = true
       await entityStore.reloadEntities()
-        .then(() => query.value.criteria = query.value.criteria?.filter(c => entities.value.findIndex(e => e.id === c.subject.id) !== -1))
+        .then(() => query.value.criteria = query.value.criteria?.filter(c => entities.value.findIndex(e => e.id === c.subjectId) !== -1))
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
@@ -337,23 +306,42 @@ export default defineComponent({
 
     const getRunIndex = (queryId: string) => runs.value.findIndex(r => r.query.id === queryId)
 
-    const updateRun = (run: Run) => {
-      if (!queryApi || !organisation.value?.id || !repository.value?.id || run.result?.finishedAt) return
-      queryApi?.getQueryResult(organisation.value.id, repository.value.id, run.query.id)
+    const buildQueryRunTimer = (run: Run) =>
+      window.setInterval(() => {
+        void updateRun(run).then(() => {
+          if (run.result?.finishedAt) clearInterval(run.timer)
+        })
+      }, 5000)
+
+    const updateRun = async (run: Run) => {
+      if (!queryApi || !organisation.value?.id || !repository.value?.id || run.result?.finishedAt)
+        return new Promise<void>(resolve => resolve())
+      return queryApi.getQueryResult(organisation.value.id, repository.value.id, run.query.id)
         .then(r => run.result = r.data)
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => {
+          clearInterval(run.timer)
+          alert(e.message)
+        })
     }
 
-    onMounted(() => reloadEntities())
+    onMounted(() => {
+      reloadEntities().catch((e: Error) => alert(e.message))
+      if (queryApi && organisation.value && repository.value)
+        queryApi.getQueries(organisation.value.id, repository.value.id)
+          .then(r => r.data.forEach(q => {
+            const run = { query: q } as Run
+            void updateRun(run).then(() => {
+              if (!run.result) run.timer = buildQueryRunTimer(run)
+              runs.value.push(run)
+            })
+          }))
+          .catch((e: Error) => alert(e.message))
+    })
 
     return {
       t,
-      getTitle,
-      getSynonyms,
-      getIcon,
-      isRestricted,
       EntityType,
-      step: ref(1),
+      step,
       query,
       organisation,
       repository,
@@ -362,10 +350,10 @@ export default defineComponent({
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
-      Sorting,
       dataSources,
       importFile,
       aggregationFunctionOptions,
+      prefillQuery,
 
       configurationComplete: computed(() =>
         query.value.dataSources && query.value.dataSources.length > 0
@@ -375,49 +363,45 @@ export default defineComponent({
       ),
 
       projectionComplete: computed(() =>
-        query.value.projection && query.value.projection.select && query.value.projection.select.length > 0
+        query.value.projection && query.value.projection.length > 0
       ),
 
       addCriterion: (subject: Phenotype) => {
         if (!subject || !isPhenotype(subject) && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
-          defaultAggregationFunction: { id: 'last', title: 'last' },
-          exclusion: false,
-          subject: subject
+          defaultAggregationFunctionId: 'last',
+          inclusion: true,
+          subjectId: subject.id as string
         })
       },
 
       addSelection: (subject: Phenotype) => {
-        if (!query.value.projection) query.value.projection = { select: [] }
-        if (!query.value.projection.select) query.value.projection.select = []
+        if (!query.value.projection) query.value.projection = []
         if (
           !subject
           || ![EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(subject.entityType)
-          || query.value.projection.select.findIndex(r => r.subject.id === subject.id) !== -1
+          || query.value.projection.findIndex(r => r.subjectId === subject.id) !== -1
         ) return
-        query.value.projection.select.push({ subject: subject, sorting: Sorting.Asc })
+        query.value.projection.push({ subjectId: subject.id as string, sorting: Sorting.Asc })
       },
 
       moveSelectEntry: (oldIndex: number, newIndex: number) => {
-        if (!query.value.projection || !query.value.projection.select || newIndex < 0 || newIndex >= query.value.projection.select.length) return
-        query.value.projection.select.splice(newIndex, 0, query.value.projection.select.splice(oldIndex, 1)[0])
+        if (!query.value.projection || newIndex < 0 || newIndex >= query.value.projection.length) return
+        query.value.projection.splice(newIndex, 0, query.value.projection.splice(oldIndex, 1)[0])
       },
 
       execute: () => {
         if (!queryApi || !organisation.value || !repository.value) return
-        query.value.id = (uuidv4 as () => string)()
-        runs.value.push({ query: query.value })
+        const currentQuery = JSON.parse(JSON.stringify(query.value)) as Query
+        currentQuery.id = (uuidv4 as () => string)()
+        runs.value.push({ query: currentQuery })
 
-        queryApi.enqueueQuery(organisation.value.id, repository.value.id, query.value)
+        queryApi.enqueueQuery(organisation.value.id, repository.value.id, currentQuery)
           .then(r => {
             const index = getRunIndex(r.data.id)
             runs.value[index].result = r.data
-            runs.value[index].timer = window.setInterval(() => {
-              updateRun(runs.value[index])
-              if (runs.value[index].result?.finishedAt)
-                clearInterval(runs.value[index].timer)
-            }, 5000)
+            runs.value[index].timer = buildQueryRunTimer(runs.value[index])
           })
           .catch((e: Error) => alert(e.message))
       },
@@ -436,11 +420,11 @@ export default defineComponent({
         if (!queryApi || !organisation.value || !repository.value) return
 
         queryApi?.deleteQuery(organisation.value.id, repository.value.id, queryId)
-          .then(() => {
+          .catch((e: Error) => alert(e.message))
+          .finally(() => {
             const index = getRunIndex(queryId)
             if (index !== -1) runs.value.splice(index, 1)
           })
-          .catch((e: Error) => alert(e.message))
       }
     }
   }

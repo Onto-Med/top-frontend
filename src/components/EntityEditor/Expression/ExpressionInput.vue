@@ -158,7 +158,7 @@ export default defineComponent({
       indent: ref(2),
       showClearDialog: ref(false),
       functions,
-      scores: computed(() => props.modelValue && props.modelValue.function === 'switch')
+      scores: computed(() => props.modelValue && props.modelValue.functionId === 'switch')
     }
   }
 })
