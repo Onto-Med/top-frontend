@@ -33,10 +33,13 @@
               :label="t('dataSource', 2)"
               :error-message="t('dataSourceDescription')"
               :error="query.dataSources?.length == 0"
+              option-value="id"
               option-label="title"
               multiple
               counter
               use-chips
+              emit-value
+              map-options
             />
           </div>
 
