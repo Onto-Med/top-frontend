@@ -47,9 +47,10 @@ export default function (this: void) {
      * @param entity the entity
      * @returns the title
      */
-  const getTitle = (entity: Entity, prefix?: boolean): string => {
+  const getTitle = (entity: Entity, prefix?: boolean, unit?: boolean): string => {
     const lang = locale.value.split('-')[0]
     let superPhenotypePrefix = ''
+    let title = ''
 
     if (prefix && isRestricted(entity) && entity.superPhenotype) {
       superPhenotypePrefix += getTitle(entity.superPhenotype) + ': '
@@ -57,15 +58,23 @@ export default function (this: void) {
 
     if (entity.titles) {
       const result = entity.titles.filter(t => t.lang === lang).shift()
-      if (result && result.text) return superPhenotypePrefix + result.text
-      if (entity.titles[0] && entity.titles[0].text) return superPhenotypePrefix + entity.titles[0].text
+      if (result && result.text) title = result.text
+      else if (entity.titles[0] && entity.titles[0].text) title = entity.titles[0].text
     }
-    if (isCategory(entity))
-      return t('unnamedCategory')
-    else if (isPhenotype(entity))
-      return t('unnamedPhenotype')
 
-    return superPhenotypePrefix + t('unnamedRestriction')
+    if (!title) {
+      if (isCategory(entity))
+        title = t('unnamedCategory')
+      else if (isPhenotype(entity))
+        title = t('unnamedPhenotype')
+      else if (isRestricted(entity))
+        title = t('unnamedRestriction')
+    }
+
+    if (unit && isPhenotype(entity) && entity.unit)
+      title += ' [' + entity.unit + ']'
+
+    return superPhenotypePrefix + title
   }
 
   return {

@@ -313,5 +313,7 @@
     "min": "Mindestens X Werte in Bereich",
     "max": "Nicht mehr als X Werte in Bereich"
   },
-  "copy": "Kopieren"
+  "copy": "Kopieren",
+  "restrictionOf": "Restriktion von",
+  "inUnit": "in {unit}"
 }
