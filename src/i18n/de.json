@@ -317,5 +317,6 @@
   "restrictionOf": "Restriktion von",
   "inUnit": "in {unit}",
   "projectionEntry": "Projektionseintrag|Projektionseinträge",
-  "addAsThing": "Als {thing} hinzufügen"
+  "addAsThing": "Als {thing} hinzufügen",
+  "incomplete": "Unvollständig"
 }

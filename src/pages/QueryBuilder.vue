@@ -93,6 +93,7 @@
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('projection') }}
+                    <q-icon v-show="!projectionComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
                   <q-item-label v-t="'eligibilityCriterionSelection'" caption />
                 </q-item-section>
@@ -123,6 +124,7 @@
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('eligibilityCriterion', 2) }}
+                    <q-icon v-show="!criteriaComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
                   <q-item-label v-t="'eligibilityCriterionSelection'" caption />
                 </q-item-section>
