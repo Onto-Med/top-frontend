@@ -91,6 +91,14 @@
 
           <q-card-section class="q-pt-none q-pr-none q-pb-none text-caption">
             <q-scroll-area class="json-section">
+              <q-btn
+                flat
+                round
+                icon="content_copy"
+                class="fixed-top-right q-mr-md text-grey"
+                :title="t('copy')"
+                @click="copyToClipboard(local)"
+              />
               <pre>{{ local }}</pre>
             </q-scroll-area>
           </q-card-section>
@@ -186,6 +194,7 @@ import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
 import { EntityApiKey } from 'src/boot/axios'
+import { copyToClipboard } from 'quasar'
 
 export default defineComponent({
   name: 'EntityTab',
@@ -367,6 +376,11 @@ export default defineComponent({
           query: { version: local.value.version }
         })
         emit('changeVersion', local.value.version)
+      },
+
+      copyToClipboard (text: unknown): void {
+        copyToClipboard(JSON.stringify(text))
+          .catch(() => alert(t('copyFailed')))
       }
     }
   }
