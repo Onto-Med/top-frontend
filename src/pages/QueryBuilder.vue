@@ -69,7 +69,20 @@
               :exclude-type-if-empty="[EntityType.Category]"
               @refresh-clicked="reloadEntities"
               @update:selected="addCriterion($event); addSelection($event)"
-            />
+            >
+              <template #entity-context-menu="props">
+                <q-menu context-menu>
+                  <q-list dense>
+                    <q-item v-close-popup clickable @click="addSelection(props.entity)">
+                      <q-item-section>{{ t('addAsThing', { thing: t('projectionEntry') }) }}</q-item-section>
+                    </q-item>
+                    <q-item v-close-popup clickable @click="addCriterion(props.entity)">
+                      <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </template>
+            </entity-tree>
           </div>
         </template>
 
