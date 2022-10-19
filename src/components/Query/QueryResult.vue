@@ -4,8 +4,8 @@
       <template #header>
         <q-item-section avatar>
           <q-spinner v-show="running" :title="t('running')" class="q-mr-sm" />
-          <q-icon v-show="done" name="done" color="positive" class="q-mr-sm" />
-          <q-icon v-show="failed" name="bolt" color="negative" class="q-mr-sm" />
+          <q-icon v-show="done" :title="t('finished')" name="done" color="positive" class="q-mr-sm" />
+          <q-icon v-show="failed" :title="t('failed')" name="bolt" color="negative" class="q-mr-sm" />
         </q-item-section>
 
         <q-item-section>
