@@ -131,7 +131,7 @@
                     />
                     <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
                       <q-separator class="col" />
-                      <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable" />
+                      <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable and-separator" />
                       <q-separator class="col" />
                     </div>
                   </template>
@@ -375,4 +375,7 @@ export default defineComponent({
   min-height: 200px
   .q-stepper__step-inner
     padding: 0 !important
+.and-separator
+  height: 0px
+  margin-top: -16px
 </style>
