@@ -302,7 +302,7 @@ export const useEntity = defineStore('entity', {
       return [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entity.entityType)
     },
 
-    isRestriction (entity: Entity): entity is Phenotype {
+    isRestricted (entity: Entity): entity is Phenotype {
       return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
     },
 
@@ -313,7 +313,7 @@ export const useEntity = defineStore('entity', {
     getSuperPhenotype (phenotype: Phenotype|string): Phenotype|undefined {
       const entityId = phenotype.hasOwnProperty('id') ? (phenotype as Phenotype).id : phenotype as string
       const restriction = this.getEntity(entityId)
-      if (!restriction || !this.isRestriction(restriction) || !restriction.superPhenotype) return undefined
+      if (!restriction || !this.isRestricted(restriction) || !restriction.superPhenotype) return undefined
       return this.getEntity(restriction.superPhenotype.id) as Phenotype|undefined
     }
   }
