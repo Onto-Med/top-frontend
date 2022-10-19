@@ -54,6 +54,12 @@
               @update:model-value="$emit('update:dataType', $event)"
             />
 
+            <data-type-select
+              v-else
+              :model-value="DataType.Boolean"
+              readonly
+            />
+
             <unit-input
               v-if="[EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entityType) && dataType === DataType.Number"
               :model-value="unit"
