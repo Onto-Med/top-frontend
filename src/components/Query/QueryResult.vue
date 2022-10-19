@@ -1,6 +1,6 @@
 <template>
   <q-card>
-    <q-expansion-item expand-icon-toggle switch-toggle-side>
+    <q-expansion-item :model-value="expanded && !running" expand-icon-toggle switch-toggle-side>
       <template #header>
         <q-item-section avatar>
           <q-spinner v-show="running" :title="t('running')" class="q-mr-sm" />
@@ -97,6 +97,7 @@ export default defineComponent({
       t,
       elapsedTime,
       running,
+      expanded: !props.result?.finishedAt,
       done: computed(() => !running.value && props.result?.state === QueryState.Finished),
       failed: computed(() => !running.value && props.result?.state === QueryState.Failed)
     }
