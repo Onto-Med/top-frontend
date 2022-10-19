@@ -37,7 +37,6 @@
           :model-value="titles"
           unique
           expanded
-          :autofocus="autofocusTitle"
           :readonly="readonly"
           :required="true"
           :label="t('title', 2)"
@@ -197,10 +196,6 @@ export default defineComponent({
     superCategories: {
       type: Array as () => Category[],
       default: () => []
-    },
-    autofocusTitle: {
-      type: Boolean,
-      default: false
     }
   },
   emits: [

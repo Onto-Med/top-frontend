@@ -168,7 +168,6 @@
       :repository-id="repositoryId"
       :organisation-id="organisationId"
       :readonly="isOtherVersion"
-      :autofocus-title="isNew"
       @entity-clicked="$emit('entityClicked', $event)"
       @add-super-category="addSuperCategory(undefined)"
       @set-super-category="setSuperCategory"
