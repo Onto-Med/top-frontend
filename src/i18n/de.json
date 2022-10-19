@@ -318,5 +318,7 @@
   "inUnit": "in {unit}",
   "projectionEntry": "Projektionseintrag|Projektionseinträge",
   "addAsThing": "Als {thing} hinzufügen",
-  "incomplete": "Unvollständig"
+  "incomplete": "Unvollständig",
+  "failed": "Fehlgeschlagen",
+  "finished": "Abgeschlossen"
 }

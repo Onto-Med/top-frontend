@@ -1,36 +1,46 @@
 <template>
   <q-card>
-    <q-card-section>
-      <div class="row items-center no-wrap">
-        <div class="text-h6 col row items-center">
+    <q-expansion-item :model-value="expanded && !running" expand-icon-toggle switch-toggle-side>
+      <template #header>
+        <q-item-section avatar>
           <q-spinner v-show="running" :title="t('running')" class="q-mr-sm" />
-          <q-icon v-show="done" name="done" color="positive" class="q-mr-sm" />
-          <q-icon v-show="failed" name="bolt" color="negative" class="q-mr-sm" />
+          <q-icon v-show="done" :title="t('finished')" name="done" color="positive" class="q-mr-sm" />
+          <q-icon v-show="failed" :title="t('failed')" name="bolt" color="negative" class="q-mr-sm" />
+        </q-item-section>
+
+        <q-item-section>
           {{ title || t('unnamedQuery') }}
-        </div>
-        <small class="col-auto text-grey" :title="t('elapsedTime')">
-          {{ elapsedTime }}
-        </small>
-        <q-btn-group flat class="q-ml-sm">
-          <q-btn
-            icon="file_upload"
-            :title="t('loadThing', { thing: t('query') })"
-            @click="$emit('prefill')"
-          />
-          <q-btn
-            icon="clear"
-            :title="t('removeThing', { thing: t('queryResult') })"
-            @click="$emit('remove')"
-          />
-        </q-btn-group>
-      </div>
-    </q-card-section>
-    <q-separator />
-    <q-card-section>
-      <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-        <pre v-show="!running">{{ result }}</pre>
-      </transition>
-    </q-card-section>
+        </q-item-section>
+
+        <q-item-section side>
+          <div class="row items-center">
+            <small class="col-auto text-grey" :title="t('elapsedTime')">
+              {{ elapsedTime }}
+            </small>
+            <q-btn-group flat class="q-ml-sm">
+              <q-btn
+                icon="file_upload"
+                :title="t('loadThing', { thing: t('query') })"
+                @click.stop="$emit('prefill')"
+              />
+              <q-btn
+                icon="clear"
+                :title="t('removeThing', { thing: t('queryResult') })"
+                @click.stop="$emit('remove')"
+              />
+            </q-btn-group>
+          </div>
+        </q-item-section>
+      </template>
+
+      <q-separator />
+
+      <q-card>
+        <q-card-section>
+          <pre v-show="!running" class="q-ma-none">{{ result }}</pre>
+        </q-card-section>
+      </q-card>
+    </q-expansion-item>
   </q-card>
 </template>
 
@@ -87,6 +97,7 @@ export default defineComponent({
       t,
       elapsedTime,
       running,
+      expanded: !props.result?.finishedAt,
       done: computed(() => !running.value && props.result?.state === QueryState.Finished),
       failed: computed(() => !running.value && props.result?.state === QueryState.Failed)
     }
