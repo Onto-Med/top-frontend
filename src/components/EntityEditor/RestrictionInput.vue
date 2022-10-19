@@ -50,6 +50,7 @@
             :readonly="readonly"
             :operators="operators"
             :type="state.type"
+            :unit="unit"
           />
 
           <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
@@ -104,6 +105,7 @@ export default defineComponent({
     },
     name: String,
     label: String,
+    unit: String,
     operators: Array,
     quantifiers: Array,
     expanded: Boolean,

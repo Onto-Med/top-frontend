@@ -38,6 +38,9 @@
       :type="inputType"
       @update:model-value="updateMaximum($event)"
     />
+    <div v-if="unit" class="q-ml-md">
+      {{ t('inUnit', { unit: unit }) }}
+    </div>
   </div>
 </template>
 
@@ -48,6 +51,7 @@ import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   props: {
+    unit: String,
     minimum: [Number, Date],
     maximum: [Number, Date],
     minOperator: String,

@@ -312,5 +312,7 @@
     "exact": "Exactly X values in range",
     "min": "At least X values in range",
     "max": "No more than X values in range"
-  }
+  },
+  "copy": "Copy",
+  "restrictionOf": "Restriction of"
 }

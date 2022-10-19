@@ -312,5 +312,8 @@
     "exact": "Exakt X Werte in Bereich",
     "min": "Mindestens X Werte in Bereich",
     "max": "Nicht mehr als X Werte in Bereich"
-  }
+  },
+  "copy": "Kopieren",
+  "restrictionOf": "Restriktion von",
+  "inUnit": "in {unit}"
 }

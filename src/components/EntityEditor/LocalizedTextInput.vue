@@ -9,7 +9,7 @@
           :cols="cols"
           :readonly="readonly"
           :error="!modelValue[index].text"
-          :autofocus="autofocus && index === 0 && !modelValue[index].text"
+          :autofocus="autofocus || !modelValue[index].text"
           debounce="200"
           class="col q-pb-none"
           @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"

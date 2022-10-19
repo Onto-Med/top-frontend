@@ -1,9 +1,11 @@
 import { Category, DataType, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
+import { useEntity } from 'src/pinia/entity'
 import { useI18n } from 'vue-i18n'
 
 export default function (this: void) {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { locale, t } = useI18n()
+  const entityStore = useEntity()
 
   const getLocalizedPropertyValues = (entity: Entity, property: keyof Entity): string[] => {
     const lang = locale.value.split('-')[0]
@@ -45,27 +47,39 @@ export default function (this: void) {
      * A title, were lang matches the currently selected language for i18n, is priortized.
      * If the entity has no titles, 'unnamed entity' is returned.
      * @param entity the entity
+     * @param prefix add title of super phenotype as prefix
+     * @param unit add unit as suffix
      * @returns the title
      */
-  const getTitle = (entity: Entity, prefix?: boolean): string => {
+  const getTitle = (entity: Entity, prefix?: boolean, unit?: boolean): string => {
     const lang = locale.value.split('-')[0]
     let superPhenotypePrefix = ''
+    let title = ''
 
     if (prefix && isRestricted(entity) && entity.superPhenotype) {
-      superPhenotypePrefix += getTitle(entity.superPhenotype) + ': '
+      const superPhenotype = entityStore.getEntity(entity.superPhenotype.id)
+      superPhenotypePrefix += getTitle(superPhenotype || entity.superPhenotype) + ': '
     }
 
     if (entity.titles) {
       const result = entity.titles.filter(t => t.lang === lang).shift()
-      if (result && result.text) return superPhenotypePrefix + result.text
-      if (entity.titles[0] && entity.titles[0].text) return superPhenotypePrefix + entity.titles[0].text
+      if (result && result.text) title = result.text
+      else if (entity.titles[0] && entity.titles[0].text) title = entity.titles[0].text
     }
-    if (isCategory(entity))
-      return t('unnamedCategory')
-    else if (isPhenotype(entity))
-      return t('unnamedPhenotype')
 
-    return superPhenotypePrefix + t('unnamedRestriction')
+    if (!title) {
+      if (isCategory(entity))
+        title = t('unnamedCategory')
+      else if (isPhenotype(entity))
+        title = t('unnamedPhenotype')
+      else if (isRestricted(entity))
+        title = t('unnamedRestriction')
+    }
+
+    if (unit && isPhenotype(entity) && entity.unit)
+      title += ' [' + entity.unit + ']'
+
+    return superPhenotypePrefix + title
   }
 
   return {
