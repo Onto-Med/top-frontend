@@ -1,9 +1,11 @@
 import { Category, DataType, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
+import { useEntity } from 'src/pinia/entity'
 import { useI18n } from 'vue-i18n'
 
 export default function (this: void) {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { locale, t } = useI18n()
+  const entityStore = useEntity()
 
   const getLocalizedPropertyValues = (entity: Entity, property: keyof Entity): string[] => {
     const lang = locale.value.split('-')[0]
@@ -55,7 +57,8 @@ export default function (this: void) {
     let title = ''
 
     if (prefix && isRestricted(entity) && entity.superPhenotype) {
-      superPhenotypePrefix += getTitle(entity.superPhenotype) + ': '
+      const superPhenotype = entityStore.getEntity(entity.superPhenotype.id)
+      superPhenotypePrefix += getTitle(superPhenotype || entity.superPhenotype) + ': '
     }
 
     if (entity.titles) {
