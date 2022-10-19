@@ -314,5 +314,6 @@
     "max": "No more than X values in range"
   },
   "copy": "Copy",
-  "restrictionOf": "Restriction of"
+  "restrictionOf": "Restriction of",
+  "inUnit": "in {unit}"
 }
