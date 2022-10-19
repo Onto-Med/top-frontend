@@ -315,5 +315,8 @@
   },
   "copy": "Kopieren",
   "restrictionOf": "Restriktion von",
-  "inUnit": "in {unit}"
+  "inUnit": "in {unit}",
+  "projectionEntry": "Projektionseintrag|Projektionseinträge",
+  "addAsThing": "Als {thing} hinzufügen",
+  "incomplete": "Unvollständig"
 }

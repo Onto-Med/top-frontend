@@ -60,10 +60,12 @@
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
               @export-clicked="$emit('exportEntity', $event)"
             />
+            <slot v-else name="entity-context-menu" :entity="node" />
           </div>
         </template>
       </q-tree>
       <entity-tree-context-menu v-if="showContextMenu" @create-entity-clicked="handleCreateEntityClicked" />
+      <slot v-else name="empty-context-menu" />
     </q-scroll-area>
     <q-inner-loading
       :showing="loading"
