@@ -45,6 +45,8 @@ export default function (this: void) {
      * A title, were lang matches the currently selected language for i18n, is priortized.
      * If the entity has no titles, 'unnamed entity' is returned.
      * @param entity the entity
+     * @param prefix add title of super phenotype as prefix
+     * @param unit add unit as suffix
      * @returns the title
      */
   const getTitle = (entity: Entity, prefix?: boolean, unit?: boolean): string => {
