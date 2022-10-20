@@ -11,45 +11,102 @@
       </q-card-section>
     </q-card>
 
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">
-          {{ t('concept', 2) }}
-        </div>
-      </q-card-section>
+    <div class="row no-wrap justify-between">
 
-      <q-separator />
-
-      <div class="q-pa-sm row items-start q-gutter-sm">
-        <q-card
-          v-for="(concept, index) in concepts"
-          :key="concept"
-          :style="{ background: distinctColors[index], color: distinctColorsFont[index]}">
-          <q-card-section v-ripple class="cursor-pointer relative-position" @click="chooseConcept(concept.id)">
-            {{ concept.text }}
-          </q-card-section>
-        </q-card>
-      </div>
-    </q-card>
-
-    <table-with-actions
-      :rows="documents"
-      :columns="columns"
-      :loading="loading"
-      @reload-clicked="reload()"
-      @row-clicked="routeToDocument($event)"
-    >
-      <template #row-cells="{ row }">
-        <q-td auto-width>
-          {{ row.id }}
-        </q-td>
-        <q-td class="q-gutter-md">
-          <q-chip v-for="phrase in row.phrases" :key="phrase" size="md" @click.stop="alert(phrase)">
-            {{ phrase }}
+      <q-card class="col-2">
+        <q-card-section>
+          <div class="text-subtitle2">
+            {{ t('concept', 2) }}
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <q-chip
+            v-for="concept in concepts"
+            :key="concept"
+            class="cursor-pointer relative-position"
+            clickable
+            @click="chooseConcept(concept.id)"
+          >
+            <div class="ellipsis">
+              {{ concept.labels }}
+            </div>
           </q-chip>
-        </q-td>
-      </template>
-    </table-with-actions>
+        </q-card-section>
+      </q-card>
+
+      <q-card class="col">
+        <q-card-section>
+          <div class="text-subtitle2">
+            {{ t('document', 2) }}
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <q-chip
+            v-for="document in documents"
+            :key="document"
+            class="cursor-pointer relative-position"
+            clickable
+            @click="chooseDocument(document.id)"
+          >
+            {{ document.id }}
+          </q-chip>
+        </q-card-section>
+      </q-card>
+
+      <q-card v-if="document_" class="col">
+        <q-card-section>
+          <div class="text-subtitle2">
+            {{ t('details', 2) }}
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <div class="text-h6"> {{ document_.id }} </div>
+        </q-card-section>
+        <q-card-section>
+            <div> {{ document_.text }} </div>
+        </q-card-section>
+      </q-card>
+
+    </div>
+<!--    <q-card>-->
+<!--      <q-card-section>-->
+<!--        <div class="text-h6">-->
+<!--          {{ t('concept', 2) }}-->
+<!--        </div>-->
+<!--      </q-card-section>-->
+
+<!--      <q-separator />-->
+
+<!--      <div class="q-pa-sm row items-start q-gutter-sm">-->
+<!--        <q-card-->
+<!--          v-for="(concept, index) in concepts"-->
+<!--          :key="concept"-->
+<!--          :style="{ background: distinctColors[index], color: distinctColorsFont[index]}">-->
+<!--          <q-card-section v-ripple class="cursor-pointer relative-position" @click="chooseConcept(concept.id)">-->
+<!--            {{ concept.text }}-->
+<!--          </q-card-section>-->
+<!--        </q-card>-->
+<!--      </div>-->
+<!--    </q-card>-->
+
+<!--    <table-with-actions-->
+<!--      :rows="documents"-->
+<!--      :columns="columns"-->
+<!--      :loading="loading"-->
+<!--      @reload-clicked="reload()"-->
+<!--      @row-clicked="routeToDocument($event)"-->
+<!--    >-->
+<!--      <template #row-cells="{ row }">-->
+<!--        <q-td auto-width>-->
+<!--          {{ row.id }}-->
+<!--        </q-td>-->
+<!--        <q-td class="q-gutter-md">-->
+<!--          <q-chip v-for="phrase in row.phrases" :key="phrase" size="md" @click.stop="alert(phrase)">-->
+<!--            {{ phrase }}-->
+<!--          </q-chip>-->
+<!--        </q-td>-->
+<!--      </template>-->
+<!--    </table-with-actions>-->
   </q-page>
 </template>
 
@@ -65,20 +122,21 @@ import TableWithActions from 'components/TableWithActions.vue';
 export default defineComponent({
   name: 'DocumentSearch',
   components: {
-    TableWithActions,
+    // TableWithActions,
   },
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const router    = useRouter()
+    // const router    = useRouter()
     const documentApi = inject(DocumentApiKey)
     const phraseApi = inject(PhraseApiKey)
     const conceptApi = inject(ConceptApiKey)
     const documents = ref<Document[]>([])
+    const document_ = ref<Document>()
     const concepts = ref<Concept[]>([])
     const loading = ref(false)
     const columns = computed(() => [
-      { name: 'actions', sortable: false },
+      // { name: 'actions', sortable: false },
       { name: 'docId', label: t('document'), align: 'left', required: true, sortable: true },
       { name: 'docPhrases', label: t('phrase',2), align: 'left', sortable: false },
     ])
@@ -104,13 +162,10 @@ export default defineComponent({
     const phraseText: string[] = [];
 
     const reload = async () => {
-      if (!documentApi || !phraseApi || !conceptApi) return
+      if (!conceptApi || !documentApi) return
       loading.value = true
       await conceptApi.getConcepts()
         .then(r => concepts.value = r.data)
-        .catch((e: Error) => alert(e.message))
-      await documentApi.getDocuments(undefined, undefined, 0, 10) // ToDo: Read these numbers from table values
-        .then(r => documents.value = r.data)
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
     }
@@ -121,6 +176,7 @@ export default defineComponent({
 
     return {
       t,
+      document_,
       documents,
       concepts,
       loading,
@@ -129,28 +185,22 @@ export default defineComponent({
       alert,
       distinctColors,
       distinctColorsFont,
-      async chooseConcept (conceptId: string) {
-        if (!phraseApi) return
-        await phraseApi.getPhrases(undefined, undefined, undefined, conceptId)
-          .then(r => {
-            phraseText.splice(0)
-            r.data.forEach( phrase => phraseText.push(phrase.text !== undefined ? phrase.text : ''))
-            Notify.create(phraseText.join(', '))
-          })
-      },
       phraseText,
-      async choosePhrase(text: string) {
-        if (!phraseApi) return
-        await phraseApi.getPhrases(undefined, undefined, text, undefined)
+      async chooseConcept (conceptId: string) {
+        if (!documentApi) return
+        await documentApi.getDocumentByConceptId(conceptId)
           .then(r => {
-            phraseText.splice(0)
-            r.data.forEach( phrase => phraseText.push(phrase.text !== undefined ? phrase.text : ''))
-            Notify.create(phraseText.join(', '))
+            documents.value = r.data
           })
+          .catch((e: Error) => alert(e.message))
       },
-      routeToDocument (document: Document) {
-        alert(document.text)
-        void router.push({ name: 'showDocument', params: { documentId: document.id } })
+      async chooseDocument (documentId: string) {
+        if (!documentApi) return
+        await documentApi.getDocumentById(documentId)
+          .then(r => {
+            document_.value = r.data
+          })
+          .catch((e: Error) => alert(e.message))
       },
     }
   }
