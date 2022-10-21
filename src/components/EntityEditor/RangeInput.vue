@@ -15,6 +15,7 @@
       :label="t('minimum')"
       stack-label
       outlined
+      :readonly="readonly"
       :type="inputType"
       class="q-mr-md"
       @update:model-value="updateMinimum($event)"
@@ -35,6 +36,7 @@
       :label="t('maximum')"
       stack-label
       outlined
+      :readonly="readonly"
       :type="inputType"
       @update:model-value="updateMaximum($event)"
     />
