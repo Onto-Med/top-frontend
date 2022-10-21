@@ -24,6 +24,7 @@
           v-if="[Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier)"
           v-model="state.cardinality"
           type="number"
+          :readonly="readonly"
           :error="state.cardinality === undefined"
           :label="t('cardinality')"
         />
