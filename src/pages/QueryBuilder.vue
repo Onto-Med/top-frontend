@@ -87,9 +87,9 @@
         </template>
 
         <template #after>
-          <div class="row q-gutter-md q-pa-md">
-            <q-card class="col">
-              <q-item>
+          <div class="row q-gutter-md q-pt-md q-pl-md fit">
+            <q-card class="col column">
+              <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('projection') }}
@@ -99,28 +99,30 @@
                 </q-item-section>
               </q-item>
               <q-separator />
-              <q-card-section>
-                <q-list v-if="query.projection && query.projection.length" dense separator>
-                  <projection-entry
-                    v-for="(entry, index) in query.projection"
-                    :key="index"
-                    v-model:sorting="entry.sorting"
-                    :subject-id="entry.subjectId"
-                    :up-disabled="index == 0"
-                    :down-disabled="index == query.projection.length - 1"
-                    @move-up="moveSelectEntry(index, index - 1)"
-                    @move-down="moveSelectEntry(index, index + 1)"
-                    @remove="query.projection.splice(index, 1)"
-                  />
-                </q-list>
-                <div v-else>
-                  {{ t('nothingSelectedYet') }}
-                </div>
+              <q-card-section class="col fit q-pa-none">
+                <q-scroll-area class="fit q-px-sm">
+                  <q-list v-if="query.projection && query.projection.length" dense separator>
+                    <projection-entry
+                      v-for="(entry, index) in query.projection"
+                      :key="index"
+                      v-model:sorting="entry.sorting"
+                      :subject-id="entry.subjectId"
+                      :up-disabled="index == 0"
+                      :down-disabled="index == query.projection.length - 1"
+                      @move-up="moveSelectEntry(index, index - 1)"
+                      @move-down="moveSelectEntry(index, index + 1)"
+                      @remove="query.projection.splice(index, 1)"
+                    />
+                  </q-list>
+                  <div v-else>
+                    {{ t('nothingSelectedYet') }}
+                  </div>
+                </q-scroll-area>
               </q-card-section>
             </q-card>
 
-            <q-card class="col">
-              <q-item>
+            <q-card class="col column">
+              <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('eligibilityCriterion', 2) }}
@@ -130,27 +132,29 @@
                 </q-item-section>
               </q-item>
               <q-separator />
-              <q-card-section v-if="aggregationFunctionOptions">
-                <div v-show="!query.criteria.length">
-                  {{ t('nothingSelectedYet') }}
-                </div>
-                <q-list v-show="query.criteria.length" dense>
-                  <template v-for="(criterion, index) in query.criteria" :key="index">
-                    <criterion
-                      v-model:inclusion="criterion.inclusion"
-                      v-model:date-time-restriction="criterion.dateTimeRestriction"
-                      v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
-                      :aggregation-function-options="aggregationFunctionOptions"
-                      :subject-id="criterion.subjectId"
-                      @remove-clicked="query.criteria.splice(index, 1)"
-                    />
-                    <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
-                      <q-separator class="col" />
-                      <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable and-separator" />
-                      <q-separator class="col" />
-                    </div>
-                  </template>
-                </q-list>
+              <q-card-section v-if="aggregationFunctionOptions" class="col fit q-pa-none">
+                <q-scroll-area class="fit q-px-sm">
+                  <div v-show="!query.criteria.length">
+                    {{ t('nothingSelectedYet') }}
+                  </div>
+                  <q-list v-show="query.criteria.length" dense>
+                    <template v-for="(criterion, index) in query.criteria" :key="index">
+                      <criterion
+                        v-model:inclusion="criterion.inclusion"
+                        v-model:date-time-restriction="criterion.dateTimeRestriction"
+                        v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
+                        :aggregation-function-options="aggregationFunctionOptions"
+                        :subject-id="criterion.subjectId"
+                        @remove-clicked="query.criteria.splice(index, 1)"
+                      />
+                      <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
+                        <q-separator class="col" />
+                        <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable and-separator" />
+                        <q-separator class="col" />
+                      </div>
+                    </template>
+                  </q-list>
+                </q-scroll-area>
               </q-card-section>
             </q-card>
           </div>
