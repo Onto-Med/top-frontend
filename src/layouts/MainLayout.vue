@@ -153,6 +153,11 @@
     <q-page-container>
       <router-view :key="repositoryId" />
     </q-page-container>
+
+    <q-ajax-bar
+      position="top"
+      color="primary"
+    />
   </q-layout>
 </template>
 
