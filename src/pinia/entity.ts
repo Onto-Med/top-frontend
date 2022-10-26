@@ -62,13 +62,14 @@ export const useEntity = defineStore('entity', {
     },
 
     async setOrganisation (organisationId: string|undefined) {
-      if (this.organisationId !== organisationId)
-        this.entities = []
-      this.organisationId = organisationId
-      if (!organisationId) {
-        this.organisation = undefined
-        return
+      if (this.organisationId !== organisationId) {
+        this.entities       = []
+        this.organisationId = organisationId
+        this.organisation   = undefined
+        this.repositoryId   = undefined
+        this.repository     = undefined
       }
+      if (!organisationId || this.organisation) return
       await this.organisationApi?.getOrganisationById(organisationId)
         .then(r => {
           if (organisationId === this.organisationId)
@@ -77,19 +78,18 @@ export const useEntity = defineStore('entity', {
     },
 
     async setRepository (repositoryId: string|undefined) {
-      if (this.repositoryId !== repositoryId)
+      if (this.repositoryId !== repositoryId) {
         this.entities = []
-      this.repositoryId = repositoryId
-      if (!repositoryId) {
+        this.repositoryId = repositoryId
         this.repository = undefined
-        return
       }
+      if (!repositoryId || this.repository) return
       const organisationId = this.organisationId
       if (!organisationId) return
       await this.repositoryApi?.getRepositoryById(organisationId, repositoryId, undefined)
         .then(r => {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
-          this.repository = r.data
+            this.repository = r.data
         })
     },
 
