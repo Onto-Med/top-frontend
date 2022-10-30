@@ -12,8 +12,7 @@
     </q-card>
 
     <div class="row no-wrap justify-between">
-
-      <q-card class="col-2">
+      <q-card class="col-2 q-mr-xs">
         <q-card-section>
           <div class="text-subtitle2">
             {{ t('concept', 2) }}
@@ -21,11 +20,12 @@
         </q-card-section>
         <q-card-section>
           <q-chip
-            v-for="concept in concepts"
-            :key="concept"
+            v-for="(concept, index) in concepts"
+            :key="concept.id"
             class="cursor-pointer relative-position"
+            :style="selectedColors[index]"
             clickable
-            @click="chooseConcept(concept.id)"
+            @click="chooseConcept(concept, index)"
           >
             <div class="ellipsis">
               {{ concept.labels }}
@@ -34,23 +34,25 @@
         </q-card-section>
       </q-card>
 
-      <q-card class="col">
+      <q-card class="col q-mr-xs">
         <q-card-section>
           <div class="text-subtitle2">
             {{ t('document', 2) }}
           </div>
         </q-card-section>
-        <q-card-section>
-          <q-chip
-            v-for="document in documents"
-            :key="document"
-            class="cursor-pointer relative-position"
-            clickable
-            @click="chooseDocument(document.id)"
-          >
-            {{ document.id }}
-          </q-chip>
-        </q-card-section>
+        <q-scroll-area style="height: 92%">
+          <q-card-section class="col fit">
+            <q-chip
+              v-for="(documentId, index) in documentIds"
+              :key="'doc-'+index"
+              class="cursor-pointer relative-position"
+              clickable
+              @click="chooseDocument(documentId)"
+            >
+              {{ documentId }}
+            </q-chip>
+          </q-card-section>
+        </q-scroll-area>
       </q-card>
 
       <q-card v-if="document_" class="col">
@@ -59,60 +61,26 @@
             {{ t('details', 2) }}
           </div>
         </q-card-section>
-        <q-card-section>
-          <div class="text-h6"> {{ document_.id }} </div>
-        </q-card-section>
-        <q-card-section>
-            <div> {{ document_.text }} </div>
-        </q-card-section>
+        <q-scroll-area style="height: 92%">
+          <q-card-section>
+            <div class="text-h6">
+              {{ document_.id }}
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <div>
+              {{ document_.text }}
+            </div>
+          </q-card-section>
+        </q-scroll-area>
       </q-card>
-
     </div>
-<!--    <q-card>-->
-<!--      <q-card-section>-->
-<!--        <div class="text-h6">-->
-<!--          {{ t('concept', 2) }}-->
-<!--        </div>-->
-<!--      </q-card-section>-->
-
-<!--      <q-separator />-->
-
-<!--      <div class="q-pa-sm row items-start q-gutter-sm">-->
-<!--        <q-card-->
-<!--          v-for="(concept, index) in concepts"-->
-<!--          :key="concept"-->
-<!--          :style="{ background: distinctColors[index], color: distinctColorsFont[index]}">-->
-<!--          <q-card-section v-ripple class="cursor-pointer relative-position" @click="chooseConcept(concept.id)">-->
-<!--            {{ concept.text }}-->
-<!--          </q-card-section>-->
-<!--        </q-card>-->
-<!--      </div>-->
-<!--    </q-card>-->
-
-<!--    <table-with-actions-->
-<!--      :rows="documents"-->
-<!--      :columns="columns"-->
-<!--      :loading="loading"-->
-<!--      @reload-clicked="reload()"-->
-<!--      @row-clicked="routeToDocument($event)"-->
-<!--    >-->
-<!--      <template #row-cells="{ row }">-->
-<!--        <q-td auto-width>-->
-<!--          {{ row.id }}-->
-<!--        </q-td>-->
-<!--        <q-td class="q-gutter-md">-->
-<!--          <q-chip v-for="phrase in row.phrases" :key="phrase" size="md" @click.stop="alert(phrase)">-->
-<!--            {{ phrase }}-->
-<!--          </q-chip>-->
-<!--        </q-td>-->
-<!--      </template>-->
-<!--    </table-with-actions>-->
   </q-page>
 </template>
 
 <script lang="ts">
 import {computed, defineComponent, inject, onMounted, ref} from 'vue'
-import { Notify } from 'quasar'
+import {Notify, QChip} from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { DocumentApiKey, PhraseApiKey, ConceptApiKey } from 'src/boot/axios'
@@ -127,45 +95,47 @@ export default defineComponent({
   setup () {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    // const router    = useRouter()
     const documentApi = inject(DocumentApiKey)
     const phraseApi = inject(PhraseApiKey)
     const conceptApi = inject(ConceptApiKey)
-    const documents = ref<Document[]>([])
+    const documentIds = ref<string[]>([])
     const document_ = ref<Document>()
     const concepts = ref<Concept[]>([])
     const loading = ref(false)
-    const columns = computed(() => [
-      // { name: 'actions', sortable: false },
-      { name: 'docId', label: t('document'), align: 'left', required: true, sortable: true },
-      { name: 'docPhrases', label: t('phrase',2), align: 'left', sortable: false },
-    ])
+    const selectedConcepts = ref<number[]>([])
     const distinctColors = [
-      '#696969', '#d3d3d3', '#556b2f', '#228b22',
+      '#556b2f', '#228b22',
       '#7f0000', '#483d8b', '#008b8b', '#cd853f',
       '#4682b4', '#000080', '#8fbc8f', '#800080',
       '#b03060', '#ff0000', '#ffa500', '#00ff00',
       '#dc143c', '#00ffff', '#0000ff', '#f08080',
       '#adff2f', '#ff00ff', '#1e90ff', '#f0e68c',
       '#ffff54', '#dda0dd', '#90ee90', '#7b68ee',
-      '#00ff7f', '#ff1493']
+      '#00ff7f', '#ff1493', '#696969', '#d3d3d3']
     const distinctColorsFont = [
-      '#ffffff', '#000000', '#ffffff', '#ffffff',
+      '#ffffff', '#ffffff',
       '#ffffff', '#ffffff', '#000000', '#000000',
       '#000000', '#ffffff', '#000000', '#ffffff',
       '#000000', '#000000', '#000000', '#000000',
       '#000000', '#000000', '#ffffff', '#000000',
       '#000000', '#000000', '#000000', '#000000',
       '#000000', '#000000', '#000000', '#000000',
-      '#000000', '#000000'
-    ]
-    const phraseText: string[] = [];
+      '#000000', '#000000', '#ffffff', '#000000']
+    const conceptColors: object[] = []; //ToDo: const? or ref?
+    const selectedColors = ref<object[]>([])
 
     const reload = async () => {
       if (!conceptApi || !documentApi) return
       loading.value = true
       await conceptApi.getConcepts()
-        .then(r => concepts.value = r.data)
+        .then(r => {
+          concepts.value = r.data
+          concepts.value.forEach(function (concept, index) {
+            conceptColors.push({'background-color': distinctColors[index], 'color': distinctColorsFont[index]})
+          });
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          selectedColors.value = new Array(concepts.value.length).fill({'background-color': '', 'color': ''})
+        })
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
     }
@@ -177,20 +147,26 @@ export default defineComponent({
     return {
       t,
       document_,
-      documents,
+      documentIds,
       concepts,
       loading,
-      columns,
       reload,
       alert,
-      distinctColors,
-      distinctColorsFont,
-      phraseText,
-      async chooseConcept (conceptId: string) {
+      selectedColors,
+      async chooseConcept (concept: Concept, idx: number) {
         if (!documentApi) return
-        await documentApi.getDocumentByConceptId(conceptId)
+        await documentApi.getDocumentByConceptId(concept.id, true)
           .then(r => {
-            documents.value = r.data
+            selectedConcepts.value.length = 0 //Todo: some toggle when multiple selected concepts are desirable
+            documentIds.value.length = 0
+
+            selectedConcepts.value.push(idx)
+            documentIds.value = r.data.map(function (doc) {
+              return doc.id
+            })
+
+            selectedColors.value.fill({'background-color': '', 'color': ''})
+            selectedConcepts.value.forEach( function (_idx) {selectedColors.value[_idx] = conceptColors[_idx]})
           })
           .catch((e: Error) => alert(e.message))
       },
