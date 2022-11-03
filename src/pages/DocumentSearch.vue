@@ -11,11 +11,18 @@
       </q-card-section>
     </q-card>
 
-    <div class="row no-wrap justify-between">
-      <q-card class="col-2 q-mr-xs">
+    <div class="row no-wrap justify-between" style="height: calc(85vh)">
+      <q-card id="concept-box" class="col-2 q-mr-xs">
         <q-card-section>
           <div class="text-subtitle2">
             {{ t('concept', 2) }}
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <div class="q-gutter-sm">
+            <q-radio v-model="conceptMode" dense val="exclusive" label="exclusive" @click="clearConceptSelection()"/>
+            <q-radio v-model="conceptMode" dense val="union" label="union" />
+            <q-radio v-model="conceptMode" dense val="intersection" label="intersection" disable/>
           </div>
         </q-card-section>
         <q-card-section>
@@ -34,34 +41,50 @@
         </q-card-section>
       </q-card>
 
-      <q-card class="col q-mr-xs">
+      <q-card id="document-box" class="col q-mr-xs">
         <q-card-section>
           <div class="text-subtitle2">
-            {{ t('document', 2) }}
+            {{ t('document', 2) }} <a v-if="documentIds.length > 0">(Results: {{ documentIds.length }})</a>
           </div>
         </q-card-section>
-        <q-scroll-area style="height: 92%">
-          <q-card-section class="col fit">
-            <q-chip
-              v-for="(documentId, index) in documentIds"
-              :key="'doc-'+index"
-              class="cursor-pointer relative-position"
-              clickable
-              @click="chooseDocument(documentId)"
-            >
-              {{ documentId }}
-            </q-chip>
-          </q-card-section>
-        </q-scroll-area>
+        <!--  TODO: need to find a better solution for style height -->
+        <q-virtual-scroll
+          v-slot="{ item, index }"
+          style="height: 94%"
+          :items="documentIds"
+          separator
+        >
+          <q-item
+            :key="index + item"
+            class="cursor-pointer relative-position"
+            clickable
+            @click="chooseDocument(item)"
+          >
+            <q-item-section>
+              <q-item-label
+                :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
+              >
+                {{ item }}
+              </q-item-label>
+              <q-item-label
+                caption
+                lines="2"
+                :style="{'font-size': '14px'}"
+              >
+                First line of doc or some such thing
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-virtual-scroll>
       </q-card>
 
-      <q-card v-if="document_" class="col">
+      <q-card v-if="document_" id="details-box" class="col">
         <q-card-section>
           <div class="text-subtitle2">
             {{ t('details', 2) }}
           </div>
         </q-card-section>
-        <q-scroll-area style="height: 92%">
+        <q-scroll-area style="height: 94%">
           <q-card-section>
             <div class="text-h6">
               {{ document_.id }}
@@ -123,6 +146,7 @@ export default defineComponent({
       '#000000', '#000000', '#ffffff', '#000000']
     const conceptColors: object[] = []; //ToDo: const? or ref?
     const selectedColors = ref<object[]>([])
+    const conceptMode = ref('exclusive')
 
     const reload = async () => {
       if (!conceptApi || !documentApi) return
@@ -153,22 +177,37 @@ export default defineComponent({
       reload,
       alert,
       selectedColors,
+      conceptMode,
       async chooseConcept (concept: Concept, idx: number) {
         if (!documentApi) return
-        await documentApi.getDocumentByConceptId(concept.id, true)
-          .then(r => {
-            selectedConcepts.value.length = 0 //Todo: some toggle when multiple selected concepts are desirable
-            documentIds.value.length = 0
 
-            selectedConcepts.value.push(idx)
-            documentIds.value = r.data.map(function (doc) {
-              return doc.id
-            })
-
-            selectedColors.value.fill({'background-color': '', 'color': ''})
-            selectedConcepts.value.forEach( function (_idx) {selectedColors.value[_idx] = conceptColors[_idx]})
+        documentIds.value.length = 0
+        if (conceptMode.value === 'exclusive') {
+          selectedConcepts.value.length = 0
+          selectedConcepts.value.push(idx)
+        } else if (selectedConcepts.value.includes(idx)) {
+          selectedConcepts.value = selectedConcepts.value.filter(function (item) {
+            return item !== idx
           })
-          .catch((e: Error) => alert(e.message))
+        } else {
+          selectedConcepts.value.push(idx)
+        }
+
+        if (selectedConcepts.value.length !== 0) {
+          await documentApi.getDocumentsByConceptIds(
+            selectedConcepts.value.map(selConcept => {
+              return concepts.value[selConcept].id
+            }), true
+          )
+            .then(r => {
+              documentIds.value = [...new Set(r.data.map(function (doc) {
+                return doc.id
+              }))] //ToDo: I'm not sure if I need a set here...
+            })
+            .catch((e: Error) => alert(e.message))
+        } else {document_.value = undefined}
+        selectedColors.value.fill({'background-color': '', 'color': ''})
+        selectedConcepts.value.forEach( function (_idx) {selectedColors.value[_idx] = conceptColors[_idx]})
       },
       async chooseDocument (documentId: string) {
         if (!documentApi) return
@@ -177,6 +216,12 @@ export default defineComponent({
             document_.value = r.data
           })
           .catch((e: Error) => alert(e.message))
+      },
+      clearConceptSelection() {
+        selectedConcepts.value.length = 0
+        documentIds.value.length = 0
+        document_.value = undefined
+        selectedColors.value.fill({'background-color': '', 'color': ''})
       },
     }
   }
