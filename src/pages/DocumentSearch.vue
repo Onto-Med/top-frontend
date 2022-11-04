@@ -19,10 +19,41 @@
           </div>
         </q-card-section>
         <q-card-section>
-          <div class="q-gutter-sm">
-            <q-radio v-model="conceptMode" dense val="exclusive" label="exclusive" @click="clearConceptSelection()"/>
-            <q-radio v-model="conceptMode" dense val="union" label="union" />
-            <q-radio v-model="conceptMode" dense val="intersection" label="intersection" disable/>
+          <div class="q-pa-xs-md">
+            <!-- ToDo: is weird (toggle group parts are not visible) when viewport gets too small -->
+            <q-btn-toggle
+              v-model="conceptMode"
+              toggle-color="primary"
+              no-caps
+              rounded
+              size="sm"
+              text-color="grey"
+              :options="[
+                {slot: 'exclusive', value: 'exclusive'},
+                {slot: 'union', value: 'union'},
+                {slot: 'intersection', value: 'intersection'}
+              ]"
+              @click="checkConceptSelectionMode()"
+            >
+              <template v-slot:exclusive>
+                <div class="row items-center no-wrap">
+                  <div> Exclusive </div>
+                  <q-icon right size="xs" name="mdi-circle" />
+                </div>
+              </template>
+              <template v-slot:union>
+                <div class="row items-center no-wrap">
+                  <div> Union </div>
+                  <q-icon right size="sm" name="mdi-set-all" />
+                </div>
+              </template>
+              <template v-slot:intersection>
+                <div class="row items-center no-wrap">
+                  <div> Intersection </div>
+                  <q-icon right size="sm" name="mdi-set-center" />
+                </div>
+              </template>
+            </q-btn-toggle>
           </div>
         </q-card-section>
         <q-card-section>
@@ -32,11 +63,14 @@
             class="cursor-pointer relative-position"
             :style="selectedColors[index]"
             clickable
-            @click="chooseConcept(concept, index)"
+            @click="chooseConcept(index, false)"
           >
             <div class="ellipsis">
               {{ concept.labels }}
             </div>
+            <q-tooltip :delay="500" anchor="center right" self="center left" :offset="[10, 10]">
+             {{ concept.labels }}
+            </q-tooltip>
           </q-chip>
         </q-card-section>
       </q-card>
@@ -148,6 +182,9 @@ export default defineComponent({
     const selectedColors = ref<object[]>([])
     const conceptMode = ref('exclusive')
 
+    let currentConceptMode = conceptMode.value
+    let lastSelectedConcept = -1
+
     const reload = async () => {
       if (!conceptApi || !documentApi) return
       loading.value = true
@@ -164,6 +201,41 @@ export default defineComponent({
         .finally(() => loading.value = false)
     }
 
+    const chooseConcept = async (idx: number, changedConceptMode: boolean | undefined) => {
+      if (!documentApi) return
+
+      documentIds.value.length = 0
+      if (changedConceptMode !== true) {
+        if (conceptMode.value === 'exclusive') {
+          selectedConcepts.value.length = 0
+          selectedConcepts.value.push(idx)
+        } else if (selectedConcepts.value.includes(idx)) {
+          selectedConcepts.value = selectedConcepts.value.filter(function (item) {
+            return item !== idx
+          })
+        } else {
+          selectedConcepts.value.push(idx)
+        }
+        lastSelectedConcept = idx
+      }
+
+      if (selectedConcepts.value.length !== 0) {
+        await documentApi.getDocumentsByConceptIds(
+          selectedConcepts.value.map(selConcept => {
+            return concepts.value[selConcept].id
+          }), true, conceptMode.value, undefined
+        )
+          .then(r => {
+            documentIds.value = [...new Set(r.data.map(function (doc) {
+              return doc.id
+            }))] //ToDo: I'm not sure if I need a set here...
+          })
+          .catch((e: Error) => alert(e.message))
+      } else {document_.value = undefined}
+      selectedColors.value.fill({'background-color': '', 'color': ''})
+      selectedConcepts.value.forEach( function (_idx) {selectedColors.value[_idx] = conceptColors[_idx]})
+    }
+
     onMounted(async () => {
       await reload()
     })
@@ -178,37 +250,7 @@ export default defineComponent({
       alert,
       selectedColors,
       conceptMode,
-      async chooseConcept (concept: Concept, idx: number) {
-        if (!documentApi) return
-
-        documentIds.value.length = 0
-        if (conceptMode.value === 'exclusive') {
-          selectedConcepts.value.length = 0
-          selectedConcepts.value.push(idx)
-        } else if (selectedConcepts.value.includes(idx)) {
-          selectedConcepts.value = selectedConcepts.value.filter(function (item) {
-            return item !== idx
-          })
-        } else {
-          selectedConcepts.value.push(idx)
-        }
-
-        if (selectedConcepts.value.length !== 0) {
-          await documentApi.getDocumentsByConceptIds(
-            selectedConcepts.value.map(selConcept => {
-              return concepts.value[selConcept].id
-            }), true
-          )
-            .then(r => {
-              documentIds.value = [...new Set(r.data.map(function (doc) {
-                return doc.id
-              }))] //ToDo: I'm not sure if I need a set here...
-            })
-            .catch((e: Error) => alert(e.message))
-        } else {document_.value = undefined}
-        selectedColors.value.fill({'background-color': '', 'color': ''})
-        selectedConcepts.value.forEach( function (_idx) {selectedColors.value[_idx] = conceptColors[_idx]})
-      },
+      chooseConcept,
       async chooseDocument (documentId: string) {
         if (!documentApi) return
         await documentApi.getDocumentById(documentId)
@@ -217,11 +259,20 @@ export default defineComponent({
           })
           .catch((e: Error) => alert(e.message))
       },
-      clearConceptSelection() {
-        selectedConcepts.value.length = 0
-        documentIds.value.length = 0
-        document_.value = undefined
-        selectedColors.value.fill({'background-color': '', 'color': ''})
+      async checkConceptSelectionMode() {
+        if (currentConceptMode === conceptMode.value) return
+        currentConceptMode = conceptMode.value
+        if (selectedConcepts.value.length <= 1) return
+
+        if (conceptMode.value === 'exclusive') {
+          await chooseConcept(lastSelectedConcept, false)
+          // selectedConcepts.value.length = 0;
+          // documentIds.value.length = 0;
+          // document_.value = undefined;
+          // selectedColors.value.fill({'background-color': '', 'color': ''});
+        } else {
+          await chooseConcept(lastSelectedConcept, true)
+        }
       },
     }
   }
