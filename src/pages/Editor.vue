@@ -9,7 +9,7 @@
               {{ repository.name || repository.id }}
             </div>
 
-            <div v-if="repository">
+            <div v-if="isPhenotypeRepository">
               <q-btn
                 dense
                 flat
@@ -359,7 +359,11 @@ export default defineComponent({
         if (repository.value?.repositoryType === RepositoryType.PhenotypeRepository)
           return undefined
         return []
-      })
+      }),
+
+      isPhenotypeRepository: computed(() =>
+        repository.value && repository.value.repositoryType === RepositoryType.PhenotypeRepository
+      )
     }
   }
 })
