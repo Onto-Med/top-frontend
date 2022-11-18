@@ -319,5 +319,8 @@
   "valueRange": "Wertebereich|Wertebereiche",
   "version": "Version|Versionen",
   "versionHistory": "Versionsverlauf|Versionsverläufe",
-  "versionRestoreDescription": "Dies wird die Entität auf den angezeigten Status zurücksetzen."
+  "versionRestoreDescription": "Dies wird die Entität auf den angezeigten Status zurücksetzen.",
+  "phenotype_repository": "Phänotyp-Repositorium|Phänotyp-Repositorien",
+  "concept_repository": "Konzept-Repositorium|Konzept-Repositorien",
+  "repositoryType": "Repositoriumsart|Repositoriumsarten"
 }

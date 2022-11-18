@@ -319,5 +319,8 @@
   "valueRange": "Value range|Value ranges",
   "version": "Version|Versions",
   "versionHistory": "Version history|Version histories",
-  "versionRestoreDescription": "This will reset the entity to the displayed status."
+  "versionRestoreDescription": "This will reset the entity to the displayed status.",
+  "repositoryType": "Repository type|Repository types",
+  "concept_repository": "Concept repository|Concept repositories",
+  "phenotype_repository": "Phenotype repository|Phenotype repositories"
 }
