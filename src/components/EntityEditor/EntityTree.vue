@@ -55,6 +55,7 @@
             <entity-tree-context-menu
               v-if="showContextMenu"
               :entity="node"
+              :allowed-entity-types="allowedEntityTypes"
               @delete-entity-clicked="$emit('deleteEntity', $event)"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
@@ -63,7 +64,11 @@
           </div>
         </template>
       </q-tree>
-      <entity-tree-context-menu v-if="showContextMenu" @create-entity-clicked="handleCreateEntityClicked" />
+      <entity-tree-context-menu
+        v-if="showContextMenu"
+        :allowed-entity-types="allowedEntityTypes"
+        @create-entity-clicked="handleCreateEntityClicked"
+      />
     </q-scroll-area>
     <q-inner-loading
       :showing="loading"
@@ -116,6 +121,10 @@ export default defineComponent({
     excludeTypeIfEmpty: {
       type: Array as () => EntityType[],
       default: () => []
+    },
+    allowedEntityTypes: {
+      type: Array as () => EntityType[],
+      default: () => Object.values(EntityType)
     }
   },
   emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
@@ -130,6 +139,7 @@ export default defineComponent({
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
       return props.nodes.filter(n => {
+        if (!props.allowedEntityTypes.includes(n.entityType)) return false
         if (hideCategories.value && n.entityType === EntityType.Category) return false
         return true
       })

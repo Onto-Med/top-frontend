@@ -25,6 +25,7 @@
             v-model:selected="selected"
             :nodes="entities"
             :loading="treeLoading"
+            :allowed-entity-types="allowedEntityTypes"
             class="col column"
             show-context-menu
             @refresh-clicked="reloadEntities"
@@ -119,7 +120,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick } from 'vue'
+import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
@@ -131,6 +132,7 @@ import ExportDialog from 'src/components/EntityEditor/ExportDialog.vue'
 import { Entity, EntityType, LocalisableText, Phenotype, DataType } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { RepositoryType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'Editor',
@@ -349,7 +351,15 @@ export default defineComponent({
             if (tab) tab.preserve = true
           }
         })
-      }
+      },
+
+      allowedEntityTypes: computed(() => {
+        if (repository.value?.repositoryType === RepositoryType.ConceptRepository)
+          return [EntityType.Category]
+        if (repository.value?.repositoryType === RepositoryType.PhenotypeRepository)
+          return undefined
+        return []
+      })
     }
   }
 })

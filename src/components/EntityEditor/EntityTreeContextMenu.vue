@@ -2,7 +2,7 @@
   <q-menu context-menu>
     <q-list v-if="!entity || entity.createdAt && entity.entityType === EntityType.Category" dense>
       <q-item
-        v-for="entityType in [EntityType.Category, EntityType.SinglePhenotype, EntityType.CompositePhenotype]"
+        v-for="entityType in abstractEntityTypes"
         :key="entityType"
         v-close-popup
         clickable
@@ -14,7 +14,7 @@
     <q-list v-else-if="entity && entity.createdAt" dense>
       <template v-for="entry in entries" :key="entry.phenotype">
         <q-item
-          v-if="entity.entityType === entry.phenotype"
+          v-if="entity.entityType === entry.phenotype && allowedEntityTypes.includes(entry.restriction)"
           v-close-popup
           clickable
           @click="emitCreateEntity(entry.restriction, entity.id)"
@@ -23,7 +23,7 @@
         </q-item>
       </template>
     </q-list>
-    <q-list v-if="entity && entity.createdAt" dense>
+    <q-list v-if="duplicatable && entity && entity.createdAt" dense>
       <q-item
         v-close-popup
         clickable
@@ -33,12 +33,12 @@
       </q-item>
     </q-list>
     <q-separator />
-    <q-list v-if="entity" dense>
+    <q-list v-if="exportable && entity" dense>
       <q-item v-close-popup clickable @click="$emit('exportClicked', entity)">
         <q-item-section v-t="'export'" />
       </q-item>
     </q-list>
-    <q-list v-if="entity" dense>
+    <q-list v-if="deletable && entity" dense>
       <q-item clickable @click="showDeleteDialog = true">
         <q-item-section v-t="'delete'" />
       </q-item>
@@ -67,18 +67,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, Entity } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'EntityTreeContextMenu',
   props: {
-    entity: Object as () => Entity
+    entity: Object as () => Entity,
+    allowedEntityTypes: {
+      type: Array as () => EntityType[],
+      default: () => Object.values(EntityType)
+    },
+    deletable: {
+      type: Boolean,
+      default: true
+    },
+    duplicatable: {
+      type: Boolean,
+      default: true
+    },
+    exportable: {
+      type: Boolean,
+      default: true
+    }
   },
   emits: ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked', 'exportClicked'],
   setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
 
     return {
@@ -88,6 +103,11 @@ export default defineComponent({
         { phenotype: EntityType.SinglePhenotype, restriction: EntityType.SingleRestriction },
         { phenotype: EntityType.CompositePhenotype, restriction: EntityType.CompositeRestriction }
       ],
+
+      abstractEntityTypes: computed(() =>
+        [EntityType.Category, EntityType.SinglePhenotype, EntityType.CompositePhenotype]
+          .filter(e => props.allowedEntityTypes.includes(e))
+      ),
 
       EntityType,
 
