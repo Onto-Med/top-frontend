@@ -88,7 +88,7 @@
 
         <template #after>
           <div class="row q-gutter-md q-pt-md q-pl-md fit">
-            <q-card class="col column">
+            <q-card class="col-12 col-md column">
               <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
@@ -121,7 +121,7 @@
               </q-card-section>
             </q-card>
 
-            <q-card class="col column">
+            <q-card class="col-12 col-md column">
               <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
