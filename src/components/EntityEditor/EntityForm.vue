@@ -50,7 +50,7 @@
             <data-type-select
               v-if="hasDataType(entityType)"
               :model-value="dataType"
-              :readonly="readonly"
+              :readonly="readonly || version !== undefined"
               @update:model-value="$emit('update:dataType', $event)"
             />
 
