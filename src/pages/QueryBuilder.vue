@@ -14,7 +14,7 @@
       <q-separator />
 
       <q-card-section class="row q-pa-none">
-        <div class="col-7 q-pa-md">
+        <div class="col-12 col-sm-6 col-md-7 q-pa-md">
           <q-input v-model="query.name" :label="t('queryName')" type="text" />
           <q-select
             v-model="query.dataSources"
@@ -32,9 +32,9 @@
           />
         </div>
 
-        <q-separator vertical />
+        <q-separator vertical class="gt-xs" />
 
-        <div class="col q-pa-md">
+        <div class="col-12 col-sm q-pa-md">
           <p v-t="'queryImportDescription'" />
           <q-file
             v-model="importFile"
@@ -88,7 +88,7 @@
 
         <template #after>
           <div class="row q-gutter-md q-pt-md q-pl-md fit">
-            <q-card class="col column">
+            <q-card class="col-12 col-md column">
               <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
@@ -121,7 +121,7 @@
               </q-card-section>
             </q-card>
 
-            <q-card class="col column">
+            <q-card class="col-12 col-md column">
               <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
