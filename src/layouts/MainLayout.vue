@@ -8,7 +8,6 @@
           round
           icon="menu"
           aria-label="Menu"
-          class="gt-sm"
           @click="toggleLeftDrawer"
         />
 
@@ -110,6 +109,7 @@
     </q-header>
 
     <q-drawer
+      ref="drawer"
       :mini="!leftDrawerOpen"
       show-if-above
       bordered
@@ -172,7 +172,7 @@ import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDial
 import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
 import { Entity, ForkingInstruction } from '@onto-med/top-api'
-import { useQuasar } from 'quasar'
+import { QMenu, useQuasar } from 'quasar'
 import { fabGithub } from '@quasar/extras/fontawesome-v5'
 import useAlert from 'src/mixins/useAlert'
 
@@ -193,6 +193,7 @@ export default defineComponent({
     const { alert } = useAlert()
     const keycloak = entityStore.keycloak
     const forkOrigin = ref(undefined as Entity|undefined)
+    const drawer = ref(undefined as QMenu|undefined)
 
     const linksList = computed(() => [
       {
@@ -211,6 +212,7 @@ export default defineComponent({
 
     return {
       t,
+      drawer,
       productName: packageInfo.productName,
       repositoryUrl: packageInfo.repository ? (packageInfo.repository as Record<string, unknown>).url as string : undefined,
       links: linksList,
@@ -227,7 +229,10 @@ export default defineComponent({
       }),
 
       toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
+        if (($q.platform.is.mobile || $q.screen.lt.md) && drawer.value)
+          drawer.value.show()
+        else
+          leftDrawerOpen.value = !leftDrawerOpen.value
       },
 
       routeToEntity (entity: Entity) {
