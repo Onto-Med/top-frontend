@@ -217,19 +217,18 @@ export default defineComponent({
     superCategories: {
       type: Array as () => Category[],
       default: () => []
-    }
+    },
+    restrictionKey: Number
   },
   emits: [
     'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
     'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory'
   ],
   setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const router = useRouter()
     const { isRestricted, hasDataType, restrictionEntityTypes, getTitle } = useEntityFormatter()
     const entityStore = useEntity()
-    const restrictionKey = ref(0)
     const showSuperCategoryInput = ref(false)
 
     return {
@@ -239,7 +238,6 @@ export default defineComponent({
       restrictionEntityTypes,
       getTitle,
 
-      restrictionKey,
       EntityType,
       DataType,
       showSuperCategoryInput,
