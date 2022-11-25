@@ -33,7 +33,7 @@
       <q-btn-group flat>
         <q-btn
           :icon="sorting === Sorting.Desc ? 'arrow_downward' : 'arrow_upward'"
-          :label="t(sorting)"
+          :label="$q.screen.gt.md ? t(sorting) : ''"
           :title="t('sorting')"
           @click="$emit('update:sorting', sorting === Sorting.Asc ? Sorting.Desc : Sorting.Asc)"
         />
