@@ -1,45 +1,55 @@
 <template>
   <div class="row items-center">
-    <q-select
-      :model-value="minOperator || minOperators[0]"
-      :options="minOperators"
-      :readonly="readonly"
-      outlined
-      emit-value
-      map-options
-      class="operator-input"
-      @update:model-value="$emit('update:minOperator', $event)"
-    />
     <q-input
       :model-value="minimumValue"
       :label="t('minimum')"
       stack-label
       outlined
+      dense
       :readonly="readonly"
       :type="inputType"
       class="q-mr-md"
       @update:model-value="updateMinimum($event)"
-    />
+    >
+      <template #before>
+        <q-select
+          :model-value="minOperator || minOperators[0]"
+          :options="minOperators"
+          :readonly="readonly"
+          outlined
+          dense
+          emit-value
+          map-options
+          class="operator-input"
+          @update:model-value="$emit('update:minOperator', $event)"
+        />
+      </template>
+    </q-input>
 
-    <q-select
-      :model-value="maxOperator || maxOperators[0]"
-      :options="maxOperators"
-      :readonly="readonly"
-      emit-value
-      map-options
-      outlined
-      class="operator-input"
-      @update:model-value="$emit('update:maxOperator', $event)"
-    />
     <q-input
       :model-value="maximumValue"
       :label="t('maximum')"
       stack-label
       outlined
+      dense
       :readonly="readonly"
       :type="inputType"
       @update:model-value="updateMaximum($event)"
-    />
+    >
+      <template #before>
+        <q-select
+          :model-value="maxOperator || maxOperators[0]"
+          :options="maxOperators"
+          :readonly="readonly"
+          emit-value
+          map-options
+          outlined
+          dense
+          class="operator-input"
+          @update:model-value="$emit('update:maxOperator', $event)"
+        />
+      </template>
+    </q-input>
     <div v-if="unit" class="q-ml-md">
       {{ t('inUnit', { unit: unit }) }}
     </div>
