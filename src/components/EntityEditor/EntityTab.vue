@@ -168,6 +168,7 @@
       :repository-id="repositoryId"
       :organisation-id="organisationId"
       :readonly="isOtherVersion"
+      :restriction-key="restrictionKey"
       @entity-clicked="$emit('entityClicked', $event)"
       @add-super-category="addSuperCategory(undefined)"
       @set-super-category="setSuperCategory"
@@ -227,7 +228,6 @@ export default defineComponent({
   },
   emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'change'],
   setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
     const clone = (value: Category|Phenotype) =>
       JSON.parse(JSON.stringify(value)) as Category|Phenotype
@@ -369,6 +369,7 @@ export default defineComponent({
 
       reset: () => {
         local.value = clone(props.entity)
+        restrictionKey.value++
         void router.replace({
           name: 'editor',
           params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: local.value.id },
