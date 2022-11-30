@@ -35,7 +35,7 @@ export const useEntity = defineStore('entity', {
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
 
-      await this.entityApi?.getEntitiesByRepositoryId(organisationId, repositoryId)
+      await this.entityApi?.getRootEntitiesByRepositoryId(organisationId, repositoryId)
         .then((r) => {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
             this.entities = r.data
