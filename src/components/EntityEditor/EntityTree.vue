@@ -192,7 +192,6 @@ export default defineComponent({
               const parent = map.get(c.id)
               if (parent) {
                 parent.children.push(map.get(e.id as string) as TreeNode)
-                parent.lazy = false
                 root = false
               }
             }
@@ -206,7 +205,6 @@ export default defineComponent({
                 const parent = map.get(e.superPhenotype.id)
                 if (parent) {
                   parent.children.push(node)
-                  parent.lazy = false
                 }
               }
             }
