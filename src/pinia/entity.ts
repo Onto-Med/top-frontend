@@ -290,6 +290,17 @@ export const useEntity = defineStore('entity', {
         })
     },
 
+    async loadChildren (entity: Entity) {
+      if (!entity || !entity.id || !this.entityApi || !this.organisationId || !this.repositoryId)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+
+      await this.entityApi.getSubclassesById(this.organisationId, this.repositoryId, entity.id)
+        .then((r) => r.data.forEach(e => this.addOrReplaceEntity(e)))
+    },
+
     hasSuperCategory (entity: Category|Phenotype, category: Category): boolean {
       return entity.superCategories?.findIndex(c => c.id === category.id) !== -1
     },
