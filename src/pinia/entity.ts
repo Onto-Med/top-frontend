@@ -267,23 +267,23 @@ export const useEntity = defineStore('entity', {
     },
 
     async deleteVersion (entity: Entity) {
-      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
     },
 
     async restoreVersion (entity: Entity) {
-      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
         .then(() => {
           const old = this.entities.find(e => e.id == entity.id)
           if (old) Object.assign(old, entity)
