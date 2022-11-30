@@ -38,6 +38,7 @@
         node-key="id"
         selected-color="primary"
         @update:selected="handleSelectedChange"
+        @lazy-load="onLazyLoad"
       >
         <template #default-header="{ node }">
           <div class="row items-center fit non-selectable">
@@ -100,6 +101,7 @@ import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
 import { Category, EntityType, Entity } from '@onto-med/top-api'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   name: 'EntityTree',
@@ -124,6 +126,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const { t } = useI18n()
     const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
+    const entityStore       = useEntity()
     const expansion         = ref([] as string[])
     const filter            = ref('')
     const hideCategories    = ref(false)
@@ -172,7 +175,7 @@ export default defineComponent({
 
       list
         .filter(e => e.id)
-        .forEach(e => map.set(e.id as string, { ...e, children: [] } as TreeNode))
+        .forEach(e => map.set(e.id as string, { ...e, children: [], lazy: true } as TreeNode))
 
       list
         .filter(e => e.id)
@@ -185,15 +188,28 @@ export default defineComponent({
           let root = true;
 
           (e as Category).superCategories?.forEach(c => {
-            if (c.id && map.get(c.id)) {
-              (map.get(c.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
-              root = false
+            if (c.id) {
+              const parent = map.get(c.id)
+              if (parent) {
+                parent.children.push(map.get(e.id as string) as TreeNode)
+                parent.lazy = false
+                root = false
+              }
             }
           })
           if (isRestricted(e)) {
             root = false
-            if (e.superPhenotype && e.superPhenotype.id && map.get(e.superPhenotype.id))
-              (map.get(e.superPhenotype.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
+            const node = map.get(e.id as string)
+            if (node) {
+              node.lazy = false
+              if (e.superPhenotype && e.superPhenotype.id) {
+                const parent = map.get(e.superPhenotype.id)
+                if (parent) {
+                  parent.children.push(node)
+                  parent.lazy = false
+                }
+              }
+            }
           }
 
           if (root) {
@@ -245,13 +261,29 @@ export default defineComponent({
       handleCreateEntityClicked (t: EntityType, e?: string) {
         if (e) expansion.value.push(e)
         emit('createEntity', t, e)
+      },
+
+      async onLazyLoad ({ node, done, fail }: LazyLoadDetails) {
+        await entityStore.loadChildren(node)
+          .then(() => done([]))
+          .catch((e: Error) => {
+            alert(e)
+            fail()
+          })
       }
     }
   }
 })
 
 interface TreeNode extends Entity {
-  children: TreeNode[]
+  children: TreeNode[],
+  lazy?: boolean
+}
+
+interface LazyLoadDetails {
+  node: TreeNode,
+  done: (children: TreeNode[]) => void,
+  fail: () => void
 }
 </script>
 
