@@ -131,7 +131,24 @@ export const useEntity = defineStore('entity', {
     },
 
     getEntity (id: string|undefined): Entity|undefined {
+      if (!id) return undefined
       return this.entities.find(e => e.id === id)
+    },
+
+    loadEntity (id: string|undefined, ignoreCache = false): Promise<Entity|undefined> {
+      if (!ignoreCache) {
+        const entity = this.getEntity(id)
+        if (entity) return Promise.resolve(entity)
+      }
+
+      if (!id || !this.entityApi || !this.organisationId || !this.repositoryId)
+        return Promise.resolve(undefined)
+      return this.entityApi
+        .getEntityById(this.organisationId, this.repositoryId, id)
+        .then(r => {
+          this.addOrReplaceEntity(r.data)
+          return r.data
+        })
     },
 
     addEntity (entityType: EntityType, superClassId: string): Entity {
@@ -321,11 +338,13 @@ export const useEntity = defineStore('entity', {
       return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
     },
 
-    getSuperPhenotype (phenotype: Phenotype|string): Phenotype|undefined {
+    async loadSuperPhenotype (phenotype: Phenotype|string): Promise<Phenotype|undefined> {
       const entityId = phenotype.hasOwnProperty('id') ? (phenotype as Phenotype).id : phenotype as string
-      const restriction = this.getEntity(entityId)
-      if (!restriction || !this.isRestricted(restriction) || !restriction.superPhenotype) return undefined
-      return this.getEntity(restriction.superPhenotype.id) as Phenotype|undefined
+      return this.loadEntity(entityId)
+        .then(restriction => {
+          if (!restriction || !this.isRestricted(restriction) || !restriction.superPhenotype) return Promise.resolve(undefined)
+          return this.loadEntity(restriction.superPhenotype.id)
+        })
     }
   }
 })

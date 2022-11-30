@@ -255,11 +255,14 @@ export default defineComponent({
       document.addEventListener('keydown', keylistener)
       await reloadEntities().then(() => {
         if (!props.entityId) return
-        const entity = entityStore.getEntity(props.entityId)
-        if (entity) {
-          tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
-          selected.value = entity
-        }
+        entityStore
+          .loadEntity(props.entityId)
+          .then(entity => {
+            if (!entity) return
+            tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
+            selected.value = entity
+          })
+          .catch((e: Error) => alert(e.message))
       })
     })
 

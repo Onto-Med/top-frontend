@@ -267,7 +267,7 @@ export default defineComponent({
         await entityStore.loadChildren(node)
           .then(() => done([]))
           .catch((e: Error) => {
-            alert(e)
+            alert(e.message)
             fail()
           })
       }

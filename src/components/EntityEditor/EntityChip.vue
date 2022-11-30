@@ -104,9 +104,13 @@ export default defineComponent({
       }
       loading.value = true
       if (props.entityId) {
-        const entity = entityStore.getEntity(props.entityId)
-        if (entity) state.value = entity
-        loading.value = false
+        entityStore
+          .loadEntity(props.entityId)
+          .then(e => {
+            state.value = e
+            loading.value = false
+          })
+          .catch((e: Error) => alert(e.message))
       }
     }
 
