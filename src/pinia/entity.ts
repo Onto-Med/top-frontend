@@ -157,6 +157,8 @@ export const useEntity = defineStore('entity', {
           const categories = (e as Category).superCategories
           if (categories) {
             return Promise.all(categories.map(c => {
+              if (!c || !c.id || !this.entityApi || !this.organisationId || !this.repositoryId || this.getEntity(c.id))
+                return Promise.resolve(e)
               return this.loadEntity(c.id, ignorelocal)
             })).then(() => e)
           }
