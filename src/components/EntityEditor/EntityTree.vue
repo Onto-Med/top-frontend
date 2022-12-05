@@ -260,11 +260,10 @@ export default defineComponent({
 
       handleSearch (entity?: Entity) {
         if (!entity) return
-        entityStore.addOrReplaceEntity(entity)
         void router.push({
-            name: 'editor',
-            params: { organisationId: organisationId.value, repositoryId: repositoryId.value, entityId: entity.id }
-          })
+          name: 'editor',
+          params: { organisationId: organisationId.value, repositoryId: repositoryId.value, entityId: entity.id }
+        })
       }
     }
   }

@@ -135,19 +135,32 @@ export const useEntity = defineStore('entity', {
       return this.entities.find(e => e.id === id)
     },
 
-    loadEntity (id: string|undefined, ignoreCache = false): Promise<Entity|undefined> {
-      if (!ignoreCache) {
-        const entity = this.getEntity(id)
-        if (entity) return Promise.resolve(entity)
-      }
-
-      if (!id || !this.entityApi || !this.organisationId || !this.repositoryId)
-        return Promise.resolve(undefined)
-      return this.entityApi
-        .getEntityById(this.organisationId, this.repositoryId, id)
-        .then(r => {
-          this.addOrReplaceEntity(r.data)
-          return r.data
+    loadEntity (id: string|undefined, ignorelocal = false): Promise<Entity|undefined> {
+      return Promise.resolve()
+        .then(() => {
+          if (!ignorelocal) {
+            const entity = this.getEntity(id)
+            if (entity) return entity
+          }
+        })
+        .then((e) => {
+          if (e || !id || !this.entityApi || !this.organisationId || !this.repositoryId)
+            return Promise.resolve(e)
+          return this.entityApi
+            .getEntityById(this.organisationId, this.repositoryId, id)
+            .then(r => {
+              this.addOrReplaceEntity(r.data)
+              return r.data
+            })
+        })
+        .then((e) => {
+          const categories = (e as Category).superCategories
+          if (categories) {
+            return Promise.all(categories.map(c => {
+              return this.loadEntity(c.id, ignorelocal)
+            })).then(() => e)
+          }
+          return e
         })
     },
 

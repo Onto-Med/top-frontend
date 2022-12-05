@@ -224,7 +224,9 @@ export default defineComponent({
       (newVal) => {
         if (newVal) {
           if (!selected.value || newVal !== selected.value.id)
-            selected.value = entityStore.getEntity(newVal)
+            entityStore.loadEntity(newVal)
+              .then(entity => selected.value = entity)
+              .catch((e: Error) => alert(e.message))
         } else {
           selected.value = undefined
         }
