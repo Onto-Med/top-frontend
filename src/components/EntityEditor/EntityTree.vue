@@ -22,8 +22,6 @@
           </q-list>
         </q-menu>
       </q-btn>
-      <q-separator vertical />
-      <q-btn stretch flat icon="refresh" :title="t('reload')" @click="handleRefreshClick" />
     </q-toolbar>
 
     <q-separator />
@@ -75,26 +73,6 @@
       :showing="loading"
       :label="t('pleaseWait') + '...'"
     />
-
-    <q-dialog v-model="showRefreshDialog">
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar icon="warning_amber" color="warning" text-color="white" />
-            </q-item-section>
-            <q-item-section v-t="'entityEditor.confirmRefreshTree'" />
-          </q-item>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('refreshClicked')" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -131,7 +109,7 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
+  emits: ['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
   setup (props, { emit }) {
     const { t } = useI18n()
     const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()
@@ -140,7 +118,6 @@ export default defineComponent({
     const filter            = ref('')
     const filterEntityType  = ref(undefined as EntityType|undefined)
     const filterDataType    = ref(undefined as DataType|undefined)
-    const showRefreshDialog = ref(false)
     const entityTypeOptions = [EntityType.SinglePhenotype, EntityType.CompositePhenotype]
 
     const visibleNodes = computed((): Entity[] => {
@@ -171,10 +148,6 @@ export default defineComponent({
       () => props.selected,
       (entity: Entity|undefined) => expand(entity)
     )
-
-    const newNodes = computed((): boolean => {
-      return props.nodes?.findIndex(n => !n.createdAt) !== -1
-    })
 
     const removeEmptyNodes = (nodes: TreeNode[], types: EntityType[]): TreeNode[] => {
       const result = JSON.parse(JSON.stringify(nodes)) as TreeNode[]
@@ -238,7 +211,6 @@ export default defineComponent({
       filterEntityType,
       EntityType,
       entityTypeOptions,
-      showRefreshDialog,
       getIcon,
       getIconTooltip,
       getTitle,
@@ -248,13 +220,6 @@ export default defineComponent({
       treeNodes: computed((): TreeNode[] => {
         return toTree(visibleNodes.value, props.excludeTypeIfEmpty)
       }),
-
-      handleRefreshClick (): void {
-        if (newNodes.value)
-          showRefreshDialog.value = true
-        else
-          emit('refreshClicked')
-      },
 
       handleSelectedChange (key: string): void {
         if (!key || !props.nodes) {
