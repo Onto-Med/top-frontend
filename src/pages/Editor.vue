@@ -59,7 +59,7 @@
                   rounded
                   icon="close"
                   size="xs"
-                  @click.prevent="closeTab(tab.entity)"
+                  @click.stop="closeTab(tab.entity)"
                 />
               </span>
               <q-menu context-menu>
