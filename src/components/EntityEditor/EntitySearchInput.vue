@@ -17,6 +17,8 @@
       :rounded="rounded"
       :outlined="outlined"
       :dense="dense"
+      :filled="filled"
+      :square="square"
       hide-bottom-space
       hide-dropdown-icon
       use-input
@@ -116,14 +118,13 @@ export default defineComponent({
     },
     entityTypes: Array as () => EntityType[],
     dataType: String as () => DataType,
-    clearOnSelect: {
-      type: Boolean,
-      default: false
-    },
+    clearOnSelect: Boolean,
     showDetails: Boolean,
     rounded: Boolean,
     outlined: Boolean,
     dense: Boolean,
+    filled: Boolean,
+    square: Boolean,
     autofocus: Boolean,
     organisationId: String,
     repositoryId: String,
@@ -132,7 +133,6 @@ export default defineComponent({
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const { getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted } = useEntityFormatter()
     const entityApi = inject(EntityApiKey)
