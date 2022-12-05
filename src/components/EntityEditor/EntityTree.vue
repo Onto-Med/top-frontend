@@ -46,6 +46,7 @@
         no-selection-unset
         node-key="id"
         selected-color="primary"
+        no-transition
         @update:selected="handleSelectedChange"
         @lazy-load="onLazyLoad"
       >
