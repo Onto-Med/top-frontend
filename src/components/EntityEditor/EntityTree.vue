@@ -2,11 +2,21 @@
   <div>
     <q-toolbar class="q-px-none q-gutter-y-sm">
       <q-toolbar-title class="q-px-none">
-        <q-input v-model="filter" dense filled :label="t('filter')">
+        <entity-search-input
+          v-if="repositoryId"
+          :label="t('searchThing', { thing: t('entity') }) + '...'"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          dense
+          filled
+          square
+          clear-on-select
+          @entity-selected="handleSearch"
+        >
           <template #append>
-            <q-icon v-show="filter !== ''" name="clear" class="cursor-pointer" @click="filter = ''" />
+            <q-btn dense flat icon="search" :title="t('search')" />
           </template>
-        </q-input>
+        </entity-search-input>
       </q-toolbar-title>
 
       <q-separator vertical />
@@ -31,8 +41,6 @@
         v-model:expanded="expansion"
         :selected="selected ? selected.id : ''"
         :nodes="treeNodes"
-        :filter="filter"
-        :filter-method="filterFn"
         :no-nodes-label="t('entityTree.noNodesLabel')"
         :no-results-label="t('entityTree.noResultsLabel')"
         no-selection-unset
@@ -82,14 +90,18 @@ import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
 import EntityTypeSelect from 'src/components/EntityEditor/EntityTypeSelect.vue'
+import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import { Category, EntityType, Entity, DataType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'EntityTree',
   components: {
     DataTypeSelect,
+    EntitySearchInput,
     EntityTreeContextMenu,
     EntityTypeSelect
   },
@@ -113,9 +125,10 @@ export default defineComponent({
   setup (props, { emit }) {
     const { t } = useI18n()
     const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()
-    const entityStore       = useEntity()
+    const entityStore = useEntity()
+    const router      = useRouter()
+    const { organisationId, repositoryId } = storeToRefs(entityStore)
     const expansion         = ref([] as string[])
-    const filter            = ref('')
     const filterEntityType  = ref(undefined as EntityType|undefined)
     const filterDataType    = ref(undefined as DataType|undefined)
     const entityTypeOptions = [EntityType.SinglePhenotype, EntityType.CompositePhenotype]
@@ -206,11 +219,12 @@ export default defineComponent({
     return {
       t,
       expansion,
-      filter,
       filterDataType,
       filterEntityType,
       EntityType,
       entityTypeOptions,
+      repositoryId,
+      organisationId,
       getIcon,
       getIconTooltip,
       getTitle,
@@ -230,10 +244,6 @@ export default defineComponent({
         }
       },
 
-      filterFn (node: Entity, filter: string): boolean {
-        return getTitle(node).toLowerCase().includes(filter.toLowerCase())
-      },
-
       handleCreateEntityClicked (t: EntityType, e?: string) {
         if (e) expansion.value.push(e)
         emit('createEntity', t, e)
@@ -245,6 +255,15 @@ export default defineComponent({
           .catch((e: Error) => {
             alert(e.message)
             fail()
+          })
+      },
+
+      handleSearch (entity?: Entity) {
+        if (!entity) return
+        entityStore.addOrReplaceEntity(entity)
+        void router.push({
+            name: 'editor',
+            params: { organisationId: organisationId.value, repositoryId: repositoryId.value, entityId: entity.id }
           })
       }
     }
