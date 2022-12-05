@@ -204,11 +204,9 @@ export default defineComponent({
 
           (e as Category).superCategories?.forEach(c => {
             if (c.id) {
+              root = false
               const parent = map.get(c.id)
-              if (parent) {
-                parent.children.push(map.get(e.id as string) as TreeNode)
-                root = false
-              }
+              if (parent) parent.children.push(map.get(e.id as string) as TreeNode)
             }
           })
           if (isRestricted(e)) {
@@ -218,9 +216,7 @@ export default defineComponent({
               node.lazy = false
               if (e.superPhenotype && e.superPhenotype.id) {
                 const parent = map.get(e.superPhenotype.id)
-                if (parent) {
-                  parent.children.push(node)
-                }
+                if (parent) parent.children.push(node)
               }
             }
           }
