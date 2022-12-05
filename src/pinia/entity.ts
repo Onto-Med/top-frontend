@@ -307,15 +307,18 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async loadChildren (entity: Entity) {
+    async loadChildren (entity: Entity): Promise<Entity[]> {
       if (!entity || !entity.id || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await this.entityApi.getSubclassesById(this.organisationId, this.repositoryId, entity.id)
-        .then((r) => r.data.forEach(e => this.addOrReplaceEntity(e)))
+      return await this.entityApi.getSubclassesById(this.organisationId, this.repositoryId, entity.id)
+        .then((r) => {
+          r.data.forEach(e => this.addOrReplaceEntity(e))
+          return r.data
+        })
     },
 
     hasSuperCategory (entity: Category|Phenotype, category: Category): boolean {
