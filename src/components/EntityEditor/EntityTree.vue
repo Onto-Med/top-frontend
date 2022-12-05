@@ -86,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch } from 'vue'
+import { defineComponent, computed, ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
@@ -96,7 +96,6 @@ import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import { Category, EntityType, Entity, DataType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'EntityTree',
@@ -127,7 +126,6 @@ export default defineComponent({
     const { t } = useI18n()
     const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
-    const router      = useRouter()
     const { organisationId, repositoryId } = storeToRefs(entityStore)
     const expansion         = ref([] as string[])
     const filterEntityType  = ref(undefined as EntityType|undefined)
@@ -259,12 +257,13 @@ export default defineComponent({
           })
       },
 
-      handleSearch (entity?: Entity) {
+      async handleSearch (entity?: Entity) {
         if (!entity) return
-        void router.push({
-          name: 'editor',
-          params: { organisationId: organisationId.value, repositoryId: repositoryId.value, entityId: entity.id }
-        })
+        await entityStore.loadEntity(entity.id)
+          .then((e) => {
+            emit('update:selected', e)
+            void nextTick(() => expand(entity))
+          })
       }
     }
   }
