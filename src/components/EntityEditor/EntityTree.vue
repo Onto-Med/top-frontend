@@ -24,10 +24,10 @@
         <q-menu class="filter-menu">
           <q-list dense>
             <q-item>
-              <entity-type-select v-model="filterEntityType" :options="entityTypeOptions" class="fit" />
+              <entity-type-select v-model="filterEntityType" :options="entityTypeOptions" class="fit" dense />
             </q-item>
             <q-item>
-              <data-type-select v-model="filterDataType" class="fit" />
+              <data-type-select v-model="filterDataType" class="fit" dense />
             </q-item>
           </q-list>
         </q-menu>
