@@ -51,6 +51,7 @@
               v-if="hasDataType(entityType)"
               :model-value="dataType"
               :readonly="readonly || version !== undefined"
+              required
               @update:model-value="$emit('update:dataType', $event)"
             />
 

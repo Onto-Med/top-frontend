@@ -14,7 +14,10 @@
         <q-menu class="filter-menu">
           <q-list dense>
             <q-item>
-              <q-checkbox v-model="hideCategories" :label="t('hideThing', { thing: t('category', 2) })" />
+              <entity-type-select v-model="filterEntityType" :options="entityTypeOptions" class="fit" />
+            </q-item>
+            <q-item>
+              <data-type-select v-model="filterDataType" class="fit" />
             </q-item>
           </q-list>
         </q-menu>
@@ -100,12 +103,18 @@ import { defineComponent, computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
-import { Category, EntityType, Entity } from '@onto-med/top-api'
+import EntityTypeSelect from 'src/components/EntityEditor/EntityTypeSelect.vue'
+import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
+import { Category, EntityType, Entity, DataType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   name: 'EntityTree',
-  components: { EntityTreeContextMenu },
+  components: {
+    DataTypeSelect,
+    EntityTreeContextMenu,
+    EntityTypeSelect
+  },
   props: {
     nodes: Array as () => Entity[],
     selected: Object as () => Entity,
@@ -125,17 +134,23 @@ export default defineComponent({
   emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
   setup (props, { emit }) {
     const { t } = useI18n()
-    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore       = useEntity()
     const expansion         = ref([] as string[])
     const filter            = ref('')
-    const hideCategories    = ref(false)
+    const filterEntityType  = ref(undefined as EntityType|undefined)
+    const filterDataType    = ref(undefined as DataType|undefined)
     const showRefreshDialog = ref(false)
+    const entityTypeOptions = [EntityType.SinglePhenotype, EntityType.CompositePhenotype]
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
+      if (!filterEntityType.value && !filterDataType.value) return props.nodes
       return props.nodes.filter(n => {
-        if (hideCategories.value && n.entityType === EntityType.Category) return false
+        if (filterEntityType.value && entityTypeOptions.includes(n.entityType) && n.entityType !== filterEntityType.value) return false
+        if (filterDataType.value) {
+          if (isPhenotype(n) && n.dataType !== filterDataType.value) return false
+        }
         return true
       })
     })
@@ -222,9 +237,11 @@ export default defineComponent({
     return {
       t,
       expansion,
-      hideCategories,
       filter,
+      filterDataType,
+      filterEntityType,
       EntityType,
+      entityTypeOptions,
       showRefreshDialog,
       getIcon,
       getIconTooltip,
