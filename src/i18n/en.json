@@ -320,5 +320,6 @@
   "addAsThing": "Add as {thing}",
   "incomplete": "Incomplete",
   "failed": "Failed",
-  "finished": "Finished"
+  "finished": "Finished",
+  "entityType": "Entity type|Entity types"
 }
