@@ -1,7 +1,7 @@
 <template>
   <q-select
     v-model="entityType"
-    stack-label
+    :stack-label="required"
     emit-value
     map-options
     :readonly="readonly"
