@@ -25,10 +25,8 @@
         <div class="toolbar-input-container row no-wrap gt-sm">
           <entity-search-input
             :label="t('searchThing', { thing: t('entity') }) + '...'"
-            :repository-id="repositoryId"
             outlined
             dense
-            square
             clear-on-select
             show-details
             fork
