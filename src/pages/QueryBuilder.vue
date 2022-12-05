@@ -66,7 +66,6 @@
               :nodes="entities"
               :loading="treeLoading"
               class="col column"
-              :exclude-type-if-empty="[EntityType.Category]"
               @refresh-clicked="reloadEntities"
               @update:selected="addCriterion($event); addSelection($event)"
             >
