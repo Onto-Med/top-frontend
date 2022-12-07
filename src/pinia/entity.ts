@@ -154,11 +154,14 @@ export const useEntity = defineStore('entity', {
             })
         })
         .then((e) => {
+          const superPhenotype = (e as Phenotype).superPhenotype
           const categories = (e as Category).superCategories
-          if (categories) {
+          if (superPhenotype && superPhenotype.id) {
+            if (this.getEntity(superPhenotype.id)) return Promise.resolve(e)
+            return this.loadEntity(superPhenotype.id, ignorelocal).then(() => e)
+          } else if (categories) {
             return Promise.all(categories.map(c => {
-              if (!c || !c.id || !this.entityApi || !this.organisationId || !this.repositoryId || this.getEntity(c.id))
-                return Promise.resolve(e)
+              if (!c || !c.id || this.getEntity(c.id)) return Promise.resolve(e)
               return this.loadEntity(c.id, ignorelocal)
             })).then(() => e)
           }
