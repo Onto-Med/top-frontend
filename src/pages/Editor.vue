@@ -59,7 +59,7 @@
                   rounded
                   icon="close"
                   size="xs"
-                  @click.prevent="closeTab(tab.entity)"
+                  @click.stop="closeTab(tab.entity)"
                 />
               </span>
               <q-menu context-menu>
@@ -224,7 +224,9 @@ export default defineComponent({
       (newVal) => {
         if (newVal) {
           if (!selected.value || newVal !== selected.value.id)
-            selected.value = entityStore.getEntity(newVal)
+            entityStore.loadEntity(newVal)
+              .then(entity => selected.value = entity)
+              .catch((e: Error) => alert(e.message))
         } else {
           selected.value = undefined
         }
@@ -255,11 +257,14 @@ export default defineComponent({
       document.addEventListener('keydown', keylistener)
       await reloadEntities().then(() => {
         if (!props.entityId) return
-        const entity = entityStore.getEntity(props.entityId)
-        if (entity) {
-          tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
-          selected.value = entity
-        }
+        entityStore
+          .loadEntity(props.entityId)
+          .then(entity => {
+            if (!entity) return
+            tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
+            selected.value = entity
+          })
+          .catch((e: Error) => alert(e.message))
       })
     })
 

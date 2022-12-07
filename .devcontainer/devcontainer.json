@@ -41,7 +41,8 @@
 		"dariofuzinato.vue-peek",
 		"mhutchie.git-graph",
 		"syler.sass-indented",
-		"HookyQR.minify"
+		"HookyQR.minify",
+		"lokalise.i18n-ally"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

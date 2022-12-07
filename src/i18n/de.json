@@ -320,5 +320,6 @@
   "addAsThing": "Als {thing} hinzufügen",
   "incomplete": "Unvollständig",
   "failed": "Fehlgeschlagen",
-  "finished": "Abgeschlossen"
+  "finished": "Abgeschlossen",
+  "entityType": "Entitätstyp|Entitätstypen"
 }

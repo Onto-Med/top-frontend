@@ -51,6 +51,7 @@
               v-if="hasDataType(entityType)"
               :model-value="dataType"
               :readonly="readonly || version !== undefined"
+              required
               @update:model-value="$emit('update:dataType', $event)"
             />
 
@@ -138,7 +139,7 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType, computed } from 'vue'
+import { ref, defineComponent, PropType, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, Entity  } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
@@ -230,6 +231,13 @@ export default defineComponent({
     const { isRestricted, hasDataType, restrictionEntityTypes, getTitle } = useEntityFormatter()
     const entityStore = useEntity()
     const showSuperCategoryInput = ref(false)
+    const superPhenotype = ref(undefined as Entity|undefined)
+
+    onMounted(async () => {
+      await entityStore
+        .loadSuperPhenotype(props.entityId)
+        .then(e => superPhenotype.value = e)
+    })
 
     return {
       t,
@@ -241,7 +249,7 @@ export default defineComponent({
       EntityType,
       DataType,
       showSuperCategoryInput,
-      superPhenotype: computed(() => entityStore.getSuperPhenotype(props.entityId)),
+      superPhenotype,
 
       routeToEntity (entity: Entity) {
         if (!entity.repository || !entity.repository.organisation) return

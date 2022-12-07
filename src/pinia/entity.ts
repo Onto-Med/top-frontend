@@ -35,7 +35,7 @@ export const useEntity = defineStore('entity', {
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
 
-      await this.entityApi?.getEntitiesByRepositoryId(organisationId, repositoryId)
+      await this.entityApi?.getRootEntitiesByRepositoryId(organisationId, repositoryId)
         .then((r) => {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
             this.entities = r.data
@@ -131,7 +131,39 @@ export const useEntity = defineStore('entity', {
     },
 
     getEntity (id: string|undefined): Entity|undefined {
+      if (!id) return undefined
       return this.entities.find(e => e.id === id)
+    },
+
+    loadEntity (id: string|undefined, ignorelocal = false): Promise<Entity|undefined> {
+      return Promise.resolve()
+        .then(() => {
+          if (!ignorelocal) {
+            const entity = this.getEntity(id)
+            if (entity) return entity
+          }
+        })
+        .then((e) => {
+          if (e || !id || !this.entityApi || !this.organisationId || !this.repositoryId)
+            return Promise.resolve(e)
+          return this.entityApi
+            .getEntityById(this.organisationId, this.repositoryId, id)
+            .then(r => {
+              this.addOrReplaceEntity(r.data)
+              return r.data
+            })
+        })
+        .then((e) => {
+          const categories = (e as Category).superCategories
+          if (categories) {
+            return Promise.all(categories.map(c => {
+              if (!c || !c.id || !this.entityApi || !this.organisationId || !this.repositoryId || this.getEntity(c.id))
+                return Promise.resolve(e)
+              return this.loadEntity(c.id, ignorelocal)
+            })).then(() => e)
+          }
+          return e
+        })
     },
 
     addEntity (entityType: EntityType, superClassId: string): Entity {
@@ -267,26 +299,40 @@ export const useEntity = defineStore('entity', {
     },
 
     async deleteVersion (entity: Entity) {
-      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
     },
 
     async restoreVersion (entity: Entity) {
-      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
         .then(() => {
           const old = this.entities.find(e => e.id == entity.id)
           if (old) Object.assign(old, entity)
+        })
+    },
+
+    async loadChildren (entity: Entity): Promise<Entity[]> {
+      if (!entity || !entity.id || !this.entityApi || !this.organisationId || !this.repositoryId)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+
+      return await this.entityApi.getSubclassesById(this.organisationId, this.repositoryId, entity.id)
+        .then((r) => {
+          r.data.forEach(e => this.addOrReplaceEntity(e))
+          return r.data
         })
     },
 
@@ -310,11 +356,13 @@ export const useEntity = defineStore('entity', {
       return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
     },
 
-    getSuperPhenotype (phenotype: Phenotype|string): Phenotype|undefined {
+    async loadSuperPhenotype (phenotype: Phenotype|string): Promise<Phenotype|undefined> {
       const entityId = phenotype.hasOwnProperty('id') ? (phenotype as Phenotype).id : phenotype as string
-      const restriction = this.getEntity(entityId)
-      if (!restriction || !this.isRestricted(restriction) || !restriction.superPhenotype) return undefined
-      return this.getEntity(restriction.superPhenotype.id) as Phenotype|undefined
+      return this.loadEntity(entityId)
+        .then(restriction => {
+          if (!restriction || !this.isRestricted(restriction) || !restriction.superPhenotype) return Promise.resolve(undefined)
+          return this.loadEntity(restriction.superPhenotype.id)
+        })
     }
   }
 })
