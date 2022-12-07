@@ -187,6 +187,12 @@ export default defineComponent({
         .forEach(e => {
           let root = true;
 
+            if (
+              !e.version
+              || (e as Category).subCategories && (e as Category).subCategories?.length === 0
+              && (e as Category).phenotypes && (e as Category).phenotypes?.length === 0
+            ) (map.get(e.id as string) as TreeNode).lazy = false;
+
           (e as Category).superCategories?.forEach(c => {
             if (c.id) {
               root = false
