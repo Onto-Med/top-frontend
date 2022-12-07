@@ -264,7 +264,13 @@ export default defineComponent({
             tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
             selected.value = entity
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => {
+            alert(e.message)
+            void router.push({
+              name: 'editor',
+              params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: undefined }
+            })
+          })
       })
     })
 
