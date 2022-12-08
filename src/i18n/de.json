@@ -321,5 +321,6 @@
   "incomplete": "Unvollständig",
   "failed": "Fehlgeschlagen",
   "finished": "Abgeschlossen",
-  "entityType": "Entitätstyp|Entitätstypen"
+  "entityType": "Entitätstyp|Entitätstypen",
+  "documentation": "Dokumentation|Dokumentationen"
 }
