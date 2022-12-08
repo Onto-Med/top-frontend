@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -176,7 +176,11 @@ export const useEntity = defineStore('entity', {
       if (superClass && [ EntityType.CompositePhenotype, EntityType.SinglePhenotype ].includes(superClass.entityType)) {
         (entity as Phenotype).dataType = (superClass as Phenotype).dataType || DataType.Number
         if (this.hasRestriction(entity))
-          entity.restriction = { type: entity.dataType } as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
+          entity.restriction = {
+            type: entity.dataType,
+            quantifier: Quantifier.Min,
+            cardinality: 1
+          } as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
       }
 
       if (superClass) {
