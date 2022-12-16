@@ -1,12 +1,13 @@
 {
   "name": "top-frontend",
-  "version": "0.3.3",
+  "version": "0.5.0",
   "description": "An app for ontological modelling and managing of phenotypes.",
   "productName": "TOP Framework",
   "repository": {
     "type": "git",
     "url": "https://github.com/Onto-Med/top-frontend"
   },
+  "homepage": "https://onto-med.github.io/top-deployment/",
   "author": "Christoph Beger <ChristophB@users.noreply.github.com>",
   "private": true,
   "scripts": {
@@ -23,9 +24,8 @@
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "^2.1.5-beta",
     "@lhncbc/ucum-lhc": "^4.1.5",
-    "@onto-med/top-api": "file:../top-api/target/generated-sources/openapi/axios",
+    "@onto-med/top-api": "^0.6.0",
     "@quasar/extras": "^1.15.1",
-    "axios": "^0.21.4",
     "core-js": "^3.24.1",
     "pinia": "^2.0.17",
     "quasar": "^2.7.7",

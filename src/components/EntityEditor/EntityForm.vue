@@ -37,7 +37,6 @@
           :model-value="titles"
           unique
           expanded
-          :autofocus="autofocusTitle"
           :readonly="readonly"
           :required="true"
           :label="t('title', 2)"
@@ -51,8 +50,15 @@
             <data-type-select
               v-if="hasDataType(entityType)"
               :model-value="dataType"
-              :readonly="readonly"
+              :readonly="readonly || version !== undefined"
+              required
               @update:model-value="$emit('update:dataType', $event)"
+            />
+
+            <data-type-select
+              v-else
+              :model-value="DataType.Boolean"
+              readonly
             />
 
             <unit-input
@@ -62,6 +68,18 @@
               show-label
               @update:model-value="$emit('update:unit', $event)"
             />
+
+            <div v-if="isRestricted(entityType) && superPhenotype">
+              {{ t('restrictionOf') }}:
+              <q-btn
+                flat
+                dense
+                no-caps
+                :label="getTitle(superPhenotype, false, true)"
+                :title="t('showThing', { thing: t('phenotype') })"
+                @click="routeToEntity(superPhenotype)"
+              />
+            </div>
           </q-card-section>
         </q-card>
       </div>
@@ -85,6 +103,7 @@
         v-if="[EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entityType)"
         :key="restrictionKey"
         :model-value="restriction"
+        :unit="superPhenotype?.unit"
         expanded
         :readonly="readonly"
         @update:model-value="$emit('update:restriction', $event)"
@@ -120,9 +139,9 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType } from 'vue'
+import { ref, defineComponent, PropType, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category  } from '@onto-med/top-api'
+import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, Entity  } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
@@ -131,6 +150,8 @@ import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UnitInput from 'src/components/UnitInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { useEntity } from 'src/pinia/entity'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   components: {
@@ -198,32 +219,42 @@ export default defineComponent({
       type: Array as () => Category[],
       default: () => []
     },
-    autofocusTitle: {
-      type: Boolean,
-      default: false
-    }
+    restrictionKey: Number
   },
   emits: [
     'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
     'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory'
   ],
-  setup () {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  setup (props) {
     const { t } = useI18n()
-    const { isRestricted, hasDataType, restrictionEntityTypes } = useEntityFormatter()
-    const restrictionKey = ref(0)
+    const router = useRouter()
+    const { isRestricted, hasDataType, restrictionEntityTypes, getTitle } = useEntityFormatter()
+    const entityStore = useEntity()
     const showSuperCategoryInput = ref(false)
+    const superPhenotype = ref(undefined as Entity|undefined)
+
+    onMounted(async () => {
+      await entityStore
+        .loadSuperPhenotype(props.entityId)
+        .then(e => superPhenotype.value = e)
+    })
 
     return {
       t,
       isRestricted,
       hasDataType,
       restrictionEntityTypes,
+      getTitle,
 
-      restrictionKey,
       EntityType,
       DataType,
-      showSuperCategoryInput
+      showSuperCategoryInput,
+      superPhenotype,
+
+      routeToEntity (entity: Entity) {
+        if (!entity.repository || !entity.repository.organisation) return
+        void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
+      }
     }
   }
 })

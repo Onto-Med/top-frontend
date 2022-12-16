@@ -9,7 +9,7 @@
               {{ repository.name || repository.id }}
             </div>
 
-            <div v-if="isPhenotypeRepository">
+            <div v-if="repository" class="gt-xs">
               <q-btn
                 dense
                 flat
@@ -25,7 +25,6 @@
             v-model:selected="selected"
             :nodes="entities"
             :loading="treeLoading"
-            :allowed-entity-types="allowedEntityTypes"
             class="col column"
             show-context-menu
             @refresh-clicked="reloadEntities"
@@ -60,7 +59,7 @@
                   rounded
                   icon="close"
                   size="xs"
-                  @click.prevent="closeTab(tab.entity)"
+                  @click.stop="closeTab(tab.entity)"
                 />
               </span>
               <q-menu context-menu>
@@ -96,7 +95,7 @@
               />
             </q-tab-panel>
           </q-tab-panels>
-          <div v-show="tabs.length === 0" class="col column entity-editor-tab text-grey">
+          <div v-show="tabs.length === 0" class="col column entity-editor-tab text-grey gt-xs">
             <div class="col-3 row q-pa-md">
               <q-icon name="arrow_back_ios" size="xl" />
               <p>
@@ -120,7 +119,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick, computed } from 'vue'
+import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
@@ -129,10 +128,9 @@ import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/EntityEditor/ExportDialog.vue'
-import { Entity, EntityType, LocalisableText, Phenotype, DataType } from '@onto-med/top-api'
+import { Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { RepositoryType } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'Editor',
@@ -148,7 +146,7 @@ export default defineComponent({
   setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, locale } = useI18n()
-    const { getIcon, getTitle, isRestricted, isPhenotype, hasDataType } = useEntityFormatter()
+    const { getIcon, getTitle, isRestricted, isPhenotype } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { alert }        = useAlert()
@@ -226,7 +224,9 @@ export default defineComponent({
       (newVal) => {
         if (newVal) {
           if (!selected.value || newVal !== selected.value.id)
-            selected.value = entityStore.getEntity(newVal)
+            entityStore.loadEntity(newVal)
+              .then(entity => selected.value = entity)
+              .catch((e: Error) => alert(e.message))
         } else {
           selected.value = undefined
         }
@@ -257,11 +257,20 @@ export default defineComponent({
       document.addEventListener('keydown', keylistener)
       await reloadEntities().then(() => {
         if (!props.entityId) return
-        const entity = entityStore.getEntity(props.entityId)
-        if (entity) {
-          tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
-          selected.value = entity
-        }
+        entityStore
+          .loadEntity(props.entityId)
+          .then(entity => {
+            if (!entity) return
+            tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
+            selected.value = entity
+          })
+          .catch((e: Error) => {
+            alert(e.message)
+            void router.push({
+              name: 'editor',
+              params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: undefined }
+            })
+          })
       })
     })
 
@@ -320,8 +329,6 @@ export default defineComponent({
       handleEntityCreation (entityType: EntityType, superClassId: string): void {
         const entity = entityStore.addEntity(entityType, superClassId)
         entity.titles = [ { lang: locale.value } as LocalisableText ]
-        if (hasDataType(entity))
-          (entity as Phenotype).dataType = DataType.Number
         if (entity) selectTabByKey(entity.id)
       },
 
@@ -351,19 +358,7 @@ export default defineComponent({
             if (tab) tab.preserve = true
           }
         })
-      },
-
-      allowedEntityTypes: computed(() => {
-        if (repository.value?.repositoryType === RepositoryType.ConceptRepository)
-          return [EntityType.Category]
-        if (repository.value?.repositoryType === RepositoryType.PhenotypeRepository)
-          return undefined
-        return []
-      }),
-
-      isPhenotypeRepository: computed(() =>
-        repository.value && repository.value.repositoryType === RepositoryType.PhenotypeRepository
-      )
+      }
     }
   }
 })

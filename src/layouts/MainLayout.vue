@@ -22,13 +22,11 @@
 
         <q-space />
 
-        <div class="toolbar-input-container row no-wrap">
+        <div class="toolbar-input-container row no-wrap gt-sm">
           <entity-search-input
             :label="t('searchThing', { thing: t('entity') }) + '...'"
-            :repository-id="repositoryId"
             outlined
             dense
-            square
             clear-on-select
             show-details
             fork
@@ -80,7 +78,7 @@
                 <div class="column items-center">
                   <q-avatar icon="person" size="72px" />
                   <div class="text-subtitle1 q-mb-xs">
-                    {{ keycloak.tokenParsed.preferred_username }}
+                    {{ keycloak.tokenParsed?.preferred_username }}
                   </div>
                   <q-btn
                     v-close-popup
@@ -88,7 +86,7 @@
                     :label="t('logOut')"
                     push
                     size="sm"
-                    @click="keycloak.logout({ redirectUri: 'http://127.0.0.1/' })"
+                    @click="keycloak?.logout({ redirectUri: 'http://127.0.0.1/' })"
                   />
                 </div>
               </div>
@@ -102,13 +100,14 @@
             icon="login"
             :title="t('logIn')"
             class="q-ml-sm"
-            @click="keycloak.login()"
+            @click="keycloak?.login()"
           />
         </div>
       </q-toolbar>
     </q-header>
 
     <q-drawer
+      ref="drawer"
       :mini="!leftDrawerOpen"
       show-if-above
       bordered
@@ -128,6 +127,7 @@
           <div v-show="leftDrawerOpen" class="q-px-md text-grey">
             <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
               <q-btn
+                v-if="repositoryUrl"
                 flat
                 dense
                 no-caps
@@ -136,6 +136,17 @@
                 :href="repositoryUrl"
                 target="_blank"
                 :label="t('sourceCode')"
+              />
+              <q-btn
+                v-if="documentationUrl"
+                flat
+                dense
+                no-caps
+                size="sm"
+                :icon="fasBook"
+                :href="documentationUrl"
+                target="_blank"
+                :label="t('documentation')"
               />
             </div>
           </div>
@@ -152,6 +163,11 @@
     <q-page-container>
       <router-view :key="repositoryId" />
     </q-page-container>
+
+    <q-ajax-bar
+      position="top"
+      color="primary"
+    />
   </q-layout>
 </template>
 
@@ -166,8 +182,8 @@ import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDial
 import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
 import { Entity, ForkingInstruction } from '@onto-med/top-api'
-import { useQuasar } from 'quasar'
-import { fabGithub } from '@quasar/extras/fontawesome-v5'
+import { QMenu, useQuasar } from 'quasar'
+import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
 import useAlert from 'src/mixins/useAlert'
 
 export default defineComponent({
@@ -187,6 +203,7 @@ export default defineComponent({
     const { alert } = useAlert()
     const keycloak = entityStore.keycloak
     const forkOrigin = ref(undefined as Entity|undefined)
+    const drawer = ref(undefined as QMenu|undefined)
 
     const linksList = computed(() => [
       {
@@ -202,13 +219,6 @@ export default defineComponent({
         isHidden: keycloak && !keycloak.authenticated
       },
       {
-        title: t('repository', 2),
-        icon: 'tab',
-        caption: t('developPhenotype', 2),
-        routeName: 'repositories',
-        isHidden: keycloak && !keycloak.authenticated
-      },
-      {
         title: t('document', 2),
         icon: 'article',
         caption: t('documentSearch', 2),
@@ -219,11 +229,14 @@ export default defineComponent({
 
     return {
       t,
+      drawer,
       productName: packageInfo.productName,
+      documentationUrl: packageInfo.homepage,
       repositoryUrl: packageInfo.repository ? (packageInfo.repository as Record<string, unknown>).url as string : undefined,
       links: linksList,
       leftDrawerOpen,
       fabGithub,
+      fasBook,
       keycloak,
       forkOrigin,
       showForkCreateDialog: ref(false),
@@ -231,11 +244,14 @@ export default defineComponent({
       repositoryId: computed(() => {
         const route = router.currentRoute.value
         if (!route || route.name !== 'editor') return undefined
-        return route.params.repositoryId
+        return route.params.repositoryId as string|undefined
       }),
 
       toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
+        if (($q.platform.is.mobile || $q.screen.lt.md) && drawer.value)
+          drawer.value.show()
+        else
+          leftDrawerOpen.value = !leftDrawerOpen.value
       },
 
       routeToEntity (entity: Entity) {
@@ -243,7 +259,8 @@ export default defineComponent({
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
       },
 
-      forkEntity (entity: Entity, forkingInstruction: ForkingInstruction) {
+      forkEntity (entity: Entity|undefined, forkingInstruction: ForkingInstruction) {
+        if (!entity) return
         entityStore.forkEntity(entity, forkingInstruction)
           .then((count) => {
             forkOrigin.value = undefined

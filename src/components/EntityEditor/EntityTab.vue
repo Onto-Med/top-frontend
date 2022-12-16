@@ -4,7 +4,7 @@
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           {{ getTitle(local) }}
-          <small v-if="!isNew" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
+          <small v-if="!isNew" class="gt-xs" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
             {{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})
           </small>
           <small v-else class="text-accent">{{ t('notSavedYet') }}</small>
@@ -45,36 +45,38 @@
           :disable="!hasUnsavedChanges"
           @click="showClearDialog = true"
         />
-        <q-separator vertical />
-        <q-btn
-          flat
-          round
-          dense
-          icon="history"
-          color="primary"
-          :disabled="isNew"
-          :title="t('versionHistory')"
-          @click="showVersionHistory = true"
-        />
-        <q-btn
-          v-show="isForking"
-          flat
-          round
-          dense
-          icon="fork_right"
-          color="primary"
-          :title="t('forkingState')"
-          @click="showForking = true"
-        />
-        <q-btn
-          flat
-          round
-          dense
-          icon="raw_on"
-          color="primary"
-          :title="t('entityEditor.rawBtn.label')"
-          @click="showJson = true"
-        />
+        <q-separator vertical class="gt-xs" />
+        <div class="gt-xs">
+          <q-btn
+            flat
+            round
+            dense
+            icon="history"
+            color="primary"
+            :disabled="isNew"
+            :title="t('versionHistory')"
+            @click="showVersionHistory = true"
+          />
+          <q-btn
+            v-show="isForking"
+            flat
+            round
+            dense
+            icon="fork_right"
+            color="primary"
+            :title="t('forkingState')"
+            @click="showForking = true"
+          />
+          <q-btn
+            flat
+            round
+            dense
+            icon="raw_on"
+            color="primary"
+            :title="t('entityEditor.rawBtn.label')"
+            @click="showJson = true"
+          />
+        </div>
       </q-toolbar>
 
       <q-separator />
@@ -89,6 +91,14 @@
 
           <q-card-section class="q-pt-none q-pr-none q-pb-none text-caption">
             <q-scroll-area class="json-section">
+              <q-btn
+                flat
+                round
+                icon="content_copy"
+                class="fixed-top-right q-mr-md text-grey"
+                :title="t('copy')"
+                @click="copyToClipboard(local)"
+              />
               <pre>{{ local }}</pre>
             </q-scroll-area>
           </q-card-section>
@@ -158,7 +168,7 @@
       :repository-id="repositoryId"
       :organisation-id="organisationId"
       :readonly="isOtherVersion"
-      :autofocus-title="isNew"
+      :restriction-key="restrictionKey"
       @entity-clicked="$emit('entityClicked', $event)"
       @add-super-category="addSuperCategory(undefined)"
       @set-super-category="setSuperCategory"
@@ -184,6 +194,7 @@ import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
 import { EntityApiKey } from 'src/boot/axios'
+import { copyToClipboard } from 'quasar'
 
 export default defineComponent({
   name: 'EntityTab',
@@ -217,7 +228,6 @@ export default defineComponent({
   },
   emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'change'],
   setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d } = useI18n()
     const clone = (value: Category|Phenotype) =>
       JSON.parse(JSON.stringify(value)) as Category|Phenotype
@@ -359,12 +369,18 @@ export default defineComponent({
 
       reset: () => {
         local.value = clone(props.entity)
+        restrictionKey.value++
         void router.replace({
           name: 'editor',
           params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: local.value.id },
           query: { version: local.value.version }
         })
         emit('changeVersion', local.value.version)
+      },
+
+      copyToClipboard (text: unknown): void {
+        copyToClipboard(JSON.stringify(text))
+          .catch(() => alert(t('copyFailed')))
       }
     }
   }

@@ -1,227 +1,184 @@
 <template>
   <q-page v-if="organisation && repository" class="q-pa-md q-gutter-md">
-    <h5 class="row">
-      <b>{{ t('buildQueryFor') }}:</b>
-      <q-breadcrumbs class="q-ml-sm">
-        <q-breadcrumbs-el :label="organisation.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation.id } }" />
-        <q-breadcrumbs-el :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation.id, repositoryId: repository.id } }" />
-      </q-breadcrumbs>
-    </h5>
-
-    <q-stepper
-      ref="stepper"
-      v-model="step"
-      color="primary"
-      done-color="secondary"
-      animated
-      header-nav
-      keep-alive
-    >
-      <q-step
-        :name="1"
-        icon="settings"
-        :title="t('configureThing', { thing: t('source', 2) })"
-        :error="!configurationComplete && step > 1"
-        :done="configurationComplete"
-      >
-        <div class="row q-gutter-md">
-          <div class="col-7">
-            <q-input v-model="query.name" :label="t('queryName')" type="text" />
-            <q-select
-              v-model="query.dataSources"
-              :options="dataSources"
-              :label="t('dataSource', 2)"
-              :error-message="t('dataSourceDescription')"
-              :error="query.dataSources?.length == 0"
-              option-label="title"
-              multiple
-              counter
-              use-chips
-            />
-          </div>
-
-          <q-separator vertical />
-
-          <div class="col">
-            <p v-t="'queryImportDescription'" />
-            <q-file
-              v-model="importFile"
-              :label="t('queryImportFile')"
-              accept=".json"
-            >
-              <template #prepend>
-                <q-icon name="attach_file" />
-              </template>
-              <template #after>
-                <q-btn
-                  color="primary"
-                  icon="file_upload"
-                  :disabled="!importFile"
-                  :label="t('import')"
-                  @click="importQuery"
-                />
-              </template>
-            </q-file>
-          </div>
+    <q-card>
+      <q-card-section>
+        <div class="text-h6 row">
+          <b>{{ t('buildQueryFor') }}:</b>
+          <q-breadcrumbs class="q-ml-sm">
+            <q-breadcrumbs-el :label="organisation.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation.id } }" />
+            <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation.id, repositoryId: repository.id } }" />
+          </q-breadcrumbs>
         </div>
-      </q-step>
+      </q-card-section>
 
-      <q-step
-        :name="2"
-        icon="rule"
-        :title="t('selectThing', { thing: t('criterion', 2) })"
-        :error="!criteriaComplete && step > 2"
-        :done="criteriaComplete"
-        class="phenotype-step"
-      >
-        <q-splitter v-model="splitterModel" style="height: 50vh">
-          <template #before>
-            <div class="column fit">
-              <entity-tree
-                :nodes="entities"
-                :loading="treeLoading"
-                class="col column"
-                :exclude-type-if-empty="[EntityType.Category]"
-                @refresh-clicked="reloadEntities"
-                @update:selected="addCriterion"
+      <q-separator />
+
+      <q-card-section class="row q-pa-none">
+        <div class="col-12 col-sm-6 col-md-7 q-pa-md">
+          <q-input v-model="query.name" :label="t('queryName')" type="text" />
+          <q-select
+            v-model="query.dataSources"
+            :options="dataSources"
+            :label="t('dataSource', 2)"
+            :error-message="t('dataSourceDescription')"
+            :error="query.dataSources?.length == 0"
+            option-value="id"
+            option-label="title"
+            multiple
+            counter
+            use-chips
+            emit-value
+            map-options
+          />
+        </div>
+
+        <q-separator vertical class="gt-xs" />
+
+        <div class="col-12 col-sm q-pa-md">
+          <p v-t="'queryImportDescription'" />
+          <q-file
+            v-model="importFile"
+            :label="t('queryImportFile')"
+            accept=".json"
+          >
+            <template #prepend>
+              <q-icon name="attach_file" />
+            </template>
+            <template #after>
+              <q-btn
+                color="primary"
+                icon="file_upload"
+                :disabled="!importFile"
+                :label="t('import')"
+                @click="importQuery"
               />
-            </div>
-          </template>
+            </template>
+          </q-file>
+        </div>
+      </q-card-section>
 
-          <template #after>
-            <q-card class="q-ma-lg">
-              <q-item>
+      <q-separator />
+
+      <q-splitter v-model="splitterModel" style="height: 50vh">
+        <template #before>
+          <div class="column fit">
+            <entity-tree
+              :nodes="entities"
+              :loading="treeLoading"
+              class="col column"
+              @refresh-clicked="reloadEntities"
+              @update:selected="addCriterion($event); addSelection($event)"
+            >
+              <template #entity-context-menu="props">
+                <q-menu context-menu>
+                  <q-list dense>
+                    <q-item v-close-popup clickable @click="addSelection(props.entity)">
+                      <q-item-section>{{ t('addAsThing', { thing: t('projectionEntry') }) }}</q-item-section>
+                    </q-item>
+                    <q-item v-close-popup clickable @click="addCriterion(props.entity)">
+                      <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </template>
+            </entity-tree>
+          </div>
+        </template>
+
+        <template #after>
+          <div class="row q-gutter-md q-pt-md q-pl-md fit">
+            <q-card class="col-12 col-md column">
+              <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
-                    {{ t('eligibilityCriterion', 2) }}
+                    {{ t('projection') }}
+                    <q-icon v-show="!projectionComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
                   <q-item-label v-t="'eligibilityCriterionSelection'" caption />
                 </q-item-section>
               </q-item>
-
               <q-separator />
-
-              <q-card-section v-if="aggregationFunctionOptions">
-                <div v-show="!query.criteria.length">
-                  {{ t('nothingSelectedYet') }}
-                </div>
-                <q-list v-show="query.criteria.length" dense>
-                  <template v-for="(criterion, index) in query.criteria" :key="index">
-                    <criterion
-                      v-model:inclusion="criterion.inclusion"
-                      v-model:date-time-restriction="criterion.dateTimeRestriction"
-                      v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
-                      :aggregation-function-options="aggregationFunctionOptions"
-                      :subject-id="criterion.subjectId"
-                      @remove-clicked="query.criteria.splice(index, 1)"
+              <q-card-section class="col fit q-pa-none">
+                <q-scroll-area class="fit q-px-sm">
+                  <q-list v-if="query.projection && query.projection.length" dense separator>
+                    <projection-entry
+                      v-for="(entry, index) in query.projection"
+                      :key="index"
+                      v-model:sorting="entry.sorting"
+                      :subject-id="entry.subjectId"
+                      :up-disabled="index == 0"
+                      :down-disabled="index == query.projection.length - 1"
+                      @move-up="moveSelectEntry(index, index - 1)"
+                      @move-down="moveSelectEntry(index, index + 1)"
+                      @remove="query.projection.splice(index, 1)"
                     />
-                    <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
-                      <q-separator class="col" />
-                      <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable" />
-                      <q-separator class="col" />
-                    </div>
-                  </template>
-                </q-list>
+                  </q-list>
+                  <div v-else>
+                    {{ t('nothingSelectedYet') }}
+                  </div>
+                </q-scroll-area>
               </q-card-section>
             </q-card>
-          </template>
-        </q-splitter>
-      </q-step>
 
-      <q-step
-        :name="3"
-        icon="checklist"
-        :title="t('defineThing', { thing: t('resultSet') })"
-        :error="!projectionComplete && step > 3"
-        :done="projectionComplete"
-        class="projection-step"
-      >
-        <q-splitter v-model="splitterModel" style="height: 50vh">
-          <template #before>
-            <div class="column fit">
-              <entity-tree
-                :nodes="entities"
-                :loading="treeLoading"
-                :exclude-type-if-empty="[EntityType.Category]"
-                class="col column"
-                @refresh-clicked="reloadEntities"
-                @update:selected="addSelection"
-              />
-            </div>
-          </template>
-
-          <template #after>
-            <q-card class="q-ma-lg">
-              <q-item>
+            <q-card class="col-12 col-md column">
+              <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
-                    {{ t('projection') }}
+                    {{ t('eligibilityCriterion', 2) }}
+                    <q-icon v-show="!criteriaComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label v-t="'projectionSelection'" caption />
+                  <q-item-label v-t="'eligibilityCriterionSelection'" caption />
                 </q-item-section>
               </q-item>
-
               <q-separator />
-
-              <q-card-section>
-                <q-list v-if="query.projection && query.projection.length" dense separator>
-                  <projection-entry
-                    v-for="(entry, index) in query.projection"
-                    :key="index"
-                    v-model:sorting="entry.sorting"
-                    :subject-id="entry.subjectId"
-                    :up-disabled="index == 0"
-                    :down-disabled="index == query.projection.length - 1"
-                    @move-up="moveSelectEntry(index, index - 1)"
-                    @move-down="moveSelectEntry(index, index + 1)"
-                    @remove="query.projection.splice(index, 1)"
-                  />
-                </q-list>
-                <div v-else>
-                  {{ t('nothingSelectedYet') }}
-                </div>
+              <q-card-section v-if="aggregationFunctionOptions" class="col fit q-pa-none">
+                <q-scroll-area class="fit q-px-sm">
+                  <div v-show="!query.criteria.length">
+                    {{ t('nothingSelectedYet') }}
+                  </div>
+                  <q-list v-show="query.criteria.length" dense>
+                    <template v-for="(criterion, index) in query.criteria" :key="index">
+                      <criterion
+                        v-model:inclusion="criterion.inclusion"
+                        v-model:date-time-restriction="criterion.dateTimeRestriction"
+                        v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
+                        :aggregation-function-options="aggregationFunctionOptions"
+                        :subject-id="criterion.subjectId"
+                        @remove-clicked="query.criteria.splice(index, 1)"
+                      />
+                      <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
+                        <q-separator class="col" />
+                        <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable and-separator" />
+                        <q-separator class="col" />
+                      </div>
+                    </template>
+                  </q-list>
+                </q-scroll-area>
               </q-card-section>
             </q-card>
-          </template>
-        </q-splitter>
-      </q-step>
+          </div>
+        </template>
+      </q-splitter>
 
-      <template #navigation>
-        <q-separator class="q-mb-md" />
-        <q-stepper-navigation>
-          <q-btn-group flat>
-            <q-btn
-              :disable="step == 1"
-              :label="t('back')"
-              class="q-ml-sm"
-              @click="$refs.stepper.previous()"
-            />
-            <q-btn
-              :disable="step >= 3"
-              :label="t('continue')"
-              @click="$refs.stepper.next()"
-            />
-          </q-btn-group>
+      <q-separator />
 
-          <q-btn-group class="float-right">
-            <q-btn
-              icon="play_arrow"
-              color="secondary"
-              :label="t('execute')"
-              :disable="!(configurationComplete && criteriaComplete && projectionComplete)"
-              @click="execute()"
-            />
-            <q-btn
-              icon="save"
-              color="primary"
-              :label="t('export')"
-              :title="t('queryExportDescription')"
-              @click="exportQuery"
-            />
-          </q-btn-group>
-        </q-stepper-navigation>
-      </template>
-    </q-stepper>
+      <q-card-actions>
+        <q-btn
+          icon="play_arrow"
+          color="secondary"
+          :label="t('execute')"
+          :disable="!(configurationComplete && criteriaComplete && projectionComplete)"
+          @click="execute()"
+        />
+        <q-btn
+          icon="save"
+          color="primary"
+          :label="t('export')"
+          :title="t('queryExportDescription')"
+          @click="exportQuery"
+        />
+      </q-card-actions>
+    </q-card>
 
     <query-result-view
       v-for="run in runs.slice().reverse()"
@@ -380,7 +337,7 @@ export default defineComponent({
         if (!query.value.projection) query.value.projection = []
         if (
           !subject
-          || ![EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(subject.entityType)
+          || !isPhenotype(subject) && !isRestricted(subject)
           || query.value.projection.findIndex(r => r.subjectId === subject.id) !== -1
         ) return
         query.value.projection.push({ subjectId: subject.id as string, sorting: Sorting.Asc })
@@ -436,4 +393,7 @@ export default defineComponent({
   min-height: 200px
   .q-stepper__step-inner
     padding: 0 !important
+.and-separator
+  height: 0px
+  margin-top: -16px
 </style>

@@ -17,6 +17,8 @@
       :rounded="rounded"
       :outlined="outlined"
       :dense="dense"
+      :filled="filled"
+      :square="square"
       hide-bottom-space
       hide-dropdown-icon
       use-input
@@ -27,7 +29,9 @@
       :options="options"
       :loading="loading"
       :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
+      :virtual-scroll-item-size="40"
       @filter="filterFn"
+      @virtual-scroll="onScroll"
       @update:model-value="handleSelectionChanged"
     >
       <template #append>
@@ -89,9 +93,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject } from 'vue'
+import { defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import useAlert from 'src/mixins/useAlert'
 import { EntityType, Entity, Repository, DataType } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
@@ -100,7 +103,6 @@ import RepositorySelectField from 'src/components/Repository/RepositorySelectFie
 import { QSelect } from 'quasar'
 
 export default defineComponent({
-  name: 'EntitySearchInput',
   components: {
     RepositorySelectField
   },
@@ -116,14 +118,13 @@ export default defineComponent({
     },
     entityTypes: Array as () => EntityType[],
     dataType: String as () => DataType,
-    clearOnSelect: {
-      type: Boolean,
-      default: false
-    },
+    clearOnSelect: Boolean,
     showDetails: Boolean,
     rounded: Boolean,
     outlined: Boolean,
     dense: Boolean,
+    filled: Boolean,
+    square: Boolean,
     autofocus: Boolean,
     organisationId: String,
     repositoryId: String,
@@ -132,40 +133,76 @@ export default defineComponent({
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const { getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted } = useEntityFormatter()
-    const entityApi = inject(EntityApiKey)
-    const { alert } = useAlert()
-    const options = ref([] as Entity[])
-    const selection = ref(null)
-    const loading = ref(false)
+    const entityApi  = inject(EntityApiKey)
+    const options    = ref([] as Entity[])
+    const selection  = ref(null)
+    const loading    = ref(false)
     const repository = ref(undefined as (Repository|undefined))
-    const select = ref(null as unknown as QSelect)
+    const select     = ref(null as unknown as QSelect)
+    const prevInput  = ref(undefined as string|undefined)
+    const nextPage   = ref(2)
+
+    const loadOptions = (input: string, page = 1): Promise<Entity[]> => {
+      if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
+      let promise: Promise<AxiosResponse<Entity[]>>
+      if (props.organisationId && props.repositoryId) {
+        promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, page)
+      } else if (repository.value && repository.value.organisation) {
+        promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, page)
+      } else {
+        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, page)
+      }
+      return promise.then((r) => r.data)
+    }
 
     return {
-      t, getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted,
-      select, repository, options, selection, loading,
-      async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
-        if (val.length < props.minLength || !entityApi) {
+      t,
+      getTitle,
+      getIcon,
+      getIconTooltip,
+      getSynonyms,
+      getDescriptions,
+      isRestricted,
+
+      select,
+      repository,
+      options,
+      selection,
+      loading,
+
+      filterFn (input: string, update: (arg0: () => void) => void, abort: () => void) {
+        if (input.length < props.minLength || !entityApi) {
           abort()
           return
         }
-
+        prevInput.value = input
         loading.value = true
-        let promise: Promise<AxiosResponse<Entity[]>>
-        if (props.organisationId && props.repositoryId) {
-          promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, val, props.entityTypes, props.dataType)
-        } else if (repository.value && repository.value.organisation) {
-          promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, val, props.entityTypes, props.dataType)
-        } else {
-          promise = entityApi.getEntities(undefined, val, props.entityTypes, props.dataType)
-        }
-        await promise
-          .then((r) => update(() => options.value = r.data))
-          .catch((e: Error) => alert(e.message))
+        loadOptions(input)
+          .then(entities => update(() => options.value = entities))
           .finally(() => loading.value = false)
       },
+
+      onScroll ({ to, direction, ref }: ScrollDetails) {
+        const lastIndex = options.value.length - 1
+        if (loading.value || !prevInput.value || to !== lastIndex || direction === 'decrease')
+          return
+        loading.value = true
+        loadOptions(prevInput.value, nextPage.value)
+          .then(entities => {
+            if (entities.length > 0) {
+              nextPage.value++
+              options.value = options.value.concat(entities)
+              void nextTick(() => {
+                ref.refresh()
+                loading.value = false
+              })
+            }
+          })
+          .finally(() => loading.value = false)
+      },
+
       handleSelectionChanged (entity: Entity) {
         if (props.clearOnSelect) {
           selection.value = null
@@ -173,11 +210,18 @@ export default defineComponent({
         }
         emit('entitySelected', entity)
       },
+
       handleFork (entity: Entity) {
         select.value?.updateInputValue('')
         emit('forkClicked', entity)
       }
     }
-  },
+  }
 });
+
+interface ScrollDetails {
+  to: number,
+  direction: string,
+  ref: QSelect
+}
 </script>

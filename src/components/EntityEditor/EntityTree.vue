@@ -2,11 +2,21 @@
   <div>
     <q-toolbar class="q-px-none q-gutter-y-sm">
       <q-toolbar-title class="q-px-none">
-        <q-input v-model="filter" dense filled :label="t('filter')">
+        <entity-search-input
+          v-if="repositoryId"
+          :label="t('searchThing', { thing: t('entity') }) + '...'"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          dense
+          filled
+          square
+          clear-on-select
+          @entity-selected="handleSearch"
+        >
           <template #append>
-            <q-icon v-show="filter !== ''" name="clear" class="cursor-pointer" @click="filter = ''" />
+            <q-btn dense flat icon="search" :title="t('search')" />
           </template>
-        </q-input>
+        </entity-search-input>
       </q-toolbar-title>
 
       <q-separator vertical />
@@ -14,13 +24,14 @@
         <q-menu class="filter-menu">
           <q-list dense>
             <q-item>
-              <q-checkbox v-model="hideCategories" :label="t('hideThing', { thing: t('category', 2) })" />
+              <entity-type-select v-model="filterEntityType" :options="entityTypeOptions" class="fit" dense />
+            </q-item>
+            <q-item>
+              <data-type-select v-model="filterDataType" class="fit" dense />
             </q-item>
           </q-list>
         </q-menu>
       </q-btn>
-      <q-separator vertical />
-      <q-btn stretch flat icon="refresh" :title="t('reload')" @click="handleRefreshClick" />
     </q-toolbar>
 
     <q-separator />
@@ -30,14 +41,14 @@
         v-model:expanded="expansion"
         :selected="selected ? selected.id : ''"
         :nodes="treeNodes"
-        :filter="filter"
-        :filter-method="filterFn"
         :no-nodes-label="t('entityTree.noNodesLabel')"
         :no-results-label="t('entityTree.noResultsLabel')"
         no-selection-unset
         node-key="id"
         selected-color="primary"
+        no-transition
         @update:selected="handleSelectedChange"
+        @lazy-load="onLazyLoad"
       >
         <template #default-header="{ node }">
           <div class="row items-center fit non-selectable">
@@ -61,6 +72,7 @@
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
               @export-clicked="$emit('exportEntity', $event)"
             />
+            <slot v-else name="entity-context-menu" :entity="node" />
           </div>
         </template>
       </q-tree>
@@ -69,44 +81,35 @@
         :allowed-entity-types="allowedEntityTypes"
         @create-entity-clicked="handleCreateEntityClicked"
       />
+      <slot v-else name="empty-context-menu" />
     </q-scroll-area>
     <q-inner-loading
       :showing="loading"
       :label="t('pleaseWait') + '...'"
     />
-
-    <q-dialog v-model="showRefreshDialog">
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar icon="warning_amber" color="warning" text-color="white" />
-            </q-item-section>
-            <q-item-section v-t="'entityEditor.confirmRefreshTree'" />
-          </q-item>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('refreshClicked')" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch } from 'vue'
+import { defineComponent, computed, ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
-import { Category, EntityType, Entity } from '@onto-med/top-api'
+import EntityTypeSelect from 'src/components/EntityEditor/EntityTypeSelect.vue'
+import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
+import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
+import { Category, EntityType, Entity, DataType } from '@onto-med/top-api'
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'EntityTree',
-  components: { EntityTreeContextMenu },
+  components: {
+    DataTypeSelect,
+    EntitySearchInput,
+    EntityTreeContextMenu,
+    EntityTypeSelect
+  },
   props: {
     nodes: Array as () => Entity[],
     selected: Object as () => Entity,
@@ -127,20 +130,26 @@ export default defineComponent({
       default: () => Object.values(EntityType)
     }
   },
-  emits: ['update:selected', 'refreshClicked', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
+  emits: ['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
   setup (props, { emit }) {
     const { t } = useI18n()
-    const { getIcon, getIconTooltip, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()
+    const entityStore = useEntity()
+    const { organisationId, repositoryId } = storeToRefs(entityStore)
     const expansion         = ref([] as string[])
-    const filter            = ref('')
-    const hideCategories    = ref(false)
-    const showRefreshDialog = ref(false)
+    const filterEntityType  = ref(undefined as EntityType|undefined)
+    const filterDataType    = ref(undefined as DataType|undefined)
+    const entityTypeOptions = [EntityType.SinglePhenotype, EntityType.CompositePhenotype]
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
+      if (!filterEntityType.value && !filterDataType.value) return props.nodes
       return props.nodes.filter(n => {
         if (!props.allowedEntityTypes.includes(n.entityType)) return false
-        if (hideCategories.value && n.entityType === EntityType.Category) return false
+        if (filterEntityType.value && entityTypeOptions.includes(n.entityType) && n.entityType !== filterEntityType.value) return false
+        if (filterDataType.value) {
+          if (isPhenotype(n) && n.dataType !== filterDataType.value) return false
+        }
         return true
       })
     })
@@ -162,10 +171,6 @@ export default defineComponent({
       (entity: Entity|undefined) => expand(entity)
     )
 
-    const newNodes = computed((): boolean => {
-      return props.nodes?.findIndex(n => !n.createdAt) !== -1
-    })
-
     const removeEmptyNodes = (nodes: TreeNode[], types: EntityType[]): TreeNode[] => {
       const result = JSON.parse(JSON.stringify(nodes)) as TreeNode[]
       return result.map(n => {
@@ -180,7 +185,7 @@ export default defineComponent({
 
       list
         .filter(e => e.id)
-        .forEach(e => map.set(e.id as string, { ...e, children: [] } as TreeNode))
+        .forEach(e => map.set(e.id as string, { ...e, children: [], lazy: true } as TreeNode))
 
       list
         .filter(e => e.id)
@@ -192,16 +197,31 @@ export default defineComponent({
         .forEach(e => {
           let root = true;
 
+            if (
+              !e.version
+              || (
+                (isPhenotype(e) || (e as Category).subCategories && (e as Category).subCategories?.length === 0)
+                && (e as Category).phenotypes && (e as Category).phenotypes?.length === 0
+              )
+            ) (map.get(e.id as string) as TreeNode).lazy = false;
+
           (e as Category).superCategories?.forEach(c => {
-            if (c.id && map.get(c.id)) {
-              (map.get(c.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
+            if (c.id) {
               root = false
+              const parent = map.get(c.id)
+              if (parent) parent.children.push(map.get(e.id as string) as TreeNode)
             }
           })
           if (isRestricted(e)) {
             root = false
-            if (e.superPhenotype && e.superPhenotype.id && map.get(e.superPhenotype.id))
-              (map.get(e.superPhenotype.id) as TreeNode).children.push(map.get(e.id as string) as TreeNode)
+            const node = map.get(e.id as string)
+            if (node) {
+              node.lazy = false
+              if (e.superPhenotype && e.superPhenotype.id) {
+                const parent = map.get(e.superPhenotype.id)
+                if (parent) parent.children.push(node)
+              }
+            }
           }
 
           if (root) {
@@ -216,10 +236,12 @@ export default defineComponent({
     return {
       t,
       expansion,
-      hideCategories,
-      filter,
+      filterDataType,
+      filterEntityType,
       EntityType,
-      showRefreshDialog,
+      entityTypeOptions,
+      repositoryId,
+      organisationId,
       getIcon,
       getIconTooltip,
       getTitle,
@@ -230,13 +252,6 @@ export default defineComponent({
         return toTree(visibleNodes.value, props.excludeTypeIfEmpty)
       }),
 
-      handleRefreshClick (): void {
-        if (newNodes.value)
-          showRefreshDialog.value = true
-        else
-          emit('refreshClicked')
-      },
-
       handleSelectedChange (key: string): void {
         if (!key || !props.nodes) {
           emit('update:selected', undefined)
@@ -246,20 +261,41 @@ export default defineComponent({
         }
       },
 
-      filterFn (node: Entity, filter: string): boolean {
-        return getTitle(node).toLowerCase().includes(filter.toLowerCase())
-      },
-
       handleCreateEntityClicked (t: EntityType, e?: string) {
         if (e) expansion.value.push(e)
         emit('createEntity', t, e)
+      },
+
+      async onLazyLoad ({ node, done, fail }: LazyLoadDetails) {
+        await entityStore.loadChildren(node)
+          .then(() => done([]))
+          .catch((e: Error) => {
+            alert(e.message)
+            fail()
+          })
+      },
+
+      async handleSearch (entity?: Entity) {
+        if (!entity) return
+        await entityStore.loadEntity(entity.id)
+          .then((e) => {
+            emit('update:selected', e)
+            void nextTick(() => expand(entity))
+          })
       }
     }
   }
 })
 
 interface TreeNode extends Entity {
-  children: TreeNode[]
+  children: TreeNode[],
+  lazy?: boolean
+}
+
+interface LazyLoadDetails {
+  node: TreeNode,
+  done: (children: TreeNode[]) => void,
+  fail: () => void
 }
 </script>
 

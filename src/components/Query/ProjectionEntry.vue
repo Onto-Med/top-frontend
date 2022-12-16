@@ -24,16 +24,16 @@
       {{ t('thingIsInvalid', { thing: t('entity') }) }}
     </q-item-section>
     <q-item-section v-else :title="getSynonyms(subject)">
-      <div class="row items-center fit non-selectable">
-        <q-icon size="1.3rem" class="q-mr-sm" :name="getIcon(subject)" />
-        {{ getTitle(subject) }}
+      <div class="row items-center fit non-selectable ellipsis">
+        <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
+        {{ getTitle(subject, true) }}
       </div>
     </q-item-section>
     <q-item-section side>
       <q-btn-group flat>
         <q-btn
           :icon="sorting === Sorting.Desc ? 'arrow_downward' : 'arrow_upward'"
-          :label="t(sorting)"
+          :label="$q.screen.gt.md ? t(sorting) : ''"
           :title="t('sorting')"
           @click="$emit('update:sorting', sorting === Sorting.Asc ? Sorting.Desc : Sorting.Asc)"
         />

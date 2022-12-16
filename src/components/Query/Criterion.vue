@@ -13,9 +13,9 @@
       {{ t('thingIsInvalid', { thing: t('entity') }) }}
     </q-item-section>
     <q-item-section v-else :title="getSynonyms(subject)">
-      <div class="row items-center fit non-selectable">
+      <div class="row items-center fit non-selectable ellipsis">
         <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
-        {{ getTitle(subject) }}
+        {{ getTitle(subject, true) }}
         <small class="q-ml-md">
           (
           <span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">

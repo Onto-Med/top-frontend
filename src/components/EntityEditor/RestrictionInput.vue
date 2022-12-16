@@ -24,6 +24,7 @@
           v-if="[Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier)"
           v-model="state.cardinality"
           type="number"
+          :readonly="readonly"
           :error="state.cardinality === undefined"
           :label="t('cardinality')"
         />
@@ -42,7 +43,7 @@
           />
 
           <range-input
-            v-show="hasRange"
+            v-if="hasRange"
             v-model:minimum="state.values[0]"
             v-model:maximum="state.values[1]"
             v-model:min-operator="state.minOperator"
@@ -50,9 +51,10 @@
             :readonly="readonly"
             :operators="operators"
             :type="state.type"
+            :unit="unit"
           />
 
-          <div v-for="(value, index) in state.values" v-show="!hasRange" :key="index" class="row">
+          <div v-for="(value, index) in state.values" v-else :key="index" class="row">
             <q-input v-model="state.values[index]" outlined :readonly="readonly" :type="state.type">
               <template #after>
                 <q-btn
@@ -104,6 +106,7 @@ export default defineComponent({
     },
     name: String,
     label: String,
+    unit: String,
     operators: Array,
     quantifiers: Array,
     expanded: Boolean,
@@ -152,14 +155,16 @@ export default defineComponent({
     )
 
     const handleHasRangeChanged = (newValue: boolean) => {
-      const newState = JSON.parse(JSON.stringify(state)) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
-      if (!newValue && (newState.type === DataType.Number || newState.type === DataType.DateTime)) {
-        {(newState as NumberRestriction|DateTimeRestriction).minOperator = undefined}
-        (newState as NumberRestriction|DateTimeRestriction).maxOperator = undefined
+      if (!newValue && [DataType.Number, DataType.DateTime].includes(state.type)) {
+        {(state as NumberRestriction|DateTimeRestriction).minOperator = undefined}
+        (state as NumberRestriction|DateTimeRestriction).maxOperator = undefined
       } else {
-        newState.values?.splice(2)
+        state.values?.splice(2)
+        if ((state as NumberRestriction).minOperator === undefined)
+          (state as NumberRestriction).minOperator = RestrictionOperator.GreaterThanOrEqualTo;
+        if ((state as NumberRestriction).maxOperator === undefined)
+          (state as NumberRestriction).maxOperator = RestrictionOperator.LessThan
       }
-      emit('update:modelValue', newState)
     }
 
     return {

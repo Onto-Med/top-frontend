@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, DataType, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -35,7 +35,7 @@ export const useEntity = defineStore('entity', {
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
 
-      await this.entityApi?.getEntitiesByRepositoryId(organisationId, repositoryId)
+      await this.entityApi?.getRootEntitiesByRepositoryId(organisationId, repositoryId)
         .then((r) => {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
             this.entities = r.data
@@ -62,13 +62,14 @@ export const useEntity = defineStore('entity', {
     },
 
     async setOrganisation (organisationId: string|undefined) {
-      if (this.organisationId !== organisationId)
-        this.entities = []
-      this.organisationId = organisationId
-      if (!organisationId) {
-        this.organisation = undefined
-        return
+      if (this.organisationId !== organisationId) {
+        this.entities       = []
+        this.organisationId = organisationId
+        this.organisation   = undefined
+        this.repositoryId   = undefined
+        this.repository     = undefined
       }
+      if (!organisationId || this.organisation) return
       await this.organisationApi?.getOrganisationById(organisationId)
         .then(r => {
           if (organisationId === this.organisationId)
@@ -77,19 +78,18 @@ export const useEntity = defineStore('entity', {
     },
 
     async setRepository (repositoryId: string|undefined) {
-      if (this.repositoryId !== repositoryId)
+      if (this.repositoryId !== repositoryId) {
         this.entities = []
-      this.repositoryId = repositoryId
-      if (!repositoryId) {
+        this.repositoryId = repositoryId
         this.repository = undefined
-        return
       }
+      if (!repositoryId || this.repository) return
       const organisationId = this.organisationId
       if (!organisationId) return
       await this.repositoryApi?.getRepositoryById(organisationId, repositoryId, undefined)
         .then(r => {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
-          this.repository = r.data
+            this.repository = r.data
         })
     },
 
@@ -131,7 +131,42 @@ export const useEntity = defineStore('entity', {
     },
 
     getEntity (id: string|undefined): Entity|undefined {
+      if (!id) return undefined
       return this.entities.find(e => e.id === id)
+    },
+
+    loadEntity (id: string|undefined, ignorelocal = false): Promise<Entity|undefined> {
+      return Promise.resolve()
+        .then(() => {
+          if (!ignorelocal) {
+            const entity = this.getEntity(id)
+            if (entity) return entity
+          }
+        })
+        .then((e) => {
+          if (e || !id || !this.entityApi || !this.organisationId || !this.repositoryId)
+            return Promise.resolve(e)
+          return this.entityApi
+            .getEntityById(this.organisationId, this.repositoryId, id)
+            .then(r => {
+              this.addOrReplaceEntity(r.data)
+              return r.data
+            })
+        })
+        .then((e) => {
+          const superPhenotype = (e as Phenotype).superPhenotype
+          const categories = (e as Category).superCategories
+          if (superPhenotype && superPhenotype.id) {
+            if (this.getEntity(superPhenotype.id)) return Promise.resolve(e)
+            return this.loadEntity(superPhenotype.id, ignorelocal).then(() => e)
+          } else if (categories) {
+            return Promise.all(categories.map(c => {
+              if (!c || !c.id || this.getEntity(c.id)) return Promise.resolve(e)
+              return this.loadEntity(c.id, ignorelocal)
+            })).then(() => e)
+          }
+          return e
+        })
     },
 
     addEntity (entityType: EntityType, superClassId: string): Entity {
@@ -139,9 +174,13 @@ export const useEntity = defineStore('entity', {
 
       const superClass = this.getEntity(superClassId)
       if (superClass && [ EntityType.CompositePhenotype, EntityType.SinglePhenotype ].includes(superClass.entityType)) {
-        (entity as Phenotype).dataType = (superClass as Phenotype).dataType || DataType.Number
+        (entity as Phenotype).dataType = (superClass as Phenotype).dataType
         if (this.hasRestriction(entity))
-          entity.restriction = { type: entity.dataType } as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
+          entity.restriction = {
+            type: entity.dataType,
+            quantifier: Quantifier.Min,
+            cardinality: 1
+          } as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
       }
 
       if (superClass) {
@@ -267,26 +306,40 @@ export const useEntity = defineStore('entity', {
     },
 
     async deleteVersion (entity: Entity) {
-      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
     },
 
     async restoreVersion (entity: Entity) {
-      if (!entity || !this.entityApi || !this.organisationId || !this.repositoryId)
+      if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
           message: 'attributesMissing'
         }
 
-      await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id as string, entity.version as number, undefined, undefined)
+      await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
         .then(() => {
           const old = this.entities.find(e => e.id == entity.id)
           if (old) Object.assign(old, entity)
+        })
+    },
+
+    async loadChildren (entity: Entity): Promise<Entity[]> {
+      if (!entity || !entity.id || !this.entityApi || !this.organisationId || !this.repositoryId)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+
+      return await this.entityApi.getSubclassesById(this.organisationId, this.repositoryId, entity.id)
+        .then((r) => {
+          r.data.forEach(e => this.addOrReplaceEntity(e))
+          return r.data
         })
     },
 
@@ -302,8 +355,21 @@ export const useEntity = defineStore('entity', {
       return [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entity.entityType)
     },
 
+    isRestricted (entity: Entity): entity is Phenotype {
+      return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
+    },
+
     hasRestriction (entity: Entity): entity is Phenotype {
       return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
+    },
+
+    async loadSuperPhenotype (phenotype: Phenotype|string): Promise<Phenotype|undefined> {
+      const entityId = phenotype.hasOwnProperty('id') ? (phenotype as Phenotype).id : phenotype as string
+      return this.loadEntity(entityId)
+        .then(restriction => {
+          if (!restriction || !this.isRestricted(restriction) || !restriction.superPhenotype) return Promise.resolve(undefined)
+          return this.loadEntity(restriction.superPhenotype.id)
+        })
     }
   }
 })
