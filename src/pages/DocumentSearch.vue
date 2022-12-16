@@ -9,8 +9,8 @@
                 {{ t('concept', 2) }}
               </div>
             </q-card-section>
-            <q-card-section>
-              <div class="q-pa-xs-md">
+            <q-card-section class="row">
+              <div class="col-10">
                 <q-select
                   v-model="conceptMode"
                   :options="conceptModeOptions"
@@ -34,11 +34,11 @@
                 </q-select>
               </div>
             </q-card-section>
-            <q-card-section>
+            <q-card-section class="row">
               <q-chip
                 v-for="(concept, index) in concepts"
                 :key="concept.id"
-                class="cursor-pointer relative-position"
+                class="col-10 cursor-pointer relative-position"
                 :style="selectedColors[index]"
                 clickable
                 @click="chooseConcept(index, false)"
@@ -179,7 +179,7 @@ export default defineComponent({
               color: distinctColorsFont[index]
             })
           });
-          
+
           selectedColors.value = new Array(concepts.value.length)
             .fill({ 'background-color': '', 'color': '' }) as ConceptColor[]
         })
