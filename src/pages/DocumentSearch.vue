@@ -37,19 +37,19 @@
             >
               <template #exclusive>
                 <div class="row items-center no-wrap">
-                  <div> Exclusive </div>
+                  <div v-t="'exclusive'" />
                   <q-icon right size="xs" name="mdi-circle" />
                 </div>
               </template>
               <template #union>
                 <div class="row items-center no-wrap">
-                  <div> Union </div>
+                  <div v-t="'union'" />
                   <q-icon right size="sm" name="mdi-set-all" />
                 </div>
               </template>
               <template #intersection>
                 <div class="row items-center no-wrap">
-                  <div> Intersection </div>
+                  <div v-t="'intersection'" />
                   <q-icon right size="sm" name="mdi-set-center" />
                 </div>
               </template>
@@ -78,7 +78,9 @@
       <q-card id="document-box" class="col q-mr-xs">
         <q-card-section>
           <div class="text-subtitle2">
-            {{ t('document', 2) }} <a v-if="documentIds.length > 0">(Results: {{ documentIds.length }})</a>
+            {{ t('document', 2) }} <a v-if="documentIds.length > 0">
+              ({{ t('resultCount', documentIds.length) }})
+            </a>
           </div>
         </q-card-section>
         <!--  TODO: need to find a better solution for style height -->

@@ -336,5 +336,7 @@
   "repositoryType": "Repository type|Repository types",
   "documentSearch": "Document search",
   "phenotype_repository": "Phenotype repository",
-  "concept_repository": "Concept repository"
+  "concept_repository": "Concept repository",
+  "exclusive": "Exclusive",
+  "resultCount": "No results|{n} result|{n} results"
 }

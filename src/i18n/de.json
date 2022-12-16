@@ -336,5 +336,7 @@
   "repositoryType": "Repositoriumstyp|Repositoriumstypen",
   "documentSearch": "Dokumentensuche",
   "concept_repository": "Konzept Repositorium",
-  "phenotype_repository": "Phänotyp Repositorium"
+  "phenotype_repository": "Phänotyp Repositorium",
+  "exclusive": "Ausschließlich",
+  "resultCount": "Keine Ergebnisse|{n} Ergebnis|{n} Ergebnisse"
 }
