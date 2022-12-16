@@ -338,5 +338,6 @@
   "concept_repository": "Konzept Repositorium",
   "phenotype_repository": "Phänotyp Repositorium",
   "exclusive": "Ausschließlich",
-  "resultCount": "Keine Ergebnisse|{n} Ergebnis|{n} Ergebnisse"
+  "resultCount": "Keine Ergebnisse|{n} Ergebnis|{n} Ergebnisse",
+  "selectionMode": "Auswahlmodus"
 }

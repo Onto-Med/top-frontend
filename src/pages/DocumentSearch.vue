@@ -1,151 +1,139 @@
 <template>
   <q-page class="q-gutter-md">
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">
-          {{ t('document', 2) }}
+    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
+      <template #before>
+        <div class="column fit">
+          <q-card class="col">
+            <q-card-section>
+              <div class="text-subtitle2">
+                {{ t('concept', 2) }}
+              </div>
+            </q-card-section>
+            <q-card-section>
+              <div class="q-pa-xs-md">
+                <q-select
+                  v-model="conceptMode"
+                  :options="conceptModeOptions"
+                  :label="t('selectionMode')"
+                  emit-value
+                  map-options
+                >
+                  <template #option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section avatar>
+                        <q-icon :name="scope.opt.icon" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>{{ scope.opt.label }}</q-item-label>
+                        <q-item-label caption>
+                          {{ scope.opt.description }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+            </q-card-section>
+            <q-card-section>
+              <q-chip
+                v-for="(concept, index) in concepts"
+                :key="concept.id"
+                class="cursor-pointer relative-position"
+                :style="selectedColors[index]"
+                clickable
+                @click="chooseConcept(index, false)"
+              >
+                <div class="ellipsis">
+                  {{ concept.labels }}
+                </div>
+                <q-tooltip :delay="500" anchor="center right" self="center left" :offset="[10, 10]">
+                  {{ concept.labels }}
+                </q-tooltip>
+              </q-chip>
+            </q-card-section>
+          </q-card>
         </div>
-      </q-card-section>
-      <q-card-section>
-        {{ t('documentPage.description') }}
-      </q-card-section>
-    </q-card>
+      </template>
 
-    <div class="row no-wrap justify-between" style="height: calc(85vh)">
-      <q-card id="concept-box" class="col-2 q-mr-xs">
-        <q-card-section>
-          <div class="text-subtitle2">
-            {{ t('concept', 2) }}
-          </div>
-        </q-card-section>
-        <q-card-section>
-          <div class="q-pa-xs-md">
-            <!-- ToDo: is weird (toggle group parts are not visible) when viewport gets too small -->
-            <q-btn-toggle
-              v-model="conceptMode"
-              toggle-color="primary"
-              no-caps
-              rounded
-              size="sm"
-              text-color="grey"
-              :options="[
-                {slot: 'exclusive', value: 'exclusive'},
-                {slot: 'union', value: 'union'},
-                {slot: 'intersection', value: 'intersection'}
-              ]"
-              @click="checkConceptSelectionMode()"
-            >
-              <template #exclusive>
-                <div class="row items-center no-wrap">
-                  <div v-t="'exclusive'" />
-                  <q-icon right size="xs" name="mdi-circle" />
+      <template #after>
+        <div class="column fit">
+          <div class="row col no-wrap justify-between">
+            <q-card class="col">
+              <q-card-section>
+                <div class="text-subtitle2">
+                  {{ t('document', 2) }} <a v-if="documentIds.length > 0">
+                    ({{ t('resultCount', documentIds.length) }})
+                  </a>
                 </div>
-              </template>
-              <template #union>
-                <div class="row items-center no-wrap">
-                  <div v-t="'union'" />
-                  <q-icon right size="sm" name="mdi-set-all" />
-                </div>
-              </template>
-              <template #intersection>
-                <div class="row items-center no-wrap">
-                  <div v-t="'intersection'" />
-                  <q-icon right size="sm" name="mdi-set-center" />
-                </div>
-              </template>
-            </q-btn-toggle>
-          </div>
-        </q-card-section>
-        <q-card-section>
-          <q-chip
-            v-for="(concept, index) in concepts"
-            :key="concept.id"
-            class="cursor-pointer relative-position"
-            :style="selectedColors[index]"
-            clickable
-            @click="chooseConcept(index, false)"
-          >
-            <div class="ellipsis">
-              {{ concept.labels }}
-            </div>
-            <q-tooltip :delay="500" anchor="center right" self="center left" :offset="[10, 10]">
-              {{ concept.labels }}
-            </q-tooltip>
-          </q-chip>
-        </q-card-section>
-      </q-card>
-
-      <q-card id="document-box" class="col q-mr-xs">
-        <q-card-section>
-          <div class="text-subtitle2">
-            {{ t('document', 2) }} <a v-if="documentIds.length > 0">
-              ({{ t('resultCount', documentIds.length) }})
-            </a>
-          </div>
-        </q-card-section>
-        <!--  TODO: need to find a better solution for style height -->
-        <q-virtual-scroll
-          v-slot="{ item, index }"
-          style="height: 94%"
-          :items="documentIds"
-          separator
-        >
-          <q-item
-            :key="index + item"
-            class="cursor-pointer relative-position"
-            clickable
-            @click="chooseDocument(item)"
-          >
-            <q-item-section>
-              <q-item-label
-                :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
+              </q-card-section>
+              <!--  TODO: need to find a better solution for style height -->
+              <q-virtual-scroll
+                v-slot="{ item, index }"
+                style="height: 94%"
+                :items="documentIds"
+                separator
               >
-                {{ item }}
-              </q-item-label>
-              <q-item-label
-                caption
-                lines="2"
-                :style="{'font-size': '14px'}"
-              >
-                First line of doc or some such thing
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-virtual-scroll>
-      </q-card>
+                <q-item
+                  :key="index + item"
+                  class="cursor-pointer relative-position"
+                  clickable
+                  @click="chooseDocument(item)"
+                >
+                  <q-item-section>
+                    <q-item-label
+                      :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
+                    >
+                      {{ item }}
+                    </q-item-label>
+                    <q-item-label
+                      caption
+                      lines="2"
+                      :style="{'font-size': '14px'}"
+                    >
+                      First line of doc or some such thing
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-virtual-scroll>
+            </q-card>
 
-      <q-card v-if="document_" id="details-box" class="col">
-        <q-card-section>
-          <div class="text-subtitle2">
-            {{ t('details', 2) }}
+            <q-card class="col">
+              <q-card-section>
+                <div class="text-subtitle2">
+                  {{ t('details', 2) }}
+                </div>
+              </q-card-section>
+              <q-scroll-area v-if="document_" style="height: 94%">
+                <q-card-section>
+                  <div class="text-h6">
+                    {{ document_.id }}
+                  </div>
+                </q-card-section>
+                <q-card-section>
+                  <div>
+                    {{ document_.text }}
+                  </div>
+                </q-card-section>
+              </q-scroll-area>
+            </q-card>
           </div>
-        </q-card-section>
-        <q-scroll-area style="height: 94%">
-          <q-card-section>
-            <div class="text-h6">
-              {{ document_.id }}
-            </div>
-          </q-card-section>
-          <q-card-section>
-            <div>
-              {{ document_.text }}
-            </div>
-          </q-card-section>
-        </q-scroll-area>
-      </q-card>
-    </div>
+        </div>
+      </template>
+    </q-splitter>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onMounted, ref } from 'vue'
+import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DocumentApiKey, ConceptApiKey } from 'src/boot/axios'
 import { Document, Concept } from '@onto-med/top-api'
+import useAlert from 'src/mixins/useAlert'
 
 export default defineComponent({
   setup () {
     const { t }            = useI18n()
+    const { alert }        = useAlert()
     const documentApi      = inject(DocumentApiKey)
     const conceptApi       = inject(ConceptApiKey)
     const documentIds      = ref<string[]>([])
@@ -177,7 +165,6 @@ export default defineComponent({
     const selectedColors                = ref<ConceptColor[]>([])
     const conceptMode                   = ref('exclusive')
 
-    let currentConceptMode = conceptMode.value
     let lastSelectedConcept = -1
 
     const reload = async () => {
@@ -237,8 +224,31 @@ export default defineComponent({
       await reload()
     })
 
+    watch(
+      () => conceptMode.value,
+      (value, oldValue) => {
+        if (value === oldValue) return
+        if (selectedConcepts.value.length <= 1) return
+
+        if (conceptMode.value === 'exclusive') {
+          chooseConcept(lastSelectedConcept, false)
+            .then(() => {
+              // selectedConcepts.value.length = 0;
+              // documentIds.value.length = 0;
+              // document_.value = undefined;
+              // selectedColors.value.fill({'background-color': '', 'color': ''});
+            })
+            .catch((e: Error) => alert(e.message))
+        } else {
+          chooseConcept(lastSelectedConcept, true)
+            .catch((e: Error) => alert(e.message))
+        }
+      }
+    )
+
     return {
       t,
+      splitterModel: ref(20),
       document_,
       documentIds,
       concepts,
@@ -256,21 +266,24 @@ export default defineComponent({
           })
           .catch((e: Error) => alert(e.message))
       },
-      async checkConceptSelectionMode() {
-        if (currentConceptMode === conceptMode.value) return
-        currentConceptMode = conceptMode.value
-        if (selectedConcepts.value.length <= 1) return
 
-        if (conceptMode.value === 'exclusive') {
-          await chooseConcept(lastSelectedConcept, false)
-          // selectedConcepts.value.length = 0;
-          // documentIds.value.length = 0;
-          // document_.value = undefined;
-          // selectedColors.value.fill({'background-color': '', 'color': ''});
-        } else {
-          await chooseConcept(lastSelectedConcept, true)
+      conceptModeOptions: computed(() => [
+        {
+          label: t('exclusive'),
+          value: 'exclusive',
+          icon: 'mdi-circle'
+        },
+        {
+          label: t('union'),
+          value: 'union',
+          icon: 'mdi-set-all'
+        },
+        {
+          label: t('intersection'),
+          value: 'intersection',
+          icon: 'mdi-set-center'
         }
-      },
+      ])
     }
   }
 })
