@@ -14,28 +14,28 @@
       </q-parallax>
     </div>
     <div class="row text-center">
-      <div class="col-sm-4 col-6">
+      <div class="col-sm-3 col-6">
         <q-avatar icon="groups" size="8rem" />
         <div class="text-h6">
           {{ t('organisation', 2) }}
           <q-badge v-if="statistic" :label="statistic.organisations" />
         </div>
       </div>
-      <div class="col-sm-4 col-6">
+      <div class="col-sm-3 col-6">
         <q-avatar icon="tab" size="8rem" />
         <div class="text-h6">
           {{ t('repository', 2) }}
           <q-badge v-if="statistic" :label="statistic.repositories" />
         </div>
       </div>
-      <div class="col-sm-4 col-6">
+      <div class="col-sm-3 col-6">
         <q-avatar icon="category" size="8rem" />
         <div class="text-h6">
           {{ t('phenotype', 2) }}
           <q-badge v-if="statistic" :label="statistic.phenotypes" />
         </div>
       </div>
-      <div class="col">
+      <div class="col-sm-3 col-6">
         <q-avatar icon="article" size="8rem" />
         <div class="text-h6">
           {{ t('document', 2) }}
