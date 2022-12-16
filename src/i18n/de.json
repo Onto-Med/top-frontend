@@ -333,5 +333,8 @@
   "repositorySearchInput": {
     "emptyResult": "Kein Ergebnis|Keine ergebnisse"
   },
-  "repositoryType": "Repositoriumstyp|Repositoriumstypen"
+  "repositoryType": "Repositoriumstyp|Repositoriumstypen",
+  "documentSearch": "Dokumentensuche",
+  "concept_repository": "Konzept Repositorium",
+  "phenotype_repository": "Phänotyp Repositorium"
 }

@@ -35,19 +35,19 @@
               ]"
               @click="checkConceptSelectionMode()"
             >
-              <template v-slot:exclusive>
+              <template #exclusive>
                 <div class="row items-center no-wrap">
                   <div> Exclusive </div>
                   <q-icon right size="xs" name="mdi-circle" />
                 </div>
               </template>
-              <template v-slot:union>
+              <template #union>
                 <div class="row items-center no-wrap">
                   <div> Union </div>
                   <q-icon right size="sm" name="mdi-set-all" />
                 </div>
               </template>
-              <template v-slot:intersection>
+              <template #intersection>
                 <div class="row items-center no-wrap">
                   <div> Intersection </div>
                   <q-icon right size="sm" name="mdi-set-center" />
@@ -69,7 +69,7 @@
               {{ concept.labels }}
             </div>
             <q-tooltip :delay="500" anchor="center right" self="center left" :offset="[10, 10]">
-             {{ concept.labels }}
+              {{ concept.labels }}
             </q-tooltip>
           </q-chip>
         </q-card-section>
@@ -136,31 +136,22 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, inject, onMounted, ref} from 'vue'
-import {Notify, QChip} from 'quasar'
+import { defineComponent, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import { DocumentApiKey, PhraseApiKey, ConceptApiKey } from 'src/boot/axios'
-import {Document, Phrase, Concept} from '@onto-med/top-api';
-import TableWithActions from 'components/TableWithActions.vue';
+import { DocumentApiKey, ConceptApiKey } from 'src/boot/axios'
+import { Document, Concept } from '@onto-med/top-api'
 
 export default defineComponent({
-  name: 'DocumentSearch',
-  components: {
-    // TableWithActions,
-  },
   setup () {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n()
-    const documentApi = inject(DocumentApiKey)
-    const phraseApi = inject(PhraseApiKey)
-    const conceptApi = inject(ConceptApiKey)
-    const documentIds = ref<string[]>([])
-    const document_ = ref<Document>()
-    const concepts = ref<Concept[]>([])
-    const loading = ref(false)
+    const { t }            = useI18n()
+    const documentApi      = inject(DocumentApiKey)
+    const conceptApi       = inject(ConceptApiKey)
+    const documentIds      = ref<string[]>([])
+    const document_        = ref<Document>()
+    const concepts         = ref<Concept[]>([])
+    const loading          = ref(false)
     const selectedConcepts = ref<number[]>([])
-    const distinctColors = [
+    const distinctColors   = [
       '#556b2f', '#228b22',
       '#7f0000', '#483d8b', '#008b8b', '#cd853f',
       '#4682b4', '#000080', '#8fbc8f', '#800080',
@@ -168,7 +159,8 @@ export default defineComponent({
       '#dc143c', '#00ffff', '#0000ff', '#f08080',
       '#adff2f', '#ff00ff', '#1e90ff', '#f0e68c',
       '#ffff54', '#dda0dd', '#90ee90', '#7b68ee',
-      '#00ff7f', '#ff1493', '#696969', '#d3d3d3']
+      '#00ff7f', '#ff1493', '#696969', '#d3d3d3'
+    ]
     const distinctColorsFont = [
       '#ffffff', '#ffffff',
       '#ffffff', '#ffffff', '#000000', '#000000',
@@ -177,10 +169,11 @@ export default defineComponent({
       '#000000', '#000000', '#ffffff', '#000000',
       '#000000', '#000000', '#000000', '#000000',
       '#000000', '#000000', '#000000', '#000000',
-      '#000000', '#000000', '#ffffff', '#000000']
-    const conceptColors: object[] = []; //ToDo: const? or ref?
-    const selectedColors = ref<object[]>([])
-    const conceptMode = ref('exclusive')
+      '#000000', '#000000', '#ffffff', '#000000'
+    ]
+    const conceptColors: ConceptColor[] = [] //ToDo: const? or ref?
+    const selectedColors                = ref<ConceptColor[]>([])
+    const conceptMode                   = ref('exclusive')
 
     let currentConceptMode = conceptMode.value
     let lastSelectedConcept = -1
@@ -192,10 +185,14 @@ export default defineComponent({
         .then(r => {
           concepts.value = r.data
           concepts.value.forEach(function (concept, index) {
-            conceptColors.push({'background-color': distinctColors[index], 'color': distinctColorsFont[index]})
+            conceptColors.push({
+              'background-color': distinctColors[index],
+              color: distinctColorsFont[index]
+            })
           });
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          selectedColors.value = new Array(concepts.value.length).fill({'background-color': '', 'color': ''})
+          
+          selectedColors.value = new Array(concepts.value.length)
+            .fill({ 'background-color': '', 'color': '' }) as ConceptColor[]
         })
         .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
@@ -226,9 +223,7 @@ export default defineComponent({
           }), true, conceptMode.value, undefined
         )
           .then(r => {
-            documentIds.value = [...new Set(r.data.map(function (doc) {
-              return doc.id
-            }))] //ToDo: I'm not sure if I need a set here...
+            documentIds.value = r.data.map(doc => doc.id).filter(id => id !== undefined) as string[]
           })
           .catch((e: Error) => alert(e.message))
       } else {document_.value = undefined}
@@ -277,4 +272,9 @@ export default defineComponent({
     }
   }
 })
+
+interface ConceptColor {
+  'background-color': string,
+  color: string
+}
 </script>
