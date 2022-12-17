@@ -43,7 +43,7 @@ module.exports = configure(function (ctx) {
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       // 'ionicons-v4',
-      // 'mdi-v5',
+      'mdi-v5',
       // 'fontawesome-v5',
       // 'eva-icons',
       // 'themify',
@@ -63,7 +63,8 @@ module.exports = configure(function (ctx) {
         OAUTH2_URL:       process.env.OAUTH2_URL       || 'http:/127.0.0.1:8081/',
         OAUTH2_REALM:     process.env.OAUTH2_REALM     || 'top-realm',
         OAUTH2_CLIENT_ID: process.env.OAUTH2_CLIENT_ID || 'top-frontend',
-        API_URL:          process.env.API_URL          || 'http://127.0.0.1:8080'
+        API_URL:          process.env.API_URL          || 'http://127.0.0.1:8080',
+        NLP_URL:          process.env.NLP_URL          || 'http://127.0.0.1:8082'
       },
 
       // transpile: false,

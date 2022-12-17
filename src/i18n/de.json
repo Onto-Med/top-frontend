@@ -322,5 +322,22 @@
   "failed": "Fehlgeschlagen",
   "finished": "Abgeschlossen",
   "entityType": "Entitätstyp|Entitätstypen",
-  "documentation": "Dokumentation|Dokumentationen"
+  "documentation": "Dokumentation|Dokumentationen",
+  "document": "Dokument|Dokumente",
+  "documentPage": {
+    "description": "Dokumentensuche"
+  },
+  "concept": "Konzept|Konzepte",
+  "details": "Details",
+  "inputRequired": "Eingabe erforderlich",
+  "repositorySearchInput": {
+    "emptyResult": "Kein Ergebnis|Keine ergebnisse"
+  },
+  "repositoryType": "Repositoriumstyp|Repositoriumstypen",
+  "documentSearch": "Dokumentensuche",
+  "concept_repository": "Konzept Repositorium",
+  "phenotype_repository": "Phänotyp Repositorium",
+  "exclusive": "Ausschließlich",
+  "resultCount": "Keine Ergebnisse|{n} Ergebnis|{n} Ergebnisse",
+  "selectionMode": "Auswahlmodus"
 }

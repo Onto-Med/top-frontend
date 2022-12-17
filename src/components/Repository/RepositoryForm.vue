@@ -51,6 +51,8 @@
           </q-item-section>
         </q-item>
 
+        <repository-type-select v-model="state.repositoryType" :readonly="!isNew" />
+
         <q-input v-model="state.description" type="textarea" :label="t('description')" />
       </q-card-section>
 
@@ -89,9 +91,13 @@
 import { defineComponent, ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Repository } from '@onto-med/top-api'
+import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
 
 export default defineComponent({
   name: 'RepositoryForm',
+  components: {
+    RepositoryTypeSelect
+  },
   props: {
     modelValue: {
       type: Object as () => Repository,

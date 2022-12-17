@@ -66,6 +66,7 @@
             <entity-tree-context-menu
               v-if="showContextMenu"
               :entity="node"
+              :allowed-entity-types="allowedEntityTypes"
               @delete-entity-clicked="$emit('deleteEntity', $event)"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
@@ -75,7 +76,11 @@
           </div>
         </template>
       </q-tree>
-      <entity-tree-context-menu v-if="showContextMenu" @create-entity-clicked="handleCreateEntityClicked" />
+      <entity-tree-context-menu
+        v-if="showContextMenu"
+        :allowed-entity-types="allowedEntityTypes"
+        @create-entity-clicked="handleCreateEntityClicked"
+      />
       <slot v-else name="empty-context-menu" />
     </q-scroll-area>
     <q-inner-loading
@@ -119,6 +124,10 @@ export default defineComponent({
     excludeTypeIfEmpty: {
       type: Array as () => EntityType[],
       default: () => []
+    },
+    allowedEntityTypes: {
+      type: Array as () => EntityType[],
+      default: () => Object.values(EntityType)
     }
   },
   emits: ['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
@@ -136,6 +145,7 @@ export default defineComponent({
       if (!props.nodes) return []
       if (!filterEntityType.value && !filterDataType.value) return props.nodes
       return props.nodes.filter(n => {
+        if (!props.allowedEntityTypes.includes(n.entityType)) return false
         if (filterEntityType.value && entityTypeOptions.includes(n.entityType) && n.entityType !== filterEntityType.value) return false
         if (filterDataType.value) {
           if (isPhenotype(n) && n.dataType !== filterDataType.value) return false
