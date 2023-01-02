@@ -3,9 +3,14 @@
     <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
       <template #before>
         <div class="column fit">
-          <div class="row items-center q-pl-sm bg-primary text-white shadow-2 entity-editor-tabs-bar">
-            <q-icon name="tab" class="q-mr-sm q-tree__icon" />
-            <div v-if="repository" class="col ellipsis" :title="repository.name || repository.id">
+          <div v-if="repository" class="row items-center q-pl-sm bg-primary text-white shadow-2 entity-editor-tabs-bar">
+            <q-icon
+              :name="repositoryIcon(repository)"
+              :title="t(repository.repositoryType || 'repository')"
+              class="q-mr-sm q-tree__icon"
+            />
+
+            <div class="col ellipsis" :title="repository.name || repository.id">
               {{ repository.name || repository.id }}
             </div>
 
@@ -81,7 +86,7 @@
           <q-tab-panels v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
               <entity-tab
-                v-if="repository"
+                v-if="repository && organisationId"
                 :version="tab.selectedVersion"
                 :entity="tab.entity"
                 :repository-id="repository.id"
@@ -147,7 +152,7 @@ export default defineComponent({
   },
   setup (props) {
     const { t, locale } = useI18n()
-    const { getIcon, getTitle, isRestricted, isPhenotype } = useEntityFormatter()
+    const { getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { alert }        = useAlert()
@@ -277,7 +282,7 @@ export default defineComponent({
 
     return {
       t, showJson, splitterModel, entities, selected, tabs, treeLoading, showExportDialog, exportEntity,
-      isRestricted, getTitle, getIcon,
+      isRestricted, getTitle, getIcon, repositoryIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
       organisationId,
       repository,

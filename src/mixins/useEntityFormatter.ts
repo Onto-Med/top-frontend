@@ -1,4 +1,4 @@
-import { Category, DataType, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
+import { Category, DataType, Entity, EntityType, LocalisableText, Phenotype, Repository, RepositoryType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import { useI18n } from 'vue-i18n'
 
@@ -178,6 +178,13 @@ export default function (this: void) {
         EntityType.SingleRestriction,
         EntityType.CompositeRestriction
       ]
+    },
+
+    repositoryIcon: (repository: Repository|RepositoryType) => {
+      const type = repository.hasOwnProperty('id') ? (repository as Repository).repositoryType : repository as RepositoryType
+      if (type === RepositoryType.ConceptRepository) return 'article'
+      if (type === RepositoryType.PhenotypeRepository) return 'category'
+      return 'tab'
     }
   }
 }
