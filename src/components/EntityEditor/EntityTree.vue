@@ -27,6 +27,9 @@
               <entity-type-select v-model="filterEntityType" :options="entityTypeOptions" class="fit" dense />
             </q-item>
             <q-item>
+              <item-type-select v-model="filterItemType" class="fit" dense />
+            </q-item>
+            <q-item>
               <data-type-select v-model="filterDataType" class="fit" dense />
             </q-item>
           </q-list>
@@ -98,7 +101,8 @@ import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContext
 import EntityTypeSelect from 'src/components/EntityEditor/EntityTypeSelect.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
-import { Category, EntityType, Entity, DataType } from '@onto-med/top-api'
+import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
+import { Category, EntityType, Entity, DataType, ItemType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
 
@@ -106,6 +110,7 @@ export default defineComponent({
   name: 'EntityTree',
   components: {
     DataTypeSelect,
+    ItemTypeSelect,
     EntitySearchInput,
     EntityTreeContextMenu,
     EntityTypeSelect
@@ -139,16 +144,20 @@ export default defineComponent({
     const expansion         = ref([] as string[])
     const filterEntityType  = ref(undefined as EntityType|undefined)
     const filterDataType    = ref(undefined as DataType|undefined)
+    const filterItemType    = ref(undefined as ItemType|undefined)
     const entityTypeOptions = [EntityType.SinglePhenotype, EntityType.CompositePhenotype]
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
-      if (!filterEntityType.value && !filterDataType.value) return props.nodes
+      if (!filterEntityType.value && !filterDataType.value && !filterItemType.value) return props.nodes
       return props.nodes.filter(n => {
         if (!props.allowedEntityTypes.includes(n.entityType)) return false
         if (filterEntityType.value && entityTypeOptions.includes(n.entityType) && n.entityType !== filterEntityType.value) return false
         if (filterDataType.value) {
           if (isPhenotype(n) && n.dataType !== filterDataType.value) return false
+        }
+        if (filterItemType.value) {
+          if (isPhenotype(n) && n.itemType !== filterItemType.value) return false
         }
         return true
       })
@@ -237,6 +246,7 @@ export default defineComponent({
       t,
       expansion,
       filterDataType,
+      filterItemType,
       filterEntityType,
       EntityType,
       entityTypeOptions,

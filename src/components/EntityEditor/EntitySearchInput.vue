@@ -95,7 +95,7 @@
 <script lang="ts">
 import { defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, Entity, Repository, DataType } from '@onto-med/top-api'
+import { EntityType, Entity, Repository, DataType, ItemType } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -118,6 +118,7 @@ export default defineComponent({
     },
     entityTypes: Array as () => EntityType[],
     dataType: String as () => DataType,
+    itemType: String as () => ItemType,
     clearOnSelect: Boolean,
     showDetails: Boolean,
     rounded: Boolean,
@@ -148,11 +149,11 @@ export default defineComponent({
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
       let promise: Promise<AxiosResponse<Entity[]>>
       if (props.organisationId && props.repositoryId) {
-        promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, page)
+        promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
       } else if (repository.value && repository.value.organisation) {
-        promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, page)
+        promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
       } else {
-        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, page)
+        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, page)
       }
       return promise.then((r) => r.data)
     }

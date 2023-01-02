@@ -517,7 +517,7 @@
   resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-function-sent/-/plugin-syntax-function-sent-7.18.6.tgz#ce2e8e9979f8a26246bba81534e605c6d1369e5e"
   integrity sha512-f3OJHIlFIkg+cP1Hfo2SInLhsg0pz2Ikmgo7jMdIIKC+3jVXQlHB0bgSapOWxeWI0SU28qIWmfn5ZKu1yPJHkg==
   dependencies:
-    "@babel/helper-plugin-utils" "^7.19.0"
+    "@babel/helper-plugin-utils" "^7.18.6"
 
 "@babel/plugin-syntax-import-assertions@^7.20.0":
   version "7.20.0"
@@ -1310,10 +1310,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@onto-med/top-api@^0.6.0":
-  version "0.6.0"
-  resolved "https://npm.pkg.github.com/download/@Onto-Med/top-api/0.6.0/5c69d4e391d5c88dd39e5ea976cefc8a4057839f#5c69d4e391d5c88dd39e5ea976cefc8a4057839f"
-  integrity sha512-H3oZbgithXVoltsu/d99V0Pig1nsJnYXYibWVZWGIMwyde+qnJPD4WBqsB8Csbjv8WpdqTMTxnQxS03tJPgGjw==
+"@onto-med/top-api@^0.6.1":
+  version "0.6.1"
+  resolved "https://npm.pkg.github.com/download/@Onto-Med/top-api/0.6.1/8c69822bc026f9397d265deab0b61d6c11832646#8c69822bc026f9397d265deab0b61d6c11832646"
+  integrity sha512-OKVXa0RJXysji0bqMhduvhnZI3B8EHfVK/pFxWSpDdpTci6wsNCIUUynGfORj9Ae/tL/3/4KIhjM2Yylwj2TpA==
   dependencies:
     axios "^0.21.4"
 
