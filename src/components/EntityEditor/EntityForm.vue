@@ -47,6 +47,16 @@
 
         <q-card v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-4">
           <q-card-section>
+            <item-type-select
+              v-if="hasItemType(entityType)"
+              :model-value="itemType"
+              :readonly="readonly"
+              required
+              description
+              tooltip
+              @update:model-value="$emit('update:itemType', $event)"
+            />
+
             <data-type-select
               v-if="hasDataType(entityType)"
               :model-value="dataType"
@@ -141,9 +151,10 @@
 <script lang="ts">
 import { ref, defineComponent, PropType, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, Entity  } from '@onto-med/top-api'
+import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, Entity, ItemType  } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
+import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
@@ -157,6 +168,7 @@ export default defineComponent({
   components: {
     LocalizedTextInput,
     DataTypeSelect,
+    ItemTypeSelect,
     RestrictionInput,
     ExpressionInput,
     UnitInput,
@@ -186,6 +198,9 @@ export default defineComponent({
     },
     dataType: {
       type: String as PropType<DataType>
+    },
+    itemType: {
+      type: String as PropType<ItemType>
     },
     score: {
       type: Number
@@ -223,12 +238,12 @@ export default defineComponent({
   },
   emits: [
     'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
-    'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory'
+    'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory', 'update:itemType'
   ],
   setup (props) {
     const { t } = useI18n()
     const router = useRouter()
-    const { isRestricted, hasDataType, restrictionEntityTypes, getTitle } = useEntityFormatter()
+    const { isRestricted, hasDataType, hasItemType, restrictionEntityTypes, getTitle } = useEntityFormatter()
     const entityStore = useEntity()
     const showSuperCategoryInput = ref(false)
     const superPhenotype = ref(undefined as Entity|undefined)
@@ -243,6 +258,7 @@ export default defineComponent({
       t,
       isRestricted,
       hasDataType,
+      hasItemType,
       restrictionEntityTypes,
       getTitle,
 

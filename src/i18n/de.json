@@ -339,5 +339,9 @@
   "phenotype_repository": "Phänotyp Repositorium",
   "exclusive": "Ausschließlich",
   "resultCount": "Keine Ergebnisse|{n} Ergebnis|{n} Ergebnisse",
-  "selectionMode": "Auswahlmodus"
+  "selectionMode": "Auswahlmodus",
+  "itemType": {
+    "title": "Elementtyp|Elementtypen",
+    "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
+  }
 }
