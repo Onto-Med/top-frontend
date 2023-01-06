@@ -30,7 +30,7 @@
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
               <a :href="codeUrl(modelValue[index])" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
-                {{ getCodeSystem(entry.codeSystem?.uri).name }}: {{ entry.code }}
+                {{ getCodeSystem(entry.codeSystem?.uri)?.name }}: {{ entry.code }}
               </a>
             </q-item-section>
             <q-item-section avatar>
@@ -95,7 +95,7 @@ export default defineComponent({
       t, local, codeSystems, isValid, codeInput,
 
       codeUrl (code: Code) {
-        if (!code || !code.codeSystem) return null
+        if (!code || !code.codeSystem) return undefined
         return code.codeSystem.uri + '/' + code.code
       },
 

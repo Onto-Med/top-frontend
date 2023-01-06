@@ -63,6 +63,7 @@
 import { defineComponent, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
+import { LocalisableText } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'LocalizedTextInput',
@@ -71,7 +72,7 @@ export default defineComponent({
   },
   props: {
     modelValue: {
-      type: Array as () => Array<Record<string, string|undefined>>,
+      type: Array as () => Array<LocalisableText>,
       default: () => []
     },
     helpText: String,
@@ -125,16 +126,16 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
 
-      updateEntryByIndex (index: number, text?: string, lang?: string) {
+      updateEntryByIndex (index: number, text?: string|number|null, lang?: string) {
         let newModelValue = props.modelValue.slice()
-        newModelValue[index].text = text
-        newModelValue[index].lang = lang
+        newModelValue[index].text = text as string
+        newModelValue[index].lang = lang as string
         emit('update:modelValue', newModelValue)
       },
 
       addEntry () {
         let newModelValue = props.modelValue.slice()
-        newModelValue.push({ lang: unusedSupportedLangs.value[0] })
+        newModelValue.push({ lang: unusedSupportedLangs.value[0] as string } as LocalisableText)
         emit('update:modelValue', newModelValue)
       }
     }

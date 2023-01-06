@@ -1,11 +1,12 @@
 <template>
-  <div class="column fit">
+  <div v-if="local.id" class="column fit">
     <div class="col-auto entity-tab-header">
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           {{ getTitle(local) }}
           <small v-if="!isNew" class="gt-xs" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
-            {{ t('version') }}: {{ local.version }} ({{ d(local.createdAt, 'long') }})
+            {{ t('version') }}: {{ local.version }}
+            <span v-if="local.createdAt">({{ d(local.createdAt, 'long') }})</span>span>
           </small>
           <small v-else class="text-accent">{{ t('notSavedYet') }}</small>
         </q-toolbar-title>
@@ -159,7 +160,6 @@
       :restriction="local.restriction"
       :expression="local.expression"
       :unit="local.unit"
-      :score="local.score"
       :super-categories="local.superCategories"
       :codes="local.codes"
       :entity-id="local.id"
@@ -177,7 +177,6 @@
       @update:restriction="$emit('update:entity', { ...local, restriction: $event })"
       @update:expression="$emit('update:entity', { ...local, expression: $event })"
       @update:unit="$emit('update:entity', { ...local, unit: $event })"
-      @update:score="$emit('update:entity', { ...local, score: $event })"
       @update:super-categories="$emit('update:entity', { ...local, superCategories: $event })"
       @update:codes="$emit('update:entity', { ...local, codes: $event })"
       @entity-clicked="$emit('entityClicked', $event)"
@@ -242,7 +241,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const { t, d } = useI18n()
     const clone = (value: Category|Phenotype) =>
-      JSON.parse(JSON.stringify(value)) as Category|Phenotype
+      JSON.parse(JSON.stringify(value)) as Phenotype
 
     const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType } = useEntityFormatter()
     const { alert } = useAlert()
@@ -351,22 +350,22 @@ export default defineComponent({
 
       prefillFromVersion,
 
-      addSuperCategory (category: Category): void {
-        const casted = local.value as Category|Phenotype
+      addSuperCategory (category: Category|undefined): void {
+        const casted = local.value
         if (!casted.superCategories) casted.superCategories = []
         if (!category || casted.superCategories.findIndex(c => c && c.id === category.id) === -1)
-          if (casted.id !== category?.id) casted.superCategories.push(category)
+          if (casted.id !== category?.id) casted.superCategories.push(category as Category)
       },
 
       setSuperCategory (index: number, category: Category): void {
-        const casted = local.value as Category|Phenotype
+        const casted = local.value
         if (!casted.superCategories) casted.superCategories = []
         if (casted.superCategories.findIndex(c => c && c.id === category.id) === -1)
           if (casted.id !== category.id) casted.superCategories[index] = category
       },
 
       removeSuperCategory (index: number): void {
-        const casted = local.value as Category|Phenotype
+        const casted = local.value
         if (!casted.superCategories) return
         casted.superCategories.splice(index, 1)
       },
