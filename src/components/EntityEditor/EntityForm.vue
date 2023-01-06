@@ -1,6 +1,6 @@
 <template>
   <q-scroll-area class="col entity-tab-content">
-    <div class="q-gutter-md q-mt-none q-px-md q-pb-xl">
+    <div v-if="entityType" class="q-gutter-md q-mt-none q-px-md q-pb-xl">
       <q-card>
         <q-toolbar v-if="!isRestricted(entityType)" class="q-my-none">
           <q-toolbar-title class="row items-center">
@@ -110,10 +110,10 @@
       />
 
       <restriction-input
-        v-if="[EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entityType)"
+        v-if="[EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entityType) && superPhenotype"
         :key="restrictionKey"
         :model-value="restriction"
-        :unit="superPhenotype?.unit"
+        :unit="superPhenotype.unit"
         expanded
         :readonly="readonly"
         @update:model-value="$emit('update:restriction', $event)"
@@ -151,7 +151,7 @@
 <script lang="ts">
 import { ref, defineComponent, PropType, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, Entity, ItemType  } from '@onto-med/top-api'
+import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, Entity, ItemType, Phenotype  } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
@@ -202,9 +202,6 @@ export default defineComponent({
     itemType: {
       type: String as PropType<ItemType>
     },
-    score: {
-      type: Number
-    },
     unit: {
       type: String
     },
@@ -238,7 +235,7 @@ export default defineComponent({
   },
   emits: [
     'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
-    'update:dataType', 'update:score', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory', 'update:itemType'
+    'update:dataType', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory', 'update:itemType'
   ],
   setup (props) {
     const { t } = useI18n()
@@ -246,7 +243,7 @@ export default defineComponent({
     const { isRestricted, hasDataType, hasItemType, restrictionEntityTypes, getTitle } = useEntityFormatter()
     const entityStore = useEntity()
     const showSuperCategoryInput = ref(false)
-    const superPhenotype = ref(undefined as Entity|undefined)
+    const superPhenotype = ref(undefined as Phenotype|undefined)
 
     onMounted(async () => {
       await entityStore
@@ -267,8 +264,8 @@ export default defineComponent({
       showSuperCategoryInput,
       superPhenotype,
 
-      routeToEntity (entity: Entity) {
-        if (!entity.repository || !entity.repository.organisation) return
+      routeToEntity (entity: Entity|undefined) {
+        if (!entity || !entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
       }
     }

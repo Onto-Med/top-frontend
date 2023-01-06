@@ -51,7 +51,8 @@ export default function (this: void) {
      * @param unit add unit as suffix
      * @returns the title
      */
-  const getTitle = (entity: Entity, prefix?: boolean, unit?: boolean): string => {
+  const getTitle = (entity?: Entity, prefix?: boolean, unit?: boolean): string => {
+    if (!entity) return t('unnamedEntity')
     const lang = locale.value.split('-')[0]
     let superPhenotypePrefix = ''
     let title = ''

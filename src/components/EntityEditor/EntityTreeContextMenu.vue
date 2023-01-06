@@ -17,7 +17,7 @@
           v-if="entity.entityType === entry.phenotype && allowedEntityTypes.includes(entry.restriction)"
           v-close-popup
           clickable
-          @click="emitCreateEntity(entry.restriction, entity.id)"
+          @click="emitCreateEntity(entry.restriction, entity?.id)"
         >
           <q-item-section>{{ t('addThing', { thing: t(entry.restriction) }) }}</q-item-section>
         </q-item>

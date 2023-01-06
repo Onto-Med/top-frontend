@@ -45,7 +45,7 @@
   >
     <q-menu>
       <q-list dense>
-        <q-item v-close-popup clickable @click="$emit('entityClicked', state.id)">
+        <q-item v-close-popup clickable @click="$emit('entityClicked', state?.id)">
           <q-item-section v-t="'show'" />
         </q-item>
         <q-separator />
