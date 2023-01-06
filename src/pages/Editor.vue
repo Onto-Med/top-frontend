@@ -54,10 +54,10 @@
             class="bg-primary text-white shadow-2 entity-editor-tabs-bar"
             @update:model-value="selectTabByKey($event)"
           >
-            <q-tab v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" @dblclick="tab.preserve = true">
+            <q-tab v-for="tab in tabs" :key="tab.state.id" :name="tab.state.id" @dblclick="tab.preserve = true">
               <span class="no-wrap" :class="{ 'text-italic': !tab.preserve }">
-                <q-icon :name="getIcon(tab.entity)" :class="{ restriction: isRestricted(tab.entity) }" />
-                {{ getTitle(tab.entity, true) }}
+                <q-icon :name="getIcon(tab.state)" :class="{ restriction: isRestricted(tab.state) }" />
+                {{ getTabTitle(tab) }}
                 <span v-show="tab.dirty" class="text-accent" :title="t('unsavedChanges')">*</span>
                 <q-btn
                   flat
@@ -65,7 +65,7 @@
                   rounded
                   icon="close"
                   size="xs"
-                  @click.stop="closeTab(tab.entity)"
+                  @click.stop="closeTab(tab.state)"
                 />
               </span>
               <q-menu context-menu>
@@ -83,21 +83,23 @@
               </q-menu>
             </q-tab>
           </q-tabs>
-          <q-tab-panels v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" keep-alive class="col entity-editor-tab">
-            <q-tab-panel v-for="tab in tabs" :key="tab.entity.id" :name="tab.entity.id" class="q-pa-none">
+          <q-tab-panels v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" class="col entity-editor-tab">
+            <q-tab-panel v-for="tab in tabs" :key="tab.state.id" :name="tab.state.id" class="q-pa-none">
               <entity-tab
                 v-if="repository && organisationId"
+                :entity="tab.state"
                 :version="tab.selectedVersion"
-                :entity="tab.entity"
                 :repository-id="repository.id"
                 :organisation-id="organisationId"
-                :hotkeys-enabled="selected?.id === tab.entity.id"
-                @change="tab.dirty = $event; tab.preserve = tab.preserve || $event"
-                @update:entity="saveEntity"
+                :hotkeys-enabled="selected?.id === tab.state.id"
+                :dirty="tab.dirty"
+                @update:entity="handleTabUpdate(tab, $event)"
                 @entity-clicked="selectTabByKey($event)"
-                @reload-failed="closeTab(tab.entity); alert($event.message)"
+                @reload-failed="closeTab(tab.state); alert($event.message)"
                 @restore-version="tab.selectedVersion = $event.version; restoreVersion($event)"
                 @change-version="tab.selectedVersion = $event"
+                @save="saveEntity(tab.state)"
+                @reset="reset(tab)"
               />
             </q-tab-panel>
           </q-tab-panels>
@@ -134,7 +136,7 @@ import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/EntityEditor/ExportDialog.vue'
-import { Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
+import { Category, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { RepositoryType } from '@onto-med/top-api'
@@ -166,22 +168,22 @@ export default defineComponent({
     const tabs        = ref([] as EditorTab[])
     const treeLoading = ref(false)
 
+    const clone = (value: Category|Phenotype) =>
+      JSON.parse(JSON.stringify(value)) as Category|Phenotype
+    const equals = (expected: unknown, actual: unknown): boolean =>
+      JSON.stringify(expected) === JSON.stringify(actual)
+
     const reloadEntities = async () => {
       treeLoading.value = true
       await entityStore.reloadEntities()
-        .then(() => tabs.value = tabs.value.filter(t => entities.value.findIndex(e => e.id === t.entity.id) !== -1))
+        .then(() => tabs.value = tabs.value.filter(t => entities.value.findIndex(e => e.id === t.state.id) !== -1))
         .catch((e: Error) => alert(e.message))
         .finally(() => treeLoading.value = false)
     }
     void entityStore.reloadFunctions()
     const selectTabByKey = (key: string|undefined): void => {
-      const index = tabs.value.map(t => t.entity.id).indexOf(key)
-      if (index !== -1)
-        selected.value = tabs.value[index].entity
-      else {
-        const selection = entityStore.getEntity(key)
-        selected.value = selection ? selection : undefined
-      }
+      const selection = entityStore.getEntity(key)
+      selected.value = selection ? selection : undefined
     }
     const closeTab = (entity: Entity|undefined): void => {
       if (entity === undefined) {
@@ -189,26 +191,32 @@ export default defineComponent({
         selected.value = undefined
       } else {
         const id = entity.id
-        const index = tabs.value.map(t => t.entity.id).indexOf(id)
+        const index = tabs.value.map(t => t.state.id).indexOf(id)
         if (index !== -1) tabs.value.splice(index, 1)
         if (selected.value && selected.value.id === id) {
           if (tabs.value[tabs.value.length - 1])
-            selected.value = tabs.value[tabs.value.length - 1].entity || undefined
+            selected.value = entityStore.getEntity(tabs.value[tabs.value.length - 1].state.id) || undefined
           else selected.value = undefined
         }
       }
+    }
+
+    const handleTabUpdate = (tab: EditorTab, entity: Entity) => {
+      tab.state = entity
+      tab.dirty = !tab.state.version || !equals(tab.state, entityStore.getEntity(tab.state.id))
+      tab.preserve = tab.preserve || tab.dirty
     }
 
     watch(
       selected as Ref<Entity|undefined>,
       (entity: Entity|undefined) => {
         tabs.value
-          .filter(t => !t.preserve && t.entity.id !== entity?.id)
-          .forEach(t => closeTab(t.entity))
+          .filter(t => !t.preserve && t.state.id !== entity?.id)
+          .forEach(t => closeTab(t.state))
         if (entity) {
-          let tab = tabs.value.find(t => t.entity.id === entity.id)
+          let tab = tabs.value.find(t => t.state.id === entity.id)
           if (!tab) {
-            tabs.value.push({ selectedVersion: entity.version, entity: entity, dirty: false })
+            tabs.value.push({ selectedVersion: entity.version, state: clone(entity), dirty: false })
             tab = tabs.value[tabs.value.length - 1]
           }
           void router.push({
@@ -240,11 +248,11 @@ export default defineComponent({
     )
 
     const switchTab = (offset: number) => {
-      var index = tabs.value.findIndex(t => selected.value?.id === t.entity.id)
+      var index = tabs.value.findIndex(t => selected.value?.id === t.state.id)
       if (index === -1) return
       index += offset
       if (tabs.value[index] === undefined) return
-      selectTabByKey(tabs.value[index].entity.id)
+      selectTabByKey(tabs.value[index].state.id)
     }
 
     const keylistener = (e: KeyboardEvent) => {
@@ -267,7 +275,7 @@ export default defineComponent({
           .loadEntity(props.entityId)
           .then(entity => {
             if (!entity) return
-            tabs.value = [ { selectedVersion: props.version, entity: entity, dirty: false }]
+            tabs.value = [ { selectedVersion: props.version, state: clone(entity), dirty: false }]
             selected.value = entity
           })
           .catch((e: Error) => {
@@ -297,8 +305,8 @@ export default defineComponent({
             closeTab(entity)
             if (isPhenotype(entity))
               tabs.value
-                .filter(t => (t.entity as Phenotype).superPhenotype?.id === entity.id)
-                .forEach(t => closeTab(t.entity))
+                .filter(t => (t.state as Phenotype).superPhenotype?.id === entity.id)
+                .forEach(t => closeTab(t.state))
           })
           .catch((e: Error) => alert(t(e.message)))
           .finally(() => treeLoading.value = false)
@@ -308,9 +316,10 @@ export default defineComponent({
         entityStore.saveEntity(entity)
           .then((r) => {
             alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
-            const index = tabs.value.findIndex(t => t.entity.id === r.id)
+            const index = tabs.value.findIndex(t => t.state.id === r.id)
             if (index != -1) {
-              tabs.value[index].entity = r
+              tabs.value[index].state = clone(r)
+              tabs.value[index].dirty = false
               tabs.value[index].selectedVersion = r.version
             }
             void router.push({
@@ -326,8 +335,8 @@ export default defineComponent({
         entityStore.restoreVersion(entity)
           .then(() => {
             alert(t('thingRestored', { thing: t('version') }), 'positive')
-            const index = tabs.value.findIndex(t => t.entity.id == entity.id)
-            if (index !== -1) Object.assign(tabs.value[index].entity, entity)
+            const index = tabs.value.findIndex(t => t.state.id == entity.id)
+            if (index !== -1) Object.assign(tabs.value[index].state, entity)
           })
           .catch((e: Error) => alert(e.message))
       },
@@ -350,17 +359,17 @@ export default defineComponent({
 
       closeOtherTabs (tab: EditorTab): void {
         tabs.value = [tab]
-        selected.value = tab.entity
+        selected.value = tab.state
       },
 
       closeSavedTabs (): void {
-        tabs.value.filter(t => !t.dirty).forEach(t => closeTab(t.entity))
+        tabs.value.filter(t => !t.dirty).forEach(t => closeTab(t.state))
       },
 
       preserve (): void {
         void nextTick(() => {
           if (selected.value) {
-            const tab = tabs.value.find(t => t.entity.id === selected.value?.id)
+            const tab = tabs.value.find(t => t.state.id === selected.value?.id)
             if (tab) tab.preserve = true
           }
         })
@@ -376,13 +385,28 @@ export default defineComponent({
 
       isPhenotypeRepository: computed(() =>
         repository.value && repository.value.repositoryType === RepositoryType.PhenotypeRepository
-      )
+      ),
+
+      handleTabUpdate,
+
+      reset (tab: EditorTab) {
+        const entity = entityStore.getEntity(tab.state.id)
+        if (entity) {
+          handleTabUpdate(tab, clone(entity))
+        } else {
+          closeTab(tab.state)
+        }
+      },
+
+      getTabTitle(tab: EditorTab) {
+        return getTitle(entityStore.getEntity(tab.state.id), true)
+      }
     }
   }
 })
 
 interface EditorTab {
-  entity: Entity,
+  state: Entity,
   selectedVersion?: number,
   dirty: boolean,
   preserve?: boolean

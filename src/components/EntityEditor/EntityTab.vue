@@ -25,7 +25,7 @@
           color="primary"
           :label="t('save')"
           :title="t('ctrl') + '+S'"
-          :disabled="!hasUnsavedChanges && !isNew"
+          :disabled="!dirty && !isNew"
           @click="save()"
         />
         <q-btn
@@ -34,7 +34,7 @@
           no-caps
           color="grey-7"
           :label="t('backToCurrentVersion')"
-          @click="reset()"
+          @click="$emit('reset'); restrictionKey++"
         />
         <q-btn
           v-else
@@ -42,7 +42,7 @@
           no-caps
           color="grey-7"
           :label="t('reset')"
-          :disable="!hasUnsavedChanges"
+          :disable="!dirty"
           @click="showClearDialog = true"
         />
         <q-separator vertical class="gt-xs" />
@@ -126,7 +126,7 @@
 
           <q-card-actions align="right">
             <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-            <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="reset()" />
+            <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('reset'); restrictionKey++" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -141,7 +141,6 @@
         :repository-id="repositoryId"
         @prefill="prefillFromVersion"
         @restore="$emit('restoreVersion', $event)"
-        @deleted="reset()"
       />
 
       <forking-dialog
@@ -152,17 +151,17 @@
     </div>
 
     <entity-form
-      v-model:titles="local.titles"
-      v-model:synonyms="local.synonyms"
-      v-model:descriptions="local.descriptions"
-      v-model:data-type="local.dataType"
-      v-model:item-type="local.itemType"
-      v-model:restriction="local.restriction"
-      v-model:expression="local.expression"
-      v-model:unit="local.unit"
-      v-model:score="local.score"
-      v-model:superCategories="local.superCategories"
-      v-model:codes="local.codes"
+      :titles="local.titles"
+      :synonyms="local.synonyms"
+      :descriptions="local.descriptions"
+      :data-type="local.dataType"
+      :item-type="local.itemType"
+      :restriction="local.restriction"
+      :expression="local.expression"
+      :unit="local.unit"
+      :score="local.score"
+      :super-categories="local.superCategories"
+      :codes="local.codes"
       :entity-id="local.id"
       :entity-type="local.entityType"
       :version="version"
@@ -170,6 +169,17 @@
       :organisation-id="organisationId"
       :readonly="isOtherVersion"
       :restriction-key="restrictionKey"
+      @update:titles="$emit('update:entity', { ...local, titles: $event })"
+      @update:synonyms="$emit('update:entity', { ...local, synonyms: $event })"
+      @update:descriptions="$emit('update:entity', { ...local, descriptions: $event })"
+      @update:data-type="$emit('update:entity', { ...local, dataType: $event })"
+      @update:item-type="$emit('update:entity', { ...local, itemType: $event })"
+      @update:restriction="$emit('update:entity', { ...local, restriction: $event })"
+      @update:expression="$emit('update:entity', { ...local, expression: $event })"
+      @update:unit="$emit('update:entity', { ...local, unit: $event })"
+      @update:score="$emit('update:entity', { ...local, score: $event })"
+      @update:super-categories="$emit('update:entity', { ...local, superCategories: $event })"
+      @update:codes="$emit('update:entity', { ...local, codes: $event })"
       @entity-clicked="$emit('entityClicked', $event)"
       @add-super-category="addSuperCategory(undefined)"
       @set-super-category="setSuperCategory"
@@ -225,15 +235,14 @@ export default defineComponent({
     isOpen: {
       type: Boolean,
       default: false
-    }
+    },
+    dirty: Boolean
   },
-  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'change'],
+  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'save', 'reset'],
   setup (props, { emit }) {
     const { t, d } = useI18n()
     const clone = (value: Category|Phenotype) =>
       JSON.parse(JSON.stringify(value)) as Category|Phenotype
-    const equals = (expected: unknown, actual: unknown): boolean =>
-      JSON.stringify(expected) === JSON.stringify(actual)
 
     const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType } = useEntityFormatter()
     const { alert } = useAlert()
@@ -269,12 +278,6 @@ export default defineComponent({
       emit('changeVersion', entity.version)
     }
 
-    const hasUnsavedChanges = computed(() => {
-      const unsavedChanges = !equals(local.value, props.entity)
-      emit('change', unsavedChanges || isNew.value)
-      return unsavedChanges
-    })
-
     const isValid = computed((): boolean => {
       var result = true
 
@@ -291,11 +294,11 @@ export default defineComponent({
     })
 
     const save = () => {
-      if ((isNew.value || hasUnsavedChanges.value)) {
+      if ((isNew.value || props.dirty)) {
         if (isValid.value) {
           if (isPhenotype(local.value) && local.value.expression?.functionId === 'switch' && hasDataType(local.value))
             local.value.dataType = DataType.Number
-          emit('update:entity', local.value)
+          emit('save')
           versionHistoryDialogKey.value++
         } else {
           alert(t('pleaseCheckInput'))
@@ -344,7 +347,6 @@ export default defineComponent({
       isOtherVersion: computed(() => local.value.version != props.entity.version),
       isForking: true,
 
-      hasUnsavedChanges,
       save,
 
       prefillFromVersion,
@@ -367,17 +369,6 @@ export default defineComponent({
         const casted = local.value as Category|Phenotype
         if (!casted.superCategories) return
         casted.superCategories.splice(index, 1)
-      },
-
-      reset: () => {
-        local.value = clone(props.entity)
-        restrictionKey.value++
-        void router.replace({
-          name: 'editor',
-          params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: local.value.id },
-          query: { version: local.value.version }
-        })
-        emit('changeVersion', local.value.version)
       },
 
       copyToClipboard (text: unknown): void {
