@@ -6,7 +6,7 @@
           {{ getTitle(local) }}
           <small v-if="!isNew" class="gt-xs" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
             {{ t('version') }}: {{ local.version }}
-            <span v-if="local.createdAt">({{ d(local.createdAt, 'long') }})</span>span>
+            <span v-if="local.createdAt">({{ d(local.createdAt, 'long') }})</span>
           </small>
           <small v-else class="text-accent">{{ t('notSavedYet') }}</small>
         </q-toolbar-title>
