@@ -12,7 +12,9 @@
   >
     <template v-if="tooltip" #option="scope">
       <q-item v-bind="scope.itemProps">
-        <q-item-section v-t="scope.opt.label" :title="scope.opt.title" />
+        <q-item-section :title="scope.opt.title">
+          {{ scope.opt.label }}
+        </q-item-section>
       </q-item>
     </template>
     <template v-if="description" #after>
@@ -38,7 +40,8 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {
-    const { t } = useI18n()
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t, te } = useI18n()
     const itemType = computed({
       get (): string { return props.modelValue as string },
       set (value: string): void { emit('update:modelValue', value) }
@@ -49,7 +52,13 @@ export default defineComponent({
       itemType,
       localOptions: computed(() =>
         (props.options ? props.options : Object.values(ItemType))
-          .map(d => { return { label: t(d), value: d } })
+          .map(d => {
+            return {
+              label: t(d),
+              value: d,
+              title: te(d + 'Description') ? t(d + 'Description') : ''
+            }
+          })
           .sort((a, b) => a.label.localeCompare(b.label)))
     }
   }
