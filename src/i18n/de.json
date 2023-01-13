@@ -346,5 +346,11 @@
   },
   "unnamedEntity": "Unbenannte Entität|Unbenannte Entitäten",
   "copiedToClipboard": "In die Zwischenablage kopiert",
-  "saveAsFile": "Als Datei speichern"
+  "saveAsFile": "Als Datei speichern",
+  "importAndExport": "Import und Export",
+  "importOrExportThing": "{thing} importieren oder exportieren",
+  "importDescription": "Wählen Sie eine Datei und das entsprechende Format aus, um ihren Inhalt in dieses Repository hochzuladen.",
+  "importFormat": "Importformat|Importformate",
+  "exportFormat": "Exportformat|Exportformate",
+  "importFinished": "Import abgeschlossen"
 }

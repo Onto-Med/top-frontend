@@ -89,6 +89,8 @@ module.exports = configure(function (ctx) {
       chainWebpack (/* chain */) {
         //
       },
+
+      devtool: 'source-map',
     },
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer

@@ -15,11 +15,9 @@
             </div>
 
             <q-btn-group dense flat class="gt-xs">
-              <q-btn
-                icon="file_download"
-                :title="t('export')"
-                @click="showExportDialog = true"
-              />
+              <q-btn :title="t('importAndExport')" @click="showExportDialog = true">
+                <q-icon name="sync_alt" class="rotate-90" />
+              </q-btn>
               <q-btn
                 v-if="isPhenotypeRepository"
                 icon="manage_search"
@@ -28,7 +26,7 @@
               />
             </q-btn-group>
 
-            <export-dialog v-model:show="showExportDialog" :repository="repository" />
+            <export-dialog v-model:show="showExportDialog" :repository="repository" @import="reloadEntities()" />
           </div>
 
           <entity-tree
@@ -38,7 +36,6 @@
             :allowed-entity-types="allowedEntityTypes"
             class="col column"
             show-context-menu
-            @refresh-clicked="reloadEntities"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
@@ -137,7 +134,7 @@ import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import ExportDialog from 'src/components/EntityEditor/ExportDialog.vue'
+import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
 import { Category, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
