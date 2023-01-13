@@ -14,16 +14,19 @@
               {{ repository.name || repository.id }}
             </div>
 
-            <div v-if="isPhenotypeRepository" class="gt-xs">
+            <q-btn-group dense flat class="gt-xs">
+              <q-btn :title="t('importAndExport')" @click="showExportDialog = true">
+                <q-icon name="sync_alt" class="rotate-90" />
+              </q-btn>
               <q-btn
-                dense
-                flat
-                no-caps
+                v-if="isPhenotypeRepository"
                 icon="manage_search"
-                :label="t('buildQuery')"
+                :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder' }"
               />
-            </div>
+            </q-btn-group>
+
+            <export-dialog v-model:show="showExportDialog" :repository="repository" @import="reloadEntities()" />
           </div>
 
           <entity-tree
@@ -33,11 +36,9 @@
             :allowed-entity-types="allowedEntityTypes"
             class="col column"
             show-context-menu
-            @refresh-clicked="reloadEntities"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
-            @export-entity="handleEntityExport"
             @dblclick="preserve()"
           />
         </div>
@@ -121,8 +122,6 @@
         </div>
       </template>
     </q-splitter>
-
-    <export-dialog v-model:show="showExportDialog" :entity="exportEntity" />
   </q-page>
 </template>
 
@@ -135,7 +134,7 @@ import useAlert from 'src/mixins/useAlert'
 import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import ExportDialog from 'src/components/EntityEditor/ExportDialog.vue'
+import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
 import { Category, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -162,7 +161,6 @@ export default defineComponent({
     const showJson         = ref(false)
     const splitterModel    = ref(25)
     const showExportDialog = ref(false)
-    const exportEntity     = ref(undefined as Entity|undefined)
     const { entities, repository, organisationId } = storeToRefs(entityStore)
     const selected    = ref<Entity|undefined>(undefined)
     const tabs        = ref([] as EditorTab[])
@@ -289,7 +287,7 @@ export default defineComponent({
     })
 
     return {
-      t, showJson, splitterModel, entities, selected, tabs, treeLoading, showExportDialog, exportEntity,
+      t, showJson, splitterModel, entities, selected, tabs, treeLoading, showExportDialog,
       isRestricted, getTitle, getIcon, repositoryIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
       organisationId,
@@ -350,11 +348,6 @@ export default defineComponent({
       handleEntityDuplication (entity: Entity): void {
         const duplicate = entityStore.addDuplicate(entity)
         if (duplicate) selectTabByKey(duplicate.id)
-      },
-
-      handleEntityExport (entity: Entity): void {
-        showExportDialog.value = true
-        exportEntity.value = entity
       },
 
       closeOtherTabs (tab: EditorTab): void {

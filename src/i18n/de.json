@@ -344,5 +344,13 @@
     "title": "Elementtyp|Elementtypen",
     "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
   },
-  "unnamedEntity": "Unbenannte Entität|Unbenannte Entitäten"
+  "unnamedEntity": "Unbenannte Entität|Unbenannte Entitäten",
+  "copiedToClipboard": "In die Zwischenablage kopiert",
+  "saveAsFile": "Als Datei speichern",
+  "importAndExport": "Import und Export",
+  "importOrExportThing": "{thing} importieren oder exportieren",
+  "importDescription": "Wählen Sie eine Datei und das entsprechende Format aus, um ihren Inhalt in dieses Repository hochzuladen.",
+  "importFormat": "Importformat|Importformate",
+  "exportFormat": "Exportformat|Exportformate",
+  "importFinished": "Import abgeschlossen"
 }

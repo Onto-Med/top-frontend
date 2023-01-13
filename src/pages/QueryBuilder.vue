@@ -204,9 +204,9 @@ import { useEntity } from 'src/pinia/entity'
 import useAlert from 'src/mixins/useAlert'
 import { defineComponent, onMounted, ref, computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import useFile from 'src/mixins/useFile'
 import { v4 as uuidv4 } from 'uuid'
 import { QueryApiKey } from 'src/boot/axios'
+import { exportFile } from 'quasar'
 
 interface Run {
   query: Query,
@@ -221,7 +221,6 @@ export default defineComponent({
     const { isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
     const { alert } = useAlert()
-    const { saveToFile } = useFile()
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({
       id: (uuidv4 as () => string)(),
@@ -363,9 +362,10 @@ export default defineComponent({
           .catch((e: Error) => alert(e.message))
       },
 
-      exportQuery: () => {
-        saveToFile(JSON.stringify(query.value), new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json')
-      },
+      exportQuery: () =>
+        exportFile(
+          new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json',
+          JSON.stringify(query.value)),
 
       importQuery: () => {
         if (!importFile.value) return
