@@ -73,7 +73,6 @@
               @delete-entity-clicked="$emit('deleteEntity', $event)"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
-              @export-clicked="$emit('exportEntity', $event)"
             />
             <slot v-else name="entity-context-menu" :entity="node" />
           </div>
@@ -135,7 +134,7 @@ export default defineComponent({
       default: () => Object.values(EntityType)
     }
   },
-  emits: ['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity', 'exportEntity'],
+  emits: ['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity'],
   setup (props, { emit }) {
     const { t } = useI18n()
     const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()

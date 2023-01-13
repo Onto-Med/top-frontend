@@ -14,16 +14,21 @@
               {{ repository.name || repository.id }}
             </div>
 
-            <div v-if="isPhenotypeRepository" class="gt-xs">
+            <q-btn-group dense flat class="gt-xs">
               <q-btn
-                dense
-                flat
-                no-caps
+                icon="file_download"
+                :title="t('export')"
+                @click="showExportDialog = true"
+              />
+              <q-btn
+                v-if="isPhenotypeRepository"
                 icon="manage_search"
-                :label="t('buildQuery')"
+                :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder' }"
               />
-            </div>
+            </q-btn-group>
+
+            <export-dialog v-model:show="showExportDialog" :repository="repository" />
           </div>
 
           <entity-tree
@@ -37,7 +42,6 @@
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
-            @export-entity="handleEntityExport"
             @dblclick="preserve()"
           />
         </div>
@@ -121,8 +125,6 @@
         </div>
       </template>
     </q-splitter>
-
-    <export-dialog v-model:show="showExportDialog" :entity="exportEntity" />
   </q-page>
 </template>
 
@@ -162,7 +164,6 @@ export default defineComponent({
     const showJson         = ref(false)
     const splitterModel    = ref(25)
     const showExportDialog = ref(false)
-    const exportEntity     = ref(undefined as Entity|undefined)
     const { entities, repository, organisationId } = storeToRefs(entityStore)
     const selected    = ref<Entity|undefined>(undefined)
     const tabs        = ref([] as EditorTab[])
@@ -289,7 +290,7 @@ export default defineComponent({
     })
 
     return {
-      t, showJson, splitterModel, entities, selected, tabs, treeLoading, showExportDialog, exportEntity,
+      t, showJson, splitterModel, entities, selected, tabs, treeLoading, showExportDialog,
       isRestricted, getTitle, getIcon, repositoryIcon,
       reloadEntities, selectTabByKey, closeTab, alert,
       organisationId,
@@ -350,11 +351,6 @@ export default defineComponent({
       handleEntityDuplication (entity: Entity): void {
         const duplicate = entityStore.addDuplicate(entity)
         if (duplicate) selectTabByKey(duplicate.id)
-      },
-
-      handleEntityExport (entity: Entity): void {
-        showExportDialog.value = true
-        exportEntity.value = entity
       },
 
       closeOtherTabs (tab: EditorTab): void {

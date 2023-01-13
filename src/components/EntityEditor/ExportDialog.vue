@@ -1,8 +1,8 @@
 <template>
-  <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
+  <q-dialog :model-value="show" @update:model-value="result = undefined; $emit('update:show', $event)">
     <q-card class="export-dialog">
       <q-card-section class="text-h6">
-        {{ t('exportThing', { thing: getTitle(entity) }) }}
+        {{ t('exportThing', { thing: t('repository') }) }}: {{ repository.name }}
       </q-card-section>
 
       <q-separator />
@@ -14,12 +14,10 @@
       <q-card-section>
         <q-select
           v-model="format"
-          :options="options"
+          :options="formats"
           :label="t('format')"
           :placeholder="t('selectThing', { thing: t('format') })"
           :error="!format"
-          emit-value
-          map-options
           class="q-mb-md"
         >
           <template #after>
@@ -57,6 +55,7 @@
       <q-separator />
 
       <q-card-actions align="right">
+        <q-btn v-show="result" flat :label="t('saveAsFile')" @click="copyToFile()" />
         <q-btn v-close-popup flat :label="t('close')" color="primary" />
       </q-card-actions>
     </q-card>
@@ -64,15 +63,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, watch, computed } from 'vue'
+import { defineComponent, ref, inject, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityApiKey } from 'src/boot/axios'
-import { Entity } from '@onto-med/top-api'
+import { RepositoryApiKey } from 'src/boot/axios'
+import { Purpose, Repository } from '@onto-med/top-api'
 import useAlert from 'src/mixins/useAlert'
-import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { copyToClipboard } from 'quasar'
+import { copyToClipboard, exportFile } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
-import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -80,28 +77,25 @@ export default defineComponent({
       type: Boolean,
       required: true
     },
-    entity: {
-      type: Object as () => Entity,
+    repository: {
+      type: Object as () => Repository,
+      required: true
     }
   },
   emits: ['update:show'],
   setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, d }     = useI18n()
-    const entityApi    = inject(EntityApiKey)
-    const { alert }    = useAlert()
-    const format       = ref(undefined as string|undefined)
-    const loading      = ref(false)
-    const result       = ref(undefined as string|undefined)
-    const { getTitle } = useEntityFormatter()
-    const { repository, organisation } = storeToRefs(useEntity())
+    const { t, d }      = useI18n()
+    const repositoryApi = inject(RepositoryApiKey)
+    const entityStore   = useEntity()
+    const { alert }     = useAlert()
+    const format        = ref(undefined as string|undefined)
+    const loading       = ref(false)
+    const result        = ref(undefined as string|undefined)
+    const formats       = ref<string[]>([])
 
-    watch(
-      () => props.entity,
-      (newVal: Entity|undefined, oldVal: Entity|undefined) => {
-        if (newVal !== oldVal) result.value = undefined
-      }
-    )
+    onMounted(() =>
+      entityStore.getFormats(Purpose.Export)
+        .then(f => formats.value = f.map(f => f.id)))
 
     return {
       t,
@@ -109,16 +103,14 @@ export default defineComponent({
       format,
       loading,
       result,
-      getTitle,
-
-      options: computed(() => [ { label: t('rScript'), value: 'vnd.r-project.r' } ]),
+      formats,
 
       doExport: async () => {
-        if (loading.value || !format.value || !entityApi || !props.entity || !props.entity.id || !repository.value || !organisation.value) return
+        if (loading.value || !format.value || !repositoryApi || !props.repository.organisation) return
         loading.value = true
 
-        await entityApi.exportEntity(organisation.value.id, repository.value.id, props.entity.id, format.value)
-          .then(r => result.value = r.data)
+        await repositoryApi.exportRepository(props.repository.organisation.id, props.repository.id, format.value)
+          .then(r => result.value = r.data as string)
           .catch((e: Error) => alert(e.message))
           .finally(() => loading.value = false)
       },
@@ -128,6 +120,11 @@ export default defineComponent({
           copyToClipboard(result.value)
             .then(() => alert(t('copiedToClipboard'), 'positive'))
             .catch(() => alert(t('copyFailed')))
+      },
+
+      copyToFile: () => {
+        if (result.value)
+          exportFile(props.repository.id + '.txt', result.value)
       }
     }
   }

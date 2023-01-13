@@ -33,11 +33,6 @@
       </q-item>
     </q-list>
     <q-separator />
-    <q-list v-if="exportable && entity" dense>
-      <q-item v-close-popup clickable @click="$emit('exportClicked', entity)">
-        <q-item-section v-t="'export'" />
-      </q-item>
-    </q-list>
     <q-list v-if="deletable && entity" dense>
       <q-item clickable @click="showDeleteDialog = true">
         <q-item-section v-t="'delete'" />
@@ -86,13 +81,9 @@ export default defineComponent({
     duplicatable: {
       type: Boolean,
       default: true
-    },
-    exportable: {
-      type: Boolean,
-      default: true
     }
   },
-  emits: ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked', 'exportClicked'],
+  emits: ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked'],
   setup (props, { emit }) {
     const { t } = useI18n()
 
@@ -117,7 +108,8 @@ export default defineComponent({
         void setTimeout(() => emit('createEntityClicked', entityType, entityId), 50)
       },
 
-      emitDuplicateEntity: (entity: Entity) => {
+      emitDuplicateEntity: (entity?: Entity) => {
+        if (!entity) return
         emit('duplicateEntityClicked', entity)
       }
     }

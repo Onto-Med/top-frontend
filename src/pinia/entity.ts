@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier, DefaultApi, Purpose, Format } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,6 +15,7 @@ export const useEntity = defineStore('entity', {
       dataSources: undefined as DataSource[]|undefined,
       constants: undefined as Constant[]|undefined,
       functions: new Map<string, ExpressionFunction[]>(),
+      formats: undefined as Format[]|undefined,
       keycloak: undefined as KeycloakInstance|undefined,
       entityApi: undefined as EntityApi|undefined,
       expressionConstantApi: undefined as ExpressionConstantApi|undefined,
@@ -22,7 +23,8 @@ export const useEntity = defineStore('entity', {
       organisationApi: undefined as OrganisationApi|undefined,
       repositoryApi: undefined as RepositoryApi|undefined,
       forkApi: undefined as ForkApi|undefined,
-      dataSourceApi: undefined as DataSourceApi|undefined
+      dataSourceApi: undefined as DataSourceApi|undefined,
+      defaultApi: undefined as DefaultApi|undefined
     }
   },
   actions: {
@@ -370,6 +372,13 @@ export const useEntity = defineStore('entity', {
           if (!restriction || !this.isRestricted(restriction) || !restriction.superPhenotype) return Promise.resolve(undefined)
           return this.loadEntity(restriction.superPhenotype.id)
         })
+    },
+
+    async getFormats (purpose?: Purpose) {
+      if (!this.formats)
+        this.formats = (await this.defaultApi?.getFormats(purpose))?.data
+
+      return (this.formats || []).filter(f => !purpose || f.purposes.includes(purpose))
     }
   }
 })
