@@ -1,13 +1,14 @@
-import { AxiosError } from 'axios';
-import { route } from 'quasar/wrappers';
-import { useEntity } from 'src/pinia/entity';
+import { AxiosError } from 'axios'
+import { route } from 'quasar/wrappers'
+import useAlert from 'src/mixins/useAlert'
+import { useEntity } from 'src/pinia/entity'
 import {
   createMemoryHistory,
   createRouter,
   createWebHashHistory,
   createWebHistory,
-} from 'vue-router';
-import routes from './routes';
+} from 'vue-router'
+import routes from './routes'
 
 /*
  * If not building with SSR mode, you can
@@ -21,7 +22,7 @@ import routes from './routes';
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
-    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
+    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -33,19 +34,27 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(
       process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE
     ),
-  });
+  })
 
-  Router.beforeEach((to) => {
+  Router.beforeEach(async (to) => {
     const entityStore = useEntity()
+    const { alert } = useAlert()
+
     if (!to.meta.allowAnonymous) {
       if (entityStore.keycloak && !entityStore.keycloak.authenticated)
         void entityStore.keycloak.login()
     }
-    entityStore.setOrganisation(to.params.organisationId as string | undefined)
-      .catch((e: AxiosError) => console.log(e.message))
-    entityStore.setRepository(to.params.repositoryId as string | undefined)
-      .catch((e: AxiosError) => console.log(e.message))
+    await entityStore.setOrganisation(to.params.organisationId as string | undefined)
+      .catch((e: AxiosError) => {
+        alert(e.message)
+        void Router.push({ name: 'organisations' })
+      })
+    await entityStore.setRepository(to.params.repositoryId as string | undefined)
+      .catch((e: AxiosError) => {
+        alert(e.message)
+        void Router.push({ name: 'showOrganisation' })
+      })
   })
 
-  return Router;
-});
+  return Router
+})
