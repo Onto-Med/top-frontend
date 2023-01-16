@@ -1,5 +1,5 @@
 <template>
-  <q-page v-if="organisation && !loading" class="q-gutter-md">
+  <q-page v-if="organisation" class="q-gutter-md">
     <q-card>
       <q-card-section>
         <div class="text-h6">
@@ -18,9 +18,10 @@
     <table-with-actions
       :name="t('repository')"
       :rows="repositories"
-      :loading="repositoriesLoading"
+      :loading="loading"
       create
       @row-clicked="routeToEditor($event)"
+      @reload-clicked="reload()"
       @create-clicked="repository = newRepository(); showForm = true"
     >
       <template #actions="{ row }">
@@ -60,27 +61,21 @@ import { useRouter } from 'vue-router'
 import useAlert from 'src/mixins/useAlert'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { RepositoryApiKey } from 'src/boot/axios'
-import { Organisation, Repository } from '@onto-med/top-api'
+import { Repository } from '@onto-med/top-api'
 import TableWithActions from 'src/components/TableWithActions.vue'
 import RepositoryForm from 'src/components/Repository/RepositoryForm.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { storeToRefs } from 'pinia'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
-  name: 'Editor',
   components: {
     TableWithActions,
     RepositoryForm
   },
-  props: {
-    organisationId: {
-      type: String,
-      required: true
-    }
-  },
-  setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  setup () {
     const { t, d } = useI18n()
     const { alert } = useAlert()
     const { repositoryIcon } = useEntityFormatter()
@@ -88,39 +83,34 @@ export default defineComponent({
     const loading = ref(false)
     const showForm = ref(false)
     const saving = ref(false)
-    const repositoriesLoading = ref(false)
     const organisationApi = inject(OrganisationApiKey)
     const repositoryApi = inject(RepositoryApiKey)
-    const organisation = ref<Organisation|undefined>(undefined)
+    const { organisation } = storeToRefs(useEntity())
     const repositories = ref<Repository[]>([])
     const newRepository = () => {
       return { id: (uuidv4 as () => string)(), primary: false } as Repository
     }
     const repository = ref(newRepository())
 
-    const reloadRepositories = async () => {
-      if (!repositoryApi) return
-      repositoriesLoading.value = true
-
-      await repositoryApi.getRepositoriesByOrganisationId(props.organisationId)
-        .then(r => repositories.value = r.data)
-        .catch((e: Error) => alert(e.message))
-        .finally(() => repositoriesLoading.value = false)
-    }
-
     const reload = async () => {
-      if (!organisationApi) return
+      if (!repositoryApi || !organisation.value) return
       loading.value = true
 
-      await organisationApi.getOrganisationById(props.organisationId)
-        .then(r => organisation.value = r.data)
-        .catch((e: Error) => {
-          alert(e.message)
-          void router.push({ name: 'organisations' })
-        })
+      await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id)
+        .then(r => repositories.value = r.data)
+        .catch((e: Error) => alert(e.message))
         .finally(() => loading.value = false)
+      // if (!organisationApi) return
+      // loading.value = true
 
-      await reloadRepositories()
+      // await organisationApi.getOrganisationById(props.organisationId)
+      //   .then(r => organisation.value = r.data)
+      //   .then(() => reloadRepositories())
+      //   .catch((e: Error) => {
+      //     alert(e.message)
+      //     void router.push({ name: 'organisations' })
+      //   })
+      //   .finally(() => loading.value = false)
     }
 
     onMounted(async () => {
@@ -137,8 +127,8 @@ export default defineComponent({
       repository,
       repositories,
       loading,
-      repositoriesLoading,
       saving,
+      reload,
       newRepository,
       routeToEditor (repository: Repository) {
         if (!organisation.value) return
