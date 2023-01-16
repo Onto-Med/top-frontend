@@ -86,7 +86,7 @@
                     :label="t('logOut')"
                     push
                     size="sm"
-                    @click="keycloak?.logout({ redirectUri: 'http://127.0.0.1/' })"
+                    @click="keycloak?.logout()"
                   />
                 </div>
               </div>

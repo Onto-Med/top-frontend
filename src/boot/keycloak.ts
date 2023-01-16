@@ -2,8 +2,11 @@ import { boot } from 'quasar/wrappers'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 import { useEntity } from 'src/pinia/entity'
+import useAlert from 'src/mixins/useAlert'
 
 export default boot(async ({ app }) => {
+  const { alert } = useAlert()
+
   return new Promise(resolve => {
     if (process.env.AUTH_ENABLED) {
       app.use(VueKeyCloak, {
@@ -24,7 +27,7 @@ export default boot(async ({ app }) => {
           resolve()
         },
         onInitError: () => {
-          console.log('Keycloak initialisation failed!')
+          alert('Keycloak initialisation failed!')
           resolve()
         }
       })
