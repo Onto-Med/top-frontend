@@ -11,7 +11,7 @@
         <q-card-section>
           <p v-t="'importDescription'" />
 
-          <q-file v-model="importFile" :label="t('queryImportFile')">
+          <q-file v-model="importFile" :label="t('repositoryImportFile')">
             <template #prepend>
               <q-icon name="attach_file" />
             </template>

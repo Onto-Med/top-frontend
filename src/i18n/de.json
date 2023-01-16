@@ -353,5 +353,6 @@
   "importDescription": "Wählen Sie eine Datei und das entsprechende Format aus, um ihren Inhalt in dieses Repository hochzuladen.",
   "importFormat": "Importformat|Importformate",
   "exportFormat": "Exportformat|Exportformate",
-  "importFinished": "Import abgeschlossen"
+  "importFinished": "Import abgeschlossen",
+  "repositoryImportFile": "Repositorium Import-Datei|Repositorium Import-Dateien"
 }
