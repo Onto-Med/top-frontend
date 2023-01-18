@@ -58,7 +58,7 @@
 import { defineComponent, inject, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { RepositoryApiKey } from 'src/boot/axios'
 import { Repository } from '@onto-med/top-api'
@@ -77,7 +77,7 @@ export default defineComponent({
   },
   setup () {
     const { t, d } = useI18n()
-    const { alert } = useAlert()
+    const { notify, renderError } = useNotify()
     const { repositoryIcon } = useEntityFormatter()
     const router = useRouter()
     const loading = ref(false)
@@ -98,19 +98,8 @@ export default defineComponent({
 
       await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id)
         .then(r => repositories.value = r.data)
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
-      // if (!organisationApi) return
-      // loading.value = true
-
-      // await organisationApi.getOrganisationById(props.organisationId)
-      //   .then(r => organisation.value = r.data)
-      //   .then(() => reloadRepositories())
-      //   .catch((e: Error) => {
-      //     alert(e.message)
-      //     void router.push({ name: 'organisations' })
-      //   })
-      //   .finally(() => loading.value = false)
     }
 
     onMounted(async () => {
@@ -148,10 +137,10 @@ export default defineComponent({
         await promise
           .then(() => {
             showForm.value = false
-            alert(t('thingSaved', { thing: t('repository') }), 'positive')
+            notify(t('thingSaved', { thing: t('repository') }), 'positive')
             void reload()
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
       },
       async deleteRepository (repository: Repository) {
@@ -161,10 +150,10 @@ export default defineComponent({
         await repositoryApi?.deleteRepositoryById(repository.id, organisation.value.id)
           .then(() => {
             showForm.value = false
-            alert(t('thingDeleted', { thing: t('repository') }), 'positive')
+            notify(t('thingDeleted', { thing: t('repository') }), 'positive')
             void reload()
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
       }
     }

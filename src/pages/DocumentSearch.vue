@@ -128,12 +128,12 @@ import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DocumentApiKey, ConceptApiKey } from 'src/boot/axios'
 import { Document, Concept } from '@onto-med/top-api'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
   setup () {
-    const { t }            = useI18n()
-    const { alert }        = useAlert()
+    const { t } = useI18n()
+    const { renderError } = useNotify()
     const documentApi      = inject(DocumentApiKey)
     const conceptApi       = inject(ConceptApiKey)
     const documentIds      = ref<string[]>([])
@@ -183,7 +183,7 @@ export default defineComponent({
           selectedColors.value = new Array(concepts.value.length)
             .fill({ 'background-color': '', 'color': '' }) as ConceptColor[]
         })
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     }
 
@@ -214,7 +214,7 @@ export default defineComponent({
           .then(r => {
             documentIds.value = r.data.map(doc => doc.id).filter(id => id !== undefined) as string[]
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
       } else {document_.value = undefined}
       selectedColors.value.fill({'background-color': '', 'color': ''})
       selectedConcepts.value.forEach( function (_idx) {selectedColors.value[_idx] = conceptColors[_idx]})
@@ -238,10 +238,10 @@ export default defineComponent({
               // document_.value = undefined;
               // selectedColors.value.fill({'background-color': '', 'color': ''});
             })
-            .catch((e: Error) => alert(e.message))
+            .catch((e: Error) => renderError(e))
         } else {
           chooseConcept(lastSelectedConcept, true)
-            .catch((e: Error) => alert(e.message))
+            .catch((e: Error) => renderError(e))
         }
       }
     )
@@ -264,7 +264,7 @@ export default defineComponent({
           .then(r => {
             document_.value = r.data
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
       },
 
       conceptModeOptions: computed(() => [

@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { route } from 'quasar/wrappers'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import {
   createMemoryHistory,
@@ -38,7 +38,7 @@ export default route(function (/* { store, ssrContext } */) {
 
   Router.beforeEach(async (to) => {
     const entityStore = useEntity()
-    const { alert } = useAlert()
+    const { renderError } = useNotify()
 
     if (!to.meta.allowAnonymous) {
       if (entityStore.keycloak && !entityStore.keycloak.authenticated)
@@ -46,12 +46,12 @@ export default route(function (/* { store, ssrContext } */) {
     }
     await entityStore.setOrganisation(to.params.organisationId as string | undefined)
       .catch((e: AxiosError) => {
-        alert(e.message)
+        renderError(e)
         void Router.push({ name: 'organisations' })
       })
     await entityStore.setRepository(to.params.repositoryId as string | undefined)
       .catch((e: AxiosError) => {
-        alert(e.message)
+        renderError(e)
         void Router.push({ name: 'showOrganisation' })
       })
   })

@@ -76,7 +76,7 @@ import { useI18n } from 'vue-i18n'
 import { EntityApiKey } from 'src/boot/axios'
 import { Entity } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
@@ -108,7 +108,7 @@ export default defineComponent({
     const entityApi    = inject(EntityApiKey)
     const entityStore  = useEntity()
     const { getTitle } = useEntityFormatter()
-    const { alert }    = useAlert()
+    const { notify, renderError } = useNotify()
     const versions     = ref<Entity[]>([])
     const loading      = ref(false)
 
@@ -118,7 +118,7 @@ export default defineComponent({
 
       await entityApi.getEntityVersionsById(props.organisationId, props.repositoryId, props.entityId)
         .then(r => versions.value = r.data)
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     }
 
@@ -145,11 +145,11 @@ export default defineComponent({
       deleteVersion (version: Entity) {
         entityStore.deleteVersion(version)
           .then(() => {
-            alert(t('thingDeleted', { thing: t('version') }), 'positive')
+            notify(t('thingDeleted', { thing: t('version') }), 'positive')
           })
           .then(() => emit('deleted'))
           .then(() => reload())
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
       }
     }
   }

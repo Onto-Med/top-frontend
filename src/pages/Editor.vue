@@ -96,7 +96,7 @@
                 :dirty="tab.dirty"
                 @update:entity="handleTabUpdate(tab, $event)"
                 @entity-clicked="selectTabByKey($event)"
-                @reload-failed="closeTab(tab.state); alert($event.message)"
+                @reload-failed="closeTab(tab.state); notify($event.message)"
                 @restore-version="tab.selectedVersion = $event.version; restoreVersion($event)"
                 @change-version="tab.selectedVersion = $event"
                 @save="saveEntity(tab.state)"
@@ -130,7 +130,7 @@ import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick, computed
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
@@ -156,7 +156,7 @@ export default defineComponent({
     const { getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
-    const { alert }        = useAlert()
+    const { notify, renderError } = useNotify()
     const entityApi        = inject(EntityApiKey)
     const showJson         = ref(false)
     const splitterModel    = ref(25)
@@ -175,7 +175,7 @@ export default defineComponent({
       treeLoading.value = true
       await entityStore.reloadEntities()
         .then(() => tabs.value = tabs.value.filter(t => entities.value.findIndex(e => e.id === t.state.id) !== -1))
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => treeLoading.value = false)
     }
     void entityStore.reloadFunctions()
@@ -238,7 +238,7 @@ export default defineComponent({
           if (!selected.value || newVal !== selected.value.id)
             entityStore.loadEntity(newVal)
               .then(entity => selected.value = entity)
-              .catch((e: Error) => alert(e.message))
+              .catch((e: Error) => renderError(e))
         } else {
           selected.value = undefined
         }
@@ -277,7 +277,7 @@ export default defineComponent({
             selected.value = entity
           })
           .catch((e: Error) => {
-            alert(e.message)
+            renderError(e)
             void router.push({
               name: 'editor',
               params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: undefined }
@@ -289,7 +289,7 @@ export default defineComponent({
     return {
       t, showJson, splitterModel, entities, selected, tabs, treeLoading, showExportDialog,
       isRestricted, getTitle, getIcon, repositoryIcon,
-      reloadEntities, selectTabByKey, closeTab, alert,
+      reloadEntities, selectTabByKey, closeTab, notify,
       organisationId,
       repository,
 
@@ -299,21 +299,21 @@ export default defineComponent({
 
         entityStore.deleteEntity(entity)
           .then(() => {
-            alert(t('thingDeleted', { thing: t('entity') }), 'positive')
+            notify(t('thingDeleted', { thing: t('entity') }), 'positive')
             closeTab(entity)
             if (isPhenotype(entity))
               tabs.value
                 .filter(t => (t.state as Phenotype).superPhenotype?.id === entity.id)
                 .forEach(t => closeTab(t.state))
           })
-          .catch((e: Error) => alert(t(e.message)))
+          .catch((e: Error) => renderError(e))
           .finally(() => treeLoading.value = false)
       },
 
       saveEntity (entity: Entity) {
         entityStore.saveEntity(entity)
           .then((r) => {
-            alert(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
+            notify(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
             const index = tabs.value.findIndex(t => t.state.id === r.id)
             if (index != -1) {
               tabs.value[index].state = clone(r)
@@ -326,17 +326,17 @@ export default defineComponent({
               query: { version: r.version }
             })
           })
-          .catch((e: Error) => alert(t(e.message)))
+          .catch((e: Error) => renderError(e))
       },
 
       restoreVersion (entity: Entity) {
         entityStore.restoreVersion(entity)
           .then(() => {
-            alert(t('thingRestored', { thing: t('version') }), 'positive')
+            notify(t('thingRestored', { thing: t('version') }), 'positive')
             const index = tabs.value.findIndex(t => t.state.id == entity.id)
             if (index !== -1) Object.assign(tabs.value[index].state, entity)
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
       },
 
       handleEntityCreation (entityType: EntityType, superClassId: string): void {

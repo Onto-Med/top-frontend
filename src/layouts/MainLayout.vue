@@ -184,7 +184,7 @@ import { defineComponent, ref, computed } from 'vue'
 import { Entity, ForkingInstruction } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
   components: {
@@ -200,7 +200,7 @@ export default defineComponent({
     const entityStore = useEntity()
     const leftDrawerOpen = ref(true)
     const $q = useQuasar()
-    const { alert } = useAlert()
+    const { notify, renderError } = useNotify()
     const keycloak = entityStore.keycloak
     const forkOrigin = ref(undefined as Entity|undefined)
     const drawer = ref(undefined as QMenu|undefined)
@@ -264,9 +264,9 @@ export default defineComponent({
         entityStore.forkEntity(entity, forkingInstruction)
           .then((count) => {
             forkOrigin.value = undefined
-            alert(t('thingCreatedOrUpdated', { thing: `${count} ` + t('fork', count) }), 'positive')
+            notify(t('thingCreatedOrUpdated', { thing: `${count} ` + t('fork', count) }), 'positive')
           })
-          .catch((e: Error) => alert(t(e.message)))
+          .catch((e: Error) => renderError(e))
       },
 
       toggleDarkMode: $q.dark.toggle,

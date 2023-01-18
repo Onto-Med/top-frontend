@@ -51,7 +51,7 @@
 <script lang="ts">
 import { defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { RepositoryApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import { Repository } from '@onto-med/top-api'
@@ -77,7 +77,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const repositoryApi = inject(RepositoryApiKey)
-    const { alert } = useAlert()
+    const { renderError } = useNotify()
     const options = ref([] as Repository[])
     const loading = ref(false)
 
@@ -98,7 +98,7 @@ export default defineComponent({
         }
         await promise
           .then((r) => update(() => options.value = r.data))
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
       handleSelectionChanged (repository: Repository) {

@@ -69,6 +69,7 @@ import { useEntity } from 'src/pinia/entity'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import { QPopupEdit } from 'quasar'
+import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
   name: 'EntityChip',
@@ -91,6 +92,7 @@ export default defineComponent({
   setup(props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
+    const { renderError } = useNotify()
     const popup = ref(null as unknown as QPopupEdit)
     const loading = ref(false)
     const entityStore = useEntity()
@@ -110,7 +112,7 @@ export default defineComponent({
             state.value = e
             loading.value = false
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
       }
     }
 

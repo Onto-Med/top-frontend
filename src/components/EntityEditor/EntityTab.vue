@@ -200,11 +200,11 @@ import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDial
 import ForkingDialog from 'src/components/EntityEditor/Forking/ForkingDialog.vue'
 import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import useAlert from 'src/mixins/useAlert'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
 import { EntityApiKey } from 'src/boot/axios'
 import { copyToClipboard } from 'quasar'
+import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
   name: 'EntityTab',
@@ -244,7 +244,7 @@ export default defineComponent({
       JSON.parse(JSON.stringify(value)) as Phenotype
 
     const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType } = useEntityFormatter()
-    const { alert } = useAlert()
+    const { notify, renderError } = useNotify()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
     const entityApi = inject(EntityApiKey)
@@ -300,7 +300,7 @@ export default defineComponent({
           emit('save')
           versionHistoryDialogKey.value++
         } else {
-          alert(t('pleaseCheckInput'))
+          notify(t('pleaseCheckInput'))
         }
       }
     }
@@ -319,7 +319,7 @@ export default defineComponent({
       loading.value = true
       entityApi.getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
         .then((r) => prefillFromVersion(r.data))
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     })
 
@@ -372,7 +372,7 @@ export default defineComponent({
 
       copyToClipboard (text: unknown): void {
         copyToClipboard(JSON.stringify(text))
-          .catch(() => alert(t('copyFailed')))
+          .catch(() => notify(t('copyFailed')))
       }
     }
   }

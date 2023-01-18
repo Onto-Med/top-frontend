@@ -104,6 +104,7 @@ import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import { Category, EntityType, Entity, DataType, ItemType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
+import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
   name: 'EntityTree',
@@ -139,6 +140,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
+    const { renderError } = useNotify()
     const { organisationId, repositoryId } = storeToRefs(entityStore)
     const expansion         = ref([] as string[])
     const filterEntityType  = ref(undefined as EntityType|undefined)
@@ -279,7 +281,7 @@ export default defineComponent({
         await entityStore.loadChildren(node)
           .then(() => done([]))
           .catch((e: Error) => {
-            alert(e.message)
+            renderError(e)
             fail()
           })
       },

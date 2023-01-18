@@ -110,7 +110,7 @@
                       :down-disabled="index == query.projection.length - 1"
                       @move-up="moveSelectEntry(index, index - 1)"
                       @move-down="moveSelectEntry(index, index + 1)"
-                      @remove="query.projection.splice(index, 1)"
+                      @remove="query.projection?.splice(index, 1)"
                     />
                   </q-list>
                   <div v-else>
@@ -133,10 +133,7 @@
               <q-separator />
               <q-card-section v-if="aggregationFunctionOptions" class="col fit q-pa-none">
                 <q-scroll-area class="fit q-px-sm">
-                  <div v-show="!query.criteria.length">
-                    {{ t('nothingSelectedYet') }}
-                  </div>
-                  <q-list v-show="query.criteria.length" dense>
+                  <q-list v-if="query.criteria?.length" dense>
                     <template v-for="(criterion, index) in query.criteria" :key="index">
                       <criterion
                         v-model:inclusion="criterion.inclusion"
@@ -144,7 +141,7 @@
                         v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
                         :aggregation-function-options="aggregationFunctionOptions"
                         :subject-id="criterion.subjectId"
-                        @remove-clicked="query.criteria.splice(index, 1)"
+                        @remove-clicked="query.criteria?.splice(index, 1)"
                       />
                       <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
                         <q-separator class="col" />
@@ -153,6 +150,9 @@
                       </div>
                     </template>
                   </q-list>
+                  <div v-else>
+                    {{ t('nothingSelectedYet') }}
+                  </div>
                 </q-scroll-area>
               </q-card-section>
             </q-card>
@@ -201,7 +201,7 @@ import ProjectionEntry from 'src/components/Query/ProjectionEntry.vue'
 import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { defineComponent, onMounted, ref, computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
@@ -220,7 +220,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { isPhenotype, isRestricted } = useEntityFormatter()
     const entityStore = useEntity()
-    const { alert } = useAlert()
+    const { renderError } = useNotify()
     const { entities, repository, organisation } = storeToRefs(entityStore)
     const query = ref({
       id: (uuidv4 as () => string)(),
@@ -246,19 +246,19 @@ export default defineComponent({
       treeLoading.value = true
       await entityStore.reloadEntities()
         .then(() => query.value.criteria = query.value.criteria?.filter(c => entities.value.findIndex(e => e.id === c.subjectId) !== -1))
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => treeLoading.value = false)
     }
 
     const aggregationFunctionOptions = ref([] as ExpressionFunction[])
     entityStore.getFunction('math', 'last', 'first')
       .then(r => aggregationFunctionOptions.value = r)
-      .catch((e: Error) => alert(e.message))
+      .catch((e: Error) => renderError(e))
 
     const dataSources = ref([] as DataSource[])
     entityStore.getDataSources()
       .then(r => dataSources.value = r)
-      .catch((e: Error) => alert(e.message))
+      .catch((e: Error) => renderError(e))
 
     const getRunIndex = (queryId: string) => runs.value.findIndex(r => r.query.id === queryId)
 
@@ -276,12 +276,12 @@ export default defineComponent({
         .then(r => run.result = r.data)
         .catch((e: Error) => {
           clearInterval(run.timer)
-          alert(e.message)
+          renderError(e)
         })
     }
 
     onMounted(() => {
-      reloadEntities().catch((e: Error) => alert(e.message))
+      reloadEntities().catch((e: Error) => renderError(e))
       if (queryApi && organisation.value && repository.value)
         queryApi.getQueries(organisation.value.id, repository.value.id)
           .then(r => r.data.forEach(q => {
@@ -291,7 +291,7 @@ export default defineComponent({
               runs.value.push(run)
             })
           }))
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
     })
 
     return {
@@ -359,7 +359,7 @@ export default defineComponent({
             runs.value[index].result = r.data
             runs.value[index].timer = buildQueryRunTimer(runs.value[index])
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
       },
 
       exportQuery: () =>
@@ -377,7 +377,7 @@ export default defineComponent({
         if (!queryApi || !organisation.value || !repository.value) return
 
         queryApi?.deleteQuery(organisation.value.id, repository.value.id, queryId)
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => {
             const index = getRunIndex(queryId)
             if (index !== -1) runs.value.splice(index, 1)

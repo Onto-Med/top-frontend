@@ -66,7 +66,7 @@ import { defineComponent, ref, inject, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ForkApiKey } from 'src/boot/axios'
 import { Entity, ForkingStats } from '@onto-med/top-api'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
@@ -86,7 +86,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d }     = useI18n()
     const forkApi      = inject(ForkApiKey)
-    const { alert }    = useAlert()
+    const { renderError } = useNotify()
     const router       = useRouter()
     const loading      = ref(false)
     const forkingStats = ref(undefined as ForkingStats|undefined)
@@ -98,7 +98,7 @@ export default defineComponent({
 
       await forkApi.getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
         .then(r => forkingStats.value = r.data)
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     }
 

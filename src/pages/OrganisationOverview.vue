@@ -45,7 +45,7 @@
 <script lang="ts">
 import { defineComponent, inject, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { Organisation } from '@onto-med/top-api'
@@ -62,9 +62,8 @@ export default defineComponent({
     OrganisationForm
   },
   setup () {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t }     = useI18n()
-    const { alert } = useAlert()
+    const { notify, renderError } = useNotify()
     const router    = useRouter()
     const loading   = ref(false)
     const saving    = ref(false)
@@ -81,7 +80,7 @@ export default defineComponent({
       loading.value = true
       await organisationApi.getOrganisations()
         .then(r => organisations.value = r.data)
-        .catch((e: Error) => alert(e.message))
+        .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     }
 
@@ -91,7 +90,6 @@ export default defineComponent({
 
     return {
       t,
-      alert,
       reload,
       organisations,
       organisation,
@@ -116,10 +114,10 @@ export default defineComponent({
         await promise
           .then(() => {
             showForm.value = false
-            alert(t('thingSaved', { thing: t('organisation') }), 'positive')
+            notify(t('thingSaved', { thing: t('organisation') }), 'positive')
             void reload()
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
       },
       async deleteOrganisation (organisation: Organisation) {
@@ -129,10 +127,10 @@ export default defineComponent({
         await organisationApi.deleteOrganisationById(organisation.id)
           .then(() => {
             showForm.value = false
-            alert(t('thingDeleted', { thing: t('organisation') }), 'positive')
+            notify(t('thingDeleted', { thing: t('organisation') }), 'positive')
             void reload()
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
       }
     }

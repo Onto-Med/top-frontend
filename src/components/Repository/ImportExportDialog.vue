@@ -97,7 +97,7 @@ import { defineComponent, ref, inject, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RepositoryApiKey } from 'src/boot/axios'
 import { Format, Purpose, Repository } from '@onto-med/top-api'
-import useAlert from 'src/mixins/useAlert'
+import useNotify from 'src/mixins/useNotify'
 import { copyToClipboard, exportFile } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
 
@@ -117,7 +117,7 @@ export default defineComponent({
     const { t, d }      = useI18n()
     const repositoryApi = inject(RepositoryApiKey)
     const entityStore   = useEntity()
-    const { alert }     = useAlert()
+    const { notify, renderError } = useNotify()
     const exportFormat  = ref(undefined as string|undefined)
     const importFormat  = ref(undefined as string|undefined)
     const loading       = ref(false)
@@ -144,7 +144,7 @@ export default defineComponent({
 
         await repositoryApi.exportRepository(props.repository.organisation.id, props.repository.id, exportFormat.value)
           .then(r => result.value = r.data as string)
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
 
@@ -154,18 +154,18 @@ export default defineComponent({
 
         repositoryApi.importRepository(props.repository.organisation.id, props.repository.id, importFormat.value, importFile.value)
           .then(() => {
-            alert(t('importFinished'), 'positive')
+            notify(t('importFinished'), 'positive')
             emit('import')
           })
-          .catch((e: Error) => alert(e.message))
+          .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
 
       copyResult: () => {
         if (result.value)
           copyToClipboard(result.value)
-            .then(() => alert(t('copiedToClipboard'), 'positive'))
-            .catch(() => alert(t('copyFailed')))
+            .then(() => notify(t('copiedToClipboard'), 'positive'))
+            .catch(() => notify(t('copyFailed')))
       },
 
       copyToFile: () => {
