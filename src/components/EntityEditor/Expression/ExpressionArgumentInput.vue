@@ -109,10 +109,9 @@
 
       <template v-if="!readonly && fun && showMoreBtn">
         <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
-        <q-chip
-          icon="add"
-          clickable
-          :label="t('more')"
+        <q-icon
+          name="add"
+          class="clickable"
           :title="t('addMoreArguments')"
           @click="handleArgumentUpdate(argumentCount, { })"
         />
