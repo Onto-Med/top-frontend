@@ -1,6 +1,6 @@
 <template>
   <expandable-card
-    :error="!modelValue || !modelValue.function"
+    :error="!modelValue || !modelValue.functionId"
     :help-text="helpText"
     :expanded="expanded"
     :show-help="showHelp"
@@ -14,7 +14,7 @@
             :label="scores ? t('score', 2) : t('expression')"
             color="primary"
             size="sm"
-            @update:model-value="$emit('update:modelValue', { function: $event ? 'switch' : undefined })"
+            @update:model-value="$emit('update:modelValue', { functionId: $event ? 'switch' : undefined })"
           />
         </span>
       </q-toolbar-title>
@@ -144,7 +144,6 @@ export default defineComponent({
   },
   emits: ['update:modelValue', 'entityClicked'],
   setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const entityStore = useEntity()
     const functions = ref(undefined as ExpressionFunction[]|undefined)
