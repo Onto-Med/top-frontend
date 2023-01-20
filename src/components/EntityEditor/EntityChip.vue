@@ -90,7 +90,6 @@ export default defineComponent({
   },
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const { renderError } = useNotify()
     const popup = ref(null as unknown as QPopupEdit)
@@ -113,6 +112,7 @@ export default defineComponent({
             loading.value = false
           })
           .catch((e: Error) => renderError(e))
+          .finally(() => loading.value = false)
       }
     }
 
