@@ -1,14 +1,19 @@
 <template>
   <q-chip
     v-if="loading"
+    :dense="dense"
+    :square="dense"
     :label="t('loading') + '...'"
   />
 
   <q-chip
     v-else-if="!state"
-    clickable
+    :dense="dense"
+    :square="dense"
+    :clickable="!dense"
     :label="label"
     icon="create"
+    :class="{ 'dense-chip': dense }"
     class="truncate"
   >
     <q-popup-edit ref="popup" :model-value="null" :cover="false">
@@ -35,12 +40,14 @@
 
   <q-chip
     v-else
-    clickable
+    :dense="dense"
+    :square="dense"
+    :clickable="!dense"
     color="grey-4"
     :label="getTitle(state, true)"
     :icon="getIcon(state)"
     :title="getDescriptions(state).join('\n')"
-    :class="{ restriction: isRestricted(state) }"
+    :class="{ restriction: isRestricted(state), 'dense-chip': dense }"
     class="truncate text-dark"
   >
     <q-menu>
@@ -86,7 +93,8 @@ export default defineComponent({
     repositoryId: String,
     disable: Boolean,
     changeable: Boolean,
-    removeable: Boolean
+    removeable: Boolean,
+    dense: Boolean
   },
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {
@@ -147,3 +155,15 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.hover
+  color: var(--q-primary)
+  font-weight: 900
+
+.dense-chip
+  margin: 0
+  &:hover
+    cursor: pointer
+    @extend .hover
+</style>
