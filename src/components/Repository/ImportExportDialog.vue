@@ -156,6 +156,8 @@ export default defineComponent({
           .then(() => {
             notify(t('importFinished'), 'positive')
             emit('import')
+            importFormat.value = undefined
+            importFile.value = undefined
           })
           .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
