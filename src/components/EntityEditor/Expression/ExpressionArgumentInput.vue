@@ -1,5 +1,5 @@
 <template>
-  <div class="expression-input" :class="{ 'row items-center': !expand, 'text-primary': flash }">
+  <div class="expression-input" :class="{ 'row': !expand, 'text-primary': flash }">
     <slot name="prepend" />
     <div v-if="modelValue?.entityId || isEntity">
       {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
@@ -8,10 +8,11 @@
         :entity-types="entityTypes"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :label="t('selectThing', { thing: t('entity') }) + '...'"
+        :label="t('selectThing', { thing: t('entity') })"
         :disable="readonly"
         changeable
         removeable
+        dense
         @entity-clicked="$emit('entityClicked', $event)"
         @entity-set="setEntity($event)"
         @remove-clicked="clear()"
@@ -65,15 +66,75 @@
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}(
       </div>
 
-      <template v-for="(n, index) in argumentCount" :key="index">
+      <div :class="expand ? '' : 'col row items-center'">
+        <template v-for="(n, index) in argumentCount" :key="index">
+          <div
+            v-if="index != 0 && infix"
+            :class="{ hover: hover }"
+            class="clickable"
+            @mouseover="hover = true"
+            @mouseleave="hover = false"
+          >
+            <span>
+              {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}
+              <b :title="functionTooltip">{{ functionTitle }}</b>
+              {{ !expand ? '&nbsp;' : '' }}
+            </span>
+            <expression-context-menu
+              v-if="!readonly"
+              :functions="functions"
+              @enclose="enclose()"
+              @remove="clear()"
+              @select="setFunction($event)"
+            />
+          </div>
+          <expression-argument-input
+            v-if="modelValue.arguments"
+            :model-value="modelValue.arguments[index]"
+            :readonly="readonly"
+            :functions="functions"
+            :expand="expand"
+            :indent="indent"
+            :indent-level="indentLevel + 1"
+            :organisation-id="organisationId"
+            :repository-id="repositoryId"
+            :entity-types="entityTypes"
+            @update:model-value="handleArgumentUpdate(index, $event)"
+            @entity-clicked="$emit('entityClicked', $event)"
+          >
+            <template
+              v-if="!infix && (index + 1 < argumentCount || showMoreBtn)"
+              #append
+              :class="{ hover: hover }"
+              @mouseover="hover = true"
+              @mouseleave="hover = false"
+            >
+              <span>,{{ !expand ? '&nbsp;' : '' }}</span>
+            </template>
+          </expression-argument-input>
+        </template>
+
+        <template v-if="!readonly && fun && showMoreBtn">
+          <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
+          <q-icon
+            name="add"
+            class="clickable"
+            :title="t('addMoreArguments')"
+            @mouseover="hover = true"
+            @mouseleave="hover = false"
+            @click="handleArgumentUpdate(argumentCount, { })"
+          />
+        </template>
+
         <div
-          v-if="index != 0 && infix"
+          v-if="postfix"
           :class="{ hover: hover }"
-          class="clickable"
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          <span>{{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<b :title="functionTooltip">{{ functionTitle }}</b>{{ !expand ? '&nbsp;' : '' }}</span>
+          {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
+          <b :title="functionTooltip">{{ functionTitle }}</b>
+          <slot name="append" />
           <expression-context-menu
             v-if="!readonly"
             :functions="functions"
@@ -82,67 +143,15 @@
             @select="setFunction($event)"
           />
         </div>
-        <expression-argument-input
-          :model-value="modelValue.arguments[index]"
-          :readonly="readonly"
-          :functions="functions"
-          :expand="expand"
-          :indent="indent"
-          :indent-level="indentLevel + 1"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          :entity-types="entityTypes"
-          @update:model-value="handleArgumentUpdate(index, $event)"
-          @entity-clicked="$emit('entityClicked', $event)"
+        <div
+          v-else
+          :class="{ hover: hover }"
+          @mouseover="hover = true"
+          @mouseleave="hover = false"
         >
-          <template
-            v-if="!infix && (index + 1 < argumentCount || showMoreBtn)"
-            #append
-            :class="{ hover: hover }"
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-          >
-            <span>,{{ !expand ? '&nbsp;' : '' }}</span>
-          </template>
-        </expression-argument-input>
-      </template>
-
-      <template v-if="!readonly && fun && showMoreBtn">
-        <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
-        <q-chip
-          icon="add"
-          clickable
-          :label="t('more')"
-          :title="t('addMoreArguments')"
-          @click="handleArgumentUpdate(argumentCount, { })"
-        />
-      </template>
-
-      <div
-        v-if="postfix"
-        :class="{ hover: hover }"
-        @mouseover="hover = true"
-        @mouseleave="hover = false"
-      >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-        <b :title="functionTooltip">{{ functionTitle }}</b>
-        <slot name="append" />
-        <expression-context-menu
-          v-if="!readonly"
-          :functions="functions"
-          @enclose="enclose()"
-          @remove="clear()"
-          @select="setFunction($event)"
-        />
-      </div>
-      <div
-        v-else
-        :class="{ hover: hover }"
-        @mouseover="hover = true"
-        @mouseleave="hover = false"
-      >
-        <span>{{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})</span>
-        <slot name="append" />
+          <span>{{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})</span>
+          <slot name="append" />
+        </div>
       </div>
     </template>
     <div v-else class="clickable">
@@ -190,7 +199,10 @@ export default defineComponent({
     readonly: Boolean,
     root: Boolean,
     expand: Boolean,
-    functions: Array as () => ExpressionFunction[],
+    functions: {
+      type: Array as () => ExpressionFunction[],
+      default: () => []
+    },
     indent: {
       type: Number,
       default: 2

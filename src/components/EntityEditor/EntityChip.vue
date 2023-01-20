@@ -1,46 +1,78 @@
 <template>
   <q-chip
     v-if="loading"
+    :dense="dense"
+    :square="dense"
     :label="t('loading') + '...'"
   />
 
-  <q-chip
-    v-else-if="!state"
-    clickable
-    :label="label"
-    icon="create"
-    class="truncate"
-  >
-    <q-popup-edit ref="popup" :model-value="null" :cover="false">
-      <entity-search-input
-        v-if="!disable"
-        autofocus
-        dense
-        :label="label"
-        :entity-types="entityTypes"
-        :data-type="dataType"
-        :organisation-id="organisationId"
-        :repository-id="repositoryId"
-        @entity-selected="setEntity($event)"
-        @btn-clicked="popup.cancel()"
-      />
-      <q-list dense>
-        <slot name="additionalOptions" />
-        <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
-          <q-item-section v-t="'remove'" />
-        </q-item>
-      </q-list>
-    </q-popup-edit>
-  </q-chip>
+  <template v-else-if="!state">
+    <span v-if="dense" class="dense-chip">[{{ label }}]<!--
+      --><q-popup-edit ref="popup" :model-value="null" :cover="false">
+        <entity-search-input
+          v-if="!disable"
+          autofocus
+          dense
+          :label="label"
+          :entity-types="entityTypes"
+          :data-type="dataType"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          @entity-selected="setEntity($event)"
+          @btn-clicked="popup.cancel()"
+        />
+        <q-list dense>
+          <slot name="additionalOptions" />
+          <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
+            <q-item-section v-t="'remove'" />
+          </q-item>
+        </q-list>
+      </q-popup-edit>
+    </span>
+
+    <q-chip
+      v-else
+      :dense="dense"
+      :square="dense"
+      :clickable="!dense"
+      :label="label"
+      icon="create"
+      :class="{ 'dense-chip': dense }"
+      class="truncate"
+    >
+      <q-popup-edit ref="popup" :model-value="null" :cover="false">
+        <entity-search-input
+          v-if="!disable"
+          autofocus
+          dense
+          :label="label"
+          :entity-types="entityTypes"
+          :data-type="dataType"
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          @entity-selected="setEntity($event)"
+          @btn-clicked="popup.cancel()"
+        />
+        <q-list dense>
+          <slot name="additionalOptions" />
+          <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
+            <q-item-section v-t="'remove'" />
+          </q-item>
+        </q-list>
+      </q-popup-edit>
+    </q-chip>
+  </template>
 
   <q-chip
     v-else
-    clickable
+    :dense="dense"
+    :square="dense"
+    :clickable="!dense"
     color="grey-4"
     :label="getTitle(state, true)"
     :icon="getIcon(state)"
     :title="getDescriptions(state).join('\n')"
-    :class="{ restriction: isRestricted(state) }"
+    :class="{ restriction: isRestricted(state), 'dense-chip': dense }"
     class="truncate text-dark"
   >
     <q-menu>
@@ -86,7 +118,8 @@ export default defineComponent({
     repositoryId: String,
     disable: Boolean,
     changeable: Boolean,
-    removeable: Boolean
+    removeable: Boolean,
+    dense: Boolean
   },
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {
@@ -147,3 +180,15 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.hover
+  color: var(--q-primary)
+  font-weight: 900
+
+.dense-chip
+  margin: 0
+  &:hover
+    cursor: pointer
+    @extend .hover
+</style>
