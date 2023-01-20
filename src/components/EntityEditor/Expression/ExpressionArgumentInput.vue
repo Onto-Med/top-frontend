@@ -8,7 +8,7 @@
         :entity-types="entityTypes"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :label="t('selectThing', { thing: t('entity') }) + '...'"
+        :label="t('selectThing', { thing: t('entity') })"
         :disable="readonly"
         changeable
         removeable
