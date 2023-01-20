@@ -190,7 +190,10 @@ export default defineComponent({
     readonly: Boolean,
     root: Boolean,
     expand: Boolean,
-    functions: Array as () => ExpressionFunction[],
+    functions: {
+      type: Array as () => ExpressionFunction[],
+      default: () => []
+    },
     indent: {
       type: Number,
       default: 2
