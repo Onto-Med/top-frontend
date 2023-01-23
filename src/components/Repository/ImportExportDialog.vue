@@ -11,30 +11,30 @@
         <q-card-section>
           <p v-t="'importDescription'" />
 
-          <q-file v-model="importFile" :label="t('repositoryImportFile')">
-            <template #prepend>
-              <q-icon name="attach_file" />
-            </template>
-          </q-file>
-
           <q-select
-            v-model="importFormat"
-            :options="importFormats"
+            v-model="importConverter"
+            :options="importConverters"
             :label="t('importFormat')"
             :placeholder="t('selectThing', { thing: t('format') })"
             class="q-mb-md"
-          >
+            option-label="id"
+          />
+
+          <q-file v-model="importFile" :label="t('repositoryImportFile')" :accept="acceptedExtension" :disable="!importConverter">
+            <template #prepend>
+              <q-icon name="attach_file" />
+            </template>
             <template #after>
               <q-btn
                 no-caps
                 color="primary"
                 icon="upload"
                 :label="t('import')"
-                :disable="!importFile || !importFormat"
+                :disable="!importFile || !importConverter"
                 @click="doImport"
               />
             </template>
-          </q-select>
+          </q-file>
         </q-card-section>
 
         <q-separator />
@@ -43,11 +43,13 @@
           <p v-t="'exportDescription'" />
 
           <q-select
-            v-model="exportFormat"
-            :options="exportFormats"
+            v-model="exportConverter"
+            :options="exportConverters"
             :label="t('exportFormat')"
             :placeholder="t('selectThing', { thing: t('format') })"
+            option-label="id"
             class="q-mb-md"
+            @change="result = undefined"
           >
             <template #after>
               <q-btn
@@ -55,7 +57,7 @@
                 color="primary"
                 icon="download"
                 :label="t('export')"
-                :disable="!exportFormat"
+                :disable="!exportConverter"
                 @click="doExport"
               />
             </template>
@@ -96,10 +98,11 @@
 import { defineComponent, ref, inject, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RepositoryApiKey } from 'src/boot/axios'
-import { Format, Purpose, Repository } from '@onto-med/top-api'
+import { Converter, Purpose, Repository } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import { copyToClipboard, exportFile } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   props: {
@@ -118,45 +121,50 @@ export default defineComponent({
     const repositoryApi = inject(RepositoryApiKey)
     const entityStore   = useEntity()
     const { notify, renderError } = useNotify()
-    const exportFormat  = ref(undefined as string|undefined)
-    const importFormat  = ref(undefined as string|undefined)
-    const loading       = ref(false)
-    const result        = ref(undefined as string|undefined)
-    const formats       = ref<Format[]>([])
-    const importFile    = ref<File|undefined>(undefined)
+    const exportConverter = ref(undefined as Converter|undefined)
+    const importConverter = ref(undefined as Converter|undefined)
+    const loading        = ref(false)
+    const result         = ref(undefined as string|undefined)
+    const { converters } = storeToRefs(entityStore)
+    const importFile     = ref<File|undefined>(undefined)
 
-    onMounted(() => entityStore.getFormats().then(f => formats.value = f))
+    onMounted(() => entityStore.loadConverters())
 
     return {
       t,
       d,
-      exportFormat,
-      importFormat,
+      exportConverter,
+      importConverter,
       loading,
       result,
-      exportFormats: computed(() => formats.value.filter(f => f.purposes.includes(Purpose.Export)).map(f => f.id)),
-      importFormats: computed(() => formats.value.filter(f => f.purposes.includes(Purpose.Import)).map(f => f.id)),
+      exportConverters: computed(() => converters.value?.filter(c => c.purpose === Purpose.Export)),
+      importConverters: computed(() => converters.value?.filter(c => c.purpose === Purpose.Import)),
+      acceptedExtension: computed(() =>
+        importConverter.value && importConverter.value.fileExtension
+        ? '.' + importConverter.value.fileExtension
+        : undefined
+      ),
       importFile,
 
       doExport: async () => {
-        if (loading.value || !exportFormat.value || !repositoryApi || !props.repository.organisation) return
+        if (loading.value || !exportConverter.value || !repositoryApi || !props.repository.organisation) return
         loading.value = true
 
-        await repositoryApi.exportRepository(props.repository.organisation.id, props.repository.id, exportFormat.value)
+        await repositoryApi.exportRepository(props.repository.organisation.id, props.repository.id, exportConverter.value.id)
           .then(r => result.value = r.data as string)
           .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
 
       doImport: () => {
-        if (!repositoryApi || !importFormat.value || !importFile.value || !props.repository.organisation) return
+        if (!repositoryApi || !importConverter.value || !importFile.value || !props.repository.organisation) return
         loading.value = true
 
-        repositoryApi.importRepository(props.repository.organisation.id, props.repository.id, importFormat.value, importFile.value)
+        repositoryApi.importRepository(props.repository.organisation.id, props.repository.id, importConverter.value.id, importFile.value)
           .then(() => {
             notify(t('importFinished'), 'positive')
             emit('import')
-            importFormat.value = undefined
+            importConverter.value = undefined
             importFile.value = undefined
           })
           .catch((e: Error) => renderError(e))
@@ -172,7 +180,7 @@ export default defineComponent({
 
       copyToFile: () => {
         if (result.value)
-          exportFile(props.repository.id + '.txt', result.value)
+          exportFile(`${props.repository.id}.${exportConverter.value?.fileExtension || 'txt'}`, result.value)
       }
     }
   }
