@@ -25,9 +25,9 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="modelValue?.value || modelValue?.constantId || isConstant">
+    <div v-else-if="modelValue?.values || modelValue?.constantId || isConstant">
       <expression-value-input
-        :value="modelValue.value"
+        :value="modelValue.values ? modelValue.values[0] : undefined"
         :constant-id="modelValue.constantId"
         :readonly="readonly"
         :indent-level="indentLevel"
@@ -332,7 +332,9 @@ export default defineComponent({
 
       setValue (value: Value|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.value = value
+        newModelValue.values = []
+        if (value)
+          newModelValue.values.push(value)
         newModelValue.constantId = undefined
         isEntity.value = false
         isConstant.value = true
@@ -341,7 +343,7 @@ export default defineComponent({
 
       setConstantId (constantId: string|undefined): void {
         const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.value = undefined
+        newModelValue.values = undefined
         newModelValue.constantId = constantId
         isEntity.value = false
         isConstant.value = true
