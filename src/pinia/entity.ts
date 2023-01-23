@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier, DefaultApi, Purpose, Format } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier, DefaultApi, Converter } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,7 +15,7 @@ export const useEntity = defineStore('entity', {
       dataSources: undefined as DataSource[]|undefined,
       constants: undefined as Constant[]|undefined,
       functions: new Map<string, ExpressionFunction[]>(),
-      formats: undefined as Format[]|undefined,
+      converters: undefined as Converter[]|undefined,
       keycloak: undefined as KeycloakInstance|undefined,
       entityApi: undefined as EntityApi|undefined,
       expressionConstantApi: undefined as ExpressionConstantApi|undefined,
@@ -374,11 +374,9 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async getFormats (purpose?: Purpose) {
-      if (!this.formats)
-        this.formats = (await this.defaultApi?.getFormats(purpose))?.data
-
-      return (this.formats || []).filter(f => !purpose || f.purposes.includes(purpose))
+    async loadConverters () {
+      if (!this.converters)
+        this.converters = (await this.defaultApi?.getConverters())?.data
     }
   }
 })
