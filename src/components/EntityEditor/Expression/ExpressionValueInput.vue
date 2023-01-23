@@ -59,12 +59,17 @@ export default defineComponent({
     constantId: String,
     readonly: Boolean,
     expand: Boolean,
-    indentLevel: Number,
-    indent: Number
+    indentLevel: {
+      type: Number,
+      default: 0
+    },
+    indent: {
+      type: Number,
+      default: 2
+    }
   },
   emits: ['update:value', 'update:constantId', 'enclose', 'remove'],
   setup(props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const popup = ref(null as unknown as QPopupEdit)
     const entityStore = useEntity()
