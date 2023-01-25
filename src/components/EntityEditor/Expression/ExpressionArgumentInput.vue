@@ -25,9 +25,9 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="modelValue?.values || modelValue?.constantId || isConstant">
+    <div v-else-if="modelValue?.values && modelValue?.values.length || modelValue?.constantId || isConstant">
       <expression-value-input
-        :value="modelValue.values ? modelValue.values[0] : undefined"
+        :value="modelValue.values && modelValue?.values.length ? modelValue.values[0] : undefined"
         :constant-id="modelValue.constantId"
         :readonly="readonly"
         :indent-level="indentLevel"
