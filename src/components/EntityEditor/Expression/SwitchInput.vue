@@ -103,8 +103,8 @@ export default defineComponent({
     const buildValueConstant = (value: number|undefined) => {
       return {
         functionId: 'value',
-        value: { dataType: DataType.Number, value: value } as NumberValue
-      }
+        values: [ { dataType: DataType.Number, value: value } as NumberValue ]
+      } as Expression
     }
 
     return {
@@ -119,8 +119,11 @@ export default defineComponent({
       isSwitchExpression: computed(() => props.modelValue.functionId === 'switch'),
 
       defaultValue: computed(() => {
-        if (props.modelValue.arguments && hasDefaultValue.value)
-          return (props.modelValue.arguments[props.modelValue.arguments.length - 1].value as NumberValue).value
+        if (props.modelValue.arguments && hasDefaultValue.value) {
+          const values = props.modelValue.arguments[props.modelValue.arguments.length - 1].values
+          if (values && values.length)
+            return (values[0] as NumberValue).value
+        }
         return undefined
       }),
 
@@ -129,7 +132,13 @@ export default defineComponent({
         return props.modelValue.arguments
           .slice(0, props.modelValue.arguments.length - (hasDefaultValue.value ? 1 : 0))
           .reduce((prev, val, i, array) => {
-            if (i % 2 === 0) prev.push({ entityId: val.entityId, value: (array[i + 1].value as NumberValue).value })
+            if (i % 2 === 0) {
+              const values = array[i + 1].values
+              prev.push({
+                entityId: val.entityId,
+                value: values && values.length ? (values[0] as NumberValue).value : undefined
+              })
+            }
             return prev
           }, [] as Mapping[])
       }),
