@@ -34,7 +34,7 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"dbaeumer.vscode-eslint",
-		"octref.vetur",
+		"Vue.volar",
 		"eamodio.gitlens",
 		"gamunu.vscode-yarn",
 		"hollowtree.vue-snippets",
@@ -42,7 +42,11 @@
 		"mhutchie.git-graph",
 		"syler.sass-indented",
 		"HookyQR.minify",
-		"lokalise.i18n-ally"
+		"lokalise.i18n-ally",
+		"esbenp.prettier-vscode",
+		"formulahendry.auto-rename-tag",
+		"sdras.vue-vscode-snippets",
+		"mutantdino.resourcemonitor"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
