@@ -29,7 +29,7 @@
             </template>
             <template #option="scope">
               <q-item v-bind="scope.itemProps">
-                {{ te('functions.' + scope.opt.title) ? t('functions.' + scope.opt.title) : scope.opt.title }}
+                {{ te('functions.' + scope.opt.id) ? t('functions.' + scope.opt.id) : scope.opt.title }}
               </q-item>
             </template>
           </q-select>

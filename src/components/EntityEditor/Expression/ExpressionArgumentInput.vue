@@ -268,14 +268,14 @@ export default defineComponent({
       ),
 
       functionTitle: computed(() => {
-        if (!fun.value || !fun.value.title) return ''
-        return te('functions.' + fun.value.title) ? t('functions.' + fun.value.title) : fun.value.title
+        if (!fun.value) return ''
+        return te('functions.' + fun.value.id) ? t('functions.' + fun.value.id) : fun.value.title
       }),
 
       functionTooltip: computed(() => {
-         if (!fun.value || !fun.value.title || !te('functionDescriptions.' + fun.value.title))
+         if (!fun.value || !fun.value.id || !te('functionDescriptions.' + fun.value.id))
           return undefined
-         return t('functionDescriptions.' + fun.value.title)
+         return t('functionDescriptions.' + fun.value.id)
       }),
 
       prefix: computed(

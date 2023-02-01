@@ -59,14 +59,14 @@ export const useEntity = defineStore('entity', {
         .then(r => {
           this.functions = [
             {
-              id: 'entity',
+              id: 'Entity',
               title: 'entity',
               type: 'component',
               minArgumentNumber: 1,
               maxArgumentNumber: 1
             } as ExpressionFunction,
             {
-              id: 'constant',
+              id: 'Constant',
               title: 'constant',
               type: 'component',
               minArgumentNumber: 1,

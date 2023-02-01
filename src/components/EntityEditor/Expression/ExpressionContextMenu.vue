@@ -30,8 +30,8 @@
               class="col-4"
               @click="$emit('select', fun)"
             >
-              <q-item-section :title="te('functionDescriptions.' + fun.title) ? t('functionDescriptions.' + fun.title) : undefined">
-                {{ te('functions.' + fun.title) ? t('functions.' + fun.title) : fun.title }}
+              <q-item-section :title="te('functionDescriptions.' + fun.id) ? t('functionDescriptions.' + fun.id) : undefined">
+                {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
               </q-item-section>
             </q-item>
           </q-list>
