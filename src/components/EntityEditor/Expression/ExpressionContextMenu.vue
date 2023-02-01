@@ -108,7 +108,7 @@ export default defineComponent({
       functionTypes,
 
       filteredFunctionTypes: computed(() =>
-        !filter.value
+        (!filter.value || filter.value.length === 0)
           ? functionTypes.value
           : functionTypes.value?.filter(t => filter.value?.includes(t.value))
       ),
