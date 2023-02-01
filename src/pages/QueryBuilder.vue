@@ -251,7 +251,7 @@ export default defineComponent({
     }
 
     const aggregationFunctionOptions = ref([] as ExpressionFunction[])
-    entityStore.getFunction('math', 'last', 'first')
+    entityStore.getFunction('aggregate', 'Last', 'First')
       .then(r => aggregationFunctionOptions.value = r)
       .catch((e: Error) => renderError(e))
 
@@ -326,7 +326,7 @@ export default defineComponent({
         if (!subject || !isPhenotype(subject) && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
-          defaultAggregationFunctionId: 'last',
+          defaultAggregationFunctionId: 'Last',
           inclusion: true,
           subjectId: subject.id as string
         })
