@@ -354,5 +354,15 @@
   "importFormat": "Import format|Import formats",
   "exportFormat": "Export format|Export formats",
   "importFinished": "Import finished",
-  "repositoryImportFile": "Repository import file|Repository import files"
+  "repositoryImportFile": "Repository import file|Repository import files",
+  "functionType": {
+    "bool": "Boolean functions",
+    "arithmetic": "Arithmetic",
+    "aggregate": "Aggregations",
+    "advanced": "Advanced functions",
+    "comparison": "Comparison functions",
+    "date_time": "Date and time functions",
+    "component": "Components",
+    "none": "Unspecified functions"
+  }
 }

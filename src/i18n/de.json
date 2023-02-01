@@ -354,5 +354,15 @@
   "importFormat": "Importformat|Importformate",
   "exportFormat": "Exportformat|Exportformate",
   "importFinished": "Import abgeschlossen",
-  "repositoryImportFile": "Repositorium Import-Datei|Repositorium Import-Dateien"
+  "repositoryImportFile": "Repositorium Import-Datei|Repositorium Import-Dateien",
+  "functionType": {
+    "advanced": "Weiterführende Funktionen",
+    "aggregate": "Aggregationen",
+    "arithmetic": "Arithmetik",
+    "bool": "Boolesche Funktionen",
+    "comparison": "Vergleichsfunktionen",
+    "component": "Komponenten",
+    "date_time": "Datum- und Zeit-Funktionen",
+    "none": "Unspezifizierte Funktionen"
+  }
 }

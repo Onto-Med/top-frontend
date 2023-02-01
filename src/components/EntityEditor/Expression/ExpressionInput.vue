@@ -29,9 +29,8 @@
         @update:model-value="$emit('update:modelValue', $event)"
       />
       <expression-argument-input
-        v-else-if="functions"
+        v-else
         class="text-subtitle1"
-        :functions="functions"
         :readonly="readonly"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
@@ -107,8 +106,7 @@ import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import ExpressionArgumentInput from 'src/components/EntityEditor/Expression/ExpressionArgumentInput.vue'
 import SwitchInput from 'src/components/EntityEditor/Expression/SwitchInput.vue'
-import { EntityType, Expression, ExpressionFunction } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity'
+import { EntityType, Expression } from '@onto-med/top-api'
 
 export default defineComponent({
   components: {
@@ -145,18 +143,12 @@ export default defineComponent({
   emits: ['update:modelValue', 'entityClicked'],
   setup (props) {
     const { t } = useI18n()
-    const entityStore = useEntity()
-    const functions = ref(undefined as ExpressionFunction[]|undefined)
-
-    void entityStore.getFunctions(props.functionType)
-      .then(o => functions.value = o)
 
     return {
       t,
       expandExpression: ref(false),
       indent: ref(2),
       showClearDialog: ref(false),
-      functions,
       scores: computed(() => props.modelValue && props.modelValue.functionId === 'switch')
     }
   }

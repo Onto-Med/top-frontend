@@ -51,7 +51,6 @@
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b :title="functionTooltip">{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
-          :functions="functions"
           @enclose="enclose()"
           @remove="clear()"
           @select="setFunction($event)"
@@ -82,7 +81,6 @@
             </span>
             <expression-context-menu
               v-if="!readonly"
-              :functions="functions"
               @enclose="enclose()"
               @remove="clear()"
               @select="setFunction($event)"
@@ -92,7 +90,6 @@
             v-if="modelValue.arguments"
             :model-value="modelValue.arguments[index]"
             :readonly="readonly"
-            :functions="functions"
             :expand="expand"
             :indent="indent"
             :indent-level="indentLevel + 1"
@@ -137,7 +134,6 @@
           <slot name="append" />
           <expression-context-menu
             v-if="!readonly"
-            :functions="functions"
             @enclose="enclose()"
             @remove="clear()"
             @select="setFunction($event)"
@@ -159,7 +155,6 @@
       <expression-context-menu
         v-if="!readonly"
         :enclosable="false"
-        :functions="functions"
         @select="setFunction($event)"
         @remove="clear()"
       />
@@ -169,7 +164,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   Entity,
@@ -182,6 +177,9 @@ import {
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 import ExpressionValueInput from 'src/components/EntityEditor/Expression/ExpressionValueInput.vue'
+import { useEntity } from 'src/pinia/entity';
+import { storeToRefs } from 'pinia';
+import useNotify from 'src/mixins/useNotify';
 
 export default defineComponent({
   components: {
@@ -199,10 +197,6 @@ export default defineComponent({
     readonly: Boolean,
     root: Boolean,
     expand: Boolean,
-    functions: {
-      type: Array as () => ExpressionFunction[],
-      default: () => []
-    },
     indent: {
       type: Number,
       default: 2
@@ -222,14 +216,23 @@ export default defineComponent({
     const flash = ref(false)
     const isEntity = ref(false)
     const isConstant = ref(false)
+    const entityStore = useEntity()
+    const { renderError } = useNotify()
+    const { functions } = storeToRefs(entityStore)
 
-    const getFunction = (functionId: string|undefined) => {
-      if (!functionId) return undefined
-      const fun = props.functions?.find((o) => o.id === functionId)
+    const fun = computed(() => {
+      if (!props.modelValue || !props.modelValue.functionId || !functions.value) return undefined
+
+      const fun = functions.value
+        .find(f => f.id === props.modelValue?.functionId)
+
       if (fun) return fun
-      return { id: functionId, title: t('invalid').toUpperCase(), notation: NotationEnum.Prefix } as ExpressionFunction
-    }
-    const fun = computed(() => getFunction(props.modelValue?.functionId))
+      return {
+        id: props.modelValue.functionId,
+        title: t('invalid').toUpperCase(),
+        notation: NotationEnum.Prefix
+      } as ExpressionFunction
+    })
 
     const blink = () => {
       flash.value = true
@@ -244,6 +247,12 @@ export default defineComponent({
     }
 
     const argumentCount = computed(() => countArguments(props.modelValue, fun.value))
+
+    onMounted(() => {
+      if (!functions.value)
+        entityStore.reloadFunctions()
+          .catch((e: Error) => renderError(e))
+    })
 
     return {
       t,
@@ -297,26 +306,30 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
 
-      setFunction(functionId: string) {
+      setFunction(fun: ExpressionFunction|undefined) {
         const newModelValue = (JSON.parse(
           JSON.stringify(props.modelValue)
         ) || {}) as Expression
 
-        if (functionId === 'entity') {
+        if (!fun) {
+          isEntity.value = false
+          isConstant.value = false
+          newModelValue.functionId = undefined
+        } else if (fun.id === 'entity') {
           isEntity.value = true
           isConstant.value = false
           newModelValue.functionId = undefined
-        } else if (functionId === 'constant') {
+        } else if (fun.id === 'constant') {
           isEntity.value = false
           isConstant.value = true
           newModelValue.functionId = undefined
         } else {
           isEntity.value = false
           isConstant.value = false
-          newModelValue.functionId = functionId
+          newModelValue.functionId = fun.id
         }
         if (!newModelValue.arguments) newModelValue.arguments = []
-        const count = countArguments(newModelValue, getFunction(newModelValue.functionId))
+        const count = countArguments(newModelValue, fun)
         newModelValue.arguments.splice(count, newModelValue.arguments.length - count)
         emit('update:modelValue', newModelValue)
         blink()
