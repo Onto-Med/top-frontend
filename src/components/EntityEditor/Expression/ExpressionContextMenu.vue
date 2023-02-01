@@ -1,7 +1,7 @@
 <template>
   <q-menu>
     <div class="scroll">
-      <q-item>
+      <q-item dense>
         <q-select
           v-model="filter"
           :options="functionTypes"
@@ -14,8 +14,8 @@
           class="col"
         />
       </q-item>
-      <q-separator />
-      <q-item v-for="functionType in filteredFunctionTypes" :key="functionType.value">
+      <q-separator spaced />
+      <q-item v-for="functionType in filteredFunctionTypes" :key="functionType.value" dense>
         <q-item-section>
           <q-item-label class="text-bold">
             {{ functionType.label }}
