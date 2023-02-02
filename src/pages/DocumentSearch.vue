@@ -24,7 +24,31 @@
                         <q-icon :name="scope.opt.icon" />
                       </q-item-section>
                       <q-item-section>
-                        <q-item-label>{{ scope.opt.label }}</q-item-label>
+                        <q-item-label>
+                          {{ scope.opt.label }}
+                        </q-item-label>
+                        <q-item-label caption>
+                          {{ scope.opt.description }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+              <div class="col-10">
+                <q-select
+                  v-model="mostImportantNodes"
+                  :options="mostImportantNodesOptions"
+                  :label="t('importantNodesOnly')"
+                  emit-value
+                  map-options
+                >
+                  <template #option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label>
+                          {{ scope.opt.label }}
+                        </q-item-label>
                         <q-item-label caption>
                           {{ scope.opt.description }}
                         </q-item-label>
@@ -164,6 +188,7 @@ export default defineComponent({
     const conceptColors: ConceptColor[] = [] //ToDo: const? or ref?
     const selectedColors                = ref<ConceptColor[]>([])
     const conceptMode                   = ref('exclusive')
+    const mostImportantNodes            = ref(true)
 
     let lastSelectedConcept = -1
 
@@ -187,29 +212,31 @@ export default defineComponent({
         .finally(() => loading.value = false)
     }
 
-    const chooseConcept = async (idx: number, changedConceptMode: boolean | undefined) => {
+    const chooseConcept = async (idx: number | undefined, changedConceptMode: boolean | undefined) => {
       if (!documentApi) return
 
-      documentIds.value.length = 0
-      if (changedConceptMode !== true) {
-        if (conceptMode.value === 'exclusive') {
-          selectedConcepts.value.length = 0
-          selectedConcepts.value.push(idx)
-        } else if (selectedConcepts.value.includes(idx)) {
-          selectedConcepts.value = selectedConcepts.value.filter(function (item) {
-            return item !== idx
-          })
-        } else {
-          selectedConcepts.value.push(idx)
+      if (idx !== undefined) {
+        documentIds.value.length = 0;
+        if (changedConceptMode !== true) {
+          if (conceptMode.value === 'exclusive') {
+            selectedConcepts.value.length = 0
+            selectedConcepts.value.push(idx)
+          } else if (selectedConcepts.value.includes(idx)) {
+            selectedConcepts.value = selectedConcepts.value.filter(function (item) {
+              return item !== idx
+            })
+          } else {
+            selectedConcepts.value.push(idx)
+          }
+          lastSelectedConcept = idx
         }
-        lastSelectedConcept = idx
       }
 
       if (selectedConcepts.value.length !== 0) {
         await documentApi.getDocumentsByConceptIds(
           selectedConcepts.value.map(selConcept => {
             return concepts.value[selConcept].id
-          }), true, conceptMode.value, undefined
+          }), true, conceptMode.value, undefined, mostImportantNodes.value
         )
           .then(r => {
             documentIds.value = r.data.map(doc => doc.id).filter(id => id !== undefined) as string[]
@@ -246,6 +273,17 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => mostImportantNodes.value,
+      (value, oldValue) => {
+        chooseConcept(undefined, undefined)
+          .then( () => {
+            // something
+          })
+          .catch((e: Error) => renderError(e))
+      }
+    )
+
     return {
       t,
       splitterModel: ref(20),
@@ -257,6 +295,7 @@ export default defineComponent({
       alert,
       selectedColors,
       conceptMode,
+      mostImportantNodes,
       chooseConcept,
       async chooseDocument (documentId: string) {
         if (!documentApi) return
@@ -282,6 +321,16 @@ export default defineComponent({
           label: t('intersection'),
           value: 'intersection',
           icon: 'mdi-set-center'
+        }
+      ]),
+      mostImportantNodesOptions: computed(() => [
+        {
+          label: t('yes'),
+          value: true,
+        },
+        {
+          label: t('no'),
+          value: false,
         }
       ])
     }
