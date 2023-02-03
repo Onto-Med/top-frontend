@@ -315,11 +315,11 @@ export default defineComponent({
           isEntity.value = false
           isConstant.value = false
           newModelValue.functionId = undefined
-        } else if (fun.id === 'entity') {
+        } else if (fun.id === 'Entity') {
           isEntity.value = true
           isConstant.value = false
           newModelValue.functionId = undefined
-        } else if (fun.id === 'constant') {
+        } else if (fun.id === 'Constant') {
           isEntity.value = false
           isConstant.value = true
           newModelValue.functionId = undefined
