@@ -371,5 +371,6 @@
     "component": "Komponenten",
     "date_time": "Datum- und Zeit-Funktionen",
     "none": "Unspezifizierte Funktionen"
-  }
+  },
+  "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?"
 }

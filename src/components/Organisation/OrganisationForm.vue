@@ -11,7 +11,7 @@
             icon="delete"
             class="float-right"
             :title="t('deleteThing', { thing: t('organisation') })"
-            @click="showDeleteDialog = true"
+            @click="showDeleteDialog"
           />
         </div>
         <div v-else class="text-h6">
@@ -54,22 +54,6 @@
         :label="t('pleaseWait') + '...'"
       />
     </q-card>
-
-    <q-dialog v-model="showDeleteDialog">
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-avatar icon="warning_amber" color="red" text-color="white" />
-          <span v-t="'organisationPage.confirmDelete'" class="q-ml-sm" />
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('delete-clicked', modelValue)" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </q-dialog>
 </template>
 
@@ -78,9 +62,10 @@ import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
 import OrganisationSelectInput from 'src/components/Organisation/OrganisationSelectInput.vue'
+import Dialog from 'src/components/Dialog.vue'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
-  name: 'OrganisationForm',
   components: {
     OrganisationSelectInput
   },
@@ -93,14 +78,14 @@ export default defineComponent({
     loading: Boolean
   },
   emits: ['update:show', 'update:model-value', 'delete-clicked'],
-  setup(props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  setup(props, { emit }) {
     const { t } = useI18n()
     const copy = (value: unknown) => {
       return JSON.parse(JSON.stringify(value)) as Organisation
     }
     const state = ref(copy(props.modelValue))
     const isNew = computed(() => !state.value.createdAt)
+    const $q = useQuasar()
 
     watch(() => props.modelValue, (value) => {
       state.value = copy(value)
@@ -110,7 +95,16 @@ export default defineComponent({
       t,
       state,
       isNew,
-      showDeleteDialog: ref(false),
+      showDeleteDialog () {
+        $q.dialog({
+          component: Dialog,
+          componentProps: {
+            message: t('organisationPage.confirmDelete')
+          }
+        }).onOk(() => {
+          emit('delete-clicked', props.modelValue)
+        })
+      },
 
       setId (id: string|undefined) {
         if (!isNew.value) return

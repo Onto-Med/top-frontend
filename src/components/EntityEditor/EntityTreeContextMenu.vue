@@ -34,37 +34,23 @@
     </q-list>
     <q-separator />
     <q-list v-if="deletable && entity" dense>
-      <q-item clickable @click="showDeleteDialog = true">
+      <q-item
+        v-close-popup
+        clickable
+        @click="showDeleteDialog"
+      >
         <q-item-section v-t="'delete'" />
       </q-item>
     </q-list>
-
-    <q-dialog v-model="showDeleteDialog">
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar icon="warning_amber" color="warning" text-color="white" />
-            </q-item-section>
-            <q-item-section v-t="'entityEditor.confirmDelete'" />
-          </q-item>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-          <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('deleteEntityClicked', entity)" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </q-menu>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, Entity } from '@onto-med/top-api'
+import Dialog from 'src/components/Dialog.vue'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   name: 'EntityTreeContextMenu',
@@ -86,6 +72,7 @@ export default defineComponent({
   emits: ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked'],
   setup (props, { emit }) {
     const { t } = useI18n()
+    const $q = useQuasar()
 
     return {
       t,
@@ -102,7 +89,16 @@ export default defineComponent({
 
       EntityType,
 
-      showDeleteDialog: ref(false),
+      showDeleteDialog () {
+        $q.dialog({
+          component: Dialog,
+          componentProps: {
+            message: t('entityEditor.confirmDelete')
+          }
+        }).onOk(() => {
+          emit('deleteEntityClicked', props.entity)
+        })
+      },
 
       emitCreateEntity: (entityType: EntityType, entityId: string|undefined) => {
         void setTimeout(() => emit('createEntityClicked', entityType, entityId), 50)
