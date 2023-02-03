@@ -84,7 +84,7 @@
               </q-menu>
             </q-tab>
           </q-tabs>
-          <q-tab-panels v-show="tabs.length !== 0" :model-value="selected ? selected.id : undefined" class="col entity-editor-tab">
+          <q-tab-panels v-if="tabs.length !== 0" :model-value="selected ? selected.id : undefined" class="col entity-editor-tab">
             <q-tab-panel v-for="tab in tabs" :key="tab.state.id" :name="tab.state.id" class="q-pa-none">
               <entity-tab
                 v-if="repository && organisationId"
@@ -104,7 +104,7 @@
               />
             </q-tab-panel>
           </q-tab-panels>
-          <div v-show="tabs.length === 0" class="col column entity-editor-tab text-grey gt-xs">
+          <div v-else class="col column entity-editor-tab text-grey gt-xs">
             <div class="col-3 row q-pa-md">
               <q-icon name="arrow_back_ios" size="xl" />
               <p>
