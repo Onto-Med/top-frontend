@@ -54,9 +54,9 @@ export default defineComponent({
         (props.options ? props.options : Object.values(ItemType))
           .map(d => {
             return {
-              label: t(d),
+              label: te('itemTypes.' + d) ? t('itemTypes.' + d) : d,
               value: d,
-              title: te(d + 'Description') ? t(d + 'Description') : ''
+              title: te('itemTypeDescriptions.' + d) ? t('itemTypeDescriptions.' + d) : ''
             }
           })
           .sort((a, b) => a.label.localeCompare(b.label)))
