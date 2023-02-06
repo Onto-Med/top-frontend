@@ -151,7 +151,13 @@ export default defineComponent({
         loading.value = true
 
         await repositoryApi.exportRepository(props.repository.organisation.id, props.repository.id, exportConverter.value.id)
-          .then(r => result.value = r.data as string)
+          .then(r => {
+            if (typeof r.data === 'object' || Array.isArray(r.data)) {
+              result.value = JSON.stringify(r.data)
+            } else {
+              result.value = r.data as string
+            }
+          })
           .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
