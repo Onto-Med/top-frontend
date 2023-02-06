@@ -130,7 +130,8 @@ export default defineComponent({
     organisationId: String,
     repositoryId: String,
     fork: Boolean,
-    repositoryFilter: Boolean
+    repositoryFilter: Boolean,
+    includePrimary: Boolean
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {

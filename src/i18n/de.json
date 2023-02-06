@@ -372,5 +372,7 @@
     "date_time": "Datum- und Zeit-Funktionen",
     "none": "Unspezifizierte Funktionen"
   },
-  "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?"
+  "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
+  "includePrimaryRepositories": "Primäre Repositorien einschließen",
+  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositories zu erweitern."
 }
