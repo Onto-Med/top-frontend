@@ -59,7 +59,7 @@
             <q-icon :name="getIcon(scope.opt)" :title="getIconTooltip(scope.opt)" :class="{ restriction: isRestricted(scope.opt) }" />
           </q-item-section>
           <q-item-section>
-            <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
+            <q-item-label v-if="(!(repositoryId && organisationId) || includePrimary) && scope.opt.repository" overline>
               {{ scope.opt.repository.name }}
             </q-item-label>
             <q-item-label>{{ getTitle(scope.opt, true) }}</q-item-label>
