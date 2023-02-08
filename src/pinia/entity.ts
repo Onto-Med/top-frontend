@@ -131,21 +131,23 @@ export const useEntity = defineStore('entity', {
       return this.entities.find(e => e.id === id)
     },
 
-    loadEntity(id: string | undefined, ignorelocal = false): Promise<Entity | undefined> {
+    async loadEntity(id: string | undefined, ignoreLocal = false): Promise<Entity | undefined> {
       return Promise.resolve()
         .then(() => {
-          if (!ignorelocal) {
+          if (!ignoreLocal) {
             const entity = this.getEntity(id)
             if (entity) return entity
           }
         })
-        .then((e) => {
+        .then(async (e) => {
           if (e || !id || !this.entityApi || !this.organisationId || !this.repositoryId)
             return Promise.resolve(e)
           return this.entityApi
             .getEntityById(this.organisationId, this.repositoryId, id)
             .then(r => {
-              this.addOrReplaceEntity(r.data)
+              if (r.data !== undefined && r.data.repository?.organisation?.id === this.organisationId && r.data.repository?.id === this.repositoryId) {
+                this.addOrReplaceEntity(r.data)
+              }
               return r.data
             })
         })
@@ -154,11 +156,11 @@ export const useEntity = defineStore('entity', {
           const categories = (e as Category).superCategories
           if (superPhenotype && superPhenotype.id) {
             if (this.getEntity(superPhenotype.id)) return Promise.resolve(e)
-            return this.loadEntity(superPhenotype.id, ignorelocal).then(() => e)
+            return this.loadEntity(superPhenotype.id, ignoreLocal).then(() => e)
           } else if (categories) {
             return Promise.all(categories.map(c => {
               if (!c || !c.id || this.getEntity(c.id)) return Promise.resolve(e)
-              return this.loadEntity(c.id, ignorelocal)
+              return this.loadEntity(c.id, ignoreLocal)
             })).then(() => e)
           }
           return e
