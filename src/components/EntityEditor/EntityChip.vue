@@ -18,7 +18,7 @@
           :data-type="dataType"
           :organisation-id="organisationId"
           :repository-id="repositoryId"
-          :include-primary="includePrimary"
+          :include-primary="includePrimaryRepositories"
           class="q-px-sm"
           @entity-selected="setEntity($event)"
           @btn-clicked="popup.cancel()"
@@ -53,7 +53,6 @@
       :label="label"
       icon="create"
       :class="{ 'dense-chip': dense }"
-      :include-primary="includePrimary"
       class="truncate"
     >
       <q-popup-edit ref="popup" :model-value="null" :cover="false">
@@ -66,6 +65,7 @@
           :data-type="dataType"
           :organisation-id="organisationId"
           :repository-id="repositoryId"
+          :include-primary="includePrimaryRepositories"
           @entity-selected="setEntity($event)"
           @btn-clicked="popup.cancel()"
         />

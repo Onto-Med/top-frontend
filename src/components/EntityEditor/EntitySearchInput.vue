@@ -153,6 +153,7 @@ export default defineComponent({
       } else if (repository.value && repository.value.organisation) {
         repositoryIds = [repository.value.id]
       }
+      console.log(props.includePrimary)
       return entityApi.getEntities(
         undefined, input, props.entityTypes, props.dataType, props.itemType, repositoryIds, props.includePrimary, page
       ).then((r) => r.data)
