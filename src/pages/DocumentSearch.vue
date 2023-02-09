@@ -201,7 +201,7 @@ export default defineComponent({
           concepts.value.forEach(function (concept, index) {
             conceptColors.push({
               'background-color': distinctColors[index],
-              color: distinctColorsFont[index]
+              'color': distinctColorsFont[index]
             })
           });
 
@@ -259,12 +259,6 @@ export default defineComponent({
 
         if (conceptMode.value === 'exclusive') {
           chooseConcept(lastSelectedConcept, false)
-            .then(() => {
-              // selectedConcepts.value.length = 0;
-              // documentIds.value.length = 0;
-              // document_.value = undefined;
-              // selectedColors.value.fill({'background-color': '', 'color': ''});
-            })
             .catch((e: Error) => renderError(e))
         } else {
           chooseConcept(lastSelectedConcept, true)
@@ -275,11 +269,8 @@ export default defineComponent({
 
     watch(
       () => mostImportantNodes.value,
-      (value, oldValue) => {
+      () => {
         chooseConcept(undefined, undefined)
-          .then( () => {
-            // something
-          })
           .catch((e: Error) => renderError(e))
       }
     )
