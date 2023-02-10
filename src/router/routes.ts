@@ -28,9 +28,27 @@ const routes: RouteRecordRaw[] = [
         },
         component: () => import('pages/Editor.vue')
       },
-      { name: 'organisations', path: '/organisation', component: () => import('pages/OrganisationOverview.vue') },
-      { name: 'showOrganisation', path: '/:organisationId', component: () => import('pages/Organisation.vue') },
-      { name: 'documentSearch', path: '/document', component: () => import('pages/DocumentSearch.vue') }
+      {
+        name: 'organisations',
+        path: '/organisation',
+        component: () => import('pages/OrganisationOverview.vue'),
+        meta: {
+          allowAnonymous: true
+        }
+      },
+      {
+        name: 'showOrganisation',
+        path: '/:organisationId',
+        component: () => import('pages/Organisation.vue'),
+        meta: {
+          allowAnonymous: true
+        }
+      },
+      {
+        name: 'documentSearch',
+        path: '/document',
+        component: () => import('pages/DocumentSearch.vue')
+      }
     ],
   },
 
