@@ -8,7 +8,7 @@
 
   <template v-else-if="!state">
     <span v-if="dense" class="dense-chip">[{{ label }}]<!--
-      --><q-popup-edit ref="popup" :model-value="null" :cover="false">
+      --><q-popup-edit ref="popup" :model-value="null" :cover="false" class="q-pa-none">
         <entity-search-input
           v-if="!disable"
           autofocus
@@ -18,9 +18,24 @@
           :data-type="dataType"
           :organisation-id="organisationId"
           :repository-id="repositoryId"
+          :include-primary="includePrimaryRepositories"
+          class="q-px-sm"
           @entity-selected="setEntity($event)"
           @btn-clicked="popup.cancel()"
         />
+        <q-item v-if="includePrimary" dense>
+          <q-item-section>
+            <q-checkbox
+              v-model="includePrimaryRepositories"
+              dense
+              size="xs"
+              class="text-caption"
+              :label="t('includePrimaryRepositories')"
+              :title="t('includePrimaryRepositoriesDescription')"
+            />
+          </q-item-section>
+        </q-item>
+        <q-separator v-if="includePrimary" />
         <q-list dense>
           <slot name="additionalOptions" />
           <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
@@ -50,10 +65,24 @@
           :data-type="dataType"
           :organisation-id="organisationId"
           :repository-id="repositoryId"
+          :include-primary="includePrimaryRepositories"
           @entity-selected="setEntity($event)"
           @btn-clicked="popup.cancel()"
         />
         <q-list dense>
+          <q-item v-if="includePrimary" dense>
+            <q-item-section>
+              <q-checkbox
+                v-model="includePrimaryRepositories"
+                dense
+                size="xs"
+                class="text-caption"
+                :label="t('includePrimaryRepositories')"
+                :title="t('includePrimaryRepositoriesDescription')"
+              />
+            </q-item-section>
+          </q-item>
+          <q-separator v-if="includePrimary" />
           <slot name="additionalOptions" />
           <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
             <q-item-section v-t="'remove'" />
@@ -119,7 +148,8 @@ export default defineComponent({
     disable: Boolean,
     changeable: Boolean,
     removeable: Boolean,
-    dense: Boolean
+    dense: Boolean,
+    includePrimary: Boolean
   },
   emits: ['entityClicked', 'entitySet', 'removeClicked'],
   setup(props, { emit }) {
@@ -171,6 +201,7 @@ export default defineComponent({
       popup,
       state,
       loading,
+      includePrimaryRepositories: ref(false),
 
       setEntity: (entity: Entity|undefined) => {
         state.value = entity

@@ -59,7 +59,7 @@
             <q-icon :name="getIcon(scope.opt)" :title="getIconTooltip(scope.opt)" :class="{ restriction: isRestricted(scope.opt) }" />
           </q-item-section>
           <q-item-section>
-            <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
+            <q-item-label v-if="(!(repositoryId && organisationId) || includePrimary) && scope.opt.repository" overline>
               {{ scope.opt.repository.name }}
             </q-item-label>
             <q-item-label>{{ getTitle(scope.opt, true) }}</q-item-label>
@@ -97,7 +97,6 @@ import { defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, Entity, Repository, DataType, ItemType } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
-import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import { QSelect } from 'quasar'
@@ -130,7 +129,8 @@ export default defineComponent({
     organisationId: String,
     repositoryId: String,
     fork: Boolean,
-    repositoryFilter: Boolean
+    repositoryFilter: Boolean,
+    includePrimary: Boolean
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {
@@ -145,17 +145,18 @@ export default defineComponent({
     const prevInput  = ref(undefined as string|undefined)
     const nextPage   = ref(2)
 
-    const loadOptions = (input: string, page = 1): Promise<Entity[]> => {
+    const loadOptions = async (input: string, page = 1): Promise<Entity[]> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      let promise: Promise<AxiosResponse<Entity[]>>
+      let repositoryIds = undefined
       if (props.organisationId && props.repositoryId) {
-        promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
+        repositoryIds = [props.repositoryId]
       } else if (repository.value && repository.value.organisation) {
-        promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
-      } else {
-        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, page)
+        repositoryIds = [repository.value.id]
       }
-      return promise.then((r) => r.data)
+      console.log(props.includePrimary)
+      return entityApi.getEntities(
+        undefined, input, props.entityTypes, props.dataType, props.itemType, repositoryIds, props.includePrimary, page
+      ).then((r) => r.data)
     }
 
     return {

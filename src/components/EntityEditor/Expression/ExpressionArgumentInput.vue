@@ -10,6 +10,7 @@
         :repository-id="repositoryId"
         :label="t('selectThing', { thing: t('entity') })"
         :disable="readonly"
+        include-primary
         changeable
         removeable
         dense

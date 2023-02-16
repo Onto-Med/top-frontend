@@ -378,5 +378,7 @@
     "component": "Components",
     "none": "Unspecified functions"
   },
-  "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?"
+  "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
+  "includePrimaryRepositories": "Include primary repositories",
+  "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in primary repositories."
 }
