@@ -130,13 +130,13 @@
               <q-scroll-area v-if="document_" style="height: 94%">
                 <q-card-section>
                   <div class="text-h6">
-                    {{ document_.id }}
+                    {{ document_.name }}
                   </div>
                 </q-card-section>
                 <q-card-section>
-                  <div>
-                    {{ document_.text }}
-                  </div>
+                  <div style="line-height: 1.6" v-html="document_.highlightedText"/>
+<!--                    {{ document_.highlightedText }}-->
+<!--                  </div>-->
                 </q-card-section>
               </q-scroll-area>
             </q-card>
@@ -233,12 +233,14 @@ export default defineComponent({
       }
 
       if (selectedConcepts.value.length !== 0) {
-        await documentApi.getDocumentsByConceptIds(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        await documentApi.getDocumentIdsByConceptIds(
           selectedConcepts.value.map(selConcept => {
             return concepts.value[selConcept].id
-          }), true, conceptMode.value, undefined, mostImportantNodes.value
+          }), conceptMode.value, undefined, mostImportantNodes.value
         )
           .then(r => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
             documentIds.value = r.data.map(doc => doc.id).filter(id => id !== undefined) as string[]
           })
           .catch((e: Error) => renderError(e))
