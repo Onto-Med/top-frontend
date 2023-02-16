@@ -1,5 +1,5 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier, DefaultApi, Converter } from '@onto-med/top-api'
+import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier, DefaultApi, Converter, CodeApi, Code, CodeSystem } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -24,7 +24,9 @@ export const useEntity = defineStore('entity', {
       repositoryApi: undefined as RepositoryApi | undefined,
       forkApi: undefined as ForkApi | undefined,
       dataSourceApi: undefined as DataSourceApi | undefined,
-      defaultApi: undefined as DefaultApi | undefined
+      defaultApi: undefined as DefaultApi | undefined,
+      codeApi: undefined as CodeApi | undefined,
+      codeSystems: undefined as CodeSystem[] | undefined
     }
   },
   actions: {
@@ -371,6 +373,12 @@ export const useEntity = defineStore('entity', {
     async loadConverters() {
       if (!this.converters)
         this.converters = (await this.defaultApi?.getConverters())?.data
+    },
+
+    async getCodeSystems(): Promise<CodeSystem[] | undefined> {
+      if (!this.codeSystems)
+        this.codeSystems = (await this.codeApi?.getCodeSystems(undefined, undefined, undefined, 0))?.data
+      return this.codeSystems
     }
   }
 })
