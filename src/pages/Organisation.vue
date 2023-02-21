@@ -19,7 +19,7 @@
       :name="t('repository')"
       :rows="repositories"
       :loading="loading"
-      create
+      :create="isAuthenticated"
       @row-clicked="routeToEditor($event)"
       @reload-clicked="reload()"
       @create-clicked="repository = newRepository(); showForm = true"
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref, onMounted } from 'vue'
+import { computed, defineComponent, inject, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import useNotify from 'src/mixins/useNotify'
@@ -91,6 +91,7 @@ export default defineComponent({
       return { id: (uuidv4 as () => string)(), primary: false } as Repository
     }
     const repository = ref(newRepository())
+    const { keycloak } = storeToRefs(useEntity())
 
     const reload = async () => {
       if (!repositoryApi || !organisation.value) return
@@ -155,7 +156,9 @@ export default defineComponent({
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
-      }
+      },
+
+      isAuthenticated: computed(() => !keycloak.value || keycloak.value.authenticated)
     }
   }
 })
