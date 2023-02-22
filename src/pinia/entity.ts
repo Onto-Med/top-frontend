@@ -378,9 +378,11 @@ export const useEntity = defineStore('entity', {
     },
 
     async getCodeSystems(): Promise<CodeSystem[] | undefined> {
-      if (!this.codeSystems)
-        this.codeSystems = (await this.codeApi?.getCodeSystems(undefined, undefined, undefined, 0))?.data
-      return this.codeSystems
+      await this.codeApi?.getCodeSystems(undefined, undefined, undefined, 1)
+        .then((r) => {
+            this.codeSystems = r.data
+        })
+        return this.codeSystems
     }
   }
 })

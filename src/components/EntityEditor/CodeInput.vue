@@ -58,6 +58,7 @@ import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import { QInput } from 'quasar'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   name: 'CodeInput',
@@ -75,19 +76,16 @@ export default defineComponent({
     readonly: Boolean
   },
   emits: ['update:modelValue'],
-  setup (props, { emit }) {
+  async setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const codeInput = ref(null as unknown as QInput)
 
-    const codeSystems = [
-      { uri: 'http://snomed.info/id', name: 'SNOMED CT' },
-      { uri: 'http://loinc.org', name: 'LOINC' },
-      { uri: 'http://fhir.de/CodeSystem/bfarm/icd-10-gm', name: 'ICD-10-GM' },
-      { uri: 'http://fhir.de/CodeSystem/bfarm/ops', name: 'OPS' },
-      { uri: 'http://fhir.de/CodeSystem/bfarm/atc', name: 'ATC' }
-    ] as CodeSystem[]
-    const local = ref({ codeSystem: codeSystems[0] } as Code)
+    const entityStore = useEntity()
+
+    const codeSystems = await entityStore.getCodeSystems() || []
+    
+    const local = ref({ codeSystem : codeSystems[0] } as Code)
 
     const isValid = computed(() => !!local.value && local.value.code && local.value.codeSystem?.uri)
 
@@ -100,7 +98,7 @@ export default defineComponent({
       },
 
       getCodeSystem (uri: string) {
-        return codeSystems.find(c => c.uri === uri)
+        return codeSystems === undefined ? undefined : codeSystems.find(c => c.uri === uri)
       },
 
       addEntry () {

@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
-import { DataSourceApi, DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, RepositoryApi } from '@onto-med/top-api'
+import { DataSourceApi, DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, RepositoryApi, CodeApi } from '@onto-med/top-api'
 import { AxiosInstance } from 'axios'
 
 export default boot(({ app }) => {
@@ -13,7 +13,8 @@ export default boot(({ app }) => {
     organisationApi: new OrganisationApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
     repositoryApi: new RepositoryApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
     dataSourceApi: new DataSourceApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
-    defaultApi: new DefaultApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined)
+    defaultApi: new DefaultApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
+    codeApi: new CodeApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined)
   }))
   app.use(pinia)
 })
