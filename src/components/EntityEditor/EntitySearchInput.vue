@@ -69,7 +69,7 @@
               </q-item-label>
             </template>
           </q-item-section>
-          <q-item-section v-show="fork && repositoryId && repositoryId !== scope.opt.repository.id && scope.opt.repository.primary" avatar>
+          <q-item-section v-show="fork && currentRepositoryId && currentRepositoryId !== scope.opt.repository.id && scope.opt.repository.primary" avatar>
             <q-btn
               v-close-popup
               flat
@@ -101,6 +101,8 @@ import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import { QSelect } from 'quasar'
+import { storeToRefs } from 'pinia'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   components: {
@@ -144,8 +146,9 @@ export default defineComponent({
     const select     = ref(null as unknown as QSelect)
     const prevInput  = ref(undefined as string|undefined)
     const nextPage   = ref(2)
+    const { repositoryId } = storeToRefs(useEntity())
 
-    const loadOptions = (input: string, page = 1): Promise<Entity[]> => {
+    const loadOptions = async (input: string, page = 1): Promise<Entity[]> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
       let promise: Promise<AxiosResponse<Entity[]>>
       if (props.organisationId && props.repositoryId) {
@@ -166,6 +169,7 @@ export default defineComponent({
       getSynonyms,
       getDescriptions,
       isRestricted,
+      currentRepositoryId: repositoryId,
 
       select,
       repository,
