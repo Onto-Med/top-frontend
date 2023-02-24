@@ -1,17 +1,32 @@
 <template>
   <q-page v-if="organisation" class="q-gutter-md">
     <q-card>
-      <q-card-section>
-        <div class="text-h6">
-          <q-icon name="groups" :title="t('organisation')" class="q-mr-sm q-tree__icon" />
-          {{ organisation.name }}
+      <q-card-section class="q-pb-none">
+        <div class="row">
+          <div class="col">
+            <div class="text-h6">
+              <q-icon name="groups" :title="t('organisation')" class="q-mr-sm q-tree__icon" />
+              {{ organisation.name }}
+            </div>
+            <small v-if="organisation.createdAt">
+              {{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}
+            </small>
+          </div>
+          <div v-if="isAuthenticated" class="col-auto">
+            <q-btn
+              v-if="isAuthenticated"
+              color="primary"
+              icon="settings"
+              :label="t('manageThing', { thing: t('permission', 2) })"
+              @click="showMembershipDialog()"
+            />
+          </div>
         </div>
-        <small v-if="organisation.createdAt">
-          {{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}
-        </small>
       </q-card-section>
-      <q-card-section>
-        {{ organisation.description }}
+      <q-separator />
+      <q-card-section class="q-pt-sm">
+        <b>{{ t('description') }}:</b>
+        <p>{{ organisation.description }}</p>
       </q-card-section>
     </q-card>
 
@@ -26,6 +41,7 @@
     >
       <template #actions="{ row }">
         <q-btn
+          v-if="isAuthenticated"
           size="sm"
           color="primary"
           dense
@@ -55,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, ref, onMounted } from 'vue'
+import { defineComponent, inject, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import useNotify from 'src/mixins/useNotify'
@@ -64,11 +80,13 @@ import { RepositoryApiKey } from 'src/boot/axios'
 import { Repository } from '@onto-med/top-api'
 import TableWithActions from 'src/components/TableWithActions.vue'
 import RepositoryForm from 'src/components/Repository/RepositoryForm.vue'
+import MembershipDialog from 'src/components/Organisation/MembershipDialog.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -77,6 +95,7 @@ export default defineComponent({
   },
   setup () {
     const { t, d } = useI18n()
+    const $q = useQuasar()
     const { notify, renderError } = useNotify()
     const { repositoryIcon } = useEntityFormatter()
     const router = useRouter()
@@ -91,7 +110,7 @@ export default defineComponent({
       return { id: (uuidv4 as () => string)(), primary: false } as Repository
     }
     const repository = ref(newRepository())
-    const { keycloak } = storeToRefs(useEntity())
+    const { isAuthenticated } = storeToRefs(useEntity())
 
     const reload = async () => {
       if (!repositoryApi || !organisation.value) return
@@ -120,10 +139,13 @@ export default defineComponent({
       saving,
       reload,
       newRepository,
+      isAuthenticated,
+
       routeToEditor (repository: Repository) {
         if (!organisation.value) return
         void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
       },
+
       async saveRepository (repository: Repository) {
         if (!repositoryApi || !organisation.value) return
         saving.value = true
@@ -144,6 +166,7 @@ export default defineComponent({
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
       },
+
       async deleteRepository (repository: Repository) {
         if (!organisationApi || !organisation.value) return
         saving.value = true
@@ -158,7 +181,14 @@ export default defineComponent({
           .finally(() => saving.value = false)
       },
 
-      isAuthenticated: computed(() => !keycloak.value || keycloak.value.authenticated)
+      showMembershipDialog () {
+        $q.dialog({
+          component: MembershipDialog,
+          componentProps: {
+            organisation: organisation.value
+          }
+        })
+      }
     }
   }
 })

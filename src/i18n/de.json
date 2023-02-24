@@ -378,5 +378,22 @@
     "date_time": "Datum- und Zeit-Funktionen",
     "none": "Unspezifizierte Funktionen"
   },
-  "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?"
+  "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
+  "permission": "Berechtigung|Berechtigungen",
+  "manageThing": "{thing} verwalten",
+  "organisationMembership": "Organisationsmitgliedschaft|Organisationsmitgliedschaften",
+  "user": "Benutzer|Benutzer",
+  "permissions": {
+    "READ": "Lesen",
+    "WRITE": "Schreiben",
+    "MANAGE": "Verwalten"
+  },
+  "permissionDescriptions": {
+    "READ": "Alle in der Organisation enthaltenen Inhalte dürfen betrachtet werden.",
+    "WRITE": "Repositorien dürfen angelegt, bearbeitet und gelöscht werden.",
+    "MANAGE": "Vollzugriff auf alle Inhalte und Einstellungen der Organisation."
+  },
+  "revokePermission": "Berechtigung widerrufen|Berechtigungen widerrufen",
+  "confirmDeleteOrganisationMembership": "Möchten Sie diese Mitgliedschaft wirklich löschen? Der Benutzer verliert seine Berechtigungen für diese Organisation!",
+  "add": "Hinzufügen"
 }

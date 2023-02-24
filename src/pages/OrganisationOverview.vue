@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, ref, onMounted } from 'vue'
+import { defineComponent, inject, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
@@ -76,7 +76,7 @@ export default defineComponent({
       return { id: (uuidv4 as () => string)() } as Organisation
     }
     const organisation = ref(newOrganisation())
-    const { keycloak } = storeToRefs(useEntity())
+    const { isAuthenticated } = storeToRefs(useEntity())
 
     const reload = async () => {
       if (!organisationApi) return
@@ -99,6 +99,7 @@ export default defineComponent({
       loading,
       saving,
       showForm,
+      isAuthenticated,
       newOrganisation,
       routeToOrganisation (organisation: Organisation) {
         void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
@@ -135,9 +136,7 @@ export default defineComponent({
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
-      },
-
-      isAuthenticated: computed(() => !keycloak.value || keycloak.value.authenticated)
+      }
     }
   }
 })
