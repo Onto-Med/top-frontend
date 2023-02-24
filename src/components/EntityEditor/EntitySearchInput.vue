@@ -153,7 +153,7 @@ export default defineComponent({
       } else if (repository.value && repository.value.organisation) {
         promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
       } else {
-        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, page)
+        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, undefined, true, page)
       }
       return promise.then((r) => r.data)
     }
