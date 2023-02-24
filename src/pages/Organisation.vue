@@ -54,6 +54,14 @@
           :title="t(row.repositoryType || 'repository')"
           class="q-ml-sm q-tree__icon"
         />
+        <q-chip
+          v-if="row.primary"
+          size="sm"
+          color="primary"
+          text-color="white"
+          :label="t('primary')"
+          :title="t('primaryRepositoryDescription')"
+        />
       </template>
     </table-with-actions>
 

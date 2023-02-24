@@ -277,7 +277,7 @@
     }
   },
   "organisationPage": {
-    "description": "Verwalten Sie Ihre Organisationen oder erstellen Sie neue.",
+    "description": "Organisationen können Repositories enthalten. Benutzer mit entsprechenden Berechtigungen können den Inhalt einer Organisation anzeigen oder ändern.",
     "confirmDelete": "Möchten Sie diese Organisation wirklich löschen?"
   },
   "repositoryPage": {

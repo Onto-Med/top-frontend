@@ -277,7 +277,7 @@
     }
   },
   "organisationPage": {
-    "description": "Manage your organisations or create new ones.",
+    "description": "Organisations can contain repositories. Users with appropriate permissions can view or modify the content of an organisation.",
     "confirmDelete": "Do you really want to delete this organisation?"
   },
   "repositoryPage": {
