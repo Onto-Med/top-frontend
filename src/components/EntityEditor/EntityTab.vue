@@ -15,6 +15,7 @@
           color="accent"
           dense
           no-caps
+          :disabled="readonly"
           :label="t('restore')"
           :title="t('versionRestoreDescription')"
           @click.stop="$emit('restoreVersion', local)"
@@ -26,7 +27,7 @@
           color="primary"
           :label="t('save')"
           :title="t('ctrl') + '+S'"
-          :disabled="!dirty && !isNew"
+          :disabled="readonly || !dirty && !isNew"
           @click="save()"
         />
         <q-btn
@@ -147,7 +148,7 @@
       :version="version"
       :repository-id="repositoryId"
       :organisation-id="organisationId"
-      :readonly="isOtherVersion"
+      :readonly="isOtherVersion || readonly"
       :restriction-key="restrictionKey"
       @update:titles="$emit('update:entity', { ...local, titles: $event })"
       @update:synonyms="$emit('update:entity', { ...local, synonyms: $event })"
@@ -216,7 +217,8 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    dirty: Boolean
+    dirty: Boolean,
+    readonly: Boolean
   },
   emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'save', 'reset'],
   setup (props, { emit }) {

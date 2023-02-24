@@ -19,7 +19,7 @@
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
               <q-btn
-                v-if="isPhenotypeRepository"
+                v-if="isPhenotypeRepository && isAuthenticated"
                 icon="manage_search"
                 :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder' }"
@@ -35,7 +35,7 @@
             :loading="treeLoading"
             :allowed-entity-types="allowedEntityTypes"
             class="col column"
-            show-context-menu
+            :show-context-menu="isAuthenticated"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
@@ -94,6 +94,7 @@
                 :organisation-id="organisationId"
                 :hotkeys-enabled="selected?.id === tab.state.id"
                 :dirty="tab.dirty"
+                :readonly="!isAuthenticated"
                 @update:entity="handleTabUpdate(tab, $event)"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab.state); notify($event.message)"
@@ -165,6 +166,7 @@ export default defineComponent({
     const selected    = ref<Entity|undefined>(undefined)
     const tabs        = ref([] as EditorTab[])
     const treeLoading = ref(false)
+    const { isAuthenticated } = storeToRefs(entityStore)
 
     const clone = (value: Category|Phenotype) =>
       JSON.parse(JSON.stringify(value)) as Category|Phenotype
@@ -292,6 +294,7 @@ export default defineComponent({
       reloadEntities, selectTabByKey, closeTab, notify,
       organisationId,
       repository,
+      isAuthenticated,
 
       deleteEntity (entity: Entity): void {
         if (!entity || !entityApi) return

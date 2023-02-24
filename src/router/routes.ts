@@ -26,7 +26,10 @@ const routes: RouteRecordRaw[] = [
           const version = Number.parseInt(route.query.version as string, 10)
           return { entityId: route.params.entityId, version: version }
         },
-        component: () => import('pages/Editor.vue')
+        component: () => import('pages/Editor.vue'),
+        meta: {
+          allowAnonymous: true
+        }
       },
       {
         name: 'organisations',
