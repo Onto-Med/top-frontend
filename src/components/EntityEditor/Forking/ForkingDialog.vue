@@ -17,6 +17,7 @@
             :title="t('showThing', { thing: t('origin') })"
             @click="routeToEntity(forkingStats.origin)"
           />
+          ({{ forkingStats.origin.repository?.name }})
         </q-card-section>
       </template>
 
@@ -38,10 +39,10 @@
             class="cursor-pointer"
             @click="routeToEntity(props.row)"
           >
-            <q-td>{{ props.row.repository.organisation.name }}</q-td>
-            <q-td>{{ props.row.repository.name }}</q-td>
-            <q-td>{{ props.row.author ? props.row.author.username : '' }}</q-td>
-            <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
+            <q-td>{{ props.row.repository?.organisation?.name }}</q-td>
+            <q-td>{{ props.row.repository?.name }}</q-td>
+            <q-td>{{ props.row.author ? props.row.author : '' }}</q-td>
+            <q-td>{{ props.row.createdAt ? d(props.row.createdAt, 'long') : '' }}</q-td>
           </q-tr>
         </template>
       </q-table>

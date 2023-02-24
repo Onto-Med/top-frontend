@@ -277,7 +277,7 @@
     }
   },
   "organisationPage": {
-    "description": "Manage your organisations or create new ones.",
+    "description": "Organisations can contain repositories. Users with appropriate permissions can view or modify the content of an organisation.",
     "confirmDelete": "Do you really want to delete this organisation?"
   },
   "repositoryPage": {
@@ -378,5 +378,22 @@
     "component": "Components",
     "none": "Unspecified functions"
   },
-  "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?"
+  "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
+  "permission": "Permission|Permissions",
+  "manageThing": "Manage {thing}",
+  "organisationMembership": "Organisation membership|Organisation memberships",
+  "user": "User|Users",
+  "permissions": {
+    "READ": "Read",
+    "WRITE": "Write",
+    "MANAGE": "Manage"
+  },
+  "permissionDescriptions": {
+    "READ": "All content contained in the organisation may be viewed.",
+    "WRITE": "Repositories may be created, edited and deleted.",
+    "MANAGE": "Full access to all contents and settings of the organisation."
+  },
+  "revokePermission": "Revoke permission|Revoke permissions",
+  "confirmDeleteOrganisationMembership": "Are you sure you want to delete this membership? The user will lose their permissions for this organisation!",
+  "add": "Add"
 }

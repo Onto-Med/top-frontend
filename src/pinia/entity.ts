@@ -27,6 +27,9 @@ export const useEntity = defineStore('entity', {
       defaultApi: undefined as DefaultApi | undefined
     }
   },
+  getters: {
+    isAuthenticated: (state) => !state.keycloak || state.keycloak.authenticated
+  },
   actions: {
     async reloadEntities() {
       if (!this.organisationId || !this.repositoryId)

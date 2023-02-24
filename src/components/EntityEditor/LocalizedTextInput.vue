@@ -44,13 +44,12 @@
         {{ t('oneThingPerThing', { thing1: name || t('entry'), thing2: t('language') }) }}
       </div>
     </template>
-    <template #append>
+    <template v-if="!readonly" #append>
       <q-card-actions class="q-pa-md">
         <q-btn
           color="primary"
           icon="add"
           class="add-localized-text-btn"
-          :disable="readonly"
           :label="t('addThing', { thing: name || t('entry') })"
           @click="addEntry()"
         />

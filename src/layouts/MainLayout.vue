@@ -216,7 +216,6 @@ export default defineComponent({
         icon: 'groups',
         caption: t('collaborativeWork'),
         routeName: 'organisations',
-        isHidden: keycloak && !keycloak.authenticated
       },
       {
         title: t('document', 2),

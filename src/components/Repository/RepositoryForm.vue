@@ -43,7 +43,7 @@
 
         <q-item :v-ripple="isNew" :tag="isNew ? 'label' : 'div'" class="q-pl-none">
           <q-item-section avatar>
-            <q-toggle v-model="state.primary" :disable="!isNew" />
+            <q-toggle v-model="state.primary" />
           </q-item-section>
           <q-item-section>
             <q-item-label v-t="'primary'" />

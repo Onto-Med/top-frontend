@@ -15,12 +15,12 @@
       :name="t('organisation')"
       :rows="organisations"
       :loading="loading"
-      create
+      :create="isAuthenticated"
       @row-clicked="routeToOrganisation($event)"
       @reload-clicked="reload()"
       @create-clicked="organisation = newOrganisation(); showForm = true"
     >
-      <template #actions="{ row }">
+      <template v-if="isAuthenticated" #actions="{ row }">
         <q-btn
           size="sm"
           color="primary"
@@ -53,6 +53,8 @@ import TableWithActions from 'src/components/TableWithActions.vue'
 import OrganisationForm from 'src/components/Organisation/OrganisationForm.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
 
 
 export default defineComponent({
@@ -70,10 +72,11 @@ export default defineComponent({
     const showForm  = ref(false)
     const organisationApi = inject(OrganisationApiKey)
     const organisations   = ref<Organisation[]>([])
-    const  newOrganisation = () => {
+    const newOrganisation = () => {
       return { id: (uuidv4 as () => string)() } as Organisation
     }
-    const organisation    = ref(newOrganisation())
+    const organisation = ref(newOrganisation())
+    const { isAuthenticated } = storeToRefs(useEntity())
 
     const reload = async () => {
       if (!organisationApi) return
@@ -96,6 +99,7 @@ export default defineComponent({
       loading,
       saving,
       showForm,
+      isAuthenticated,
       newOrganisation,
       routeToOrganisation (organisation: Organisation) {
         void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
