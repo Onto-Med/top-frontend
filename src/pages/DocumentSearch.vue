@@ -85,8 +85,8 @@
             <q-card class="col">
               <q-card-section>
                 <div class="text-subtitle2">
-                  {{ t('document', 2) }} <a v-if="documentIds.length > 0">
-                    ({{ t('resultCount', documentIds.length) }})
+                  {{ t('document', 2) }} <a v-if="documents.length > 0">
+                    ({{ t('resultCount', documents.length) }})
                   </a>
                 </div>
               </q-card-section>
@@ -94,20 +94,20 @@
               <q-virtual-scroll
                 v-slot="{ item, index }"
                 style="height: 94%"
-                :items="documentIds"
+                :items="documents"
                 separator
               >
                 <q-item
-                  :key="index + item"
+                  :key="index + item.name"
                   class="cursor-pointer relative-position"
                   clickable
-                  @click="chooseDocument(item)"
+                  @click="chooseDocument(item.id)"
                 >
                   <q-item-section>
                     <q-item-label
                       :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
                     >
-                      {{ item }}
+                      {{ item.name }}
                     </q-item-label>
                     <q-item-label
                       caption
@@ -134,9 +134,7 @@
                   </div>
                 </q-card-section>
                 <q-card-section>
-                  <div style="line-height: 1.6" v-html="document_.highlightedText"/>
-<!--                    {{ document_.highlightedText }}-->
-<!--                  </div>-->
+                  <div style="line-height: 1.6" v-html="document_.highlightedText" />
                 </q-card-section>
               </q-scroll-area>
             </q-card>
@@ -157,10 +155,10 @@ import useNotify from 'src/mixins/useNotify'
 export default defineComponent({
   setup () {
     const { t } = useI18n()
-    const { renderError } = useNotify()
+    const { renderError }  = useNotify()
     const documentApi      = inject(DocumentApiKey)
     const conceptApi       = inject(ConceptApiKey)
-    const documentIds      = ref<string[]>([])
+    const documents        = ref<Document[]>([])
     const document_        = ref<Document>()
     const concepts         = ref<Concept[]>([])
     const loading          = ref(false)
@@ -216,7 +214,7 @@ export default defineComponent({
       if (!documentApi) return
 
       if (idx !== undefined) {
-        documentIds.value.length = 0;
+        documents.value.length = 0;
         if (changedConceptMode !== true) {
           if (conceptMode.value === 'exclusive') {
             selectedConcepts.value.length = 0
@@ -234,14 +232,14 @@ export default defineComponent({
 
       if (selectedConcepts.value.length !== 0) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        await documentApi.getDocumentIdsByConceptIds(
+        await documentApi.getDocumentsByConceptIds(
           selectedConcepts.value.map(selConcept => {
             return concepts.value[selConcept].id
           }), conceptMode.value, undefined, mostImportantNodes.value
         )
           .then(r => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
-            documentIds.value = r.data.map(doc => doc.id).filter(id => id !== undefined) as string[]
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+            documents.value = r.data//.map(doc => doc.id).filter(id => id !== undefined) as string[]
           })
           .catch((e: Error) => renderError(e))
       } else {document_.value = undefined}
@@ -281,7 +279,7 @@ export default defineComponent({
       t,
       splitterModel: ref(20),
       document_,
-      documentIds,
+      documents,
       concepts,
       loading,
       reload,
@@ -292,7 +290,11 @@ export default defineComponent({
       chooseConcept,
       async chooseDocument (documentId: string) {
         if (!documentApi) return
-        await documentApi.getDocumentById(documentId)
+        await documentApi.getDocumentById(documentId,
+          selectedConcepts.value.map(selConcept => {
+            return concepts.value[selConcept].id
+          })
+        )
           .then(r => {
             document_.value = r.data
           })
