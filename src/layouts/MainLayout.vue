@@ -247,9 +247,7 @@ export default defineComponent({
       forkOrigin,
       showForkCreateDialog: ref(false),
 
-      editAccountUrl: process.env.OAUTH2_URL && process.env.OAUTH2_REALM
-        ? `${process.env.OAUTH2_URL}/realms/${process.env.OAUTH2_REALM}/account`
-        : '',
+      editAccountUrl: keycloak?.createAccountUrl(),
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value
