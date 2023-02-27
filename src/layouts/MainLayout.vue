@@ -69,10 +69,17 @@
           >
             <q-menu>
               <div class="row no-wrap q-pa-md">
-                <div class="column">
+                <div class="column items-center">
                   <div class="text-h6 q-mb-md">
                     {{ t('setting', 2) }}
                   </div>
+                  <q-btn
+                    flat
+                    no-caps
+                    :label="t('editAccount')"
+                    :href="editAccountUrl"
+                    target="_blank"
+                  />
                 </div>
                 <q-separator vertical inset class="q-mx-lg" />
                 <div class="column items-center">
@@ -239,6 +246,10 @@ export default defineComponent({
       keycloak,
       forkOrigin,
       showForkCreateDialog: ref(false),
+
+      editAccountUrl: process.env.OAUTH2_URL && process.env.OAUTH2_REALM
+        ? `${process.env.OAUTH2_URL}/realms/${process.env.OAUTH2_REALM}/account`
+        : '',
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value

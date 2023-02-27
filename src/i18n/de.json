@@ -395,5 +395,6 @@
   },
   "revokePermission": "Berechtigung widerrufen|Berechtigungen widerrufen",
   "confirmDeleteOrganisationMembership": "Möchten Sie diese Mitgliedschaft wirklich löschen? Der Benutzer verliert seine Berechtigungen für diese Organisation!",
-  "add": "Hinzufügen"
+  "add": "Hinzufügen",
+  "editAccount": "Konto bearbeiten"
 }
