@@ -396,5 +396,8 @@
   "revokePermission": "Berechtigung widerrufen|Berechtigungen widerrufen",
   "confirmDeleteOrganisationMembership": "Möchten Sie diese Mitgliedschaft wirklich löschen? Der Benutzer verliert seine Berechtigungen für diese Organisation!",
   "add": "Hinzufügen",
-  "editAccount": "Konto bearbeiten"
+  "editAccount": "Konto bearbeiten",
+  "notAuthenticated": {
+    "onlyPrimaryVisible": "Sie sind nicht angemeldet, daher sind nur primäre Repositorien für Sie sichtbar."
+  }
 }

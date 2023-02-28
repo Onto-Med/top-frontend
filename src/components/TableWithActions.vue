@@ -51,6 +51,13 @@
         </slot>
       </q-tr>
     </template>
+    <template v-if="$slots.footer" #bottom-row>
+      <q-tr>
+        <q-td colspan="100%">
+          <slot name="footer" />
+        </q-td>
+      </q-tr>
+    </template>
   </q-table>
 </template>
 

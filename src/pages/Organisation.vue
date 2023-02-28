@@ -63,6 +63,10 @@
           :title="t('primaryRepositoryDescription')"
         />
       </template>
+      <template v-if="!isAuthenticated" #footer>
+        <q-icon name="info" />
+        {{ t('notAuthenticated.onlyPrimaryVisible') }}
+      </template>
     </table-with-actions>
 
     <repository-form
