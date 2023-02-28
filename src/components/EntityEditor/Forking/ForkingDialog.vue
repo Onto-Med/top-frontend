@@ -41,7 +41,7 @@
           >
             <q-td>{{ props.row.repository?.organisation?.name }}</q-td>
             <q-td>{{ props.row.repository?.name }}</q-td>
-            <q-td>{{ props.row.author ? props.row.author : '' }}</q-td>
+            <q-td>{{ props.row.author }}</q-td>
             <q-td>{{ props.row.createdAt ? d(props.row.createdAt, 'long') : '' }}</q-td>
           </q-tr>
         </template>
