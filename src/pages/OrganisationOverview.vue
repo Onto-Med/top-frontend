@@ -91,6 +91,18 @@ export default defineComponent({
       void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
     }
 
+    const updateRow = (organisation: Organisation) => {
+      const index = organisations.value.findIndex((o) => o.id === organisation.id)
+      if (index !== -1)
+        organisations.value[index] = organisation
+    }
+
+    const removeRow = (organisation: Organisation) => {
+      const index = organisations.value.findIndex((o) => o.id === organisation.id)
+      if (index !== -1)
+        organisations.value.splice(index, 1)
+    }
+
     onMounted(async () => {
       await reload()
     })
@@ -124,8 +136,9 @@ export default defineComponent({
           })
           .then(() => {
             if (organisation.createdAt)
-              return reload()
-            routeToOrganisation(organisation)
+              updateRow(organisation)
+            else
+              routeToOrganisation(organisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
@@ -138,7 +151,7 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingDeleted', { thing: t('organisation') }), 'positive')
-            void reload()
+            removeRow(organisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)

@@ -139,6 +139,18 @@ export default defineComponent({
       void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
     }
 
+    const updateRow = (repository: Repository) => {
+      const index = repositories.value.findIndex((r) => r.id === repository.id)
+      if (index !== -1)
+        repositories.value[index] = repository
+    }
+
+    const removeRow = (repository: Repository) => {
+      const index = repositories.value.findIndex((r) => r.id === repository.id)
+      if (index !== -1)
+        repositories.value.splice(index, 1)
+    }
+
     onMounted(async () => {
       await reload()
     })
@@ -177,8 +189,9 @@ export default defineComponent({
           })
           .then(() => {
             if (repository.createdAt)
-              return reload()
-            routeToEditor(repository)
+              updateRow(repository)
+            else
+              routeToEditor(repository)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
@@ -192,7 +205,7 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingDeleted', { thing: t('repository') }), 'positive')
-            void reload()
+            removeRow(repository)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
