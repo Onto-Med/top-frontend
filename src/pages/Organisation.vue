@@ -134,6 +134,11 @@ export default defineComponent({
         .finally(() => loading.value = false)
     }
 
+    const routeToEditor = (repository: Repository) => {
+      if (!organisation.value) return
+      void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
+    }
+
     onMounted(async () => {
       await reload()
     })
@@ -152,11 +157,7 @@ export default defineComponent({
       reload,
       newRepository,
       isAuthenticated,
-
-      routeToEditor (repository: Repository) {
-        if (!organisation.value) return
-        void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
-      },
+      routeToEditor,
 
       async saveRepository (repository: Repository) {
         if (!repositoryApi || !organisation.value) return
@@ -173,7 +174,11 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingSaved', { thing: t('repository') }), 'positive')
-            void reload()
+          })
+          .then(() => {
+            if (repository.createdAt)
+              return reload()
+            routeToEditor(repository)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)

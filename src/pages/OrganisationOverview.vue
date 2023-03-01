@@ -87,6 +87,10 @@ export default defineComponent({
         .finally(() => loading.value = false)
     }
 
+    const routeToOrganisation = (organisation: Organisation) => {
+      void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
+    }
+
     onMounted(async () => {
       await reload()
     })
@@ -101,9 +105,7 @@ export default defineComponent({
       showForm,
       isAuthenticated,
       newOrganisation,
-      routeToOrganisation (organisation: Organisation) {
-        void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
-      },
+      routeToOrganisation,
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return
         saving.value = true
@@ -119,7 +121,11 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingSaved', { thing: t('organisation') }), 'positive')
-            void reload()
+          })
+          .then(() => {
+            if (organisation.createdAt)
+              return reload()
+            routeToOrganisation(organisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
