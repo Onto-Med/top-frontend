@@ -7,8 +7,10 @@
     :label="modelValue ? '' : label || t('selectThing', { thing: t('user') })"
     :options="options"
     :loading="loading"
-    :title="t('entitySearchInput.description', { minLength: minLength, types: t('organisation', 2) })"
+    :title="t('entitySearchInput.description', { minLength: minLength, types: t('user', 2) })"
+    :virtual-scroll-item-size="50"
     @filter="filterFn"
+    @virtual-scroll="onScroll"
     @update:model-value="$emit('update:model-value', $event)"
   >
     <template #selected>
@@ -29,7 +31,7 @@
     <template #no-option>
       <q-item>
         <q-item-section>
-          {{ t('entitySearchInput.emptyResult', { types: t('organisation', 2) }) }}
+          {{ t('entitySearchInput.emptyResult', { types: t('user', 2) }) }}
         </q-item-section>
       </q-item>
     </template>
@@ -37,10 +39,12 @@
 </template>
 
 <script lang="ts">
-import { User } from '@onto-med/top-api';
-import { defineComponent, ref, inject } from 'vue'
+import { User, UserPage } from '@onto-med/top-api';
+import { defineComponent, nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { UserApiKey } from 'src/boot/axios'
+import useNotify from 'src/mixins/useNotify';
+import ScrollDetails from 'src/mixins/ScrollDetails';
 
 export default defineComponent({
   props: {
@@ -53,25 +57,63 @@ export default defineComponent({
   },
   emits: ['update:model-value'],
   setup(props) {
-    const { t } = useI18n();
+    const { t } = useI18n()
+    const { renderError } = useNotify()
     const userApi = inject(UserApiKey)
     const options = ref<User[]>([])
     const loading = ref(false)
+    const prevInput  = ref(undefined as string|undefined)
+    const nextPage   = ref(2)
+    const totalPages = ref(0)
+
+    const loadOptions = async (input: string|undefined, page = 1): Promise<UserPage> => {
+      if (!userApi) return Promise.reject({ message: 'Could not load data from the server.' })
+      return userApi.getUsers(input, undefined, page)
+        .then(r => r.data)
+    }
 
     return {
       t,
       options,
       loading,
 
-      async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
-        if (!userApi || val.length < props.minLength) {
+      filterFn (input: string, update: (arg0: () => void) => void, abort: () => void) {
+        if (input.length < props.minLength) {
           abort()
           return
         }
-
+        prevInput.value = input
         loading.value = true
-        await userApi.getUsers(val)
-          .then((r) => update(() => options.value = r.data.content))
+        nextPage.value = 2
+        totalPages.value = 0
+        loading.value = true
+        loadOptions(input)
+          .then(page => {
+            totalPages.value = page.totalPages
+            update(() => options.value = page.content)
+          })
+          .catch((e: Error) => renderError(e))
+          .finally(() => loading.value = false)
+      },
+
+      onScroll ({ to, direction, ref }: ScrollDetails) {
+        const lastIndex = options.value.length - 1
+        if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
+          return
+        loading.value = true
+        loadOptions(prevInput.value, nextPage.value)
+          .then(page => {
+            totalPages.value = page.totalPages
+            if (page.content.length > 0) {
+              nextPage.value++
+              options.value = options.value.concat(page.content)
+              void nextTick(() => {
+                ref.refresh()
+                loading.value = false
+              })
+            }
+          })
+          .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       }
     }
