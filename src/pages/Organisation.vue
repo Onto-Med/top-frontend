@@ -134,6 +134,23 @@ export default defineComponent({
         .finally(() => loading.value = false)
     }
 
+    const routeToEditor = (repository: Repository) => {
+      if (!organisation.value) return
+      void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
+    }
+
+    const updateRow = (repository: Repository) => {
+      const index = repositories.value.findIndex((r) => r.id === repository.id)
+      if (index !== -1)
+        repositories.value[index] = repository
+    }
+
+    const removeRow = (repository: Repository) => {
+      const index = repositories.value.findIndex((r) => r.id === repository.id)
+      if (index !== -1)
+        repositories.value.splice(index, 1)
+    }
+
     onMounted(async () => {
       await reload()
     })
@@ -152,11 +169,7 @@ export default defineComponent({
       reload,
       newRepository,
       isAuthenticated,
-
-      routeToEditor (repository: Repository) {
-        if (!organisation.value) return
-        void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
-      },
+      routeToEditor,
 
       async saveRepository (repository: Repository) {
         if (!repositoryApi || !organisation.value) return
@@ -173,7 +186,12 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingSaved', { thing: t('repository') }), 'positive')
-            void reload()
+          })
+          .then(() => {
+            if (repository.createdAt)
+              updateRow(repository)
+            else
+              routeToEditor(repository)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
@@ -187,7 +205,7 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingDeleted', { thing: t('repository') }), 'positive')
-            void reload()
+            removeRow(repository)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)

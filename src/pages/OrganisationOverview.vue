@@ -87,6 +87,22 @@ export default defineComponent({
         .finally(() => loading.value = false)
     }
 
+    const routeToOrganisation = (organisation: Organisation) => {
+      void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
+    }
+
+    const updateRow = (organisation: Organisation) => {
+      const index = organisations.value.findIndex((o) => o.id === organisation.id)
+      if (index !== -1)
+        organisations.value[index] = organisation
+    }
+
+    const removeRow = (organisation: Organisation) => {
+      const index = organisations.value.findIndex((o) => o.id === organisation.id)
+      if (index !== -1)
+        organisations.value.splice(index, 1)
+    }
+
     onMounted(async () => {
       await reload()
     })
@@ -101,9 +117,7 @@ export default defineComponent({
       showForm,
       isAuthenticated,
       newOrganisation,
-      routeToOrganisation (organisation: Organisation) {
-        void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
-      },
+      routeToOrganisation,
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return
         saving.value = true
@@ -119,7 +133,12 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingSaved', { thing: t('organisation') }), 'positive')
-            void reload()
+          })
+          .then(() => {
+            if (organisation.createdAt)
+              updateRow(organisation)
+            else
+              routeToOrganisation(organisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
@@ -132,7 +151,7 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingDeleted', { thing: t('organisation') }), 'positive')
-            void reload()
+            removeRow(organisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
