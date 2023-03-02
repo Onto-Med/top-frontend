@@ -82,7 +82,7 @@ export default defineComponent({
       if (!organisationApi) return
       loading.value = true
       await organisationApi.getOrganisations()
-        .then(r => organisations.value = r.data)
+        .then(r => organisations.value = r.data.content)
         .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     }

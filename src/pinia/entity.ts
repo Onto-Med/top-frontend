@@ -43,7 +43,7 @@ export const useEntity = defineStore('entity', {
       await this.entityApi?.getRootEntitiesByRepositoryId(organisationId, repositoryId)
         .then((r) => {
           if (organisationId === this.organisationId && repositoryId === this.repositoryId)
-            this.entities = r.data
+            this.entities = r.data.content
         })
     },
 

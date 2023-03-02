@@ -54,7 +54,7 @@ import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { RepositoryApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
-import { Repository } from '@onto-med/top-api'
+import { Repository, RepositoryPage } from '@onto-med/top-api'
 
 export default defineComponent({
   name: 'RepositorySelectField',
@@ -90,14 +90,14 @@ export default defineComponent({
         }
 
         loading.value = true
-        let promise: Promise<AxiosResponse<Repository[]>>
+        let promise: Promise<AxiosResponse<RepositoryPage>>
         if (props.organisationId) {
           promise = repositoryApi.getRepositoriesByOrganisationId(props.organisationId, undefined, val)
         } else {
           promise = repositoryApi.getRepositories(undefined, val)
         }
         await promise
-          .then((r) => update(() => options.value = r.data))
+          .then((r) => update(() => options.value = r.data.content))
           .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },

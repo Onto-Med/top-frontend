@@ -70,7 +70,7 @@ export default defineComponent({
 
         loading.value = true
         await organisationApi.getOrganisations(undefined, val)
-          .then((r) => update(() => options.value = r.data))
+          .then((r) => update(() => options.value = r.data.content))
           .finally(() => loading.value = false)
       }
     }

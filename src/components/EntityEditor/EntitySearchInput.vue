@@ -95,7 +95,7 @@
 <script lang="ts">
 import { defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, Entity, Repository, DataType, ItemType } from '@onto-med/top-api'
+import { EntityType, Entity, Repository, DataType, ItemType, EntityPage } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -150,7 +150,7 @@ export default defineComponent({
 
     const loadOptions = async (input: string, page = 1): Promise<Entity[]> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      let promise: Promise<AxiosResponse<Entity[]>>
+      let promise: Promise<AxiosResponse<EntityPage>>
       if (props.organisationId && props.repositoryId) {
         promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
       } else if (repository.value && repository.value.organisation) {
@@ -158,7 +158,7 @@ export default defineComponent({
       } else {
         promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, undefined, true, page)
       }
-      return promise.then((r) => r.data)
+      return promise.then((r) => r.data.content)
     }
 
     return {

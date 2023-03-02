@@ -129,7 +129,7 @@ export default defineComponent({
       loading.value = true
 
       await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id)
-        .then(r => repositories.value = r.data)
+        .then(r => repositories.value = r.data.content)
         .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     }
