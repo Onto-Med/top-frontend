@@ -6,6 +6,7 @@
         :columns="cols"
         :loading="loading"
         :no-data-label="t('noDataPresent')"
+        :rows-per-page-options="[0]"
         flat
         hide-pagination
         row-key="id"
