@@ -399,5 +399,6 @@
   "editAccount": "Edit account",
   "notAuthenticated": {
     "onlyPrimaryVisible": "You are not logged in, so only primary repositories will be visible to you."
-  }
+  },
+  "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results"
 }

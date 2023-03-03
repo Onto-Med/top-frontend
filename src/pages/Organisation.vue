@@ -32,12 +32,12 @@
 
     <table-with-actions
       :name="t('repository')"
-      :rows="repositories"
+      :page="repositories"
       :loading="loading"
       :create="isAuthenticated"
       @row-clicked="routeToEditor($event)"
-      @reload-clicked="reload()"
       @create-clicked="repository = newRepository(); showForm = true"
+      @request="reload"
     >
       <template #actions="{ row }">
         <q-btn
@@ -89,7 +89,7 @@ import { useRouter } from 'vue-router'
 import useNotify from 'src/mixins/useNotify'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { RepositoryApiKey } from 'src/boot/axios'
-import { Repository } from '@onto-med/top-api'
+import { Repository, RepositoryPage } from '@onto-med/top-api'
 import TableWithActions from 'src/components/TableWithActions.vue'
 import RepositoryForm from 'src/components/Repository/RepositoryForm.vue'
 import MembershipDialog from 'src/components/Organisation/MembershipDialog.vue'
@@ -117,19 +117,26 @@ export default defineComponent({
     const organisationApi = inject(OrganisationApiKey)
     const repositoryApi = inject(RepositoryApiKey)
     const { organisation } = storeToRefs(useEntity())
-    const repositories = ref<Repository[]>([])
+    const repositories = ref<RepositoryPage>({
+      content: [],
+      number: 1,
+      size: 0,
+      totalElements: 0,
+      totalPages: 0,
+      type: 'repository'
+    })
     const newRepository = () => {
       return { id: (uuidv4 as () => string)(), primary: false } as Repository
     }
     const repository = ref(newRepository())
     const { isAuthenticated } = storeToRefs(useEntity())
 
-    const reload = async () => {
+    const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!repositoryApi || !organisation.value) return
       loading.value = true
 
-      await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id)
-        .then(r => repositories.value = r.data.content)
+      await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id, undefined, filter, undefined, page)
+        .then(r => repositories.value = r.data)
         .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
     }
@@ -140,15 +147,17 @@ export default defineComponent({
     }
 
     const updateRow = (repository: Repository) => {
-      const index = repositories.value.findIndex((r) => r.id === repository.id)
+      const index = repositories.value.content.findIndex((r) => r.id === repository.id)
       if (index !== -1)
-        repositories.value[index] = repository
+        repositories.value.content[index] = repository
     }
 
     const removeRow = (repository: Repository) => {
-      const index = repositories.value.findIndex((r) => r.id === repository.id)
-      if (index !== -1)
-        repositories.value.splice(index, 1)
+      const index = repositories.value.content.findIndex((r) => r.id === repository.id)
+      if (index !== -1) {
+        repositories.value.content.splice(index, 1)
+        repositories.value.totalElements--
+      }
     }
 
     onMounted(async () => {
