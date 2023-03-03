@@ -1,13 +1,13 @@
 <template>
   <q-select
-    v-model="itemType"
+    v-model="permission"
     :stack-label="required"
     emit-value
     map-options
     :readonly="readonly"
-    :label="label || t('itemType.title')"
+    :label="label || t('permission')"
     :options="localOptions"
-    :error="required ? !itemType : false"
+    :error="required ? !permission : false"
     :clearable="!required"
   >
     <template v-if="tooltip" #option="scope">
@@ -17,49 +17,48 @@
         </q-item-section>
       </q-item>
     </template>
-    <template v-if="description" #after>
-      <q-icon name="help" :title="t('itemType.description')" />
-    </template>
   </q-select>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ItemType } from '@onto-med/top-api'
+import { Permission } from '@onto-med/top-api'
 
 export default defineComponent({
   props: {
-    modelValue: String,
+    modelValue: String as () => Permission,
     label: String,
-    options: Array as () => ItemType[],
+    options: Array as () => Permission[],
     readonly: Boolean,
     required: Boolean,
-    description: Boolean,
-    tooltip: Boolean
+    tooltip: {
+      type: Boolean,
+      default: true
+    }
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
-    const itemType = computed({
+    const permission = computed({
       get (): string { return props.modelValue as string },
       set (value: string): void { emit('update:modelValue', value) }
     })
 
     return {
       t,
-      itemType,
+      permission,
       localOptions: computed(() =>
-        (props.options ? props.options : Object.values(ItemType))
+      (props.options ? props.options : Object.values(Permission))
           .map(d => {
             return {
-              label: te('itemTypes.' + d) ? t('itemTypes.' + d) : d,
+              label: te('permissions.' + d) ? t('permissions.' + d) : d,
               value: d,
-              title: te('itemTypeDescriptions.' + d) ? t('itemTypeDescriptions.' + d) : ''
+              title: te('permissionDescriptions.' + d) ? t('permissionDescriptions.' + d) : ''
             }
           })
-          .sort((a, b) => a.label.localeCompare(b.label)))
+      )
     }
   }
 })

@@ -50,8 +50,8 @@
             </q-td>
             <q-td>{{ props.row.version }}</q-td>
             <q-td>{{ getTitle(props.row) }}</q-td>
-            <q-td>{{ props.row.author ? props.row.author.username : '' }}</q-td>
-            <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
+            <q-td>{{ props.row.author }}</q-td>
+            <q-td>{{ props.row.createdAt ? d(props.row.createdAt, 'long') : '' }}</q-td>
           </q-tr>
         </template>
       </q-table>

@@ -15,6 +15,7 @@
           color="accent"
           dense
           no-caps
+          :disabled="readonly"
           :label="t('restore')"
           :title="t('versionRestoreDescription')"
           @click.stop="$emit('restoreVersion', local)"
@@ -26,7 +27,7 @@
           color="primary"
           :label="t('save')"
           :title="t('ctrl') + '+S'"
-          :disabled="!dirty && !isNew"
+          :disabled="readonly || !dirty && !isNew"
           @click="save()"
         />
         <q-btn
@@ -44,7 +45,7 @@
           color="grey-7"
           :label="t('reset')"
           :disable="!dirty"
-          @click="showClearDialog = true"
+          @click="showClearDialog"
         />
         <q-separator vertical class="gt-xs" />
         <div class="gt-xs">
@@ -112,26 +113,6 @@
         </q-card>
       </q-dialog>
 
-      <q-dialog v-model="showClearDialog">
-        <q-card>
-          <q-card-section class="row items-center">
-            <q-item>
-              <q-item-section avatar>
-                <q-avatar icon="warning_amber" color="warning" text-color="white" />
-              </q-item-section>
-              <q-item-section v-t="'confirmDiscardChanges'" />
-            </q-item>
-          </q-card-section>
-
-          <q-separator />
-
-          <q-card-actions align="right">
-            <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-            <q-btn v-close-popup flat :label="t('ok')" color="primary" @click="$emit('reset'); restrictionKey++" />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-
       <version-history-dialog
         :key="versionHistoryDialogKey"
         v-model:show="showVersionHistory"
@@ -167,7 +148,7 @@
       :version="version"
       :repository-id="repositoryId"
       :organisation-id="organisationId"
-      :readonly="isOtherVersion"
+      :readonly="isOtherVersion || readonly"
       :restriction-key="restrictionKey"
       @update:titles="$emit('update:entity', { ...local, titles: $event })"
       @update:synonyms="$emit('update:entity', { ...local, synonyms: $event })"
@@ -199,11 +180,12 @@ import { EntityType, DataType, Category, Phenotype } from '@onto-med/top-api'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import ForkingDialog from 'src/components/EntityEditor/Forking/ForkingDialog.vue'
 import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
+import Dialog from 'src/components/Dialog.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
 import { EntityApiKey } from 'src/boot/axios'
-import { copyToClipboard } from 'quasar'
+import { copyToClipboard, useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
@@ -235,7 +217,8 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    dirty: Boolean
+    dirty: Boolean,
+    readonly: Boolean
   },
   emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'save', 'reset'],
   setup (props, { emit }) {
@@ -252,11 +235,11 @@ export default defineComponent({
     const showJson  = ref(false)
     const loading   = ref(false)
     const showVersionHistory = ref(false)
-    const showClearDialog    = ref(false)
     const restrictionKey     = ref(0)
     const showSuperCategoryInput = ref(false)
     const versionHistoryDialogKey = ref(1)
     const isNew = computed(() => !local.value.version)
+    const $q = useQuasar()
 
     watch(
       () => props.entity,
@@ -335,7 +318,6 @@ export default defineComponent({
       showVersionHistory,
       showForking: ref(false),
       loading,
-      showClearDialog,
       restrictionKey,
       EntityType,
       DataType,
@@ -373,6 +355,18 @@ export default defineComponent({
       copyToClipboard (text: unknown): void {
         copyToClipboard(JSON.stringify(text))
           .catch(() => notify(t('copyFailed')))
+      },
+
+      showClearDialog () {
+        $q.dialog({
+          component: Dialog,
+          componentProps: {
+            message: t('confirmDiscardChanges')
+          }
+        }).onOk(() => {
+          emit('reset')
+          restrictionKey.value++
+        })
       }
     }
   }

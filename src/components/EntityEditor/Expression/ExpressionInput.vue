@@ -14,7 +14,7 @@
             :label="scores ? t('score', 2) : t('expression')"
             color="primary"
             size="sm"
-            @update:model-value="$emit('update:modelValue', { functionId: $event ? 'switch' : undefined })"
+            @update:model-value="toggleExpressionType($event)"
           />
         </span>
       </q-toolbar-title>
@@ -29,9 +29,8 @@
         @update:model-value="$emit('update:modelValue', $event)"
       />
       <expression-argument-input
-        v-else-if="functions"
+        v-else
         class="text-subtitle1"
-        :functions="functions"
         :readonly="readonly"
         :class="{ monospace: monospace }"
         :model-value="modelValue"
@@ -54,7 +53,7 @@
         icon="clear"
         :disable="readonly"
         :title="t('clearAll')"
-        @click.stop="showClearDialog = true"
+        @click.stop="showClearDialog"
       />
       <q-btn
         flat
@@ -73,31 +72,6 @@
         </q-menu>
       </q-btn>
     </template>
-
-    <template #append>
-      <q-dialog v-model="showClearDialog">
-        <q-card>
-          <q-card-section class="row items-center">
-            <q-avatar icon="warning_amber" color="warning" text-color="white" />
-            <span v-t="'confirmClearExpression'" class="q-ml-sm" />
-          </q-card-section>
-
-          <q-separator />
-
-          <q-card-actions align="right">
-            <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-            <q-btn
-              v-close-popup
-              flat
-              :label="t('ok')"
-              :disable="readonly"
-              color="primary"
-              @click="$emit('update:modelValue', {})"
-            />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-    </template>
   </expandable-card>
 </template>
 
@@ -107,8 +81,9 @@ import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import ExpressionArgumentInput from 'src/components/EntityEditor/Expression/ExpressionArgumentInput.vue'
 import SwitchInput from 'src/components/EntityEditor/Expression/SwitchInput.vue'
-import { EntityType, Expression, ExpressionFunction } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity'
+import Dialog from 'src/components/Dialog.vue'
+import { EntityType, Expression } from '@onto-med/top-api'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -143,21 +118,46 @@ export default defineComponent({
     }
   },
   emits: ['update:modelValue', 'entityClicked'],
-  setup (props) {
+  setup (props, { emit }) {
     const { t } = useI18n()
-    const entityStore = useEntity()
-    const functions = ref(undefined as ExpressionFunction[]|undefined)
-
-    void entityStore.getFunctions(props.functionType)
-      .then(o => functions.value = o)
+    const $q = useQuasar()
 
     return {
       t,
       expandExpression: ref(false),
       indent: ref(2),
-      showClearDialog: ref(false),
-      functions,
-      scores: computed(() => props.modelValue && props.modelValue.functionId === 'switch')
+      scores: computed(() => props.modelValue && props.modelValue.functionId === 'switch'),
+
+      showClearDialog () {
+        $q.dialog({
+          component: Dialog,
+          componentProps: {
+            message: t('confirmClearExpression')
+          }
+        }).onOk(() =>
+          emit('update:modelValue', {})
+        )
+      },
+
+      toggleExpressionType (state: boolean) {
+        if (
+          (props.modelValue.functionId && props.modelValue.functionId !== 'switch')
+          || props.modelValue.arguments
+          || props.modelValue.constantId
+          || props.modelValue.entityId
+        ) {
+          $q.dialog({
+            component: Dialog,
+            componentProps: {
+              message: t('confirmChangeExpressionType')
+            }
+          }).onOk(() =>
+            emit('update:modelValue', { functionId: state ? 'switch' : undefined })
+          )
+        } else {
+          emit('update:modelValue', { functionId: state ? 'switch' : undefined })
+        }
+      }
     }
   }
 })

@@ -7,28 +7,31 @@ import { v4 as uuidv4 } from 'uuid'
 export const useEntity = defineStore('entity', {
   state: () => {
     return {
-      organisationId: undefined as string|undefined,
-      repositoryId: undefined as string|undefined,
-      organisation: undefined as Organisation|undefined,
-      repository: undefined as Repository|undefined,
+      organisationId: undefined as string | undefined,
+      repositoryId: undefined as string | undefined,
+      organisation: undefined as Organisation | undefined,
+      repository: undefined as Repository | undefined,
       entities: [] as Entity[],
-      dataSources: undefined as DataSource[]|undefined,
-      constants: undefined as Constant[]|undefined,
-      functions: new Map<string, ExpressionFunction[]>(),
-      converters: undefined as Converter[]|undefined,
-      keycloak: undefined as KeycloakInstance|undefined,
-      entityApi: undefined as EntityApi|undefined,
-      expressionConstantApi: undefined as ExpressionConstantApi|undefined,
-      expressionFunctionApi: undefined as ExpressionFunctionApi|undefined,
-      organisationApi: undefined as OrganisationApi|undefined,
-      repositoryApi: undefined as RepositoryApi|undefined,
-      forkApi: undefined as ForkApi|undefined,
-      dataSourceApi: undefined as DataSourceApi|undefined,
-      defaultApi: undefined as DefaultApi|undefined
+      dataSources: undefined as DataSource[] | undefined,
+      constants: undefined as Constant[] | undefined,
+      functions: undefined as ExpressionFunction[] | undefined,
+      converters: undefined as Converter[] | undefined,
+      keycloak: undefined as KeycloakInstance | undefined,
+      entityApi: undefined as EntityApi | undefined,
+      expressionConstantApi: undefined as ExpressionConstantApi | undefined,
+      expressionFunctionApi: undefined as ExpressionFunctionApi | undefined,
+      organisationApi: undefined as OrganisationApi | undefined,
+      repositoryApi: undefined as RepositoryApi | undefined,
+      forkApi: undefined as ForkApi | undefined,
+      dataSourceApi: undefined as DataSourceApi | undefined,
+      defaultApi: undefined as DefaultApi | undefined
     }
   },
+  getters: {
+    isAuthenticated: (state) => !state.keycloak || state.keycloak.authenticated
+  },
   actions: {
-    async reloadEntities () {
+    async reloadEntities() {
       if (!this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingParametersException',
@@ -44,32 +47,51 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async reloadDataSources () {
+    async reloadDataSources() {
       await this.dataSourceApi?.getDataSources()
         .then(r => this.dataSources = r.data)
     },
 
-    async reloadConstants () {
+    async reloadConstants() {
       await this.expressionConstantApi?.getExpressionConstants()
         .then(r => this.constants = r.data)
     },
 
-    async reloadFunctionsByType (type: string) {
-      await this.expressionFunctionApi?.getExpressionFunctions(type)
-        .then((r) => this.functions.set(type, r.data))
+    async reloadFunctions() {
+      await this.expressionFunctionApi?.getExpressionFunctions()
+        .then(r => {
+          this.functions = [
+            {
+              id: 'Entity',
+              title: 'entity',
+              type: 'component',
+              minArgumentNumber: 1,
+              maxArgumentNumber: 1
+            } as ExpressionFunction,
+            {
+              id: 'Constant',
+              title: 'constant',
+              type: 'component',
+              minArgumentNumber: 1,
+              maxArgumentNumber: 1
+            } as ExpressionFunction
+          ].concat(r.data)
+        })
     },
 
-    async reloadFunctions () {
-      await this.reloadFunctionsByType('math')
+    async getFunction(type: string, ...id: string[]): Promise<ExpressionFunction[]> {
+      if (!this.functions)
+        await this.reloadFunctions()
+      return this.functions?.filter(f => f.type === type && id.includes(f.id)) || []
     },
 
-    async setOrganisation (organisationId: string|undefined) {
+    async setOrganisation(organisationId: string | undefined) {
       if (this.organisationId !== organisationId) {
-        this.entities       = []
+        this.entities = []
         this.organisationId = organisationId
-        this.organisation   = undefined
-        this.repositoryId   = undefined
-        this.repository     = undefined
+        this.organisation = undefined
+        this.repositoryId = undefined
+        this.repository = undefined
       }
       if (!organisationId || this.organisation) return
       await this.organisationApi?.getOrganisationById(organisationId)
@@ -79,7 +101,7 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async setRepository (repositoryId: string|undefined) {
+    async setRepository(repositoryId: string | undefined) {
       if (this.repositoryId !== repositoryId) {
         this.entities = []
         this.repositoryId = repositoryId
@@ -95,49 +117,24 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async getDataSources (): Promise<DataSource[]> {
+    async getDataSources(): Promise<DataSource[]> {
       if (!this.dataSources)
         await this.reloadDataSources()
       return this.dataSources || []
     },
 
-    async getConstants (): Promise<Constant[]> {
+    async getConstants(): Promise<Constant[]> {
       if (!this.constants)
         await this.reloadConstants()
       return this.constants || []
     },
 
-    async getFunctions (type: string): Promise<ExpressionFunction[]> {
-      if (!this.functions.get(type))
-        await this.reloadFunctionsByType(type)
-      return [
-        {
-          id: 'entity',
-          title: 'entity',
-          minArgumentNumber: 1,
-          maxArgumentNumber: 1
-        } as ExpressionFunction,
-        {
-          id: 'constant',
-          title: 'constant',
-          minArgumentNumber: 1,
-          maxArgumentNumber: 1
-        } as ExpressionFunction
-      ].concat(this.functions.get(type) || [])
-    },
-
-    async getFunction (type: string, ...id: string[]): Promise<ExpressionFunction[]> {
-      if (!this.functions.get(type))
-        await this.reloadFunctionsByType(type)
-      return (this.functions.get(type) || []).filter(f => id.includes(f.id))
-    },
-
-    getEntity (id: string|undefined): Entity|undefined {
+    getEntity(id: string | undefined): Entity | undefined {
       if (!id) return undefined
       return this.entities.find(e => e.id === id)
     },
 
-    loadEntity (id: string|undefined, ignorelocal = false): Promise<Entity|undefined> {
+    loadEntity(id: string | undefined, ignorelocal = false): Promise<Entity | undefined> {
       return Promise.resolve()
         .then(() => {
           if (!ignorelocal) {
@@ -171,18 +168,18 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    addEntity (entityType: EntityType, superClassId: string): Entity {
+    addEntity(entityType: EntityType, superClassId: string): Entity {
       const entity = { id: (uuidv4 as () => string)(), entityType: entityType } as Entity
 
       const superClass = this.getEntity(superClassId)
-      if (superClass && [ EntityType.CompositePhenotype, EntityType.SinglePhenotype ].includes(superClass.entityType)) {
+      if (superClass && [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(superClass.entityType)) {
         (entity as Phenotype).dataType = (superClass as Phenotype).dataType
         if (this.hasRestriction(entity))
           entity.restriction = {
             type: entity.dataType,
             quantifier: Quantifier.Min,
             cardinality: 1
-          } as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction
+          } as NumberRestriction | StringRestriction | BooleanRestriction | DateTimeRestriction
       }
 
       if (superClass) {
@@ -194,7 +191,7 @@ export const useEntity = defineStore('entity', {
         if (this.isPhenotype(superClass)) {
           (entity as Phenotype).superPhenotype = short
         } else {
-          (entity as Category).superCategories = [ short ]
+          (entity as Category).superCategories = [short]
         }
       }
 
@@ -203,7 +200,7 @@ export const useEntity = defineStore('entity', {
       return entity
     },
 
-    addDuplicate (entity: Entity): Entity {
+    addDuplicate(entity: Entity): Entity {
       const duplicate = JSON.parse(JSON.stringify(entity)) as Entity
       duplicate.id = (uuidv4 as () => string)()
       duplicate.version = undefined
@@ -213,7 +210,7 @@ export const useEntity = defineStore('entity', {
       return duplicate
     },
 
-    async forkEntity (entity: Entity, forkingInstruction: ForkingInstruction): Promise<number> {
+    async forkEntity(entity: Entity, forkingInstruction: ForkingInstruction): Promise<number> {
       if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return 0
 
       const organisationId = this.organisationId
@@ -239,13 +236,13 @@ export const useEntity = defineStore('entity', {
       })
     },
 
-    addOrReplaceEntity (entity: Entity): void {
+    addOrReplaceEntity(entity: Entity): void {
       const index = this.entities.findIndex(e => e.id === entity.id)
       if (index !== -1) this.entities.splice(index, 1)
       this.entities.push(entity)
     },
 
-    async saveEntity (entity: Entity) {
+    async saveEntity(entity: Entity) {
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
 
@@ -276,7 +273,7 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async deleteEntity (entity: Entity) {
+    async deleteEntity(entity: Entity) {
       const index = this.entities.findIndex(e => e.id === entity.id)
       if (index === -1) return
 
@@ -298,7 +295,7 @@ export const useEntity = defineStore('entity', {
       }
 
       if (this.isCategory(entity)) {
-        this.entities.filter((e: Category|Phenotype) => this.hasSuperCategory(e, entity)).forEach((e: Category|Phenotype) => {
+        this.entities.filter((e: Category | Phenotype) => this.hasSuperCategory(e, entity)).forEach((e: Category | Phenotype) => {
           e.superCategories = e.superCategories?.filter(c => c.id !== entity.id)
           if (entity.superCategories) e.superCategories?.push(...(entity.superCategories))
         })
@@ -307,7 +304,7 @@ export const useEntity = defineStore('entity', {
       }
     },
 
-    async deleteVersion (entity: Entity) {
+    async deleteVersion(entity: Entity) {
       if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
@@ -317,7 +314,7 @@ export const useEntity = defineStore('entity', {
       await this.entityApi.deleteEntityById(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
     },
 
-    async restoreVersion (entity: Entity) {
+    async restoreVersion(entity: Entity) {
       if (!entity || !entity.id || !entity.version || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
@@ -331,7 +328,7 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async loadChildren (entity: Entity): Promise<Entity[]> {
+    async loadChildren(entity: Entity): Promise<Entity[]> {
       if (!entity || !entity.id || !this.entityApi || !this.organisationId || !this.repositoryId)
         throw {
           name: 'MissingAttributesException',
@@ -345,27 +342,27 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    hasSuperCategory (entity: Category|Phenotype, category: Category): boolean {
+    hasSuperCategory(entity: Category | Phenotype, category: Category): boolean {
       return entity.superCategories?.findIndex(c => c.id === category.id) !== -1
     },
 
-    isCategory (entity: Entity): entity is Category {
+    isCategory(entity: Entity): entity is Category {
       return EntityType.Category === entity.entityType
     },
 
-    isPhenotype (entity: Entity): entity is Phenotype {
+    isPhenotype(entity: Entity): entity is Phenotype {
       return [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entity.entityType)
     },
 
-    isRestricted (entity: Entity): entity is Phenotype {
+    isRestricted(entity: Entity): entity is Phenotype {
       return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
     },
 
-    hasRestriction (entity: Entity): entity is Phenotype {
+    hasRestriction(entity: Entity): entity is Phenotype {
       return [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entity.entityType)
     },
 
-    async loadSuperPhenotype (phenotype: Phenotype|string): Promise<Phenotype|undefined> {
+    async loadSuperPhenotype(phenotype: Phenotype | string): Promise<Phenotype | undefined> {
       const entityId = phenotype.hasOwnProperty('id') ? (phenotype as Phenotype).id : phenotype as string
       return this.loadEntity(entityId)
         .then(restriction => {
@@ -374,7 +371,7 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async loadConverters () {
+    async loadConverters() {
       if (!this.converters)
         this.converters = (await this.defaultApi?.getConverters())?.data
     }

@@ -57,28 +57,35 @@
         <language-switch />
 
         <div v-if="keycloak">
-          <q-btn
-            v-if="keycloak.authenticated"
-            flat
-            dense
-            rounded
-            no-caps
-            :title="t('account')"
-            icon="account_circle"
-            class="q-ml-sm"
-          >
+          <q-btn v-if="keycloak.authenticated" flat dense round class="q-ml-sm">
+            <q-avatar
+              :title="t('account')"
+              color="primary"
+              text-color="white"
+              size="md"
+            >
+              {{ username ? username.substring(0, 1) : '' }}
+            </q-avatar>
+
             <q-menu>
               <div class="row no-wrap q-pa-md">
-                <div class="column">
+                <div class="column items-center">
                   <div class="text-h6 q-mb-md">
                     {{ t('setting', 2) }}
                   </div>
+                  <q-btn
+                    flat
+                    no-caps
+                    :label="t('editAccount')"
+                    :href="editAccountUrl"
+                    target="_blank"
+                  />
                 </div>
                 <q-separator vertical inset class="q-mx-lg" />
                 <div class="column items-center">
                   <q-avatar icon="person" size="72px" />
-                  <div class="text-subtitle1 q-mb-xs">
-                    {{ keycloak.tokenParsed?.preferred_username }}
+                  <div class="text-subtitle1 text-center q-mb-xs">
+                    {{ username }}
                   </div>
                   <q-btn
                     v-close-popup
@@ -94,11 +101,13 @@
           </q-btn>
           <q-btn
             v-else
-            flat
+            no-caps
             dense
-            round
+            rounded
             icon="login"
+            :label="smallScreen ? '' : t('logIn')"
             :title="t('logIn')"
+            color="primary"
             class="q-ml-sm"
             @click="keycloak?.login()"
           />
@@ -216,7 +225,6 @@ export default defineComponent({
         icon: 'groups',
         caption: t('collaborativeWork'),
         routeName: 'organisations',
-        isHidden: keycloak && !keycloak.authenticated
       },
       {
         title: t('document', 2),
@@ -240,6 +248,10 @@ export default defineComponent({
       keycloak,
       forkOrigin,
       showForkCreateDialog: ref(false),
+      smallScreen: computed(() => $q.screen.lt.md),
+      username: computed(() => (keycloak?.tokenParsed?.name || keycloak?.tokenParsed?.preferred_username) as string | undefined),
+
+      editAccountUrl: keycloak?.createAccountUrl(),
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value
@@ -280,7 +292,7 @@ export default defineComponent({
 <style lang="sass" scoped>
 .toolbar-input-container
   min-width: 100px
-  width: 55%
+  width: 40%
 .brand-link
   text-decoration: none
   color: inherit

@@ -251,7 +251,7 @@ export default defineComponent({
     }
 
     const aggregationFunctionOptions = ref([] as ExpressionFunction[])
-    entityStore.getFunction('math', 'last', 'first')
+    entityStore.getFunction('aggregate', 'Last', 'First')
       .then(r => aggregationFunctionOptions.value = r)
       .catch((e: Error) => renderError(e))
 
@@ -284,7 +284,7 @@ export default defineComponent({
       reloadEntities().catch((e: Error) => renderError(e))
       if (queryApi && organisation.value && repository.value)
         queryApi.getQueries(organisation.value.id, repository.value.id)
-          .then(r => r.data.forEach(q => {
+          .then(r => r.data.content.forEach(q => {
             const run = { query: q } as Run
             void updateRun(run).then(() => {
               if (!run.result) run.timer = buildQueryRunTimer(run)
@@ -326,7 +326,7 @@ export default defineComponent({
         if (!subject || !isPhenotype(subject) && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
-          defaultAggregationFunctionId: 'last',
+          defaultAggregationFunctionId: 'Last',
           inclusion: true,
           subjectId: subject.id as string
         })

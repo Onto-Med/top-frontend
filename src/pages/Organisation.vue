@@ -1,31 +1,47 @@
 <template>
   <q-page v-if="organisation" class="q-gutter-md">
     <q-card>
-      <q-card-section>
-        <div class="text-h6">
-          <q-icon name="groups" :title="t('organisation')" class="q-mr-sm q-tree__icon" />
-          {{ organisation.name }}
+      <q-card-section class="q-pb-none">
+        <div class="row">
+          <div class="col">
+            <div class="text-h6">
+              <q-icon name="groups" :title="t('organisation')" class="q-mr-sm q-tree__icon" />
+              {{ organisation.name }}
+            </div>
+            <small v-if="organisation.createdAt">
+              {{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}
+            </small>
+          </div>
+          <div v-if="isAuthenticated" class="col-auto">
+            <q-btn
+              v-if="isAuthenticated"
+              color="primary"
+              icon="settings"
+              :label="t('manageThing', { thing: t('permission', 2) })"
+              @click="showMembershipDialog()"
+            />
+          </div>
         </div>
-        <small v-if="organisation.createdAt">
-          {{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}
-        </small>
       </q-card-section>
-      <q-card-section>
-        {{ organisation.description }}
+      <q-separator />
+      <q-card-section class="q-pt-sm">
+        <b>{{ t('description') }}:</b>
+        <p>{{ organisation.description }}</p>
       </q-card-section>
     </q-card>
 
     <table-with-actions
       :name="t('repository')"
-      :rows="repositories"
+      :page="repositories"
       :loading="loading"
-      create
+      :create="isAuthenticated"
       @row-clicked="routeToEditor($event)"
-      @reload-clicked="reload()"
       @create-clicked="repository = newRepository(); showForm = true"
+      @request="reload"
     >
       <template #actions="{ row }">
         <q-btn
+          v-if="isAuthenticated"
           size="sm"
           color="primary"
           dense
@@ -38,6 +54,18 @@
           :title="t(row.repositoryType || 'repository')"
           class="q-ml-sm q-tree__icon"
         />
+        <q-chip
+          v-if="row.primary"
+          size="sm"
+          color="primary"
+          text-color="white"
+          :label="t('primary')"
+          :title="t('primaryRepositoryDescription')"
+        />
+      </template>
+      <template v-if="!isAuthenticated" #footer>
+        <q-icon name="info" />
+        {{ t('notAuthenticated.onlyPrimaryVisible') }}
       </template>
     </table-with-actions>
 
@@ -61,14 +89,16 @@ import { useRouter } from 'vue-router'
 import useNotify from 'src/mixins/useNotify'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { RepositoryApiKey } from 'src/boot/axios'
-import { Repository } from '@onto-med/top-api'
+import { Repository, RepositoryPage } from '@onto-med/top-api'
 import TableWithActions from 'src/components/TableWithActions.vue'
 import RepositoryForm from 'src/components/Repository/RepositoryForm.vue'
+import MembershipDialog from 'src/components/Organisation/MembershipDialog.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -77,6 +107,7 @@ export default defineComponent({
   },
   setup () {
     const { t, d } = useI18n()
+    const $q = useQuasar()
     const { notify, renderError } = useNotify()
     const { repositoryIcon } = useEntityFormatter()
     const router = useRouter()
@@ -86,20 +117,47 @@ export default defineComponent({
     const organisationApi = inject(OrganisationApiKey)
     const repositoryApi = inject(RepositoryApiKey)
     const { organisation } = storeToRefs(useEntity())
-    const repositories = ref<Repository[]>([])
+    const repositories = ref<RepositoryPage>({
+      content: [],
+      number: 1,
+      size: 0,
+      totalElements: 0,
+      totalPages: 0,
+      type: 'repository'
+    })
     const newRepository = () => {
       return { id: (uuidv4 as () => string)(), primary: false } as Repository
     }
     const repository = ref(newRepository())
+    const { isAuthenticated } = storeToRefs(useEntity())
 
-    const reload = async () => {
+    const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!repositoryApi || !organisation.value) return
       loading.value = true
 
-      await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id)
+      await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id, undefined, filter, undefined, page)
         .then(r => repositories.value = r.data)
         .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
+    }
+
+    const routeToEditor = (repository: Repository) => {
+      if (!organisation.value) return
+      void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
+    }
+
+    const updateRow = (repository: Repository) => {
+      const index = repositories.value.content.findIndex((r) => r.id === repository.id)
+      if (index !== -1)
+        repositories.value.content[index] = repository
+    }
+
+    const removeRow = (repository: Repository) => {
+      const index = repositories.value.content.findIndex((r) => r.id === repository.id)
+      if (index !== -1) {
+        repositories.value.content.splice(index, 1)
+        repositories.value.totalElements--
+      }
     }
 
     onMounted(async () => {
@@ -119,10 +177,9 @@ export default defineComponent({
       saving,
       reload,
       newRepository,
-      routeToEditor (repository: Repository) {
-        if (!organisation.value) return
-        void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
-      },
+      isAuthenticated,
+      routeToEditor,
+
       async saveRepository (repository: Repository) {
         if (!repositoryApi || !organisation.value) return
         saving.value = true
@@ -138,11 +195,17 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingSaved', { thing: t('repository') }), 'positive')
-            void reload()
+          })
+          .then(() => {
+            if (repository.createdAt)
+              updateRow(repository)
+            else
+              routeToEditor(repository)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
       },
+
       async deleteRepository (repository: Repository) {
         if (!organisationApi || !organisation.value) return
         saving.value = true
@@ -151,10 +214,19 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingDeleted', { thing: t('repository') }), 'positive')
-            void reload()
+            removeRow(repository)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
+      },
+
+      showMembershipDialog () {
+        $q.dialog({
+          component: MembershipDialog,
+          componentProps: {
+            organisation: organisation.value
+          }
+        })
       }
     }
   }

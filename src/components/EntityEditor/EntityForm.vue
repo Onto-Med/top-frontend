@@ -249,6 +249,7 @@ export default defineComponent({
       await entityStore
         .loadSuperPhenotype(props.entityId)
         .then(e => superPhenotype.value = e)
+        .catch((e: Error) => console.log(e))
     })
 
     return {

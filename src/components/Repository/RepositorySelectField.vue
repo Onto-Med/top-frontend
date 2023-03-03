@@ -15,8 +15,10 @@
     :placeholder="modelValue ? '' : label || t('selectThing', { thing: t('repository') })"
     :options="options"
     :loading="loading"
+    :virtual-scroll-item-size="50"
     @filter="filterFn"
-    @update:model-value="handleSelectionChanged"
+    @virtual-scroll="onScroll"
+    @update:model-value="$emit('update:modelValue', $event)"
   >
     <template #selected>
       <span v-if="modelValue">
@@ -49,15 +51,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject } from 'vue'
+import { defineComponent, nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { RepositoryApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
-import { Repository } from '@onto-med/top-api'
+import { Repository, RepositoryPage } from '@onto-med/top-api'
+import ScrollDetails from 'src/mixins/ScrollDetails'
 
 export default defineComponent({
-  name: 'RepositorySelectField',
   props: {
     modelValue: [Object as () => Repository],
     label: String,
@@ -73,38 +75,71 @@ export default defineComponent({
     organisationId: String
   },
   emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  setup(props) {
     const { t } = useI18n()
     const repositoryApi = inject(RepositoryApiKey)
     const { renderError } = useNotify()
     const options = ref([] as Repository[])
     const loading = ref(false)
+    const prevInput  = ref(undefined as string|undefined)
+    const nextPage   = ref(2)
+    const totalPages = ref(0)
+
+    const loadOptions = async (input: string|undefined, page = 1): Promise<RepositoryPage> => {
+      if (!repositoryApi) return Promise.reject({ message: 'Could not load data from the server.' })
+      let promise: Promise<AxiosResponse<RepositoryPage>>
+      if (props.organisationId) {
+        promise = repositoryApi.getRepositoriesByOrganisationId(props.organisationId, undefined, input, undefined, page)
+      } else {
+        promise = repositoryApi.getRepositories(undefined, input, undefined, undefined, page)
+      }
+      return promise.then(r => r.data)
+    }
 
     return {
-      t, options, loading,
-      async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
-        if (val.length < props.minLength || !repositoryApi) {
+      t,
+      options,
+      loading,
+
+      filterFn (input: string, update: (arg0: () => void) => void, abort: () => void) {
+        if (input.length < props.minLength) {
           abort()
           return
         }
-
+        prevInput.value = input
         loading.value = true
-        let promise: Promise<AxiosResponse<Repository[]>>
-        if (props.organisationId) {
-          promise = repositoryApi.getRepositoriesByOrganisationId(props.organisationId, undefined, val)
-        } else {
-          promise = repositoryApi.getRepositories(undefined, val)
-        }
-        await promise
-          .then((r) => update(() => options.value = r.data))
+        nextPage.value = 2
+        totalPages.value = 0
+        loadOptions(input)
+          .then(page => {
+            totalPages.value = page.totalPages
+            update(() => options.value = page.content)
+          })
           .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
-      handleSelectionChanged (repository: Repository) {
-        emit('update:modelValue', repository)
+
+      onScroll ({ to, direction, ref }: ScrollDetails) {
+        const lastIndex = options.value.length - 1
+        if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
+          return
+        loading.value = true
+        loadOptions(prevInput.value, nextPage.value)
+          .then(page => {
+            totalPages.value = page.totalPages
+            if (page.content.length > 0) {
+              nextPage.value++
+              options.value = options.value.concat(page.content)
+              void nextTick(() => {
+                ref.refresh()
+                loading.value = false
+              })
+            }
+          })
+          .catch((e: Error) => renderError(e))
+          .finally(() => loading.value = false)
       }
     }
-  },
-});
+  }
+})
 </script>
