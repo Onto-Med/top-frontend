@@ -399,5 +399,6 @@
   "editAccount": "Konto bearbeiten",
   "notAuthenticated": {
     "onlyPrimaryVisible": "Sie sind nicht angemeldet, daher sind nur primäre Repositorien für Sie sichtbar."
-  }
+  },
+  "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse"
 }

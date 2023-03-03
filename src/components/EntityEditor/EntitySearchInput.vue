@@ -29,7 +29,7 @@
       :options="options"
       :loading="loading"
       :title="t('entitySearchInput.description', { minLength: minLength, types: t('entity', 2) })"
-      :virtual-scroll-item-size="40"
+      :virtual-scroll-item-size="50"
       @filter="filterFn"
       @virtual-scroll="onScroll"
       @update:model-value="handleSelectionChanged"
@@ -95,14 +95,16 @@
 <script lang="ts">
 import { defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, Entity, Repository, DataType, ItemType } from '@onto-med/top-api'
+import { EntityType, Entity, Repository, DataType, ItemType, EntityPage } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import ScrollDetails from 'src/mixins/ScrollDetails'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
-import { QSelect } from 'quasar'
 import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
+import { QSelect } from 'quasar'
+import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
   components: {
@@ -139,6 +141,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted } = useEntityFormatter()
     const entityApi  = inject(EntityApiKey)
+    const { renderError } = useNotify()
     const options    = ref([] as Entity[])
     const selection  = ref(null)
     const loading    = ref(false)
@@ -146,11 +149,12 @@ export default defineComponent({
     const select     = ref(null as unknown as QSelect)
     const prevInput  = ref(undefined as string|undefined)
     const nextPage   = ref(2)
+    const totalPages = ref(0)
     const { repositoryId } = storeToRefs(useEntity())
 
-    const loadOptions = async (input: string, page = 1): Promise<Entity[]> => {
+    const loadOptions = async (input: string|undefined, page = 1): Promise<EntityPage> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      let promise: Promise<AxiosResponse<Entity[]>>
+      let promise: Promise<AxiosResponse<EntityPage>>
       if (props.organisationId && props.repositoryId) {
         promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
       } else if (repository.value && repository.value.organisation) {
@@ -178,33 +182,41 @@ export default defineComponent({
       loading,
 
       filterFn (input: string, update: (arg0: () => void) => void, abort: () => void) {
-        if (input.length < props.minLength || !entityApi) {
+        if (input.length < props.minLength) {
           abort()
           return
         }
         prevInput.value = input
         loading.value = true
+        nextPage.value = 2
+        totalPages.value = 0
         loadOptions(input)
-          .then(entities => update(() => options.value = entities))
+          .then(page => {
+            totalPages.value = page.totalPages
+            update(() => options.value = page.content)
+          })
+          .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
 
       onScroll ({ to, direction, ref }: ScrollDetails) {
         const lastIndex = options.value.length - 1
-        if (loading.value || !prevInput.value || to !== lastIndex || direction === 'decrease')
+        if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
           return
         loading.value = true
         loadOptions(prevInput.value, nextPage.value)
-          .then(entities => {
-            if (entities.length > 0) {
+          .then(page => {
+            totalPages.value = page.totalPages
+            if (page.content.length > 0) {
               nextPage.value++
-              options.value = options.value.concat(entities)
+              options.value = options.value.concat(page.content)
               void nextTick(() => {
                 ref.refresh()
                 loading.value = false
               })
             }
           })
+          .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       },
 
@@ -222,11 +234,5 @@ export default defineComponent({
       }
     }
   }
-});
-
-interface ScrollDetails {
-  to: number,
-  direction: string,
-  ref: QSelect
-}
+})
 </script>

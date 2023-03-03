@@ -8,8 +8,10 @@
     :options="options"
     :loading="loading"
     :title="t('entitySearchInput.description', { minLength: minLength, types: t('organisation', 2) })"
+    :virtual-scroll-item-size="50"
     @filter="filterFn"
-    @update:model-value="$emit('update:model-value', $event)"
+    @virtual-scroll="onScroll"
+    @update:model-value="$emit('update:modelValue', $event)"
   >
     <template #selected>
       <span v-if="modelValue">
@@ -37,13 +39,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject } from 'vue'
+import { defineComponent, nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { OrganisationApiKey } from 'src/boot/axios'
-import { Organisation } from '@onto-med/top-api';
+import { Organisation, OrganisationPage } from '@onto-med/top-api'
+import ScrollDetails from 'src/mixins/ScrollDetails'
+import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
-  name: 'OrganisationSelectInput',
   props: {
     modelValue: Object as () => Organisation|undefined,
     label: String,
@@ -52,28 +55,67 @@ export default defineComponent({
       default: 2
     }
   },
-  emits: ['update:model-value'],
+  emits: ['update:modelValue'],
   setup(props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n();
+    const { t } = useI18n()
+    const { renderError } = useNotify()
     const organisationApi = inject(OrganisationApiKey)
     const options = ref([] as Organisation[])
     const loading = ref(false)
+    const prevInput  = ref(undefined as string|undefined)
+    const nextPage   = ref(2)
+    const totalPages = ref(0)
+
+    const loadOptions = async (input: string|undefined, page = 1): Promise<OrganisationPage> => {
+      if (!organisationApi) return Promise.reject({ message: 'Could not load data from the server.' })
+      return organisationApi.getOrganisations(undefined, input, page)
+        .then(r => r.data)
+    }
 
     return {
-      t, options, loading,
-      async filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
-        if (!organisationApi || val.length < props.minLength) {
+      t,
+      options,
+      loading,
+
+      filterFn (input: string, update: (arg0: () => void) => void, abort: () => void) {
+        if (input.length < props.minLength) {
           abort()
           return
         }
-
+        prevInput.value = input
         loading.value = true
-        await organisationApi.getOrganisations(undefined, val)
-          .then((r) => update(() => options.value = r.data))
+        nextPage.value = 2
+        totalPages.value = 0
+        loadOptions(input)
+          .then(page => {
+            totalPages.value = page.totalPages
+            update(() => options.value = page.content)
+          })
+          .catch((e: Error) => renderError(e))
+          .finally(() => loading.value = false)
+      },
+
+      onScroll ({ to, direction, ref }: ScrollDetails) {
+        const lastIndex = options.value.length - 1
+        if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
+          return
+        loading.value = true
+        loadOptions(prevInput.value, nextPage.value)
+          .then(page => {
+            totalPages.value = page.totalPages
+            if (page.content.length > 0) {
+              nextPage.value++
+              options.value = options.value.concat(page.content)
+              void nextTick(() => {
+                ref.refresh()
+                loading.value = false
+              })
+            }
+          })
+          .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
       }
     }
-  },
-});
+  }
+})
 </script>
