@@ -4,8 +4,6 @@
   "aggregationFunction": "Aggregation function|Aggregation functions",
   "aggregationFunctionDescription": "Select an aggregation function for cases, where this query returns multiple values for a single phenotype.",
   "and": "and",
-  "appSubtitle": "This framework supports the modelling and application of phenotypes.",
-  "appDescription": "Currently, the framework is under heavy development and will be extended with further functionalities.",
   "asc": "Ascending",
   "back": "Back",
   "buildQuery": "Build query|Build queries",
@@ -400,5 +398,7 @@
   "notAuthenticated": {
     "onlyPrimaryVisible": "You are not logged in, so only primary repositories will be visible to you."
   },
-  "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results"
+  "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
+  "projectState": "Currently, the framework is under heavy development and will be extended with further functionalities.",
+  "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search."
 }

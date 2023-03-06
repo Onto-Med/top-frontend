@@ -1,17 +1,15 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <div class="row justify-between">
-      <q-parallax src="https://cdn.quasar.dev/img/image-src.png">
-        <div class="text-h3 text-white text-center">
-          {{ productName }}
-        </div>
-        <div class="text-h6 text-grey-3 text-center">
+      <q-img src="/images/framework_overview.svg" fit="cover" height="400px">
+        <span class="absolute-bottom-right text-h6 text-grey-4 q-pr-sm">
           v{{ version }}
-        </div>
-        <br>
-        <div v-t="'appSubtitle'" class="text-h5 text-white text-center" />
-        <div v-t="'appDescription'" class="text-white text-center" />
-      </q-parallax>
+        </span>
+        <span class="absolute-bottom text-grey-4 text-center">
+          <div v-t="'appDescription'" class="text-h6" />
+          <div v-t="'projectState'" />
+        </span>
+      </q-img>
     </div>
     <div class="row text-center">
       <div class="col-sm-3 col-6">
