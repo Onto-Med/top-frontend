@@ -10,7 +10,7 @@
         </div>
         <br>
         <div v-t="'appSubtitle'" class="text-h5 text-white text-center" />
-        <div v-t="'appDescription'" class="text-white text-center" />
+        <div v-t="'projectState'" class="text-white text-center" />
       </q-parallax>
     </div>
     <div class="row text-center">
