@@ -4,7 +4,6 @@
   "aggregationFunction": "Aggregationsfunktion|Aggregationsfunktionen",
   "aggregationFunctionDescription": "Wählen Sie eine Aggregationsfunktion für Fälle, in denen diese Abfrage mehrere Werte für einen einzigen Phänotyp liefert.",
   "and": "und",
-  "appSubtitle": "Diese Framework unterstützt bei der Modellierung und Anwendung von Phänotypen.",
   "asc": "Aufsteigend",
   "back": "Zurück",
   "buildQuery": "Abfrage erstellen|Abfragen erstellen",
@@ -400,5 +399,6 @@
     "onlyPrimaryVisible": "Sie sind nicht angemeldet, daher sind nur primäre Repositorien für Sie sichtbar."
   },
   "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse",
-  "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert."
+  "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
+  "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche."
 }
