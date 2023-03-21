@@ -284,7 +284,7 @@ export default defineComponent({
       reloadEntities().catch((e: Error) => renderError(e))
       if (queryApi && organisation.value && repository.value)
         queryApi.getQueries(organisation.value.id, repository.value.id)
-          .then(r => r.data.forEach(q => {
+          .then(r => r.data.content.forEach(q => {
             const run = { query: q } as Run
             void updateRun(run).then(() => {
               if (!run.result) run.timer = buildQueryRunTimer(run)

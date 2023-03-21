@@ -4,8 +4,6 @@
   "aggregationFunction": "Aggregation function|Aggregation functions",
   "aggregationFunctionDescription": "Select an aggregation function for cases, where this query returns multiple values for a single phenotype.",
   "and": "and",
-  "appSubtitle": "This framework supports the modelling and application of phenotypes.",
-  "appDescription": "Currently, the framework is under heavy development and will be extended with further functionalities.",
   "asc": "Ascending",
   "back": "Back",
   "buildQuery": "Build query|Build queries",
@@ -277,7 +275,7 @@
     }
   },
   "organisationPage": {
-    "description": "Manage your organisations or create new ones.",
+    "description": "Organisations can contain repositories. Users with appropriate permissions can view or modify the content of an organisation.",
     "confirmDelete": "Do you really want to delete this organisation?"
   },
   "repositoryPage": {
@@ -379,6 +377,28 @@
     "none": "Unspecified functions"
   },
   "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
-  "includePrimaryRepositories": "Include primary repositories",
-  "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in primary repositories."
+  "permission": "Permission|Permissions",
+  "manageThing": "Manage {thing}",
+  "organisationMembership": "Organisation membership|Organisation memberships",
+  "user": "User|Users",
+  "permissions": {
+    "READ": "Read",
+    "WRITE": "Write",
+    "MANAGE": "Manage"
+  },
+  "permissionDescriptions": {
+    "READ": "All content contained in the organisation may be viewed.",
+    "WRITE": "Repositories may be created, edited and deleted.",
+    "MANAGE": "Full access to all contents and settings of the organisation."
+  },
+  "revokePermission": "Revoke permission|Revoke permissions",
+  "confirmDeleteOrganisationMembership": "Are you sure you want to delete this membership? The user will lose their permissions for this organisation!",
+  "add": "Add",
+  "editAccount": "Edit account",
+  "notAuthenticated": {
+    "onlyPrimaryVisible": "You are not logged in, so only primary repositories will be visible to you."
+  },
+  "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
+  "projectState": "Currently, the framework is under heavy development and will be extended with further functionalities.",
+  "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search."
 }

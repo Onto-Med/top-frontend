@@ -26,11 +26,13 @@ export default function (this: void) {
     notify,
 
     renderError: (e: AxiosError | Error): void => {
+      let message = e.message
       if (e.hasOwnProperty('response')) {
-        notify(((e as AxiosError).response?.data as ErrorResponse).message)
-      } else {
-        notify(e.message)
+        const response = (e as AxiosError).response
+        if (response)
+          message = (response.data as ErrorResponse).message || (`Status Code: ${response.status}`)
       }
+      notify(message)
     }
   }
 }

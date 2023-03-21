@@ -19,7 +19,7 @@
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
               <q-btn
-                v-if="isPhenotypeRepository"
+                v-if="isPhenotypeRepository && isAuthenticated"
                 icon="manage_search"
                 :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder' }"
@@ -35,7 +35,7 @@
             :loading="treeLoading"
             :allowed-entity-types="allowedEntityTypes"
             class="col column"
-            show-context-menu
+            :show-context-menu="isAuthenticated"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
@@ -94,6 +94,7 @@
                 :organisation-id="organisationId"
                 :hotkeys-enabled="selected?.id === tab.state.id"
                 :dirty="tab.dirty"
+                :readonly="!isAuthenticated"
                 @update:entity="handleTabUpdate(tab, $event)"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab.state); notify($event.message)"
@@ -135,7 +136,7 @@ import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
-import { Category, Entity, EntityType, LocalisableText, Phenotype } from '@onto-med/top-api'
+import { Category, Entity, EntityType, LocalisableText, Phenotype, Repository } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { RepositoryType } from '@onto-med/top-api'
@@ -165,6 +166,7 @@ export default defineComponent({
     const selected    = ref<Entity|undefined>(undefined)
     const tabs        = ref([] as EditorTab[])
     const treeLoading = ref(false)
+    const { isAuthenticated } = storeToRefs(entityStore)
 
     const clone = (value: Category|Phenotype) =>
       JSON.parse(JSON.stringify(value)) as Category|Phenotype
@@ -206,6 +208,14 @@ export default defineComponent({
     }
 
     watch(
+      repository,
+      (newVal?: Repository) => {
+        if (!newVal || !repository.value || newVal.id !== repository.value.id)
+          closeTab(undefined)
+      }
+    )
+
+    watch(
       selected as Ref<Entity|undefined>,
       (entity: Entity|undefined) => {
         tabs.value
@@ -222,10 +232,10 @@ export default defineComponent({
             params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: entity.id },
             query: tab.selectedVersion ? { version: tab.selectedVersion } : {}
           })
-        } else {
+        } else if (entityStore.repository) {
           void router.push({
             name: 'editor',
-            params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id, entityId: undefined }
+            params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository.id, entityId: undefined }
           })
         }
       }
@@ -292,6 +302,7 @@ export default defineComponent({
       reloadEntities, selectTabByKey, closeTab, notify,
       organisationId,
       repository,
+      isAuthenticated,
 
       deleteEntity (entity: Entity): void {
         if (!entity || !entityApi) return

@@ -13,14 +13,14 @@
 
     <table-with-actions
       :name="t('organisation')"
-      :rows="organisations"
+      :page="organisations"
       :loading="loading"
-      create
+      :create="isAuthenticated"
       @row-clicked="routeToOrganisation($event)"
-      @reload-clicked="reload()"
       @create-clicked="organisation = newOrganisation(); showForm = true"
+      @request="reload"
     >
-      <template #actions="{ row }">
+      <template v-if="isAuthenticated" #actions="{ row }">
         <q-btn
           size="sm"
           color="primary"
@@ -48,15 +48,15 @@ import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
 import { OrganisationApiKey } from 'src/boot/axios'
-import { Organisation } from '@onto-med/top-api'
+import { Organisation, OrganisationPage } from '@onto-med/top-api'
 import TableWithActions from 'src/components/TableWithActions.vue'
 import OrganisationForm from 'src/components/Organisation/OrganisationForm.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
-
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
-  name: 'OrganisationOverview',
   components: {
     TableWithActions,
     OrganisationForm
@@ -69,19 +69,45 @@ export default defineComponent({
     const saving    = ref(false)
     const showForm  = ref(false)
     const organisationApi = inject(OrganisationApiKey)
-    const organisations   = ref<Organisation[]>([])
-    const  newOrganisation = () => {
+    const organisations   = ref<OrganisationPage>({
+      content: [],
+      number: 1,
+      size: 0,
+      totalElements: 0,
+      totalPages: 0,
+      type: 'organisation'
+    })
+    const newOrganisation = () => {
       return { id: (uuidv4 as () => string)() } as Organisation
     }
-    const organisation    = ref(newOrganisation())
+    const organisation = ref(newOrganisation())
+    const { isAuthenticated } = storeToRefs(useEntity())
 
-    const reload = async () => {
+    const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!organisationApi) return
       loading.value = true
-      await organisationApi.getOrganisations()
+      await organisationApi.getOrganisations(undefined, filter, page)
         .then(r => organisations.value = r.data)
         .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
+    }
+
+    const routeToOrganisation = (organisation: Organisation) => {
+      void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
+    }
+
+    const updateRow = (organisation: Organisation) => {
+      const index = organisations.value.content.findIndex((o) => o.id === organisation.id)
+      if (index !== -1)
+        organisations.value.content[index] = organisation
+    }
+
+    const removeRow = (organisation: Organisation) => {
+      const index = organisations.value.content.findIndex((o) => o.id === organisation.id)
+      if (index !== -1) {
+        organisations.value.content.splice(index, 1)
+        organisations.value.totalElements--
+      }
     }
 
     onMounted(async () => {
@@ -96,10 +122,10 @@ export default defineComponent({
       loading,
       saving,
       showForm,
+      isAuthenticated,
       newOrganisation,
-      routeToOrganisation (organisation: Organisation) {
-        void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
-      },
+      routeToOrganisation,
+
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return
         saving.value = true
@@ -115,11 +141,17 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingSaved', { thing: t('organisation') }), 'positive')
-            void reload()
+          })
+          .then(() => {
+            if (organisation.createdAt)
+              updateRow(organisation)
+            else
+              routeToOrganisation(organisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
       },
+
       async deleteOrganisation (organisation: Organisation) {
         if (!organisationApi) return
         saving.value = true
@@ -128,7 +160,7 @@ export default defineComponent({
           .then(() => {
             showForm.value = false
             notify(t('thingDeleted', { thing: t('organisation') }), 'positive')
-            void reload()
+            removeRow(organisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)

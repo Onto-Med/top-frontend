@@ -42,17 +42,17 @@ export default route(function (/* { store, ssrContext } */) {
 
     if (!to.meta.allowAnonymous) {
       if (entityStore.keycloak && !entityStore.keycloak.authenticated)
-        void entityStore.keycloak.login()
+        return void entityStore.keycloak.login()
     }
     await entityStore.setOrganisation(to.params.organisationId as string | undefined)
       .catch((e: AxiosError) => {
         renderError(e)
         void Router.push({ name: 'organisations' })
       })
-    await entityStore.setRepository(to.params.repositoryId as string | undefined)
+      .then(() => entityStore.setRepository(to.params.repositoryId as string | undefined))
       .catch((e: AxiosError) => {
         renderError(e)
-        void Router.push({ name: 'showOrganisation' })
+        void Router.push({ name: 'showOrganisation', params: { organisationId: to.params.organisationId } })
       })
   })
 

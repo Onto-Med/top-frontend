@@ -26,11 +26,32 @@ const routes: RouteRecordRaw[] = [
           const version = Number.parseInt(route.query.version as string, 10)
           return { entityId: route.params.entityId, version: version }
         },
-        component: () => import('pages/Editor.vue')
+        component: () => import('pages/Editor.vue'),
+        meta: {
+          allowAnonymous: true
+        }
       },
-      { name: 'organisations', path: '/organisation', component: () => import('pages/OrganisationOverview.vue') },
-      { name: 'showOrganisation', path: '/:organisationId', component: () => import('pages/Organisation.vue') },
-      { name: 'documentSearch', path: '/document', component: () => import('pages/DocumentSearch.vue') }
+      {
+        name: 'organisations',
+        path: '/organisation',
+        component: () => import('pages/OrganisationOverview.vue'),
+        meta: {
+          allowAnonymous: true
+        }
+      },
+      {
+        name: 'showOrganisation',
+        path: '/:organisationId',
+        component: () => import('pages/Organisation.vue'),
+        meta: {
+          allowAnonymous: true
+        }
+      },
+      {
+        name: 'documentSearch',
+        path: '/document',
+        component: () => import('pages/DocumentSearch.vue')
+      }
     ],
   },
 

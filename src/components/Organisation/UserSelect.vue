@@ -4,24 +4,24 @@
     use-input
     emit-value
     clearable
-    :label="modelValue ? '' : label || t('selectThing', { thing: t('organisation') })"
+    :label="modelValue ? '' : label || t('selectThing', { thing: t('user') })"
     :options="options"
     :loading="loading"
-    :title="t('entitySearchInput.description', { minLength: minLength, types: t('organisation', 2) })"
+    :title="t('entitySearchInput.description', { minLength: minLength, types: t('user', 2) })"
     :virtual-scroll-item-size="50"
     @filter="filterFn"
     @virtual-scroll="onScroll"
-    @update:model-value="$emit('update:modelValue', $event)"
+    @update:model-value="$emit('update:model-value', $event)"
   >
     <template #selected>
       <span v-if="modelValue">
-        {{ modelValue.name }}
+        {{ modelValue.username || modelValue.id }}
       </span>
     </template>
     <template #option="scope">
       <q-item v-bind="scope.itemProps">
         <q-item-section>
-          <q-item-label>{{ scope.opt.name }}</q-item-label>
+          <q-item-label>{{ scope.opt.username || scope.opt.id }}</q-item-label>
           <q-item-label caption>
             {{ scope.opt.description }}
           </q-item-label>
@@ -31,7 +31,7 @@
     <template #no-option>
       <q-item>
         <q-item-section>
-          {{ t('entitySearchInput.emptyResult', { types: t('organisation', 2) }) }}
+          {{ t('entitySearchInput.emptyResult', { types: t('user', 2) }) }}
         </q-item-section>
       </q-item>
     </template>
@@ -39,36 +39,36 @@
 </template>
 
 <script lang="ts">
+import { User, UserPage } from '@onto-med/top-api';
 import { defineComponent, nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { OrganisationApiKey } from 'src/boot/axios'
-import { Organisation, OrganisationPage } from '@onto-med/top-api'
-import ScrollDetails from 'src/mixins/ScrollDetails'
-import useNotify from 'src/mixins/useNotify'
+import { UserApiKey } from 'src/boot/axios'
+import useNotify from 'src/mixins/useNotify';
+import ScrollDetails from 'src/mixins/ScrollDetails';
 
 export default defineComponent({
   props: {
-    modelValue: Object as () => Organisation|undefined,
+    modelValue: Object as () => User|undefined,
     label: String,
     minLength: {
       type: Number,
       default: 2
     }
   },
-  emits: ['update:modelValue'],
+  emits: ['update:model-value'],
   setup(props) {
     const { t } = useI18n()
     const { renderError } = useNotify()
-    const organisationApi = inject(OrganisationApiKey)
-    const options = ref([] as Organisation[])
+    const userApi = inject(UserApiKey)
+    const options = ref<User[]>([])
     const loading = ref(false)
     const prevInput  = ref(undefined as string|undefined)
     const nextPage   = ref(2)
     const totalPages = ref(0)
 
-    const loadOptions = async (input: string|undefined, page = 1): Promise<OrganisationPage> => {
-      if (!organisationApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      return organisationApi.getOrganisations(undefined, input, page)
+    const loadOptions = async (input: string|undefined, page = 1): Promise<UserPage> => {
+      if (!userApi) return Promise.reject({ message: 'Could not load data from the server.' })
+      return userApi.getUsers(input, undefined, page)
         .then(r => r.data)
     }
 
@@ -86,6 +86,7 @@ export default defineComponent({
         loading.value = true
         nextPage.value = 2
         totalPages.value = 0
+        loading.value = true
         loadOptions(input)
           .then(page => {
             totalPages.value = page.totalPages

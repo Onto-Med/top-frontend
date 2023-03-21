@@ -4,8 +4,6 @@
   "aggregationFunction": "Aggregationsfunktion|Aggregationsfunktionen",
   "aggregationFunctionDescription": "Wählen Sie eine Aggregationsfunktion für Fälle, in denen diese Abfrage mehrere Werte für einen einzigen Phänotyp liefert.",
   "and": "und",
-  "appSubtitle": "Diese Framework unterstützt bei der Modellierung und Anwendung von Phänotypen.",
-  "appDescription": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
   "asc": "Aufsteigend",
   "back": "Zurück",
   "buildQuery": "Abfrage erstellen|Abfragen erstellen",
@@ -277,7 +275,7 @@
     }
   },
   "organisationPage": {
-    "description": "Verwalten Sie Ihre Organisationen oder erstellen Sie neue.",
+    "description": "Organisationen können Repositories enthalten. Benutzer mit entsprechenden Berechtigungen können den Inhalt einer Organisation anzeigen oder ändern.",
     "confirmDelete": "Möchten Sie diese Organisation wirklich löschen?"
   },
   "repositoryPage": {
@@ -378,7 +376,5 @@
     "date_time": "Datum- und Zeit-Funktionen",
     "none": "Unspezifizierte Funktionen"
   },
-  "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
-  "includePrimaryRepositories": "Primäre Repositorien einschließen",
-  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositories zu erweitern."
+(??)  "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?"
 }
