@@ -102,7 +102,7 @@
               <q-card-section class="col fit q-pa-none">
                 <q-scroll-area class="fit q-px-sm">
                   <q-list v-if="query.projection && query.projection.length" dense separator>
-                    <projection-entry
+                    <query-subject
                       v-for="(entry, index) in query.projection"
                       :key="index"
                       v-model:default-aggregation-function-id="entry.defaultAggregationFunctionId"
@@ -111,6 +111,7 @@
                       :down-disabled="index == query.projection.length - 1"
                       :subject-id="entry.subjectId"
                       :up-disabled="index == 0"
+                      sortable
                       @move-up="moveSelectEntry(index, index - 1)"
                       @move-down="moveSelectEntry(index, index + 1)"
                       @remove="query.projection?.splice(index, 1)"
@@ -139,12 +140,13 @@
                 <q-scroll-area class="fit q-px-sm">
                   <q-list v-if="query.criteria?.length" dense>
                     <template v-for="(criterion, index) in query.criteria" :key="index">
-                      <criterion
-                        v-model:inclusion="criterion.inclusion"
-                        v-model:date-time-restriction="criterion.dateTimeRestriction"
+                      <query-subject
                         v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
+                        v-model:date-time-restriction="criterion.dateTimeRestriction"
+                        v-model:inclusion="criterion.inclusion"
                         :aggregation-function-options="aggregationFunctionOptions"
                         :subject-id="criterion.subjectId"
+                        excludable
                         @remove-clicked="query.criteria?.splice(index, 1)"
                       />
                       <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
@@ -200,8 +202,7 @@
 import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import Criterion from 'src/components/Query/Criterion.vue'
-import ProjectionEntry from 'src/components/Query/ProjectionEntry.vue'
+import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
@@ -219,10 +220,10 @@ interface Run {
 }
 
 export default defineComponent({
-  components: { EntityTree, Criterion, QueryResultView, ProjectionEntry },
+  components: { EntityTree, QueryResultView, QuerySubject },
   setup () {
     const { t } = useI18n()
-    const { isPhenotype, isRestricted } = useEntityFormatter()
+    const { isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
     const entityStore = useEntity()
     const { renderError } = useNotify()
     const { entities, repository, organisation } = storeToRefs(entityStore)
@@ -328,7 +329,7 @@ export default defineComponent({
         if (!subject || subject.dataType !== DataType.Boolean && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
-          defaultAggregationFunctionId: 'Last',
+          defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
           inclusion: true,
           subjectId: subject.id as string,
           type: TypeEnum.QueryCriterion
@@ -343,7 +344,7 @@ export default defineComponent({
         ) return
         query.value.projection.push({
           subjectId: subject.id as string,
-          defaultAggregationFunctionId: 'Last',
+          defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
           type: TypeEnum.ProjectionEntry
         })
       },

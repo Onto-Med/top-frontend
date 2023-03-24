@@ -186,6 +186,10 @@ export default function (this: void) {
       if (type === RepositoryType.ConceptRepository) return 'article'
       if (type === RepositoryType.PhenotypeRepository) return 'category'
       return 'tab'
+    },
+
+    requiresAggregationFunction: (entity: Entity) => {
+      return [EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(entity.entityType)
     }
   }
 }

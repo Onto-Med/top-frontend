@@ -13,7 +13,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section v-if="showAggregationFunction">
           <div v-t="'aggregationFunctionDescription'" />
           <q-select
             :model-value="defaultAggregationFunctionId"
@@ -84,6 +84,10 @@ export default defineComponent({
     aggregationFunctionOptions: {
       type: Array as () => ExpressionFunction[],
       default: () => []
+    },
+    showAggregationFunction: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:dateTimeRestriction', 'update:defaultAggregationFunctionId'],
