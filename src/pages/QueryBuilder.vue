@@ -92,28 +92,36 @@
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('projection') }}
-                    <q-icon v-show="!projectionComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+                    <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label v-t="'eligibilityCriterionSelection'" caption />
+                  <q-item-label caption>
+                    {{ t('projectionSelection') }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ t('emptyProjectionBehaviour') }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
               <q-separator />
               <q-card-section class="col fit q-pa-none">
                 <q-scroll-area class="fit q-px-sm">
                   <q-list v-if="query.projection && query.projection.length" dense separator>
-                    <projection-entry
+                    <query-subject
                       v-for="(entry, index) in query.projection"
                       :key="index"
-                      v-model:sorting="entry.sorting"
+                      v-model:default-aggregation-function-id="entry.defaultAggregationFunctionId"
+                      v-model:date-time-restriction="entry.dateTimeRestriction"
+                      :aggregation-function-options="aggregationFunctionOptions"
+                      :down-disabled="index == query.projection.length - 1"
                       :subject-id="entry.subjectId"
                       :up-disabled="index == 0"
-                      :down-disabled="index == query.projection.length - 1"
+                      sortable
                       @move-up="moveSelectEntry(index, index - 1)"
                       @move-down="moveSelectEntry(index, index + 1)"
                       @remove="query.projection?.splice(index, 1)"
                     />
                   </q-list>
-                  <div v-else>
+                  <div v-else class="q-pa-sm">
                     {{ t('nothingSelectedYet') }}
                   </div>
                 </q-scroll-area>
@@ -125,9 +133,14 @@
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('eligibilityCriterion', 2) }}
-                    <q-icon v-show="!criteriaComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+                    <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label v-t="'eligibilityCriterionSelection'" caption />
+                  <q-item-label caption>
+                    {{ t('eligibilityCriterionSelection') }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ t('emptyCriteriaBehaviour') }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
               <q-separator />
@@ -135,12 +148,13 @@
                 <q-scroll-area class="fit q-px-sm">
                   <q-list v-if="query.criteria?.length" dense>
                     <template v-for="(criterion, index) in query.criteria" :key="index">
-                      <criterion
-                        v-model:inclusion="criterion.inclusion"
-                        v-model:date-time-restriction="criterion.dateTimeRestriction"
+                      <query-subject
                         v-model:default-aggregation-function-id="criterion.defaultAggregationFunctionId"
+                        v-model:date-time-restriction="criterion.dateTimeRestriction"
+                        v-model:inclusion="criterion.inclusion"
                         :aggregation-function-options="aggregationFunctionOptions"
                         :subject-id="criterion.subjectId"
+                        excludable
                         @remove-clicked="query.criteria?.splice(index, 1)"
                       />
                       <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
@@ -150,7 +164,7 @@
                       </div>
                     </template>
                   </q-list>
-                  <div v-else>
+                  <div v-else class="q-pa-sm">
                     {{ t('nothingSelectedYet') }}
                   </div>
                 </q-scroll-area>
@@ -167,7 +181,7 @@
           icon="play_arrow"
           color="secondary"
           :label="t('execute')"
-          :disable="!(configurationComplete && criteriaComplete && projectionComplete)"
+          :disable="!(configurationComplete && querySubjectPresent)"
           @click="execute()"
         />
         <q-btn
@@ -193,11 +207,10 @@
 </template>
 
 <script lang="ts">
-import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, Sorting } from '@onto-med/top-api'
+import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import Criterion from 'src/components/Query/Criterion.vue'
-import ProjectionEntry from 'src/components/Query/ProjectionEntry.vue'
+import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
@@ -215,10 +228,10 @@ interface Run {
 }
 
 export default defineComponent({
-  components: { EntityTree, Criterion, QueryResultView, ProjectionEntry },
+  components: { EntityTree, QueryResultView, QuerySubject },
   setup () {
     const { t } = useI18n()
-    const { isPhenotype, isRestricted } = useEntityFormatter()
+    const { isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
     const entityStore = useEntity()
     const { renderError } = useNotify()
     const { entities, repository, organisation } = storeToRefs(entityStore)
@@ -314,21 +327,20 @@ export default defineComponent({
       configurationComplete: computed(() =>
         query.value.dataSources && query.value.dataSources.length > 0
       ),
-      criteriaComplete: computed(() =>
-        query.value.criteria && query.value.criteria.length > 0
-      ),
 
-      projectionComplete: computed(() =>
-        query.value.projection && query.value.projection.length > 0
+      querySubjectPresent: computed(() => 
+        query.value.criteria && query.value.criteria.length > 0
+        || query.value.projection && query.value.projection.length > 0
       ),
 
       addCriterion: (subject: Phenotype) => {
-        if (!subject || !isPhenotype(subject) && !isRestricted(subject)) return
+        if (!subject || subject.dataType !== DataType.Boolean && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
-          defaultAggregationFunctionId: 'Last',
+          defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
           inclusion: true,
-          subjectId: subject.id as string
+          subjectId: subject.id as string,
+          type: TypeEnum.QueryCriterion
         })
       },
 
@@ -337,9 +349,12 @@ export default defineComponent({
         if (
           !subject
           || !isPhenotype(subject) && !isRestricted(subject)
-          || query.value.projection.findIndex(r => r.subjectId === subject.id) !== -1
         ) return
-        query.value.projection.push({ subjectId: subject.id as string, sorting: Sorting.Asc })
+        query.value.projection.push({
+          subjectId: subject.id as string,
+          defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
+          type: TypeEnum.ProjectionEntry
+        })
       },
 
       moveSelectEntry: (oldIndex: number, newIndex: number) => {
