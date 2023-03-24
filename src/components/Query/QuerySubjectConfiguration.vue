@@ -41,8 +41,8 @@
           <div v-t="'dateTimeRestrictionDescription'" />
           <div class="row q-mt-sm">
             <range-input
-              v-model:minimum="state.values[0]"
-              v-model:maximum="state.values[1]"
+              v-model:minimum="minimum"
+              v-model:maximum="maximum"
               v-model:min-operator="state.minOperator"
               v-model:max-operator="state.maxOperator"
               :type="DataType.DateTime"
@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, watch } from 'vue'
+import { computed, defineComponent, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DateTimeRestriction, DataType, ExpressionFunction } from '@onto-med/top-api'
 import RangeInput from '../EntityEditor/RangeInput.vue'
@@ -101,6 +101,7 @@ export default defineComponent({
       () => emit('update:dateTimeRestriction', state),
       { deep: true }
     )
+
     return {
       t,
       te,
@@ -112,7 +113,25 @@ export default defineComponent({
         state.minOperator = undefined
         state.maxOperator = undefined
         state.values = []
-      }
+      },
+
+      minimum: computed({
+        get: () => state.values ? state.values[0] : undefined,
+        set: (val) => {
+          if (!state.values) state.values = []
+          state.values[0] = val as Date
+          state.values[1] = state.values[1]
+        }
+      }),
+
+      maximum: computed({
+        get: () => state.values ? state.values[1] : undefined,
+        set: (val) => {
+          if (!state.values) state.values = []
+          state.values[1] = val as Date
+          state.values[0] = state.values[0]
+        }
+      })
     }
   }
 })

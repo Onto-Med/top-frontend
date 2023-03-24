@@ -40,13 +40,13 @@
           <span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">
             {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
           </span>
-          <span v-if="dateTimeRestriction?.values?.length" :title="t('dateTimeRestriction')">
-            , {{ dateTimeRestriction.values.map(e => e ? d(e, 'long') : 'NA').join(' - ') }}
+          <span v-if="dateTimeRestrictionValues" :title="t('dateTimeRestriction')">
+            , {{ dateTimeRestrictionValues.join(' - ') }}
           </span>
           )
         </small>
-        <small v-else-if="dateTimeRestriction?.values?.length" class="q-ml-md" :title="t('dateTimeRestriction')">
-          ( {{ dateTimeRestriction.values.map(e => e ? d(e, 'long') : 'NA').join(' - ') }} )
+        <small v-else-if="dateTimeRestrictionValues" class="q-ml-md" :title="t('dateTimeRestriction')">
+          ( {{ dateTimeRestrictionValues.join(' - ') }} )
         </small>
       </div>
     </q-item-section>
@@ -120,7 +120,17 @@ export default defineComponent({
       isRestricted,
       getIcon,
       getTitle,
-      requiresAggregationFunction: computed(() => subject.value ? requiresAggregationFunction(subject.value) : false)
+
+      requiresAggregationFunction: computed(() => subject.value ? requiresAggregationFunction(subject.value) : false),
+
+      dateTimeRestrictionValues: computed(() => {
+        if (
+          !props.dateTimeRestriction?.values
+          || !props.dateTimeRestriction.values.length
+          || !props.dateTimeRestriction.values.find(v => !!v)
+        ) return undefined
+        return props.dateTimeRestriction.values.map(e => e ? d(e, 'long') : 'NA')
+      })
     }
   }
 })
