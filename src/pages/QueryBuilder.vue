@@ -104,9 +104,12 @@
                     <projection-entry
                       v-for="(entry, index) in query.projection"
                       :key="index"
+                      v-model:default-aggregation-function-id="entry.defaultAggregationFunctionId"
+                      v-model:date-time-restriction="entry.dateTimeRestriction"
+                      :aggregation-function-options="aggregationFunctionOptions"
+                      :down-disabled="index == query.projection.length - 1"
                       :subject-id="entry.subjectId"
                       :up-disabled="index == 0"
-                      :down-disabled="index == query.projection.length - 1"
                       @move-up="moveSelectEntry(index, index - 1)"
                       @move-down="moveSelectEntry(index, index + 1)"
                       @remove="query.projection?.splice(index, 1)"

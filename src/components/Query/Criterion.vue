@@ -21,7 +21,7 @@
           <span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">
             {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
           </span>
-          <span v-if="dateTimeRestriction && dateTimeRestriction.values.length" :title="t('dateTimeRestriction')">
+          <span v-if="dateTimeRestriction?.values?.length" :title="t('dateTimeRestriction')">
             , {{ dateTimeRestriction.values.map(e => e ? d(e, 'long') : 'NA').join(' - ') }}
           </span>
           )
