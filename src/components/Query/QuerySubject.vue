@@ -60,7 +60,7 @@
           @update:date-time-restriction="$emit('update:dateTimeRestriction', $event)"
           @update:default-aggregation-function-id="$emit('update:defaultAggregationFunctionId', $event)"
         />
-        <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="$emit('remove')" />
+        <q-btn icon="remove" :title="t('remove')" @click="$emit('remove')" />
       </q-btn-group>
     </q-item-section>
   </q-item>

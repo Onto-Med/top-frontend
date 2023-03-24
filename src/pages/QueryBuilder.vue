@@ -155,7 +155,7 @@
                         :aggregation-function-options="aggregationFunctionOptions"
                         :subject-id="criterion.subjectId"
                         excludable
-                        @remove-clicked="query.criteria?.splice(index, 1)"
+                        @remove="query.criteria?.splice(index, 1)"
                       />
                       <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
                         <q-separator class="col" />
