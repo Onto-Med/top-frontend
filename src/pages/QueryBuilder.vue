@@ -67,7 +67,7 @@
               :loading="treeLoading"
               class="col column"
               @refresh-clicked="reloadEntities"
-              @update:selected="addCriterion($event)"
+              @update:selected="addCriterion($event); addSelection($event)"
             >
               <template #entity-context-menu="props">
                 <q-menu context-menu>
