@@ -197,7 +197,7 @@
 </template>
 
 <script lang="ts">
-import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, TypeEnum } from '@onto-med/top-api'
+import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import Criterion from 'src/components/Query/Criterion.vue'
@@ -325,7 +325,7 @@ export default defineComponent({
       ),
 
       addCriterion: (subject: Phenotype) => {
-        if (!subject || !isPhenotype(subject) && !isRestricted(subject)) return
+        if (!subject || subject.dataType !== DataType.Boolean && !isRestricted(subject)) return
         if (!query.value.criteria) query.value.criteria = []
         query.value.criteria.push({
           defaultAggregationFunctionId: 'Last',
