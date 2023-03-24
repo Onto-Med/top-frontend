@@ -161,9 +161,6 @@
       @update:super-categories="$emit('update:entity', { ...local, superCategories: $event })"
       @update:codes="$emit('update:entity', { ...local, codes: $event })"
       @entity-clicked="$emit('entityClicked', $event)"
-      @add-super-category="addSuperCategory(undefined)"
-      @set-super-category="setSuperCategory"
-      @remove-super-category="removeSuperCategory"
     />
 
     <q-inner-loading
@@ -331,26 +328,6 @@ export default defineComponent({
       save,
 
       prefillFromVersion,
-
-      addSuperCategory (category: Category|undefined): void {
-        const casted = local.value
-        if (!casted.superCategories) casted.superCategories = []
-        if (!category || casted.superCategories.findIndex(c => c && c.id === category.id) === -1)
-          if (casted.id !== category?.id) casted.superCategories.push(category as Category)
-      },
-
-      setSuperCategory (index: number, category: Category): void {
-        const casted = local.value
-        if (!casted.superCategories) casted.superCategories = []
-        if (casted.superCategories.findIndex(c => c && c.id === category.id) === -1)
-          if (casted.id !== category.id) casted.superCategories[index] = category
-      },
-
-      removeSuperCategory (index: number): void {
-        const casted = local.value
-        if (!casted.superCategories) return
-        casted.superCategories.splice(index, 1)
-      },
 
       copyToClipboard (text: unknown): void {
         copyToClipboard(JSON.stringify(text))
