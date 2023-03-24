@@ -2,7 +2,7 @@
   "ageRestriction": "Altersbegrenzung|Altersbegrenzungen",
   "ageRestrictionDescription": "Legen Sie eine oder mehrere Altersbegrenzungen fest. Altersangaben werden in Jahren angegeben.",
   "aggregationFunction": "Aggregationsfunktion|Aggregationsfunktionen",
-  "aggregationFunctionDescription": "Wählen Sie eine Aggregationsfunktion für Fälle, in denen diese Abfrage mehrere Werte für einen einzigen Phänotyp liefert.",
+  "aggregationFunctionDescription": "Dies ist ein zusammengesetzter Phänotyp, was bedeutet, dass eine Standardaggregationsfunktion für Fälle erforderlich ist, in denen keine Funktion explizit im Ausdruck eines Phänotyps angegeben ist.  Aggregationsfunktionen werden benötigt, um mehrere Phänotypwerte zu einem Wert zu aggregieren und für Berechnungen verwenden zu können.",
   "and": "und",
   "asc": "Aufsteigend",
   "back": "Zurück",

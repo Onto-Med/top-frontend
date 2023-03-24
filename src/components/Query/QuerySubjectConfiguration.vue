@@ -14,7 +14,7 @@
         <q-separator />
 
         <q-card-section v-if="showAggregationFunction">
-          <div v-t="'aggregationFunctionDescription'" />
+          <small v-t="'aggregationFunctionDescription'" />
           <q-select
             :model-value="defaultAggregationFunctionId"
             :options="aggregationFunctionOptions"
