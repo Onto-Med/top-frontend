@@ -67,7 +67,7 @@
               :loading="treeLoading"
               class="col column"
               @refresh-clicked="reloadEntities"
-              @update:selected="addCriterion($event); addSelection($event)"
+              @update:selected="addCriterion($event)"
             >
               <template #entity-context-menu="props">
                 <q-menu context-menu>
@@ -340,7 +340,6 @@ export default defineComponent({
         if (
           !subject
           || !isPhenotype(subject) && !isRestricted(subject)
-          || query.value.projection.findIndex(r => r.subjectId === subject.id) !== -1
         ) return
         query.value.projection.push({
           subjectId: subject.id as string,
