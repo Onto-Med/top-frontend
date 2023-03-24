@@ -31,12 +31,6 @@
     </q-item-section>
     <q-item-section side>
       <q-btn-group flat>
-        <q-btn
-          :icon="sorting === Sorting.Desc ? 'arrow_downward' : 'arrow_upward'"
-          :label="$q.screen.gt.md ? t(sorting) : ''"
-          :title="t('sorting')"
-          @click="$emit('update:sorting', sorting === Sorting.Asc ? Sorting.Desc : Sorting.Asc)"
-        />
         <q-btn icon="remove" :title="t('removeThing', { thing: t('selection') })" @click="$emit('remove')" />
       </q-btn-group>
     </q-item-section>
@@ -48,7 +42,6 @@ import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
-import { Sorting } from '@onto-med/top-api'
 
 export default defineComponent({
   props: {
@@ -56,11 +49,10 @@ export default defineComponent({
       type: String,
       required: true
     },
-    sorting: String as () => Sorting,
     upDisabled: Boolean,
     downDisabled: Boolean
   },
-  emits: ['moveUp', 'moveDown', 'remove', 'update:sorting'],
+  emits: ['moveUp', 'moveDown', 'remove'],
   setup (props) {
     const { t } = useI18n()
     const entityStore = useEntity()
@@ -68,7 +60,6 @@ export default defineComponent({
 
     return {
       t,
-      Sorting,
       subject: computed(() => entityStore.getEntity(props.subjectId)),
       getSynonyms,
       isRestricted,

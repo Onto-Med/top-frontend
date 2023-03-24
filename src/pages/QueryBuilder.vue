@@ -104,7 +104,6 @@
                     <projection-entry
                       v-for="(entry, index) in query.projection"
                       :key="index"
-                      v-model:sorting="entry.sorting"
                       :subject-id="entry.subjectId"
                       :up-disabled="index == 0"
                       :down-disabled="index == query.projection.length - 1"
@@ -193,7 +192,7 @@
 </template>
 
 <script lang="ts">
-import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, Sorting } from '@onto-med/top-api'
+import { DataSource, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import Criterion from 'src/components/Query/Criterion.vue'
@@ -328,7 +327,8 @@ export default defineComponent({
         query.value.criteria.push({
           defaultAggregationFunctionId: 'Last',
           inclusion: true,
-          subjectId: subject.id as string
+          subjectId: subject.id as string,
+          type: TypeEnum.QueryCriterion
         })
       },
 
@@ -339,7 +339,11 @@ export default defineComponent({
           || !isPhenotype(subject) && !isRestricted(subject)
           || query.value.projection.findIndex(r => r.subjectId === subject.id) !== -1
         ) return
-        query.value.projection.push({ subjectId: subject.id as string, sorting: Sorting.Asc })
+        query.value.projection.push({
+          subjectId: subject.id as string,
+          defaultAggregationFunctionId: 'Last',
+          type: TypeEnum.ProjectionEntry
+        })
       },
 
       moveSelectEntry: (oldIndex: number, newIndex: number) => {
