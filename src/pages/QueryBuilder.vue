@@ -92,9 +92,10 @@
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('projection') }}
-                    <q-icon v-show="!projectionComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+                    <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label v-t="'eligibilityCriterionSelection'" caption />
+                  <q-item-label v-t="'projectionSelection'" caption />
+                  <q-item-label v-t="'emptyProjectionBehaviour'" caption />
                 </q-item-section>
               </q-item>
               <q-separator />
@@ -115,7 +116,7 @@
                       @remove="query.projection?.splice(index, 1)"
                     />
                   </q-list>
-                  <div v-else>
+                  <div v-else class="q-pa-sm">
                     {{ t('nothingSelectedYet') }}
                   </div>
                 </q-scroll-area>
@@ -127,9 +128,10 @@
                 <q-item-section>
                   <q-item-label class="text-h6">
                     {{ t('eligibilityCriterion', 2) }}
-                    <q-icon v-show="!criteriaComplete" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+                    <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
                   <q-item-label v-t="'eligibilityCriterionSelection'" caption />
+                  <q-item-label v-t="'emptyCriteriaBehaviour'" caption />
                 </q-item-section>
               </q-item>
               <q-separator />
@@ -152,7 +154,7 @@
                       </div>
                     </template>
                   </q-list>
-                  <div v-else>
+                  <div v-else class="q-pa-sm">
                     {{ t('nothingSelectedYet') }}
                   </div>
                 </q-scroll-area>
@@ -169,7 +171,7 @@
           icon="play_arrow"
           color="secondary"
           :label="t('execute')"
-          :disable="!(configurationComplete && criteriaComplete && projectionComplete)"
+          :disable="!(configurationComplete && querySubjectPresent)"
           @click="execute()"
         />
         <q-btn
@@ -316,12 +318,10 @@ export default defineComponent({
       configurationComplete: computed(() =>
         query.value.dataSources && query.value.dataSources.length > 0
       ),
-      criteriaComplete: computed(() =>
-        query.value.criteria && query.value.criteria.length > 0
-      ),
 
-      projectionComplete: computed(() =>
-        query.value.projection && query.value.projection.length > 0
+      querySubjectPresent: computed(() => 
+        query.value.criteria && query.value.criteria.length > 0
+        || query.value.projection && query.value.projection.length > 0
       ),
 
       addCriterion: (subject: Phenotype) => {
