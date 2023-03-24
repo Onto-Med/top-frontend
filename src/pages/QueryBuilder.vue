@@ -94,8 +94,12 @@
                     {{ t('projection') }}
                     <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label v-t="'projectionSelection'" caption />
-                  <q-item-label v-t="'emptyProjectionBehaviour'" caption />
+                  <q-item-label caption>
+                    {{ t('projectionSelection') }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ t('emptyProjectionBehaviour') }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
               <q-separator />
@@ -131,8 +135,12 @@
                     {{ t('eligibilityCriterion', 2) }}
                     <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label v-t="'eligibilityCriterionSelection'" caption />
-                  <q-item-label v-t="'emptyCriteriaBehaviour'" caption />
+                  <q-item-label caption>
+                    {{ t('eligibilityCriterionSelection') }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ t('emptyCriteriaBehaviour') }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
               <q-separator />
