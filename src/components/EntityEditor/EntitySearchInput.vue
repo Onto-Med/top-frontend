@@ -152,25 +152,13 @@ export default defineComponent({
     const totalPages = ref(0)
     const { repositoryId } = storeToRefs(useEntity())
 
-<<<<<<< HEAD
     const loadOptions = async (input: string, page = 1): Promise<Entity[]> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
       let repositoryIds = undefined
-=======
-    const loadOptions = async (input: string|undefined, page = 1): Promise<EntityPage> => {
-      if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      let promise: Promise<AxiosResponse<EntityPage>>
->>>>>>> f164035e4c890e4976d0a6613513091fa11b42d9
       if (props.organisationId && props.repositoryId) {
         repositoryIds = [props.repositoryId]
       } else if (repository.value && repository.value.organisation) {
-<<<<<<< HEAD
         repositoryIds = [repository.value.id]
-=======
-        promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
-      } else {
-        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, undefined, true, page)
->>>>>>> f164035e4c890e4976d0a6613513091fa11b42d9
       }
       console.log(props.includePrimary)
       return entityApi.getEntities(
