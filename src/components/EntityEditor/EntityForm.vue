@@ -15,8 +15,8 @@
               :disable="readonly"
               :label="t('selectThing', { thing: t('category') }) + '...'"
               removeable
-              @removeClicked="$emit('removeSuperCategory', index)"
-              @entity-set="$emit('setSuperCategory', index, $event)"
+              @removeClicked="removeSuperCategory(index)"
+              @entity-set="setSuperCategory(index, $event)"
               @entityClicked="$emit('entityClicked', $event)"
             />
             <q-chip
@@ -26,7 +26,7 @@
               :disable="readonly"
               :label="t('more')"
               :title="t('addThing', { thing: t('superCategory') })"
-              @click="$emit('addSuperCategory')"
+              @click="addSuperCategory(undefined)"
             />
           </q-toolbar-title>
         </q-toolbar>
@@ -237,9 +237,9 @@ export default defineComponent({
   },
   emits: [
     'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
-    'update:dataType', 'update:titles', 'addSuperCategory', 'setSuperCategory', 'removeSuperCategory', 'update:itemType'
+    'update:dataType', 'update:titles', 'update:superCategories', 'update:itemType'
   ],
-  setup (props) {
+  setup (props, { emit }) {
     const { t } = useI18n()
     const router = useRouter()
     const { isRestricted, hasDataType, hasItemType, restrictionEntityTypes, getTitle } = useEntityFormatter()
@@ -270,7 +270,28 @@ export default defineComponent({
       routeToEntity (entity: Entity|undefined) {
         if (!entity || !entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
-      }
+      },
+
+      addSuperCategory (category: Category|undefined): void {
+        const newValue = props.superCategories || []
+        if (!category || newValue.findIndex(c => c && c.id === category.id) === -1)
+          if (props.entityId !== category?.id) newValue.push(category as Category)
+        emit('update:superCategories', newValue)
+      },
+
+      setSuperCategory (index: number, category: Category): void {
+        const newValue = props.superCategories || []
+        if (newValue.findIndex(c => c && c.id === category.id) === -1)
+          if (props.entityId !== category.id) newValue[index] = category
+        emit('update:superCategories', newValue)
+      },
+
+      removeSuperCategory (index: number): void {
+        const newValue = props.superCategories
+        if (!newValue) return
+        newValue.splice(index, 1)
+        emit('update:superCategories', newValue)
+      },
     }
   }
 })
