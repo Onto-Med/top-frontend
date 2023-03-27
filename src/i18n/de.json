@@ -227,7 +227,7 @@
   "searchThing": "{thing} suchen",
   "home": "Startseite",
   "navigation": "Navigation",
-  "createdAt": "Erzeugt am",
+  "createdAt": "Erzeugt am {date}",
   "name": "Name",
   "notSavedYet": "Noch nicht gespeichert!",
   "unsaved": "ungespeichert",
@@ -401,5 +401,6 @@
   "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
   "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
-  "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion."
+  "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
+  "updatedAt": "Aktualisiert am {date}"
 }

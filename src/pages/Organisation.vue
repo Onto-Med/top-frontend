@@ -192,11 +192,12 @@ export default defineComponent({
         }
 
         await promise
-          .then(() => {
+          .then(r => {
             showForm.value = false
             notify(t('thingSaved', { thing: t('repository') }), 'positive')
+            return r.data
           })
-          .then(() => {
+          .then(repository => {
             if (repository.createdAt)
               updateRow(repository)
             else
