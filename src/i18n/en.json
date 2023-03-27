@@ -227,7 +227,7 @@
   "searchThing": "Search {thing}",
   "home": "Home",
   "navigation": "Navigation",
-  "createdAt": "Created at",
+  "createdAt": "Created at {date}",
   "name": "Name",
   "notSavedYet": "Not saved yet!",
   "unsaved": "unsaved",
@@ -401,5 +401,6 @@
   "projectState": "Currently, the framework is under heavy development and will be extended with further functionalities.",
   "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search.",
   "emptyProjectionBehaviour": "A projection is mandatory, if no criteria are defined.",
-  "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection."
+  "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
+  "updatedAt": "Updated at {date}"
 }
