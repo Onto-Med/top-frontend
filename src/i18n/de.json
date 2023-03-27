@@ -46,7 +46,11 @@
   "function": "Funktion",
   "functionDescriptions": {
     "Date": "Ermittelt das Datum, zu dem das Argument beobachtet wurde.",
-    "MinTrue": "Gibt true zurück, falls mindestens X Argumente den Wert true besitzen. X muss als erstes Argument übergeben werden."
+    "MinTrue": "Gibt true zurück, falls mindestens X Argumente den Wert true besitzen. X muss als erstes Argument übergeben werden.",
+    "Filter": "Beschränkt die Werte eines Phänotyps auf den gewählten Wertebereich oder Beobachtungszeitraum. Das erste Argument der Funktion ist der Phänotyp, dessen werte eingeschränkt werden sollen. Alle weiteren Argumente sind Paare von Vergleichsoperatoren und Werten/Datumsangaben.",
+    "If": "Wenn das erste Argument wahr ist, wird das zweite zurückgegeben, andernfalls das dritte.",
+    "CutLast": "Gibt die Phänotypwerte mit Ausnahme des letzten zurück.",
+    "CutFirst": "Gibt die Phänotypwerte mit Ausnahme des ersten zurück."
   },
   "functions": {
     "Sum": "Summe",
@@ -82,7 +86,12 @@
     "Add": "+",
     "Substract": "-",
     "Power": "^",
-    "Li": "Liste"
+    "Li": "Liste",
+    "Filter": "Filter",
+    "Median": "Median",
+    "If": "If",
+    "CutLast": "CutLast",
+    "CutFirst": "CutFirst"
   },
   "hideThing": "{thing} ausblenden",
   "import": "Importieren",

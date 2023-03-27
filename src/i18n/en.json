@@ -46,9 +46,16 @@
   "function": "Function",
   "functionDescriptions": {
     "Date": "Determines the date when the argument was observed.",
-    "MinTrue": "Returns true if at least X arguments have the value true. X must be passed as the first argument."
+    "MinTrue": "Returns true if at least X arguments have the value true. X must be passed as the first argument.",
+    "Filter": "Restricts the values of a phenotype to the selected value range or observation period. The first argument of the function is the phenotype whose values are to be restricted. All further arguments are pairs of comparison operators and values/dates.",
+    "CutFirst": "Returns the phenotype values except for the first one.",
+    "CutLast": "Returns the phenotype values except for the last one.",
+    "If": "If the first argument is true, the second one is returned, otherwise the third."
   },
   "functions": {
+    "CutFirst": "CutFirst",
+    "CutLast": "CutLast",
+    "If": "If",
     "Sum": "Sum",
     "Last": "Last",
     "First": "First",
@@ -62,6 +69,7 @@
     "Empty": "Empty",
     "Entity": "Entity",
     "Max": "Max",
+    "Median": "Median",
     "MinTrue": "Min #true",
     "DiffDays": "ΔDays",
     "Date": "Date",
@@ -82,7 +90,8 @@
     "Add": "+",
     "Substract": "-",
     "Power": "^",
-    "Li": "List"
+    "Li": "List",
+    "Filter": "Filter"
   },
   "hideThing": "Hide {thing}",
   "import": "Import",
