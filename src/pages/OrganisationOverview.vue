@@ -143,11 +143,11 @@ export default defineComponent({
             notify(t('thingSaved', { thing: t('organisation') }), 'positive')
             return r.data
           })
-          .then(organisation => {
+          .then(newOrganisation => {
             if (organisation.createdAt)
-              updateRow(organisation)
+              updateRow(newOrganisation)
             else
-              routeToOrganisation(organisation)
+              routeToOrganisation(newOrganisation)
           })
           .catch((e: Error) => renderError(e))
           .finally(() => saving.value = false)
