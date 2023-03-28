@@ -50,7 +50,8 @@
     "Filter": "Beschränkt die Werte eines Phänotyps auf den gewählten Wertebereich oder Beobachtungszeitraum. Das erste Argument der Funktion ist der Phänotyp, dessen werte eingeschränkt werden sollen. Alle weiteren Argumente sind Paare von Vergleichsoperatoren und Werten/Datumsangaben.",
     "If": "Wenn das erste Argument wahr ist, wird das zweite zurückgegeben, andernfalls das dritte.",
     "CutLast": "Gibt die Phänotypwerte mit Ausnahme des letzten zurück.",
-    "CutFirst": "Gibt die Phänotypwerte mit Ausnahme des ersten zurück."
+    "CutFirst": "Gibt die Phänotypwerte mit Ausnahme des ersten zurück.",
+    "Switch": "Die switch-Funktion erhält Paare von Werten als Argumente. Wenn der erste Wert eines Paares wahr ist, wird der zweite Wert als Ergebnis der Funktion zurückgegeben. Die Paare werden nacheinander geprüft, und nur das erste Paar, das als wahr ausgewertet wird, wird berücksichtigt. Darüber hinaus haben Sie die Möglichkeit, einen Standardwert als letztes Argument zu definieren."
   },
   "functions": {
     "Sum": "Summe",
@@ -91,7 +92,8 @@
     "Median": "Median",
     "If": "If",
     "CutLast": "CutLast",
-    "CutFirst": "CutFirst"
+    "CutFirst": "CutFirst",
+    "Switch": "Switch"
   },
   "hideThing": "{thing} ausblenden",
   "import": "Importieren",
