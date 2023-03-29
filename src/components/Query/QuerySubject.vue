@@ -67,12 +67,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import QuerySubjectConfiguration from './QuerySubjectConfiguration.vue'
 import { useEntity } from 'src/pinia/entity'
-import { DateTimeRestriction, ExpressionFunction } from '@onto-med/top-api'
+import { DateTimeRestriction, Entity, ExpressionFunction } from '@onto-med/top-api'
 
 export default defineComponent({
   components: { QuerySubjectConfiguration },
@@ -109,7 +109,15 @@ export default defineComponent({
     const { t, d, te } = useI18n()
     const entityStore = useEntity()
     const { getSynonyms, isRestricted, getIcon, getTitle, requiresAggregationFunction } = useEntityFormatter()
-    const subject = computed(() => entityStore.getEntity(props.subjectId))
+    const subject = ref<Entity>()
+
+    const loadEntity = (subjectId: string) => entityStore.loadEntity(subjectId).then(e => subject.value = e)
+
+    watch(
+      () => props.subjectId,
+      (val) => loadEntity(val)
+    )
+    onBeforeMount(() => loadEntity(props.subjectId))
 
     return {
       t,
