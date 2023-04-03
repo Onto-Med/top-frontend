@@ -111,7 +111,7 @@
           </expression-argument-input>
         </template>
 
-        <template v-if="!readonly && fun && showMoreBtn">
+        <template v-if="fun && showMoreBtn">
           <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
           <q-icon
             name="add"
@@ -264,7 +264,7 @@ export default defineComponent({
       isConstant,
 
       showMoreBtn: computed(() =>
-        fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
+        !props.readonly && fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
       ),
 
       functionTitle: computed(() => {
