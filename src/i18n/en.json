@@ -413,5 +413,6 @@
   "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search.",
   "emptyProjectionBehaviour": "A projection is mandatory, if no criteria are defined.",
   "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
-  "updatedAt": "Updated at {date}"
+  "updatedAt": "Updated at {date}",
+  "goToThing": "Go to {thing}"
 }
