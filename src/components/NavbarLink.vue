@@ -1,15 +1,12 @@
 <template>
   <q-item
     clickable
-    tag="a"
-    :to="{ name: routeName }"
     exact
+    :to="{ name: routeName }"
+    :title="title"
+    tag="a"
   >
-    <q-item-section
-      v-if="icon"
-      avatar
-      :title="title"
-    >
+    <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>
 

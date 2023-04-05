@@ -413,5 +413,6 @@
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
   "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
   "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
-  "updatedAt": "Aktualisiert am {date}"
+  "updatedAt": "Aktualisiert am {date}",
+  "goToThing": "Gehe zu {thing}"
 }

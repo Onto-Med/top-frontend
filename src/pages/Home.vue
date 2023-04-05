@@ -52,9 +52,7 @@ import { useI18n } from 'vue-i18n'
 import packageInfo from '../../package.json'
 
 export default defineComponent({
-  name: 'Home',
   setup () {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const defaultApi = inject(DefaultApiKey)
     const statistic = ref(undefined as Statistic|undefined)
