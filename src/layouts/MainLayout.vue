@@ -125,6 +125,35 @@
     >
       <q-scroll-area class="fit">
         <q-list padding>
+          <NavbarLink v-bind="{ title: t('home'), icon: 'house', routeName: 'home' }" />
+
+          <q-expansion-item
+            clickable
+            exact
+            default-opened
+            :to="{ name: 'organisations' }"
+            :label="t('organisation', 2)"
+            :title="t('organisation', 2)"
+            :caption="t('collaborativeWork')"
+            :content-inset-level="1"
+            :hide-expand-icon="!organisation"
+            icon="groups"
+            tag="a"
+          >
+            <q-item
+              v-if="organisation"
+              clickable
+              :to="{ name: 'showOrganisation', params: { organisationId: organisation.id } }"
+              :title="t('goToThing', { thing: t('organisation') })"
+              :active="!!organisation"
+              tag="a"
+            >
+              <q-item-section>
+                {{ organisation.name }}
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+
           <NavbarLink
             v-for="link in links.filter(l => !l.isHidden)"
             :key="link.title"
@@ -194,6 +223,7 @@ import { Entity, ForkingInstruction } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
 import useNotify from 'src/mixins/useNotify'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
@@ -210,28 +240,17 @@ export default defineComponent({
     const leftDrawerOpen = ref(true)
     const $q = useQuasar()
     const { notify, renderError } = useNotify()
-    const keycloak = entityStore.keycloak
+    const { keycloak, organisation } = storeToRefs(entityStore)
     const forkOrigin = ref(undefined as Entity|undefined)
     const drawer = ref(undefined as QMenu|undefined)
 
     const linksList = computed(() => [
       {
-        title: t('home'),
-        icon: 'house',
-        routeName: 'home'
-      },
-      {
-        title: t('organisation', 2),
-        icon: 'groups',
-        caption: t('collaborativeWork'),
-        routeName: 'organisations',
-      },
-      {
         title: t('document', 2),
         icon: 'article',
         caption: t('documentSearch', 2),
         routeName: 'documentSearch',
-        isHidden: keycloak && !keycloak.authenticated
+        isHidden: keycloak.value && !keycloak.value.authenticated
       }
     ])
 
@@ -247,11 +266,12 @@ export default defineComponent({
       fasBook,
       keycloak,
       forkOrigin,
+      organisation,
       showForkCreateDialog: ref(false),
       smallScreen: computed(() => $q.screen.lt.md),
-      username: computed(() => (keycloak?.tokenParsed?.name || keycloak?.tokenParsed?.preferred_username) as string | undefined),
+      username: computed(() => (keycloak.value?.tokenParsed?.name || keycloak.value?.tokenParsed?.preferred_username) as string | undefined),
 
-      editAccountUrl: keycloak?.createAccountUrl(),
+      editAccountUrl: keycloak.value?.createAccountUrl(),
 
       repositoryId: computed(() => {
         const route = router.currentRoute.value

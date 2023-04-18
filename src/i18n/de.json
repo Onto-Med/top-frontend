@@ -2,10 +2,8 @@
   "ageRestriction": "Altersbegrenzung|Altersbegrenzungen",
   "ageRestrictionDescription": "Legen Sie eine oder mehrere Altersbegrenzungen fest. Altersangaben werden in Jahren angegeben.",
   "aggregationFunction": "Aggregationsfunktion|Aggregationsfunktionen",
-  "aggregationFunctionDescription": "Wählen Sie eine Aggregationsfunktion für Fälle, in denen diese Abfrage mehrere Werte für einen einzigen Phänotyp liefert.",
+  "aggregationFunctionDescription": "Dies ist ein zusammengesetzter Phänotyp, was bedeutet, dass eine Standardaggregationsfunktion für Fälle erforderlich ist, in denen keine Funktion explizit im Ausdruck eines Phänotyps angegeben ist.  Aggregationsfunktionen werden benötigt, um mehrere Phänotypwerte zu einem Wert zu aggregieren und für Berechnungen verwenden zu können.",
   "and": "und",
-  "appSubtitle": "Diese Framework unterstützt bei der Modellierung und Anwendung von Phänotypen.",
-  "appDescription": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
   "asc": "Aufsteigend",
   "back": "Zurück",
   "buildQuery": "Abfrage erstellen|Abfragen erstellen",
@@ -35,7 +33,7 @@
   "duplicate": "Duplizieren",
   "elapsedTime": "Verstrichene Zeit",
   "eligibilityCriterion": "Auswahlkriterium|Auswahlkriterien",
-  "eligibilityCriterionSelection": "Klicken Sie auf Phänotypen im linken Baum, um sie der Liste hinzuzufügen.",
+  "eligibilityCriterionSelection": "Klicken Sie im linken Baum auf Phänotypen, um sie der Kriterienliste hinzuzufügen.",
   "entityIsForkDescription": "Diese Entität wurde von einer Entität in einem anderen Repositorium geforkt.",
   "exclusion": "Ausschluss|Ausschlüsse",
   "execute": "Ausführen",
@@ -48,7 +46,12 @@
   "function": "Funktion",
   "functionDescriptions": {
     "Date": "Ermittelt das Datum, zu dem das Argument beobachtet wurde.",
-    "MinTrue": "Gibt true zurück, falls mindestens X Argumente den Wert true besitzen. X muss als erstes Argument übergeben werden."
+    "MinTrue": "Gibt true zurück, falls mindestens X Argumente den Wert true besitzen. X muss als erstes Argument übergeben werden.",
+    "Filter": "Beschränkt die Werte eines Phänotyps auf den gewählten Wertebereich oder Beobachtungszeitraum. Das erste Argument der Funktion ist der Phänotyp, dessen werte eingeschränkt werden sollen. Alle weiteren Argumente sind Paare von Vergleichsoperatoren und Werten/Datumsangaben.",
+    "If": "Wenn das erste Argument wahr ist, wird das zweite zurückgegeben, andernfalls das dritte.",
+    "CutLast": "Gibt die Phänotypwerte mit Ausnahme des letzten zurück.",
+    "CutFirst": "Gibt die Phänotypwerte mit Ausnahme des ersten zurück.",
+    "Switch": "Die switch-Funktion erhält Paare von Werten als Argumente. Wenn der erste Wert eines Paares wahr ist, wird der zweite Wert als Ergebnis der Funktion zurückgegeben. Die Paare werden nacheinander geprüft, und nur das erste Paar, das als wahr ausgewertet wird, wird berücksichtigt. Darüber hinaus haben Sie die Möglichkeit, einen Standardwert als letztes Argument zu definieren."
   },
   "functions": {
     "Sum": "Summe",
@@ -84,7 +87,13 @@
     "Add": "+",
     "Substract": "-",
     "Power": "^",
-    "Li": "Liste"
+    "Li": "Liste",
+    "Filter": "Filter",
+    "Median": "Median",
+    "If": "If",
+    "CutLast": "CutLast",
+    "CutFirst": "CutFirst",
+    "Switch": "Switch"
   },
   "hideThing": "{thing} ausblenden",
   "import": "Importieren",
@@ -98,7 +107,7 @@
   "performThing": "{thing} ausführen",
   "pleaseModifySettings": "Bitte passen Sie die Einstellungen an",
   "projection": "Projektion|Projektionen",
-  "projectionSelection": "Klicken Sie auf einfache Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.",
+  "projectionSelection": "Klicken Sie auf Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.",
   "query": "Abfrage|Abfragen",
   "queryExecuteDescription": "Führen Sie die Abfrage jetzt aus und lassen Sie sich die Ergebnismenge anzeigen.",
   "queryExportDescription": "Speichern Sie diese Abfrage, um sie später erneut verwenden zu können.",
@@ -111,7 +120,6 @@
   "rScript": "R-Skript|R-Skripte",
   "running": "Läuft",
   "selection": "Selektion|Selektionen",
-  "sorting": "Sortierung|Sortierungen",
   "source": "Quelle|Quellen",
   "superCategory": "Super-Kategorie|Super-Kategorien",
   "thingIsInvalid": "{thing} ist ungültig",
@@ -230,7 +238,7 @@
   "searchThing": "{thing} suchen",
   "home": "Startseite",
   "navigation": "Navigation",
-  "createdAt": "Erzeugt am",
+  "createdAt": "Erzeugt am {date}",
   "name": "Name",
   "notSavedYet": "Noch nicht gespeichert!",
   "unsaved": "ungespeichert",
@@ -400,5 +408,11 @@
   "notAuthenticated": {
     "onlyPrimaryVisible": "Sie sind nicht angemeldet, daher sind nur primäre Repositorien für Sie sichtbar."
   },
-  "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse"
+  "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse",
+  "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
+  "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
+  "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
+  "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
+  "updatedAt": "Aktualisiert am {date}",
+  "goToThing": "Gehe zu {thing}"
 }

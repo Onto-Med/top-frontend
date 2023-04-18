@@ -2,10 +2,8 @@
   "ageRestriction": "Age restriction|Age restrictions",
   "ageRestrictionDescription": "Set one or more age restrictions for this phenotype. Values are in years.",
   "aggregationFunction": "Aggregation function|Aggregation functions",
-  "aggregationFunctionDescription": "Select an aggregation function for cases, where this query returns multiple values for a single phenotype.",
+  "aggregationFunctionDescription": "This is a composite phenotype, which means that a default aggregation function is required for cases where no function is explicitly given in the expression of a phenotype. Aggregation functions are needed to aggregate multiple phenotype values to one value and to be able to use it for calculations.",
   "and": "and",
-  "appSubtitle": "This framework supports the modelling and application of phenotypes.",
-  "appDescription": "Currently, the framework is under heavy development and will be extended with further functionalities.",
   "asc": "Ascending",
   "back": "Back",
   "buildQuery": "Build query|Build queries",
@@ -35,7 +33,7 @@
   "duplicate": "Duplicate",
   "elapsedTime": "Elapsed time",
   "eligibilityCriterion": "Eligibility criterion|Eligibility criteria",
-  "eligibilityCriterionSelection": "Click on phenotypes in the left tree to add them to the list.",
+  "eligibilityCriterionSelection": "Click on phenotypes in the left tree to add them to the criteria list.",
   "entityIsForkDescription": "This entity has been forked from an entity in another repository.",
   "exclusion": "Exclusion|Exclusions",
   "execute": "Execute",
@@ -48,9 +46,17 @@
   "function": "Function",
   "functionDescriptions": {
     "Date": "Determines the date when the argument was observed.",
-    "MinTrue": "Returns true if at least X arguments have the value true. X must be passed as the first argument."
+    "MinTrue": "Returns true if at least X arguments have the value true. X must be passed as the first argument.",
+    "Filter": "Restricts the values of a phenotype to the selected value range or observation period. The first argument of the function is the phenotype whose values are to be restricted. All further arguments are pairs of comparison operators and values/dates.",
+    "CutFirst": "Returns the phenotype values except for the first one.",
+    "CutLast": "Returns the phenotype values except for the last one.",
+    "If": "If the first argument is true, the second one is returned, otherwise the third.",
+    "Switch": "The switch function receives pairs of values as arguments. If the first value of a pair is true, the second value is returned as the result of the function. The pairs are checked sequentially and only the first pair that evaluates to true is considered. In addition, you have the option to define a default value as the last argument."
   },
   "functions": {
+    "CutFirst": "CutFirst",
+    "CutLast": "CutLast",
+    "If": "If",
     "Sum": "Sum",
     "Last": "Last",
     "First": "First",
@@ -64,6 +70,7 @@
     "Empty": "Empty",
     "Entity": "Entity",
     "Max": "Max",
+    "Median": "Median",
     "MinTrue": "Min #true",
     "DiffDays": "ΔDays",
     "Date": "Date",
@@ -84,7 +91,9 @@
     "Add": "+",
     "Substract": "-",
     "Power": "^",
-    "Li": "List"
+    "Li": "List",
+    "Filter": "Filter",
+    "Switch": "Switch"
   },
   "hideThing": "Hide {thing}",
   "import": "Import",
@@ -111,7 +120,6 @@
   "rScript": "R script|R scripts",
   "running": "Running",
   "selection": "Selection|Selections",
-  "sorting": "Sorting|Sortings",
   "source": "Source|Sources",
   "superCategory": "Super category|Super categories",
   "thingIsInvalid": "{thing} is invalid",
@@ -230,7 +238,7 @@
   "searchThing": "Search {thing}",
   "home": "Home",
   "navigation": "Navigation",
-  "createdAt": "Created at",
+  "createdAt": "Created at {date}",
   "name": "Name",
   "notSavedYet": "Not saved yet!",
   "unsaved": "unsaved",
@@ -400,5 +408,11 @@
   "notAuthenticated": {
     "onlyPrimaryVisible": "You are not logged in, so only primary repositories will be visible to you."
   },
-  "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results"
+  "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
+  "projectState": "Currently, the framework is under heavy development and will be extended with further functionalities.",
+  "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search.",
+  "emptyProjectionBehaviour": "A projection is mandatory, if no criteria are defined.",
+  "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
+  "updatedAt": "Updated at {date}",
+  "goToThing": "Go to {thing}"
 }

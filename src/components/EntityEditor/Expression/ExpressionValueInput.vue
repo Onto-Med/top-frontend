@@ -5,7 +5,7 @@
       {{ defaultConstant.title || defaultConstant.id }}
     </span>
     <span v-else-if="value">
-      {{ value.value }}
+      {{ isStringValue ? '"' + value.value + '"' : value.value }}
     </span>
     <span v-else>
       {{ '[' + t('constant') + ']' }}
@@ -121,6 +121,8 @@ export default defineComponent({
         else if (dataType.value === DataType.String) return 'article'
         return 'question_mark'
       }),
+
+      isStringValue: computed(() => props.value?.dataType === DataType.String),
 
       toInputType (dataType: DataType): string {
         if (dataType === DataType.DateTime) return 'datetime-local'

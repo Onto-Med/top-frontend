@@ -9,8 +9,7 @@
           clearable
           dense
           emit-value
-          use-chips
-          multiple
+          map-options
           class="col"
         />
       </q-item>
