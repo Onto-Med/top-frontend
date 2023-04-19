@@ -36,8 +36,24 @@
       <q-separator />
 
       <q-card>
-        <q-card-section>
-          <pre v-show="!running" class="q-ma-none">{{ result }}</pre>
+        <q-card-section v-if="result && !running">
+          <div v-if="done">
+            <p>
+              {{ t('dataSetCount', { count: result.count }) }}
+            </p>
+            <q-btn
+              v-if="done"
+              no-caps
+              icon="save"
+              color="primary"
+              :label="t('downloadDataSet')"
+              @click="download"
+            />
+          </div>
+          <div v-else>
+            <p>{{ t('queryFailedDescription') }}</p>
+            <pre>{{ result.message }}</pre>
+          </div>
         </q-card-section>
       </q-card>
     </q-expansion-item>
@@ -46,7 +62,11 @@
 
 <script lang="ts">
 import { Query, QueryResult, QueryState } from '@onto-med/top-api'
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { exportFile } from 'quasar'
+import { QueryApiKey } from 'src/boot/axios'
+import { useEntity } from 'src/pinia/entity'
+import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -64,9 +84,11 @@ export default defineComponent({
   emits: ['remove', 'prefill'],
   setup(props) {
     const { t } = useI18n()
+    const queryApi = inject(QueryApiKey)
     const timer = ref(undefined as undefined|number)
     const elapsedTime = ref(undefined as undefined|string)
     const running = computed(() => !props.result?.finishedAt)
+    const { organisationId, repositoryId } = storeToRefs(useEntity())
 
     const setElapsedTime = (result: QueryResult) => {
       const finishedAt = result.finishedAt
@@ -99,7 +121,14 @@ export default defineComponent({
       running,
       expanded: !props.result?.finishedAt,
       done: computed(() => !running.value && props.result?.state === QueryState.Finished),
-      failed: computed(() => !running.value && props.result?.state === QueryState.Failed)
+      failed: computed(() => !running.value && props.result?.state === QueryState.Failed),
+
+      async download () {
+        if (!queryApi || !props.result || !organisationId.value || !repositoryId.value) return
+        const queryId = props.result.id
+        await queryApi.downloadQueryResult(organisationId.value, repositoryId.value, queryId, { responseType: 'blob' })
+          .then(r => exportFile(queryId + '.zip', r.data as Blob))
+      }
     }
   }
 })

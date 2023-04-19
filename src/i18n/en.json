@@ -414,5 +414,8 @@
   "emptyProjectionBehaviour": "A projection is mandatory, if no criteria are defined.",
   "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
   "updatedAt": "Updated at {date}",
-  "goToThing": "Go to {thing}"
+  "goToThing": "Go to {thing}",
+  "dataSetCount": "The query yielded no subjects.|The query yielded {count} subject.|The query yielded {count} subjects.",
+  "downloadDataSet": "Download whole data set",
+  "queryFailedDescription": "Your query has failed! Please see the error message below. Modify your query and try again."
 }
