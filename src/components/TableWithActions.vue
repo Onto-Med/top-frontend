@@ -50,7 +50,9 @@
             <slot name="row-cells" :row="props.row">
               <q-td>{{ props.row.name || props.row.id }}</q-td>
               <q-td>{{ props.row.description }}</q-td>
-              <q-td>{{ d(props.row.createdAt, 'long') }}</q-td>
+              <q-td :title="t('createdAt', { date: d(props.row.createdAt, 'long') })">
+                {{ d(props.row.updatedAt, 'long') }}
+              </q-td>
             </slot>
           </q-tr>
         </template>
@@ -116,7 +118,7 @@ export default defineComponent({
           { name: 'actions' },
           { name: 'name', field: 'name', label: t('name'), align: 'left', required: true },
           { name: 'description', field: 'description', label: t('description'), align: 'left' },
-          { name: 'createdAt', field: 'createdAt', label: t('createdAt'), align: 'left' }
+          { name: 'updatedAt', field: 'updatedAt', label: t('updatedAt'), align: 'left' }
         ] as QTableProps['columns']
       }),
 

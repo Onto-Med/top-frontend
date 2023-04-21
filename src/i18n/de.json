@@ -46,7 +46,12 @@
   "function": "Funktion",
   "functionDescriptions": {
     "Date": "Ermittelt das Datum, zu dem das Argument beobachtet wurde.",
-    "MinTrue": "Gibt true zurück, falls mindestens X Argumente den Wert true besitzen. X muss als erstes Argument übergeben werden."
+    "MinTrue": "Gibt true zurück, falls mindestens X Argumente den Wert true besitzen. X muss als erstes Argument übergeben werden.",
+    "Filter": "Beschränkt die Werte eines Phänotyps auf den gewählten Wertebereich oder Beobachtungszeitraum. Das erste Argument der Funktion ist der Phänotyp, dessen werte eingeschränkt werden sollen. Alle weiteren Argumente sind Paare von Vergleichsoperatoren und Werten/Datumsangaben.",
+    "If": "Wenn das erste Argument wahr ist, wird das zweite zurückgegeben, andernfalls das dritte.",
+    "CutLast": "Gibt die Phänotypwerte mit Ausnahme des letzten zurück.",
+    "CutFirst": "Gibt die Phänotypwerte mit Ausnahme des ersten zurück.",
+    "Switch": "Die switch-Funktion erhält Paare von Werten als Argumente. Wenn der erste Wert eines Paares wahr ist, wird der zweite Wert als Ergebnis der Funktion zurückgegeben. Die Paare werden nacheinander geprüft, und nur das erste Paar, das als wahr ausgewertet wird, wird berücksichtigt. Darüber hinaus haben Sie die Möglichkeit, einen Standardwert als letztes Argument zu definieren."
   },
   "functions": {
     "Sum": "Summe",
@@ -82,7 +87,13 @@
     "Add": "+",
     "Substract": "-",
     "Power": "^",
-    "Li": "Liste"
+    "Li": "Liste",
+    "Filter": "Filter",
+    "Median": "Median",
+    "If": "If",
+    "CutLast": "CutLast",
+    "CutFirst": "CutFirst",
+    "Switch": "Switch"
   },
   "hideThing": "{thing} ausblenden",
   "import": "Importieren",
@@ -227,7 +238,7 @@
   "searchThing": "{thing} suchen",
   "home": "Startseite",
   "navigation": "Navigation",
-  "createdAt": "Erzeugt am",
+  "createdAt": "Erzeugt am {date}",
   "name": "Name",
   "notSavedYet": "Noch nicht gespeichert!",
   "unsaved": "ungespeichert",
@@ -401,5 +412,10 @@
   "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
   "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
-  "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion."
+  "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
+  "updatedAt": "Aktualisiert am {date}",
+  "goToThing": "Gehe zu {thing}",
+  "dataSetCount": "Die Abfrage ergab keine Subjekte.|Die Abfrage ergab {count} Subjekt.|Die Abfrage ergab {count} Subjekte.",
+  "downloadDataSet": "Gesamten Datensatz herunterladen",
+  "queryFailedDescription": "Ihre Abfrage ist fehlgeschlagen! \nBitte beachten Sie die Fehlermeldung unten. \nÄndern Sie Ihre Abfrage und versuchen Sie es erneut."
 }
