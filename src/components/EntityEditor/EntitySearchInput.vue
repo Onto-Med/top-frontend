@@ -59,7 +59,7 @@
             <q-icon :name="getIcon(scope.opt)" :title="getIconTooltip(scope.opt)" :class="{ restriction: isRestricted(scope.opt) }" />
           </q-item-section>
           <q-item-section>
-            <q-item-label v-if="!(repositoryId && organisationId) && scope.opt.repository" overline>
+            <q-item-label v-if="(!(repositoryId && organisationId) || fork) && scope.opt.repository" overline>
               {{ scope.opt.repository.name }}
             </q-item-label>
             <q-item-label>{{ getTitle(scope.opt, true) }}</q-item-label>
@@ -69,7 +69,7 @@
               </q-item-label>
             </template>
           </q-item-section>
-          <q-item-section v-show="fork && currentRepositoryId && currentRepositoryId !== scope.opt.repository.id && scope.opt.repository.primary" avatar>
+          <q-item-section v-show="isLoggedIn && fork && !implicitFork && currentRepositoryId && currentRepositoryId !== scope.opt.repository.id && scope.opt.repository.primary" avatar>
             <q-btn
               v-close-popup
               flat
@@ -89,15 +89,20 @@
         </q-item>
       </template>
     </q-select>
+
+    <fork-create-dialog
+      v-model:show="showForkCreateDialog"
+      :origin="forkOrigin"
+      @create-fork="forkEntity(forkOrigin, $event)"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, nextTick } from 'vue'
+import { defineComponent, ref, inject, nextTick, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, Entity, Repository, DataType, ItemType, EntityPage } from '@onto-med/top-api'
+import { EntityType, Entity, Repository, DataType, ItemType, EntityPage, ForkingInstruction } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
-import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import ScrollDetails from 'src/mixins/ScrollDetails'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
@@ -105,10 +110,12 @@ import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
 import { QSelect } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
+import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDialog.vue'
 
 export default defineComponent({
   components: {
-    RepositorySelectField
+    RepositorySelectField,
+    ForkCreateDialog
   },
   props: {
     label: String,
@@ -133,7 +140,10 @@ export default defineComponent({
     autofocus: Boolean,
     organisationId: String,
     repositoryId: String,
+    /** Whether search field supports forking from other repositories. */
     fork: Boolean,
+    /** Whether fork is done by clicking a copy btn (default) or implicitly by selecting an entity. */
+    implicitFork: Boolean,
     repositoryFilter: Boolean
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
@@ -141,7 +151,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { getTitle, getIcon, getIconTooltip, getSynonyms, getDescriptions, isRestricted } = useEntityFormatter()
     const entityApi  = inject(EntityApiKey)
-    const { renderError } = useNotify()
+    const { notify, renderError } = useNotify()
     const options    = ref([] as Entity[])
     const selection  = ref(null)
     const loading    = ref(false)
@@ -150,19 +160,29 @@ export default defineComponent({
     const prevInput  = ref(undefined as string|undefined)
     const nextPage   = ref(2)
     const totalPages = ref(0)
-    const { repositoryId } = storeToRefs(useEntity())
+    const entityStore = useEntity()
+    const { keycloak, repositoryId } = storeToRefs(entityStore)
+    const forkOrigin = ref<Entity>()
+    const showForkCreateDialog = ref(false)
+    const isLoggedIn = computed(() => keycloak.value?.authenticated)
 
     const loadOptions = async (input: string|undefined, page = 1): Promise<EntityPage> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      let promise: Promise<AxiosResponse<EntityPage>>
+      let repositoryIds = undefined
       if (props.organisationId && props.repositoryId) {
-        promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
+        repositoryIds = [props.repositoryId]
       } else if (repository.value && repository.value.organisation) {
-        promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
-      } else {
-        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, undefined, true, page)
+        repositoryIds = [repository.value.id]
       }
-      return promise.then((r) => r.data)
+      return entityApi.getEntities(
+        undefined, input, props.entityTypes, props.dataType, props.itemType, repositoryIds, props.fork, page
+      ).then((r) => r.data)
+    }
+
+    const handleFork = (entity: Entity) => {
+      select.value?.updateInputValue('')
+      forkOrigin.value = entity
+      showForkCreateDialog.value = true
     }
 
     return {
@@ -174,6 +194,10 @@ export default defineComponent({
       getDescriptions,
       isRestricted,
       currentRepositoryId: repositoryId,
+      showForkCreateDialog,
+      forkOrigin,
+      handleFork,
+      isLoggedIn,
 
       select,
       repository,
@@ -225,12 +249,26 @@ export default defineComponent({
           selection.value = null
           repository.value = undefined
         }
-        emit('entitySelected', entity)
+        if (isLoggedIn.value && props.fork && props.implicitFork && repositoryId.value && repositoryId.value !== entity.repository?.id && entity.repository?.primary) {
+          handleFork(entity)
+        } else {
+          emit('entitySelected', entity)
+        }
       },
 
-      handleFork (entity: Entity) {
-        select.value?.updateInputValue('')
-        emit('forkClicked', entity)
+      forkEntity (entity: Entity|undefined, forkingInstruction: ForkingInstruction) {
+        if (!entity) return
+        entityStore.forkEntity(entity, forkingInstruction)
+          .then(result => {
+            forkOrigin.value = undefined
+            if (result.count) {
+              notify(t('thingCreatedOrUpdated', { thing: `${result.count} ` + t('fork', result.count) }), 'positive')
+              if (result.entity) emit('entitySelected', result.entity)
+            } else {
+              notify(t('forkCouldNotBeCreated'), 'warning')
+            }
+          })
+          .catch((e: Error) => renderError(e))
       }
     }
   }

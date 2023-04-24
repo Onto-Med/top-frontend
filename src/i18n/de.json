@@ -417,5 +417,8 @@
   "goToThing": "Gehe zu {thing}",
   "dataSetCount": "Die Abfrage ergab keine Subjekte.|Die Abfrage ergab {count} Subjekt.|Die Abfrage ergab {count} Subjekte.",
   "downloadDataSet": "Gesamten Datensatz herunterladen",
-  "queryFailedDescription": "Ihre Abfrage ist fehlgeschlagen! \nBitte beachten Sie die Fehlermeldung unten. \nÄndern Sie Ihre Abfrage und versuchen Sie es erneut."
+  "queryFailedDescription": "Ihre Abfrage ist fehlgeschlagen! \nBitte beachten Sie die Fehlermeldung unten. \nÄndern Sie Ihre Abfrage und versuchen Sie es erneut.",
+  "includePrimaryRepositories": "Primäre Repositorien einschließen",
+  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositories zu erweitern.",
+  "forkCouldNotBeCreated": "Es konnte kein Fork erstellt werden, da möglicherweise bereits ein aktueller Fork in diesem Repository vorhanden ist."
 }
