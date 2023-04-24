@@ -419,5 +419,6 @@
   "downloadDataSet": "Gesamten Datensatz herunterladen",
   "queryFailedDescription": "Ihre Abfrage ist fehlgeschlagen! \nBitte beachten Sie die Fehlermeldung unten. \nÄndern Sie Ihre Abfrage und versuchen Sie es erneut.",
   "includePrimaryRepositories": "Primäre Repositorien einschließen",
-  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositories zu erweitern."
+  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositories zu erweitern.",
+  "forkCouldNotBeCreated": "Es konnte kein Fork erstellt werden, da möglicherweise bereits ein aktueller Fork in diesem Repository vorhanden ist."
 }

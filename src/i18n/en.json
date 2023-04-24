@@ -419,5 +419,6 @@
   "downloadDataSet": "Download whole data set",
   "queryFailedDescription": "Your query has failed! Please see the error message below. Modify your query and try again.",
   "includePrimaryRepositories": "Include primary repositories",
-  "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in primary repositories."
+  "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in primary repositories.",
+  "forkCouldNotBeCreated": "A fork could not be created because there may already be an up-to-date fork in this repository."
 }

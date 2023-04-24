@@ -18,7 +18,8 @@
           :data-type="dataType"
           :organisation-id="organisationId"
           :repository-id="repositoryId"
-          :include-primary="includePrimaryRepositories"
+          :fork="includePrimaryRepositories"
+          implicit-fork
           class="q-px-sm"
           @entity-selected="setEntity($event)"
           @btn-clicked="popup.cancel()"

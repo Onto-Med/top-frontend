@@ -212,8 +212,8 @@ export const useEntity = defineStore('entity', {
       return duplicate
     },
 
-    async forkEntity(entity: Entity, forkingInstruction: ForkingInstruction): Promise<number> {
-      if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return 0
+    async forkEntity(entity: Entity, forkingInstruction: ForkingInstruction): Promise<ForkResult> {
+      if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return { count: 0 }
 
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
@@ -232,9 +232,12 @@ export const useEntity = defineStore('entity', {
       ).then(r => {
         if (organisationId === this.organisationId && repositoryId === this.repositoryId) {
           r.data.forEach(e => this.addOrReplaceEntity(e))
-          return r.data.length
+          return {
+            count: r.data.length,
+            entity: r.data.filter(e => e.equivalentEntities?.find(eq => eq.id === entity.id))[0]
+          } as ForkResult
         }
-        return 0
+        return { count: 0 }
       })
     },
 
@@ -379,3 +382,8 @@ export const useEntity = defineStore('entity', {
     }
   }
 })
+
+interface ForkResult {
+  count: number,
+  entity?: Entity
+}
