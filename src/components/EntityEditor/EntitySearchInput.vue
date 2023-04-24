@@ -97,7 +97,6 @@ import { defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityType, Entity, Repository, DataType, ItemType, EntityPage } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
-import { AxiosResponse } from 'axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import ScrollDetails from 'src/mixins/ScrollDetails'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
@@ -134,7 +133,8 @@ export default defineComponent({
     organisationId: String,
     repositoryId: String,
     fork: Boolean,
-    repositoryFilter: Boolean
+    repositoryFilter: Boolean,
+    includePrimary: Boolean
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {
@@ -154,15 +154,16 @@ export default defineComponent({
 
     const loadOptions = async (input: string|undefined, page = 1): Promise<EntityPage> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      let promise: Promise<AxiosResponse<EntityPage>>
+      let repositoryIds = undefined
       if (props.organisationId && props.repositoryId) {
-        promise = entityApi.getEntitiesByRepositoryId(props.organisationId, props.repositoryId, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
+        repositoryIds = [props.repositoryId]
       } else if (repository.value && repository.value.organisation) {
-        promise = entityApi.getEntitiesByRepositoryId(repository.value.organisation.id, repository.value.id, undefined, input, props.entityTypes, props.dataType, props.itemType, page)
-      } else {
-        promise = entityApi.getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, undefined, true, page)
+        repositoryIds = [repository.value.id]
       }
-      return promise.then((r) => r.data)
+      console.log(props.includePrimary)
+      return entityApi.getEntities(
+        undefined, input, props.entityTypes, props.dataType, props.itemType, repositoryIds, props.includePrimary, page
+      ).then((r) => r.data)
     }
 
     return {
