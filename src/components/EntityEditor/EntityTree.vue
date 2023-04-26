@@ -70,7 +70,7 @@
               v-if="showContextMenu"
               :entity="node"
               :allowed-entity-types="allowedEntityTypes"
-              @delete-entity-clicked="$emit('deleteEntity', $event)"
+              @delete-entity-clicked="(entity, cascade) => $emit('deleteEntity', entity, cascade)"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
             />

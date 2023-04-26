@@ -304,11 +304,11 @@ export default defineComponent({
       repository,
       isAuthenticated,
 
-      deleteEntity (entity: Entity): void {
+      deleteEntity (entity: Entity, cascade?: boolean): void {
         if (!entity || !entityApi) return
         treeLoading.value = true
 
-        entityStore.deleteEntity(entity)
+        entityStore.deleteEntity(entity, cascade)
           .then(() => {
             notify(t('thingDeleted', { thing: t('entity') }), 'positive')
             closeTab(entity)
