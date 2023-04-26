@@ -195,7 +195,7 @@
     </q-card>
 
     <query-result-view
-      v-for="run in runs.slice().reverse()"
+      v-for="run in runs"
       :key="run.query.id"
       show-timer
       :result="run.result"
@@ -328,7 +328,7 @@ export default defineComponent({
         query.value.dataSources && query.value.dataSources.length > 0
       ),
 
-      querySubjectPresent: computed(() => 
+      querySubjectPresent: computed(() =>
         query.value.criteria && query.value.criteria.length > 0
         || query.value.projection && query.value.projection.length > 0
       ),
