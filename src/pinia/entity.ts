@@ -1,5 +1,10 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier, DefaultApi, Converter } from '@onto-med/top-api'
+import {
+  BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
+  ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction,
+  RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction,
+  DataSource, DataSourceApi, Quantifier, DefaultApi, Converter
+} from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -278,7 +283,7 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async deleteEntity(entity: Entity) {
+    async deleteEntity(entity: Entity, cascade?: boolean) {
       const index = this.entities.findIndex(e => e.id === entity.id)
       if (index === -1) return
 
@@ -290,7 +295,9 @@ export const useEntity = defineStore('entity', {
             name: 'MissingAttributesException',
             message: 'attributesMissing'
           }
-        await this.entityApi?.deleteEntityById(organisationId, repositoryId, entity.id)
+
+        const deleteOptions = { cascade: cascade || false } as EntityDeleteOptions
+        await this.entityApi?.deleteEntityById(organisationId, repositoryId, entity.id, undefined, undefined, deleteOptions)
           .then(() => {
             if (organisationId === this.organisationId && repositoryId === this.repositoryId)
               this.entities.splice(index, 1)

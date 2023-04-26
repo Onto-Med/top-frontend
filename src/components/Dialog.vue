@@ -1,9 +1,17 @@
 <template #append>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card>
       <q-card-section class="row items-center">
         <q-avatar v-if="icon" :icon="iconName" :color="iconColor" :text-color="iconTextColor" />
-        <span v-if="message" class="col q-ml-sm">{{ message }}</span>
+        <div v-if="message" class="col q-ml-sm">
+          {{ message }}
+          <br>
+          <q-checkbox
+            v-if="checkbox"
+            v-model:model-value="checkboxValue"
+            :label="checkboxLabel"
+          />
+        </div>
       </q-card-section>
 
       <q-separator />
@@ -17,9 +25,9 @@
 </template>
 
 <script lang="ts">
-import { QDialog } from 'quasar';
+import { useDialogPluginComponent } from 'quasar'
 import { defineComponent, ref } from 'vue'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   props: {
@@ -39,37 +47,27 @@ export default defineComponent({
     iconTextColor: {
       type: String,
       default: 'white'
-    }
+    },
+    checkbox: Boolean,
+    checkboxLabel: String
   },
-emits: ['hide', 'ok'],
-  setup(props, { emit }) {
+  emits: ['hide', 'ok'],
+  setup(props) {
     const { t } = useI18n()
-    const dialog = ref<QDialog|undefined>(undefined)
-    const show = () => {
-      dialog.value?.show()
-    }
-    const hide = () => {
-      dialog.value?.hide()
-    }
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+    const checkboxValue = ref(false)
 
     return {
       t,
-      dialog,
-      show,
-      hide,
-
-      onDialogHide () {
-        emit('hide')
-      },
+      checkboxValue,
+      dialogRef,
+      onDialogHide,
 
       onOkClick () {
-        emit('ok')
-        hide()
+        onDialogOK(props.checkbox ? checkboxValue.value : undefined)
       },
 
-      onCancelClick () {
-        hide()
-      }
+      onCancelClick: onDialogCancel
     }
   }
 })

@@ -272,7 +272,6 @@
     "formulaHelp": "Hier können mathematische Formeln eingegeben werden, mit denen die Werte des Phänotyps berechnet werden. Formeln können sowohl andere Phänotypen als auch Konstanten enthalten.",
     "restrictionHelp": "Spezifizieren Sie die Einschränkungen, die auf Werte des Phänotyps angewendet werden sollen. Wählen Sie dafür bitte zunächst einen passenden Quantor aus. Anschließend müssen Sie für den Typ der Restriktion zwischen Wertebereich (mit Minimum und/oder Maximum) oder Aufzählung (beliebige Anzahl von vordefinierten Werten) wählen. Für die Quantoren \"Werte vorhanden\" und \"Keine Werte vorhanden\" kann kein Restriktionstyp gewählt werden, da die Beschränkung der Werte implizit ist.",
     "expressionHelp": "Um Restriktionen für kombinierte Phänotypen zu definieren. Muss ein Boolescher Ausdruck angegeben werden. In dem Ausdrück können Vereinigungen (ODER), Schnittmengen (UND) und Komplemente (NICHT) von Phänotypen enthalten sein. Klicken Sie auf die Plus-Schaltfläche um Komponenten zum Ausdruck hinzuzufügen. Außerdem können Sie auf bereits hinzugefügte Komponenten klicken, um diese zu verändern oder zu entfernen.",
-    "confirmDelete": "Möchten Sie die Entität wirklich unwiderruflich löschen? Alle gespeicherten Versionen und Restriktionen werden ebenfalls gelöscht.",
     "confirmRefreshTree": "Möchten Sie die Entitäten wirklich neu laden? Alle ungespeicherten Entitäten gehen dabei verloren.",
     "emptyTab": {
       "tree": {
@@ -282,6 +281,10 @@
       "tab": {
         "description": "Hier werden Ihnen die Eigenschaften der gewählten Entitäten angezeigt."
       }
+    },
+    "delete": {
+      "confirm": "Möchten Sie die Entität wirklich unwiderruflich löschen? Alle gespeicherten Versionen und Restriktionen werden ebenfalls gelöscht.",
+      "cascade": "Enthaltene Entitäten ebenfalls löschen."
     }
   },
   "organisationPage": {
