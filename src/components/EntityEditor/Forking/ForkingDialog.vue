@@ -24,7 +24,6 @@
       <q-separator />
 
       <q-table
-        class="sticky-header-table"
         :title="t('fork', 2)"
         :rows="forkingStats.forks"
         :columns="forkColumns"

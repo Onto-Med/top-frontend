@@ -10,7 +10,6 @@
         flat
         hide-pagination
         row-key="id"
-        class="sticky-header-table"
       >
         <template #top>
           <q-input v-model="filter" dense debounce="300" color="primary" @update:model-value="onFilter">
