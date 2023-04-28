@@ -346,7 +346,7 @@ export default defineComponent({
         currentQuery.id = (uuidv4 as () => string)()
 
         queryApi.enqueueQuery(organisation.value.id, repository.value.id, currentQuery)
-          .then(() => queryPage.value.content.push(currentQuery))
+          .then(() => queryPage.value.content.unshift(currentQuery))
           .catch((e: Error) => renderError(e))
       },
 
