@@ -15,10 +15,10 @@
           <q-tr :props="props">
             <slot name="row-cells" :row="props.row">
               <q-td auto-width>
-                <q-spinner v-if="isRunning(props.row)" :title="t('running')" class="q-mr-sm" />
-                <q-icon v-else-if="isFinished(props.row)" :title="t('finished')" name="done" color="positive" class="q-mr-sm" />
-                <q-icon v-else-if="isFailed(props.row)" :title="t('failed')" name="bolt" color="negative" class="q-mr-sm" />
-                <q-icon v-else :title="t('queued')" name="pause" color="grey" class="q-mr-sm" />
+                <q-spinner v-if="isRunning(props.row)" :title="t('running')" size="sm" />
+                <q-icon v-else-if="isFinished(props.row)" :title="t('finished')" name="done" size="sm" color="positive" />
+                <q-icon v-else-if="isFailed(props.row)" :title="t('failed')" name="bolt" size="sm" color="negative" />
+                <q-icon v-else :title="t('queued')" name="pause" size="sm" color="grey" />
               </q-td>
               <q-td>{{ props.row.name || t('unnamedQuery') }}</q-td>
               <q-td>
