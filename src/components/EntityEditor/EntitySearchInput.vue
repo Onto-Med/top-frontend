@@ -164,7 +164,7 @@ export default defineComponent({
     const { keycloak, repositoryId } = storeToRefs(entityStore)
     const forkOrigin = ref<Entity>()
     const showForkCreateDialog = ref(false)
-    const isLoggedIn = computed(() => keycloak.value?.authenticated)
+    const isLoggedIn = computed(() => !keycloak.value || keycloak.value.authenticated)
 
     const loadOptions = async (input: string|undefined, page = 1): Promise<EntityPage> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
