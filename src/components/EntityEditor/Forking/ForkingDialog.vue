@@ -64,11 +64,12 @@
 <script lang="ts">
 import { defineComponent, ref, inject, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ForkApiKey } from 'src/boot/axios'
+import { EntityApiKey } from 'src/boot/axios'
 import { Entity, ForkingStats } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { QTableProps } from 'quasar'
 
 export default defineComponent({
   props: {
@@ -83,9 +84,8 @@ export default defineComponent({
   },
   emits: ['update:show'],
   setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d }     = useI18n()
-    const forkApi      = inject(ForkApiKey)
+    const entityApi    = inject(EntityApiKey)
     const { renderError } = useNotify()
     const router       = useRouter()
     const loading      = ref(false)
@@ -93,10 +93,10 @@ export default defineComponent({
     const { getTitle } = useEntityFormatter()
 
     const reload = async () => {
-      if (!forkApi || !props.entity || !props.entity.id || !props.entity.repository || !props.entity.repository.organisation) return
+      if (!entityApi || !props.entity || !props.entity.id || !props.entity.repository || !props.entity.repository.organisation) return
       loading.value = true
 
-      await forkApi.getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
+      await entityApi.getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
         .then(r => forkingStats.value = r.data)
         .catch((e: Error) => renderError(e))
         .finally(() => loading.value = false)
@@ -122,7 +122,7 @@ export default defineComponent({
         { name: 'repository', label: t('repository'), align: 'left' },
         { name: 'userAccount', label: t('author'), align: 'left' },
         { name: 'createdAt', label: t('createdAt') }
-      ]),
+      ] as QTableProps['columns']),
 
       routeToEntity (entity: Entity) {
         if (!entity.repository || !entity.repository.organisation) return

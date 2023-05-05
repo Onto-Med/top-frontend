@@ -357,7 +357,7 @@
     "none": "Unspezifizierte Funktionen"
   },
   "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
-  "permission": "Berechtigung|Berechtigungen",
+  "permission": "Keine Berechtigungen|Berechtigung|Berechtigungen",
   "manageThing": "{thing} verwalten",
   "organisationMembership": "Organisationsmitgliedschaft|Organisationsmitgliedschaften",
   "user": "Benutzer|Benutzer",
@@ -375,9 +375,6 @@
   "confirmDeleteOrganisationMembership": "Möchten Sie diese Mitgliedschaft wirklich löschen? Der Benutzer verliert seine Berechtigungen für diese Organisation!",
   "add": "Hinzufügen",
   "editAccount": "Konto bearbeiten",
-  "notAuthenticated": {
-    "onlyPrimaryVisible": "Sie sind nicht angemeldet, daher sind nur primäre Repositorien für Sie sichtbar."
-  },
   "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse",
   "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
@@ -391,5 +388,9 @@
   "forkCouldNotBeCreated": "Es konnte kein Fork erstellt werden, da möglicherweise bereits ein aktueller Fork in diesem Repository vorhanden ist.",
   "previousQuery": "Vorherige Abfrage|Vorherige Abfragen",
   "result": "Ergebnis",
-  "queued": "In Warteschlange"
+  "queued": "In Warteschlange",
+  "notAuthorised": {
+    "onlyPrimaryVisible": "Sie verfügen nicht über die erforderlichen Berechtigungen, daher sind nur primäre Repositories für Sie sichtbar."
+  },
+  "boolean": "Boolean"
 }

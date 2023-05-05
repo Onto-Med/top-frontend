@@ -22,6 +22,7 @@
     >
       <template v-if="isAuthenticated" #actions="{ row }">
         <q-btn
+          v-if="row.permission === Permission.Manage"
           size="sm"
           color="primary"
           dense
@@ -29,6 +30,7 @@
           :title="t('editThing', { thing: t('organisation') })"
           @click.stop="organisation = row; showForm = true"
         />
+        <permission-icon :permission="row.permission" class="q-ml-sm" size="sm" />
       </template>
     </table-with-actions>
 
@@ -48,9 +50,10 @@ import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
 import { OrganisationApiKey } from 'src/boot/axios'
-import { Organisation, OrganisationPage } from '@onto-med/top-api'
+import { Organisation, OrganisationPage, Permission } from '@onto-med/top-api'
 import TableWithActions from 'src/components/TableWithActions.vue'
 import OrganisationForm from 'src/components/Organisation/OrganisationForm.vue'
+import PermissionIcon from 'src/components/PermissionIcon.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import { useEntity } from 'src/pinia/entity'
@@ -59,7 +62,8 @@ import { storeToRefs } from 'pinia'
 export default defineComponent({
   components: {
     TableWithActions,
-    OrganisationForm
+    OrganisationForm,
+    PermissionIcon
   },
   setup () {
     const { t }     = useI18n()
@@ -125,6 +129,7 @@ export default defineComponent({
       isAuthenticated,
       newOrganisation,
       routeToOrganisation,
+      Permission,
 
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return

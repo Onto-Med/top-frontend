@@ -357,7 +357,7 @@
     "none": "Unspecified functions"
   },
   "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
-  "permission": "Permission|Permissions",
+  "permission": "No permissions|Permission|Permissions",
   "manageThing": "Manage {thing}",
   "organisationMembership": "Organisation membership|Organisation memberships",
   "user": "User|Users",
@@ -375,9 +375,6 @@
   "confirmDeleteOrganisationMembership": "Are you sure you want to delete this membership? The user will lose their permissions for this organisation!",
   "add": "Add",
   "editAccount": "Edit account",
-  "notAuthenticated": {
-    "onlyPrimaryVisible": "You are not logged in, so only primary repositories will be visible to you."
-  },
   "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
   "projectState": "Currently, the framework is under heavy development and will be extended with further functionalities.",
   "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search.",
@@ -391,5 +388,9 @@
   "forkCouldNotBeCreated": "A fork could not be created because there may already be an up-to-date fork in this repository.",
   "previousQuery": "Previous query|Previous queries",
   "result": "Result",
-  "queued": "Queued"
+  "queued": "Queued",
+  "notAuthorised": {
+    "onlyPrimaryVisible": "You do not have required permissions, so only primary repositories are visible to you."
+  },
+  "boolean": "Boolean"
 }
