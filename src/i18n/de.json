@@ -357,7 +357,7 @@
     "none": "Unspezifizierte Funktionen"
   },
   "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
-  "permission": "Berechtigung|Berechtigungen",
+  "permission": "Keine Berechtigungen|Berechtigung|Berechtigungen",
   "manageThing": "{thing} verwalten",
   "organisationMembership": "Organisationsmitgliedschaft|Organisationsmitgliedschaften",
   "user": "Benutzer|Benutzer",

@@ -357,7 +357,7 @@
     "none": "Unspecified functions"
   },
   "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
-  "permission": "Permission|Permissions",
+  "permission": "No permissions|Permission|Permissions",
   "manageThing": "Manage {thing}",
   "organisationMembership": "Organisation membership|Organisation memberships",
   "user": "User|Users",

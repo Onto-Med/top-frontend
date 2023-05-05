@@ -1,10 +1,10 @@
-import { Category, DataType, Entity, EntityType, LocalisableText, Phenotype, Repository, RepositoryType } from '@onto-med/top-api'
+import { Category, DataType, Entity, EntityType, LocalisableText, Permission, Phenotype, Repository, RepositoryType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import { useI18n } from 'vue-i18n'
 
 export default function (this: void) {
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { locale, t } = useI18n()
+  const { locale, t, te } = useI18n()
   const entityStore = useEntity()
 
   const getLocalizedPropertyValues = (entity: Entity, property: keyof Entity): string[] => {
@@ -36,7 +36,7 @@ export default function (this: void) {
      * @param entity the entity
      * @returns true if entity is restricted
      */
-  const isRestricted = (entity: Entity|EntityType): entity is Phenotype => {
+  const isRestricted = (entity: Entity | EntityType): entity is Phenotype => {
     return [EntityType.CompositeRestriction, EntityType.SingleRestriction].includes(
       entity.hasOwnProperty('id') ? (entity as Entity).entityType : (entity as EntityType)
     )
@@ -89,13 +89,13 @@ export default function (this: void) {
     isRestricted,
     getTitle,
 
-    hasDataType: (entity: Entity|EntityType) => {
+    hasDataType: (entity: Entity | EntityType) => {
       return [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(
         entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
       )
     },
 
-    hasItemType: (entity: Entity|EntityType) => {
+    hasItemType: (entity: Entity | EntityType) => {
       return [EntityType.SinglePhenotype].includes(
         entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
       )
@@ -107,7 +107,7 @@ export default function (this: void) {
      * @param entity the entity
      * @returns Material icon name as string
      */
-    getIcon (this: void, entity: Entity): string {
+    getIcon(this: void, entity: Entity): string {
       if ([EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(entity.entityType)) {
         return 'apps'
       } else if ([EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(entity.entityType)) {
@@ -132,7 +132,7 @@ export default function (this: void) {
      * @param entity the entity
      * @returns Tooltip string
      */
-    getIconTooltip (this: void, entity: Entity): string {
+    getIconTooltip(this: void, entity: Entity): string {
       const result = t(entity.entityType)
       if ([EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(entity.entityType)) {
         const dataType = (entity as Phenotype).dataType
@@ -146,7 +146,7 @@ export default function (this: void) {
      * @param entity the entity
      * @returns the synonyms
      */
-    getSynonyms (this: void, entity: Entity): string[] {
+    getSynonyms(this: void, entity: Entity): string[] {
       return getLocalizedPropertyValues(entity, 'synonyms')
     },
 
@@ -155,16 +155,16 @@ export default function (this: void) {
      * @param entity the entity
      * @returns the descriptions
      */
-    getDescriptions (this: void, entity: Entity): string[] {
+    getDescriptions(this: void, entity: Entity): string[] {
       return getLocalizedPropertyValues(entity, 'descriptions')
     },
 
-    hasExpression (this: void, entity: Entity|EntityType): entity is Phenotype {
+    hasExpression(this: void, entity: Entity | EntityType): entity is Phenotype {
       const entityType = entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity
       return entityType === EntityType.CompositePhenotype
     },
 
-    restrictionEntityTypes (this: void): EntityType[] {
+    restrictionEntityTypes(this: void): EntityType[] {
       return [
         EntityType.SinglePhenotype,
         EntityType.CompositeRestriction,
@@ -172,7 +172,7 @@ export default function (this: void) {
       ]
     },
 
-    phenotypeEntityTypes (this: void): EntityType[] {
+    phenotypeEntityTypes(this: void): EntityType[] {
       return [
         EntityType.CompositePhenotype,
         EntityType.SinglePhenotype,
@@ -181,7 +181,7 @@ export default function (this: void) {
       ]
     },
 
-    repositoryIcon: (repository: Repository|RepositoryType) => {
+    repositoryIcon: (repository: Repository | RepositoryType) => {
       const type = repository.hasOwnProperty('id') ? (repository as Repository).repositoryType : repository as RepositoryType
       if (type === RepositoryType.ConceptRepository) return 'article'
       if (type === RepositoryType.PhenotypeRepository) return 'category'
@@ -190,6 +190,13 @@ export default function (this: void) {
 
     requiresAggregationFunction: (entity: Entity) => {
       return [EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(entity.entityType)
+    },
+
+    permissionTitle: (permission?: Permission) => {
+      if (!permission) return t('permission', 0)
+      return te('permissions.' + permission)
+        ? t('permissions.' + permission)
+        : permission
     }
   }
 }

@@ -63,9 +63,7 @@
             <q-tr :props="props">
               <q-td>{{ props.row.user.username }}</q-td>
               <q-td :title="te('permissionDescriptions.' + props.row.permission) ? t('permissionDescriptions.' + props.row.permission) : ''">
-                {{ te('permissions.' + props.row.permission)
-                  ? t('permissions.' + props.row.permission)
-                  : props.row.permission }}
+                {{ permissionTitle(props.row.permission) }}
               </q-td>
               <q-td auto-width>
                 <q-btn
@@ -103,6 +101,7 @@ import { useI18n } from 'vue-i18n'
 import PermissionSelect from 'src/components/Organisation/PermissionSelect.vue'
 import UserSelect from 'src/components/Organisation/UserSelect.vue'
 import Dialog from 'src/components/Dialog.vue'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   components: {
@@ -120,6 +119,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
     const { notify, renderError } = useNotify()
+    const { permissionTitle } = useEntityFormatter()
     const $q = useQuasar()
     const dialog = ref<QDialog|undefined>(undefined)
     const show = () => {
@@ -170,6 +170,7 @@ export default defineComponent({
       permission,
       reloadMemberships,
       resetMembership,
+      permissionTitle,
 
       columns: computed(() => {
         return [
