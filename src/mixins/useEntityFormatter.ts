@@ -1,4 +1,4 @@
-import { Category, DataType, Entity, EntityType, LocalisableText, Permission, Phenotype, Repository, RepositoryType } from '@onto-med/top-api'
+import { Category, DataType, Entity, EntityType, LocalisableText, Organisation, Permission, Phenotype, Repository, RepositoryType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import { useI18n } from 'vue-i18n'
 
@@ -197,6 +197,20 @@ export default function (this: void) {
       return te('permissions.' + permission)
         ? t('permissions.' + permission)
         : permission
+    },
+
+    canRead: (organisation?: Organisation) => {
+      if (!organisation?.permission) return false
+      return [Permission.Manage, Permission.Write, Permission.Read].includes(organisation.permission)
+    },
+
+    canWrite: (organisation?: Organisation) => {
+      if (!organisation?.permission) return false
+      return [Permission.Manage, Permission.Write].includes(organisation.permission)
+    },
+
+    canManage: (organisation?: Organisation) => {
+      return Permission.Manage === organisation?.permission
     }
   }
 }
