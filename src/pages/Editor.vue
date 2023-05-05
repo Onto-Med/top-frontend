@@ -396,6 +396,11 @@ export default defineComponent({
       reset (tab: EditorTab) {
         const entity = entityStore.getEntity(tab.state.id)
         if (entity) {
+          void router.replace({
+            name: 'editor',
+            params: { organisationId: organisationId.value, repositoryId: entityStore.repositoryId, entityId: entity.id },
+            query: { version: entity.version }
+          })
           handleTabUpdate(tab, clone(entity))
         } else {
           closeTab(tab.state)
