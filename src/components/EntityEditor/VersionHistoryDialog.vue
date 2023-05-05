@@ -105,7 +105,6 @@ export default defineComponent({
   },
   emits: ['restore', 'update:show', 'prefill', 'deleted'],
   setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d }     = useI18n()
     const entityApi    = inject(EntityApiKey)
     const entityStore  = useEntity()
@@ -115,7 +114,7 @@ export default defineComponent({
     const loading      = ref(false)
 
     const reload = async () => {
-      if (!entityApi) return
+      if (!entityApi || !props.entityId) return
       loading.value = true
 
       await entityApi.getEntityVersionsById(props.organisationId, props.repositoryId, props.entityId)

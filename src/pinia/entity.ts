@@ -1,9 +1,9 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 import {
   BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
-  ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction,
-  RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction,
-  DataSource, DataSourceApi, Quantifier, DefaultApi, Converter
+  ExpressionFunction, NumberRestriction, Phenotype, StringRestriction,
+  RepositoryApi, Repository, Organisation, OrganisationApi, Constant, ForkingInstruction,
+  DataSource, Quantifier, DefaultApi, Converter, QueryApi
 } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
@@ -23,13 +23,10 @@ export const useEntity = defineStore('entity', {
       converters: undefined as Converter[] | undefined,
       keycloak: undefined as KeycloakInstance | undefined,
       entityApi: undefined as EntityApi | undefined,
-      expressionConstantApi: undefined as ExpressionConstantApi | undefined,
-      expressionFunctionApi: undefined as ExpressionFunctionApi | undefined,
       organisationApi: undefined as OrganisationApi | undefined,
       repositoryApi: undefined as RepositoryApi | undefined,
-      forkApi: undefined as ForkApi | undefined,
-      dataSourceApi: undefined as DataSourceApi | undefined,
-      defaultApi: undefined as DefaultApi | undefined
+      defaultApi: undefined as DefaultApi | undefined,
+      queryApi: undefined as QueryApi | undefined
     }
   },
   getters: {
@@ -53,17 +50,17 @@ export const useEntity = defineStore('entity', {
     },
 
     async reloadDataSources() {
-      await this.dataSourceApi?.getDataSources()
+      await this.queryApi?.getDataSources()
         .then(r => this.dataSources = r.data)
     },
 
     async reloadConstants() {
-      await this.expressionConstantApi?.getExpressionConstants()
+      await this.entityApi?.getExpressionConstants()
         .then(r => this.constants = r.data)
     },
 
     async reloadFunctions() {
-      await this.expressionFunctionApi?.getExpressionFunctions()
+      await this.entityApi?.getExpressionFunctions()
         .then(r => {
           this.functions = [
             {
@@ -218,12 +215,12 @@ export const useEntity = defineStore('entity', {
     },
 
     async forkEntity(entity: Entity, forkingInstruction: ForkingInstruction): Promise<ForkResult> {
-      if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return { count: 0 }
+      if (!this.entityApi || !entity.id || !entity.repository || !entity.repository.organisation) return { count: 0 }
 
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
 
-      return this.forkApi.createFork(
+      return this.entityApi.createFork(
         entity.repository.organisation.id,
         entity.repository.id,
         entity.id,
@@ -385,7 +382,7 @@ export const useEntity = defineStore('entity', {
 
     async loadConverters() {
       if (!this.converters)
-        this.converters = (await this.defaultApi?.getConverters())?.data
+        this.converters = (await this.entityApi?.getConverters())?.data
     }
   }
 })

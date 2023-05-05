@@ -391,5 +391,6 @@
   "queued": "In Warteschlange",
   "notAuthorised": {
     "onlyPrimaryVisible": "Sie verfügen nicht über die erforderlichen Berechtigungen, daher sind nur primäre Repositories für Sie sichtbar."
-  }
+  },
+  "boolean": "Boolean"
 }
