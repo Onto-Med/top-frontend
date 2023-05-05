@@ -121,6 +121,7 @@
         :selected-version="local.version"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        :readonly="readonly"
         @prefill="prefillFromVersion"
         @restore="$emit('restoreVersion', $event)"
       />

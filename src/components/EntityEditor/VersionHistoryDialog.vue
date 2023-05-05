@@ -34,7 +34,7 @@
           >
             <q-td auto-width>
               <q-btn
-                v-if="currentVersion && props.row.version !== currentVersion"
+                v-if="!readonly && currentVersion && props.row.version !== currentVersion"
                 size="sm"
                 color="red"
                 round
@@ -44,7 +44,7 @@
                 :title="t('deleteThing', { thing: t('version') })"
                 @click.stop="deleteVersion(props.row)"
               />
-              <b v-else-if="currentVersion">
+              <b v-else-if="currentVersion && props.row.version === currentVersion">
                 {{ t('current') }}:
               </b>
             </q-td>
@@ -78,6 +78,7 @@ import { Entity } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
+import { QTableProps } from 'quasar'
 
 export default defineComponent({
   name: 'VersionHistoryDialog',
@@ -99,7 +100,8 @@ export default defineComponent({
       required: true
     },
     currentVersion: Number,
-    selectedVersion: Number
+    selectedVersion: Number,
+    readonly: Boolean
   },
   emits: ['restore', 'update:show', 'prefill', 'deleted'],
   setup (props, { emit }) {
@@ -137,7 +139,7 @@ export default defineComponent({
         { name: 'title', label: t('title'), align: 'left' },
         { name: 'userAccount', label: t('author'), align: 'left' },
         { name: 'timestamp', label: t('timestamp') }
-      ]),
+      ] as QTableProps['columns']),
       versions,
       loading,
       reload,

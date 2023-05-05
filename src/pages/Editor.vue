@@ -19,7 +19,7 @@
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
               <q-btn
-                v-if="isPhenotypeRepository && isAuthenticated"
+                v-if="isPhenotypeRepository && canWrite"
                 icon="manage_search"
                 :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder' }"
@@ -35,7 +35,7 @@
             :loading="treeLoading"
             :allowed-entity-types="allowedEntityTypes"
             class="col column"
-            :show-context-menu="isAuthenticated"
+            :show-context-menu="canWrite"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
@@ -94,7 +94,7 @@
                 :organisation-id="organisationId"
                 :hotkeys-enabled="selected?.id === tab.state.id"
                 :dirty="tab.dirty"
-                :readonly="!isAuthenticated"
+                :readonly="!canWrite"
                 @update:entity="handleTabUpdate(tab, $event)"
                 @entity-clicked="selectTabByKey($event)"
                 @reload-failed="closeTab(tab.state); notify($event.message)"
@@ -154,7 +154,7 @@ export default defineComponent({
   },
   setup (props) {
     const { t, locale } = useI18n()
-    const { getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
+    const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { notify, renderError } = useNotify()
@@ -162,7 +162,7 @@ export default defineComponent({
     const showJson         = ref(false)
     const splitterModel    = ref(25)
     const showExportDialog = ref(false)
-    const { entities, repository, organisationId } = storeToRefs(entityStore)
+    const { entities, repository, organisationId, organisation } = storeToRefs(entityStore)
     const selected    = ref<Entity|undefined>(undefined)
     const tabs        = ref([] as EditorTab[])
     const treeLoading = ref(false)
@@ -409,7 +409,9 @@ export default defineComponent({
 
       getTabTitle(tab: EditorTab) {
         return getTitle(entityStore.getEntity(tab.state.id), true)
-      }
+      },
+
+      canWrite: computed(() => isAuthenticated.value && canWrite(organisation.value))
     }
   }
 })
