@@ -92,13 +92,13 @@
               </q-card-section>
               <!--  TODO: need to find a better solution for style height -->
               <q-virtual-scroll
-                v-slot="{ item, index }"
+                v-slot="{ item }"
                 style="height: 94%"
                 :items="documents"
                 separator
               >
                 <q-item
-                  :key="index + item.name"
+                  :key="item.id"
                   class="cursor-pointer relative-position"
                   clickable
                   @click="chooseDocument(item.id)"
@@ -149,7 +149,7 @@
 import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DocumentApiKey, ConceptApiKey } from 'src/boot/axios'
-import { Document, Concept } from '@onto-med/top-api'
+import { Document, ConceptCluster } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
@@ -160,7 +160,7 @@ export default defineComponent({
     const conceptApi       = inject(ConceptApiKey)
     const documents        = ref<Document[]>([])
     const document_        = ref<Document>()
-    const concepts         = ref<Concept[]>([])
+    const concepts         = ref<ConceptCluster[]>([])
     const loading          = ref(false)
     const selectedConcepts = ref<number[]>([])
     const distinctColors   = [
@@ -193,7 +193,7 @@ export default defineComponent({
     const reload = async () => {
       if (!conceptApi || !documentApi) return
       loading.value = true
-      await conceptApi.getConcepts()
+      await conceptApi.getConceptClusters()
         .then(r => {
           concepts.value = r.data
           concepts.value.forEach(function (concept, index) {
@@ -212,7 +212,8 @@ export default defineComponent({
 
     const chooseConcept = async (idx: number | undefined, changedConceptMode: boolean | undefined) => {
       if (!documentApi) return
-
+      console.log('Concept ID: ', idx)
+      console.log(documents.value.length)
       if (idx !== undefined) {
         documents.value.length = 0;
         if (changedConceptMode !== true) {
@@ -290,6 +291,7 @@ export default defineComponent({
       chooseConcept,
       async chooseDocument (documentId: string) {
         if (!documentApi) return
+        console.log(documentId)
         await documentApi.getDocumentById(documentId,
           selectedConcepts.value.map(selConcept => {
             return concepts.value[selConcept].id

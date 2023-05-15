@@ -18,7 +18,7 @@ export const RepositoryApiKey: InjectionKey<RepositoryApi> = Symbol('repositoryA
 export const QueryApiKey: InjectionKey<QueryApi> = Symbol('queryApi')
 export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 export const PhraseApiKey: InjectionKey<PhraseApi> = Symbol('phraseApi')
-export const ConceptApiKey: InjectionKey<ConceptApi> = Symbol('conceptApi')
+export const ConceptClusterApiKey: InjectionKey<ConceptclusterApi> = Symbol('conceptClusterApi')
 export const UserApiKey: InjectionKey<UserApi> = Symbol('userApi')
 
 export default boot(({ app }) => {
@@ -44,7 +44,7 @@ export default boot(({ app }) => {
   app.provide(QueryApiKey, new QueryApi(undefined, '', axiosInstance))
   app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))
   app.provide(PhraseApiKey, new PhraseApi(undefined, '', axiosInstance))
-  app.provide(ConceptApiKey, new ConceptApi(undefined, '', axiosInstance))
+  app.provide(ConceptClusterApiKey, new ConceptclusterApi(undefined, '', axiosInstance))
   app.provide(UserApiKey, new UserApi(undefined, '', axiosInstance))
 });
 
