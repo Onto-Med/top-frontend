@@ -1,5 +1,10 @@
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
-import { BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityType, ExpressionFunction, ExpressionFunctionApi, ForkApi, NumberRestriction, Phenotype, StringRestriction, RepositoryApi, Repository, Organisation, OrganisationApi, ExpressionConstantApi, Constant, ForkingInstruction, DataSource, DataSourceApi, Quantifier, DefaultApi, Converter, CodeApi, Code, CodeSystem } from '@onto-med/top-api'
+import {
+  BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
+  ExpressionFunction, NumberRestriction, Phenotype, StringRestriction,
+  RepositoryApi, Repository, Organisation, OrganisationApi, Constant, ForkingInstruction,
+  DataSource, Quantifier, DefaultApi, Converter, CodeApi, Code, CodeSystem, QueryApi
+} from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
@@ -18,13 +23,10 @@ export const useEntity = defineStore('entity', {
       converters: undefined as Converter[] | undefined,
       keycloak: undefined as KeycloakInstance | undefined,
       entityApi: undefined as EntityApi | undefined,
-      expressionConstantApi: undefined as ExpressionConstantApi | undefined,
-      expressionFunctionApi: undefined as ExpressionFunctionApi | undefined,
       organisationApi: undefined as OrganisationApi | undefined,
       repositoryApi: undefined as RepositoryApi | undefined,
-      forkApi: undefined as ForkApi | undefined,
-      dataSourceApi: undefined as DataSourceApi | undefined,
       defaultApi: undefined as DefaultApi | undefined,
+      queryApi: undefined as QueryApi | undefined,
       codeApi: undefined as CodeApi | undefined,
       codeSystems: undefined as CodeSystem[] | undefined
     }
@@ -50,17 +52,17 @@ export const useEntity = defineStore('entity', {
     },
 
     async reloadDataSources() {
-      await this.dataSourceApi?.getDataSources()
+      await this.queryApi?.getDataSources()
         .then(r => this.dataSources = r.data)
     },
 
     async reloadConstants() {
-      await this.expressionConstantApi?.getExpressionConstants()
+      await this.entityApi?.getExpressionConstants()
         .then(r => this.constants = r.data)
     },
 
     async reloadFunctions() {
-      await this.expressionFunctionApi?.getExpressionFunctions()
+      await this.entityApi?.getExpressionFunctions()
         .then(r => {
           this.functions = [
             {
@@ -214,13 +216,13 @@ export const useEntity = defineStore('entity', {
       return duplicate
     },
 
-    async forkEntity(entity: Entity, forkingInstruction: ForkingInstruction): Promise<number> {
-      if (!this.forkApi || !entity.id || !entity.repository || !entity.repository.organisation) return 0
+    async forkEntity(entity: Entity, forkingInstruction: ForkingInstruction): Promise<ForkResult> {
+      if (!this.entityApi || !entity.id || !entity.repository || !entity.repository.organisation) return { count: 0 }
 
       const organisationId = this.organisationId
       const repositoryId = this.repositoryId
 
-      return this.forkApi.createFork(
+      return this.entityApi.createFork(
         entity.repository.organisation.id,
         entity.repository.id,
         entity.id,
@@ -234,9 +236,12 @@ export const useEntity = defineStore('entity', {
       ).then(r => {
         if (organisationId === this.organisationId && repositoryId === this.repositoryId) {
           r.data.forEach(e => this.addOrReplaceEntity(e))
-          return r.data.length
+          return {
+            count: r.data.length,
+            entity: r.data.filter(e => e.equivalentEntities?.find(eq => eq.id === entity.id))[0]
+          } as ForkResult
         }
-        return 0
+        return { count: 0 }
       })
     },
 
@@ -277,7 +282,7 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async deleteEntity(entity: Entity) {
+    async deleteEntity(entity: Entity, cascade?: boolean) {
       const index = this.entities.findIndex(e => e.id === entity.id)
       if (index === -1) return
 
@@ -289,7 +294,9 @@ export const useEntity = defineStore('entity', {
             name: 'MissingAttributesException',
             message: 'attributesMissing'
           }
-        await this.entityApi?.deleteEntityById(organisationId, repositoryId, entity.id)
+
+        const deleteOptions = { cascade: cascade || false } as EntityDeleteOptions
+        await this.entityApi?.deleteEntityById(organisationId, repositoryId, entity.id, undefined, undefined, deleteOptions)
           .then(() => {
             if (organisationId === this.organisationId && repositoryId === this.repositoryId)
               this.entities.splice(index, 1)
@@ -377,7 +384,7 @@ export const useEntity = defineStore('entity', {
 
     async loadConverters() {
       if (!this.converters)
-        this.converters = (await this.defaultApi?.getConverters())?.data
+        this.converters = (await this.entityApi?.getConverters())?.data
     },
 
     async getCodeSystems(): Promise<CodeSystem[] | undefined> {
@@ -389,3 +396,8 @@ export const useEntity = defineStore('entity', {
     }
   }
 })
+
+interface ForkResult {
+  count: number,
+  entity?: Entity
+}

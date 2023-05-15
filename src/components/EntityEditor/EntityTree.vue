@@ -70,7 +70,7 @@
               v-if="showContextMenu"
               :entity="node"
               :allowed-entity-types="allowedEntityTypes"
-              @delete-entity-clicked="$emit('deleteEntity', $event)"
+              @delete-entity-clicked="handleDelete"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
             />
@@ -293,6 +293,15 @@ export default defineComponent({
             emit('update:selected', e)
             void nextTick(() => expand(entity))
           })
+      },
+
+      async handleDelete (entity: Entity, cascade?: boolean) {
+        if (!cascade) {
+          await entityStore.loadChildren(entity)
+            .then(() => emit('deleteEntity', entity, cascade))
+        } else {
+          emit('deleteEntity', entity, cascade)
+        }
       }
     }
   }

@@ -32,7 +32,6 @@
             fork
             class="q-mr-sm fit"
             @entity-selected="routeToEntity"
-            @fork-clicked="forkOrigin = $event; showForkCreateDialog = true"
           >
             <template #append>
               <q-btn dense flat icon="search" :title="t('search')" />
@@ -192,12 +191,6 @@
       </q-scroll-area>
     </q-drawer>
 
-    <fork-create-dialog
-      v-model:show="showForkCreateDialog"
-      :origin="forkOrigin"
-      @create-fork="forkEntity(forkOrigin, $event)"
-    />
-
     <q-page-container>
       <router-view :key="repositoryId" />
     </q-page-container>
@@ -216,21 +209,18 @@ import { useEntity } from 'src/pinia/entity'
 import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
-import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDialog.vue'
 import packageInfo from '../../package.json'
 import { defineComponent, ref, computed } from 'vue'
-import { Entity, ForkingInstruction } from '@onto-med/top-api'
+import { Entity } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
-import useNotify from 'src/mixins/useNotify'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
     NavbarLink,
     LanguageSwitch,
-    EntitySearchInput,
-    ForkCreateDialog
+    EntitySearchInput
   },
 
   setup () {
@@ -239,9 +229,7 @@ export default defineComponent({
     const entityStore = useEntity()
     const leftDrawerOpen = ref(true)
     const $q = useQuasar()
-    const { notify, renderError } = useNotify()
     const { keycloak, organisation } = storeToRefs(entityStore)
-    const forkOrigin = ref(undefined as Entity|undefined)
     const drawer = ref(undefined as QMenu|undefined)
 
     const linksList = computed(() => [
@@ -265,9 +253,7 @@ export default defineComponent({
       fabGithub,
       fasBook,
       keycloak,
-      forkOrigin,
       organisation,
-      showForkCreateDialog: ref(false),
       smallScreen: computed(() => $q.screen.lt.md),
       username: computed(() => (keycloak.value?.tokenParsed?.name || keycloak.value?.tokenParsed?.preferred_username) as string | undefined),
 
@@ -289,16 +275,6 @@ export default defineComponent({
       routeToEntity (entity: Entity) {
         if (!entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
-      },
-
-      forkEntity (entity: Entity|undefined, forkingInstruction: ForkingInstruction) {
-        if (!entity) return
-        entityStore.forkEntity(entity, forkingInstruction)
-          .then((count) => {
-            forkOrigin.value = undefined
-            notify(t('thingCreatedOrUpdated', { thing: `${count} ` + t('fork', count) }), 'positive')
-          })
-          .catch((e: Error) => renderError(e))
       },
 
       toggleDarkMode: $q.dark.toggle,

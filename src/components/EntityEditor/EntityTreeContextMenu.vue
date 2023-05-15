@@ -51,6 +51,7 @@ import { useI18n } from 'vue-i18n'
 import { EntityType, Entity } from '@onto-med/top-api'
 import Dialog from 'src/components/Dialog.vue'
 import { useQuasar } from 'quasar'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   name: 'EntityTreeContextMenu',
@@ -73,6 +74,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const { t } = useI18n()
     const $q = useQuasar()
+    const { isCategory } = useEntityFormatter()
 
     return {
       t,
@@ -90,13 +92,16 @@ export default defineComponent({
       EntityType,
 
       showDeleteDialog () {
+        if (!props.entity) return
         $q.dialog({
           component: Dialog,
           componentProps: {
-            message: t('entityEditor.confirmDelete')
+            message: t('entityEditor.delete.confirm'),
+            checkbox: isCategory(props.entity),
+            checkboxLabel: t('entityEditor.delete.cascade')
           }
-        }).onOk(() => {
-          emit('deleteEntityClicked', props.entity)
+        }).onOk(cascade => {
+          emit('deleteEntityClicked', props.entity, cascade)
         })
       },
 

@@ -36,7 +36,7 @@
           no-caps
           color="grey-7"
           :label="t('backToCurrentVersion')"
-          @click="$emit('reset'); restrictionKey++"
+          @click="reset()"
         />
         <q-btn
           v-else
@@ -121,6 +121,7 @@
         :selected-version="local.version"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
+        :readonly="readonly"
         @prefill="prefillFromVersion"
         @restore="$emit('restoreVersion', $event)"
       />
@@ -293,6 +294,11 @@ export default defineComponent({
       e.preventDefault()
     }
 
+    const reset = () => {
+      emit('reset')
+      restrictionKey.value++
+    }
+
     onMounted(() => {
       document.addEventListener('keydown', keylistener)
       if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
@@ -309,6 +315,7 @@ export default defineComponent({
       getTitle,
       isRestricted,
       hasDataType,
+      reset,
 
       local,
       showJson,
@@ -340,10 +347,7 @@ export default defineComponent({
           componentProps: {
             message: t('confirmDiscardChanges')
           }
-        }).onOk(() => {
-          emit('reset')
-          restrictionKey.value++
-        })
+        }).onOk(() => reset())
       }
     }
   }

@@ -13,14 +13,10 @@
   "change": "Change",
   "clearThing": "Clear {thing}",
   "closure": "Closure|Closures",
-  "configureThing": "Configure {thing}",
-  "continue": "Continue",
-  "copyiedToClipboard": "The content has been copied to the clipboard.",
   "copyFailed": "The content could not be copied.",
   "copyToClipboard": "Copy to clipboard.",
   "count": "Count|Counts",
   "thingCreatedOrUpdated": "{thing} created or updated.",
-  "criterion": "Criterion|Criteria",
   "ctrl": "CTRL",
   "dataSource": "Data source|Data sources",
   "dataSourceDescription": "Select at least one data source on which the query shall be executed.",
@@ -28,7 +24,6 @@
   "dateTimeRestrictionDescription": "Restrict the time range, when this phenotype must have been observed.",
   "defaultValue": "Default value|Default values",
   "defaultValueHint": "If none of the mappings match.",
-  "defineThing": "Define {thing}",
   "desc": "Descending",
   "duplicate": "Duplicate",
   "elapsedTime": "Elapsed time",
@@ -39,8 +34,6 @@
   "execute": "Execute",
   "export": "Export",
   "exportDescription": "Select a format in which you want to create an export for the selected content.",
-  "exportThing": "Export {thing}",
-  "finishPreviousStep": "Please finish the previous step|Please finish previous steps",
   "forkEntityToRepository": "Do you want to transfer {entity} to the repository {repository}?",
   "format": "Format|Formats",
   "function": "Function",
@@ -95,7 +88,6 @@
     "Filter": "Filter",
     "Switch": "Switch"
   },
-  "hideThing": "Hide {thing}",
   "import": "Import",
   "includeThing": "Include {thing}",
   "inclusion": "Inclusion|Inclusions",
@@ -117,13 +109,10 @@
   "queryResult": "Query result|Query results",
   "removeThing": "Remove {thing}",
   "resultSet": "Result set|Result sets",
-  "rScript": "R script|R scripts",
   "running": "Running",
   "selection": "Selection|Selections",
-  "source": "Source|Sources",
   "superCategory": "Super category|Super categories",
   "thingIsInvalid": "{thing} is invalid",
-  "thingIsRunning": "{thing} is running",
   "updateExistingThing": "Update existing {thing}",
   "origin": "Origin|Origins",
   "unnamedQuery": "Unnamed query|Unnamed queries",
@@ -138,14 +127,12 @@
   "account": "Account",
   "dataType": "Data Type|Data Types",
   "number": "Number|Numbers",
-  "boolean": "Boolean",
   "darkMode": "Dark mode",
   "date": "Date|Dates",
   "date_time": "Date and Time|Dates and Times",
   "timestamp": "Timestamp",
   "string": "Text|Texts",
   "title": "Title|Titles",
-  "describingMetadata": "Describing Metadata",
   "synonym": "Synonym|Synonyms",
   "description": "Description|Descriptions",
   "ok": "OK",
@@ -164,7 +151,6 @@
   "class": "Class",
   "union": "Union",
   "intersection": "Intersection",
-  "complement": "Complement",
   "expand": "Expand",
   "clearAll": "Clear all",
   "show": "Show",
@@ -187,7 +173,6 @@
   "reload": "Reload",
   "dismiss": "Dismiss",
   "notFound": "Not found",
-  "negated": "Negated",
   "quantifier": "Quantifier|Quantifiers",
   "loading": "Loading",
   "logOut": "Log out",
@@ -210,14 +195,11 @@
   "close": "Close",
   "author": "Author",
   "restore": "Restore",
-  "restoreThing": "Restore {thing}",
   "thingRestored": "{thing} has been restored",
-  "prefillWithThing": "Prefill with {thing}",
   "current": "Current",
   "invalid": "Invalid",
   "valid": "Valid",
   "unit": "Unit|Units",
-  "developPhenotype": "Develop Phenotype|Develop Phenotypes",
   "repository": "Repository|Repositories",
   "organisation": "Organisation|Organisations",
   "superOrganisation": "Super organisation|Super organisations",
@@ -227,24 +209,15 @@
   "closeOthers": "Close others",
   "closeSaved": "Close saved",
   "code": "Code|Codes",
-  "squareRoot": "Square root",
-  "exponent": "Exponent|Exponents",
   "base": "Base|Bases",
-  "addition": "Addition|Additions",
-  "subtraction": "Subtraction|Subtractions",
-  "multiplication": "Multiplication|Multiplications",
-  "division": "Division|Divisions",
   "search": "Search",
   "searchThing": "Search {thing}",
   "home": "Home",
-  "navigation": "Navigation",
   "createdAt": "Created at {date}",
   "name": "Name",
   "notSavedYet": "Not saved yet!",
-  "unsaved": "unsaved",
   "unsavedChanges": "Unsaved changes",
   "encloseWithExpression": "Enclose with expression",
-  "attributesMissing": "One or more attributes are missing.",
   "displayingOtherVersion": "You are shown a version other than the current one.",
   "pleaseCheckInput": "Please check your input!",
   "versionRestoreDescription": "This will reset the entity to the displayed status.",
@@ -253,7 +226,6 @@
   "more": "More",
   "new": "New",
   "addMoreArguments": "Add more arguments",
-  "toggleDarkMode": "Toggle dark mode",
   "sourceCode": "Source code",
   "fork": "Fork|Forks",
   "forkingState": "Forking status",
@@ -269,11 +241,8 @@
     "synonymsHelp": "Synonyms are alternative names for entities. For example, the phenotype \"BMI\" could have the synonym \"Body Mass Index\".",
     "descriptionsHelp": "Here you can specify further descriptions or definitions of the entity in different languages.",
     "codesHelp": "In this section, specify links to taxonomies (e.g. SNOMED CT) so that the phenotype is mapped to the standards and can be linked to other IT systems. In this way, on the one hand, data from other sources can be read in and used for phenotyping. On the other hand, results can be fed back to external IT systems.",
-    "formulaHelp": "Mathematical formulas can be entered here to calculate the values of the phenotype. Formulas can contain other phenotypes as well as constants.",
+    "formulaHelp": "Mathematical and Boolean formulas can be entered here to calculate the values of the phenotype. Formulas can contain other phenotypes as well as constants.",
     "restrictionHelp": "Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantifier. Then you have to choose between value range (with minimum and/or maximum) or enumeration (any number of predefined values) for the type of restriction. No restriction type can be selected for the quantifiers \"Values present\" and \"No values present\" because the restriction of the values is implicit.",
-    "expressionHelp": "To define restrictions for combined phenotypes. A Boolean expression must be specified. The expression can contain unions (OR), intersections (AND) and complements (NOT) of phenotypes. Click the plus button to add components to the expression. You can also click on already added components to modify or remove them.",
-    "confirmDelete": "Do you really want to delete the entity irrevocably? All saved versions and restrictions will also be deleted.",
-    "confirmRefreshTree": "Do you really want to reload the entities? All unsaved entities will be lost.",
     "emptyTab": {
       "tree": {
         "selection": "Select one or more entities in the tree on the left side.",
@@ -282,6 +251,10 @@
       "tab": {
         "description": "The properties of the selected entities are displayed here."
       }
+    },
+    "delete": {
+      "confirm": "Do you really want to delete the entity irrevocably? All saved versions and restrictions will also be deleted.",
+      "cascade": "Delete contained entities as well."
     }
   },
   "organisationPage": {
@@ -289,7 +262,6 @@
     "confirmDelete": "Do you really want to delete this organisation?"
   },
   "repositoryPage": {
-    "description": "Phenotypes can be modelled in repositories. We recommend that you distribute phenotypes topic-based across various repositories.",
     "confirmDelete": "Do you really want to delete this repository?"
   },
   "entityTree": {
@@ -320,9 +292,7 @@
   "entityType": "Entity type|Entity types",
   "documentation": "Documentation|Documentations",
   "document": "Document|Documents",
-  "documentPage": {
-    "description": "Document search"
-  },
+  "documentPage": {},
   "concept": "Concept|Concepts",
   "details": "Details",
   "inputRequired": "Input required",
@@ -387,7 +357,7 @@
     "none": "Unspecified functions"
   },
   "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
-  "permission": "Permission|Permissions",
+  "permission": "No permissions|Permission|Permissions",
   "manageThing": "Manage {thing}",
   "organisationMembership": "Organisation membership|Organisation memberships",
   "user": "User|Users",
@@ -405,9 +375,6 @@
   "confirmDeleteOrganisationMembership": "Are you sure you want to delete this membership? The user will lose their permissions for this organisation!",
   "add": "Add",
   "editAccount": "Edit account",
-  "notAuthenticated": {
-    "onlyPrimaryVisible": "You are not logged in, so only primary repositories will be visible to you."
-  },
   "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
   "projectState": "Currently, the framework is under heavy development and will be extended with further functionalities.",
   "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search.",
@@ -415,7 +382,15 @@
   "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
   "updatedAt": "Updated at {date}",
   "goToThing": "Go to {thing}",
-  "dataSetCount": "The query yielded no subjects.|The query yielded {count} subject.|The query yielded {count} subjects.",
   "downloadDataSet": "Download whole data set",
-  "queryFailedDescription": "Your query has failed! Please see the error message below. Modify your query and try again."
+  "includePrimaryRepositories": "Include primary repositories",
+  "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in primary repositories.",
+  "forkCouldNotBeCreated": "A fork could not be created because there may already be an up-to-date fork in this repository.",
+  "previousQuery": "Previous query|Previous queries",
+  "result": "Result",
+  "queued": "Queued",
+  "notAuthorised": {
+    "onlyPrimaryVisible": "You do not have required permissions, so only primary repositories are visible to you."
+  },
+  "boolean": "Boolean"
 }

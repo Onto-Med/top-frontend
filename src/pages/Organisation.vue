@@ -12,9 +12,8 @@
               {{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}
             </small>
           </div>
-          <div v-if="isAuthenticated" class="col-auto">
+          <div v-if="canManage" class="col-auto">
             <q-btn
-              v-if="isAuthenticated"
               color="primary"
               icon="settings"
               :label="t('manageThing', { thing: t('permission', 2) })"
@@ -34,14 +33,14 @@
       :name="t('repository')"
       :page="repositories"
       :loading="loading"
-      :create="isAuthenticated"
+      :create="canWrite"
       @row-clicked="routeToEditor($event)"
       @create-clicked="repository = newRepository(); showForm = true"
       @request="reload"
     >
       <template #actions="{ row }">
         <q-btn
-          v-if="isAuthenticated"
+          v-if="canWrite"
           size="sm"
           color="primary"
           dense
@@ -63,9 +62,9 @@
           :title="t('primaryRepositoryDescription')"
         />
       </template>
-      <template v-if="!isAuthenticated" #footer>
+      <template v-if="!canRead" #footer>
         <q-icon name="info" />
-        {{ t('notAuthenticated.onlyPrimaryVisible') }}
+        {{ t('notAuthorised.onlyPrimaryVisible') }}
       </template>
     </table-with-actions>
 
@@ -83,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref, onMounted } from 'vue'
+import { defineComponent, inject, ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import useNotify from 'src/mixins/useNotify'
@@ -109,7 +108,7 @@ export default defineComponent({
     const { t, d } = useI18n()
     const $q = useQuasar()
     const { notify, renderError } = useNotify()
-    const { repositoryIcon } = useEntityFormatter()
+    const { canManage, canRead, canWrite, repositoryIcon } = useEntityFormatter()
     const router = useRouter()
     const loading = ref(false)
     const showForm = ref(false)
@@ -179,6 +178,10 @@ export default defineComponent({
       newRepository,
       isAuthenticated,
       routeToEditor,
+
+      canRead: computed(() => isAuthenticated.value && canRead(organisation.value)),
+      canWrite: computed(() => isAuthenticated.value && canWrite(organisation.value)),
+      canManage: computed(() => isAuthenticated.value && canManage(organisation.value)),
 
       async saveRepository (repository: Repository) {
         if (!repositoryApi || !organisation.value) return

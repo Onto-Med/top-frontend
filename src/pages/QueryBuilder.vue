@@ -181,6 +181,7 @@
           icon="play_arrow"
           color="secondary"
           :label="t('execute')"
+          :title="t('queryExecuteDescription')"
           :disable="!(configurationComplete && querySubjectPresent)"
           @click="execute()"
         />
@@ -194,24 +195,20 @@
       </q-card-actions>
     </q-card>
 
-    <query-result-view
-      v-for="run in runs.slice().reverse()"
-      :key="run.query.id"
-      show-timer
-      :result="run.result"
-      :title="run.query.name"
-      @remove="removeRun(run.query.id)"
-      @prefill="prefillQuery(run.query)"
+    <query-results-table
+      :page="queryPage"
+      @delete="deleteQuery"
+      @prefill="prefillQuery"
+      @request="loadQueryPage($event)"
     />
   </q-page>
 </template>
 
 <script lang="ts">
-import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, Query, QueryResult, TypeEnum } from '@onto-med/top-api'
+import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, Query, QueryPage, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
-import QueryResultView from 'src/components/Query/QueryResult.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
@@ -220,15 +217,10 @@ import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { QueryApiKey } from 'src/boot/axios'
 import { exportFile } from 'quasar'
-
-interface Run {
-  query: Query,
-  result?: QueryResult,
-  timer?: number
-}
+import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 
 export default defineComponent({
-  components: { EntityTree, QueryResultView, QuerySubject },
+  components: { EntityTree, QuerySubject, QueryResultsTable },
   setup () {
     const { t } = useI18n()
     const { isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
@@ -242,11 +234,18 @@ export default defineComponent({
       projection: []
     } as Query)
     const treeLoading = ref(false)
-    const runs = ref([] as Run[])
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
     const queryApi = inject(QueryApiKey)
     const step = ref(1)
+    const queryPage = ref<QueryPage>({
+      content: [],
+      number: 1,
+      size: 0,
+      totalElements: 0,
+      totalPages: 0,
+      type: 'query'
+    })
 
     const prefillQuery = (oldQuery: Query) => {
       query.value = JSON.parse(JSON.stringify(oldQuery)) as Query
@@ -273,38 +272,16 @@ export default defineComponent({
       .then(r => dataSources.value = r)
       .catch((e: Error) => renderError(e))
 
-    const getRunIndex = (queryId: string) => runs.value.findIndex(r => r.query.id === queryId)
-
-    const buildQueryRunTimer = (run: Run) =>
-      window.setInterval(() => {
-        void updateRun(run).then(() => {
-          if (run.result?.finishedAt) clearInterval(run.timer)
-        })
-      }, 5000)
-
-    const updateRun = async (run: Run) => {
-      if (!queryApi || !organisation.value?.id || !repository.value?.id || run.result?.finishedAt)
-        return new Promise<void>(resolve => resolve())
-      return queryApi.getQueryResult(organisation.value.id, repository.value.id, run.query.id)
-        .then(r => run.result = r.data)
-        .catch((e: Error) => {
-          clearInterval(run.timer)
-          renderError(e)
-        })
+    const loadQueryPage = (page: number) => {
+      if (queryApi && organisation.value && repository.value)
+        queryApi.getQueries(organisation.value.id, repository.value.id, page)
+          .then(r => queryPage.value = r.data)
+          .catch((e: Error) => renderError(e))
     }
 
     onMounted(() => {
       reloadEntities().catch((e: Error) => renderError(e))
-      if (queryApi && organisation.value && repository.value)
-        queryApi.getQueries(organisation.value.id, repository.value.id)
-          .then(r => r.data.content.forEach(q => {
-            const run = { query: q } as Run
-            void updateRun(run).then(() => {
-              if (!run.result) run.timer = buildQueryRunTimer(run)
-              runs.value.push(run)
-            })
-          }))
-          .catch((e: Error) => renderError(e))
+      loadQueryPage(1)
     })
 
     return {
@@ -315,7 +292,6 @@ export default defineComponent({
       organisation,
       repository,
       entities,
-      runs,
       splitterModel: ref(25),
       reloadEntities,
       treeLoading,
@@ -323,12 +299,14 @@ export default defineComponent({
       importFile,
       aggregationFunctionOptions,
       prefillQuery,
+      queryPage,
+      loadQueryPage,
 
       configurationComplete: computed(() =>
         query.value.dataSources && query.value.dataSources.length > 0
       ),
 
-      querySubjectPresent: computed(() => 
+      querySubjectPresent: computed(() =>
         query.value.criteria && query.value.criteria.length > 0
         || query.value.projection && query.value.projection.length > 0
       ),
@@ -366,14 +344,9 @@ export default defineComponent({
         if (!queryApi || !organisation.value || !repository.value) return
         const currentQuery = JSON.parse(JSON.stringify(query.value)) as Query
         currentQuery.id = (uuidv4 as () => string)()
-        runs.value.push({ query: currentQuery })
 
         queryApi.enqueueQuery(organisation.value.id, repository.value.id, currentQuery)
-          .then(r => {
-            const index = getRunIndex(r.data.id)
-            runs.value[index].result = r.data
-            runs.value[index].timer = buildQueryRunTimer(runs.value[index])
-          })
+          .then(() => queryPage.value.content.unshift(currentQuery))
           .catch((e: Error) => renderError(e))
       },
 
@@ -388,14 +361,14 @@ export default defineComponent({
         importFile.value = undefined
       },
 
-      removeRun: (queryId: string) => {
+      deleteQuery: (query: Query) => {
         if (!queryApi || !organisation.value || !repository.value) return
 
-        queryApi?.deleteQuery(organisation.value.id, repository.value.id, queryId)
+        queryApi?.deleteQuery(organisation.value.id, repository.value.id, query.id)
           .catch((e: Error) => renderError(e))
           .finally(() => {
-            const index = getRunIndex(queryId)
-            if (index !== -1) runs.value.splice(index, 1)
+            const index = queryPage.value.content.findIndex(q => q.id === query.id)
+            if (index !== -1) queryPage.value.content.splice(index, 1)
           })
       }
     }

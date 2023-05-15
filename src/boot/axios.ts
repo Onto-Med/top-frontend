@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
-import { DataSourceApi, DocumentApi, PhraseApi, ConceptApi, DefaultApi, EntityApi, ExpressionConstantApi, ExpressionFunctionApi, ForkApi, OrganisationApi, QueryApi, RepositoryApi, CodeApi } from '@onto-med/top-api'
+import { DocumentApi, PhraseApi, ConceptApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, CodeApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 
@@ -15,10 +15,6 @@ export const DefaultApiKey: InjectionKey<DefaultApi> = Symbol('defaultApi')
 export const EntityApiKey: InjectionKey<EntityApi> = Symbol('entityApi')
 export const OrganisationApiKey: InjectionKey<OrganisationApi> = Symbol('organisationApi')
 export const RepositoryApiKey: InjectionKey<RepositoryApi> = Symbol('repositoryApi')
-export const ExpressionConstantApiKey: InjectionKey<ExpressionConstantApi> = Symbol('expressionConstantApi')
-export const ExpressionFunctionApiKey: InjectionKey<ExpressionFunctionApi> = Symbol('expressionFunctionApi')
-export const ForkApiKey: InjectionKey<ForkApi> = Symbol('forkApi')
-export const DataSourceApiKey: InjectionKey<DataSourceApi> = Symbol('dataSourceApi')
 export const QueryApiKey: InjectionKey<QueryApi> = Symbol('queryApi')
 export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 export const PhraseApiKey: InjectionKey<PhraseApi> = Symbol('phraseApi')
@@ -45,10 +41,6 @@ export default boot(({ app }) => {
   app.provide(EntityApiKey, new EntityApi(undefined, '', axiosInstance))
   app.provide(OrganisationApiKey, new OrganisationApi(undefined, '', axiosInstance))
   app.provide(RepositoryApiKey, new RepositoryApi(undefined, '', axiosInstance))
-  app.provide(ExpressionConstantApiKey, new ExpressionConstantApi(undefined, '', axiosInstance))
-  app.provide(ExpressionFunctionApiKey, new ExpressionFunctionApi(undefined, '', axiosInstance))
-  app.provide(ForkApiKey, new ForkApi(undefined, '', axiosInstance))
-  app.provide(DataSourceApiKey, new DataSourceApi(undefined, '', axiosInstance))
   app.provide(QueryApiKey, new QueryApi(undefined, '', axiosInstance))
   app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))
   app.provide(PhraseApiKey, new PhraseApi(undefined, '', axiosInstance))
