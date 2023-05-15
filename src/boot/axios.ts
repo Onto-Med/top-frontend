@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
-import { DocumentApi, PhraseApi, ConceptApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, UserApi } from '@onto-med/top-api'
+import { DocumentApi, PhraseApi, ConceptclusterApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, UserApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 

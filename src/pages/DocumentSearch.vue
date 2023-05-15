@@ -148,7 +148,7 @@
 <script lang="ts">
 import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DocumentApiKey, ConceptApiKey } from 'src/boot/axios'
+import { DocumentApiKey, ConceptClusterApiKey } from 'src/boot/axios'
 import { Document, ConceptCluster } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 
@@ -157,7 +157,7 @@ export default defineComponent({
     const { t } = useI18n()
     const { renderError }  = useNotify()
     const documentApi      = inject(DocumentApiKey)
-    const conceptApi       = inject(ConceptApiKey)
+    const conceptApi       = inject(ConceptClusterApiKey)
     const documents        = ref<Document[]>([])
     const document_        = ref<Document>()
     const concepts         = ref<ConceptCluster[]>([])
@@ -194,7 +194,7 @@ export default defineComponent({
       if (!conceptApi || !documentApi) return
       loading.value = true
       await conceptApi.getConceptClusters()
-        .then(r => {
+        .then((r: { data: { id: string; labels?: string | undefined }[] }) => {
           concepts.value = r.data
           concepts.value.forEach(function (concept, index) {
             conceptColors.push({
@@ -233,7 +233,7 @@ export default defineComponent({
 
       if (selectedConcepts.value.length !== 0) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        await documentApi.getDocumentsByConceptIds(
+        await documentApi.getDocumentIdsByConceptClusterIds(
           selectedConcepts.value.map(selConcept => {
             return concepts.value[selConcept].id
           }), conceptMode.value, undefined, mostImportantNodes.value
