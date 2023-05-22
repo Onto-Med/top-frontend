@@ -1,8 +1,8 @@
 import { boot } from 'quasar/wrappers'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
-import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
+import { VueKeycloakOptions } from '@dsb-norge/vue-keycloak-js/dist/types'
 
 export default boot(async ({ app }) => {
   const { notify } = useNotify()
@@ -21,7 +21,7 @@ export default boot(async ({ app }) => {
           realm:    process.env.OAUTH2_REALM,
           clientId: process.env.OAUTH2_CLIENT_ID
         },
-        onReady: (keycloak: KeycloakInstance) => {
+        onReady: (keycloak) => {
           const entityStore = useEntity()
           entityStore.keycloak = keycloak
           resolve()
@@ -30,7 +30,7 @@ export default boot(async ({ app }) => {
           notify('Keycloak initialisation failed!')
           resolve()
         }
-      })
+      } as VueKeycloakOptions)
     } else {
       resolve()
     }
