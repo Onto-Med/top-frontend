@@ -1,4 +1,4 @@
-import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
+import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
 import {
   BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
   ExpressionFunction, NumberRestriction, Phenotype, StringRestriction,
@@ -21,7 +21,7 @@ export const useEntity = defineStore('entity', {
       constants: undefined as Constant[] | undefined,
       functions: undefined as ExpressionFunction[] | undefined,
       converters: undefined as Converter[] | undefined,
-      keycloak: undefined as KeycloakInstance | undefined,
+      keycloak: undefined as Keycloak | undefined,
       entityApi: undefined as EntityApi | undefined,
       organisationApi: undefined as OrganisationApi | undefined,
       repositoryApi: undefined as RepositoryApi | undefined,

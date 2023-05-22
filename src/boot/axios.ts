@@ -2,7 +2,7 @@ import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
 import { DocumentApi, PhraseApi, ConceptApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, UserApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
-import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
+import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -26,7 +26,7 @@ export default boot(({ app }) => {
     baseURL: process.env.API_URL
   })
   axiosInstance.interceptors.request.use(config => {
-    const keycloak = (app.config.globalProperties.$keycloak as KeycloakInstance)
+    const keycloak = app.config.globalProperties.$keycloak as Keycloak
     if (keycloak && keycloak.token)
       (config.headers as Record<string, unknown>).Authorization = `Bearer ${keycloak.token}`
     return config
