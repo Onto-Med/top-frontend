@@ -6,12 +6,42 @@
         ref="codeInput"
         v-model="local.code"
         use-input
+        emit-value
         debounce="200"
         class="col"
         :options="autoSuggestOptions"
+        :loading="loading"
         @filter="autoSuggest"
+        @virtual-scroll="onScroll"
         @keyup.enter="addEntry"
       >
+        <template #selected>
+          <span v-if="local.code">
+            {{ local.code }}
+          </span>
+        </template>
+        <template #option="scope">
+          <q-item v-bind="scope.itemProps">
+            <q-item-section>
+              <q-item-label v-if="scope.opt.codeSystem" overline>
+                {{ scope.opt.codeSystem.name }}
+              </q-item-label>
+              <q-item-label>{{ scope.opt.name ||scope.opt.code }}</q-item-label>
+              <template v-if="showDetails">
+                <q-item-label v-for="(synonym, index) in scope.opt.synonyms" :key="index" caption class="ellipsis">
+                  {{ synonym }}
+                </q-item-label>
+              </template>
+            </q-item-section>
+          </q-item>
+        </template>
+        <template #no-option>
+          <q-item>
+            <q-item-section>
+              {{ t('entitySearchInput.emptyResult', { types: t('code', 2) }) }}
+            </q-item-section>
+          </q-item>
+        </template>
         <template #before>
           <code-system-input
             v-model="local.codeSystem"
@@ -54,8 +84,8 @@
 </template>
 
 <script lang="ts">
-import { Code } from '@onto-med/top-api'
-import { computed, defineComponent, ref, inject } from 'vue'
+import { Code, CodePage } from '@onto-med/top-api'
+import { computed, defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
@@ -63,10 +93,7 @@ import { QSelect } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
 import { CodeApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-
-const stringOptions = [
-  'Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'
-]
+import ScrollDetails from 'src/mixins/ScrollDetails'
 
 export default defineComponent({
   name: 'CodeInput',
@@ -81,7 +108,8 @@ export default defineComponent({
     },
     expanded: Boolean,
     showHelp: Boolean,
-    readonly: Boolean
+    readonly: Boolean,
+    showDetails: Boolean
   },
   emits: ['update:modelValue'],
   async setup (props, { emit }) {
@@ -91,14 +119,21 @@ export default defineComponent({
     const entityStore = useEntity()
 
     const codeApi     = inject(CodeApiKey)
-
     const codeSystems = await entityStore.getCodeSystems() || []
-
     const local = ref({ codeSystem : codeSystems[0] } as Code)
-
     const isValid = computed(() => !!local.value && local.value.code && local.value.codeSystem?.uri)
 
-    const autoSuggestOptions = ref(stringOptions)
+    const autoSuggestOptions = ref<Code[]>([])
+    const loading = ref(false)
+    const prevInput  = ref(undefined as string|undefined)
+    const nextPage   = ref(2)
+    const totalPages = ref(0)
+
+    const loadOptions = async (input: string|undefined, page = 1): Promise<CodePage> => {
+      if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
+      return codeApi?.getCodeSuggestions(undefined, input?.toLowerCase(), [], page)
+        .then(r => r.data)
+    }
 
     return {
       t,
@@ -107,6 +142,7 @@ export default defineComponent({
       isValid,
       codeInput,
       autoSuggestOptions,
+      loading,
 
       codeUrl (code: Code) {
         if (!code || !code.codeSystem) return undefined
@@ -144,13 +180,38 @@ export default defineComponent({
           abort()
           return
         }
-        update(() => {
-          codeApi?.getCodeSuggestions(undefined, searchString.toLowerCase(), [])
-            .then(result => {
-              autoSuggestOptions.value = result.data.content.map(code => code.code || '')
-            })
-            .catch((e: Error) => renderError(e))
-        })
+        prevInput.value = searchString
+        loading.value = true
+        nextPage.value = 2
+        totalPages.value = 0
+        loadOptions(searchString)
+          .then(page => {
+            totalPages.value = page.totalPages
+            update(() => autoSuggestOptions.value = page.content)
+          })
+          .catch((e: Error) => renderError(e))
+          .finally(() => loading.value = false)
+      },
+
+      onScroll ({ to, direction, ref }: ScrollDetails) {
+        const lastIndex = autoSuggestOptions.value.length - 1
+        if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
+          return
+        loading.value = true
+        loadOptions(prevInput.value, nextPage.value)
+          .then(page => {
+            totalPages.value = page.totalPages
+            if (page.content.length > 0) {
+              nextPage.value++
+              autoSuggestOptions.value = autoSuggestOptions.value.concat(page.content)
+              void nextTick(() => {
+                ref.refresh()
+                loading.value = false
+              })
+            }
+          })
+          .catch((e: Error) => renderError(e))
+          .finally(() => loading.value = false)
       },
 
       abortAutoSuggest () {
