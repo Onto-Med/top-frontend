@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { Code, CodeSystem, CodeApi } from '@onto-med/top-api'
+import { Code } from '@onto-med/top-api'
 import { computed, defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
@@ -62,6 +62,7 @@ import ExpandableCard from 'src/components/ExpandableCard.vue'
 import { QSelect } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
 import { CodeApiKey } from 'src/boot/axios'
+import useNotify from 'src/mixins/useNotify'
 
 const stringOptions = [
   'Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'
@@ -84,16 +85,15 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   async setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const codeInput = ref(null as unknown as QSelect)
-
+    const { renderError } = useNotify()
     const entityStore = useEntity()
 
     const codeApi     = inject(CodeApiKey)
 
     const codeSystems = await entityStore.getCodeSystems() || []
-    
+
     const local = ref({ codeSystem : codeSystems[0] } as Code)
 
     const isValid = computed(() => !!local.value && local.value.code && local.value.codeSystem?.uri)
@@ -101,7 +101,12 @@ export default defineComponent({
     const autoSuggestOptions = ref(stringOptions)
 
     return {
-      t, local, codeSystems, isValid, codeInput, autoSuggestOptions,
+      t,
+      local,
+      codeSystems,
+      isValid,
+      codeInput,
+      autoSuggestOptions,
 
       codeUrl (code: Code) {
         if (!code || !code.codeSystem) return undefined
@@ -118,7 +123,11 @@ export default defineComponent({
         newModelValue.push({
           code: local.value.code,
           name: local.value.name,
-          codeSystem: { uri: local.value.codeSystem.uri, name: local.value.codeSystem.name }
+          codeSystem: {
+            external_id: local.value.codeSystem.external_id,
+            uri: local.value.codeSystem.uri,
+            name: local.value.codeSystem.name
+          }
         })
         emit('update:modelValue', newModelValue)
         codeInput.value.$data
@@ -130,21 +139,17 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
 
-      autoSuggest (searchString: string, update: (p: object) => void, abort: () => void) {
+      autoSuggest (searchString: string, update: (arg0: () => void) => void, abort: () => void) {
         if (searchString.length < 2) {
           abort()
           return
         }
         update(() => {
           codeApi?.getCodeSuggestions(undefined, searchString.toLowerCase(), [])
-          .then(
-            (result) => {
-              autoSuggestOptions.value = result.data.map(code => code.code || '')
-          },
-          (error) => {
-            console.log(error)
-          }
-          )
+            .then(result => {
+              autoSuggestOptions.value = result.data.content.map(code => code.code || '')
+            })
+            .catch((e: Error) => renderError(e))
         })
       },
 

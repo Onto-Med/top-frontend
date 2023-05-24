@@ -3,7 +3,7 @@ import {
   BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
   ExpressionFunction, NumberRestriction, Phenotype, StringRestriction,
   RepositoryApi, Repository, Organisation, OrganisationApi, Constant, ForkingInstruction,
-  DataSource, Quantifier, DefaultApi, Converter, CodeApi, Code, CodeSystem, QueryApi
+  DataSource, Quantifier, DefaultApi, Converter, CodeApi, CodeSystem, QueryApi
 } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
@@ -389,8 +389,8 @@ export const useEntity = defineStore('entity', {
 
     async getCodeSystems(): Promise<CodeSystem[] | undefined> {
       await this.codeApi?.getCodeSystems(undefined, undefined, undefined, 1)
-        .then((r) => {
-            this.codeSystems = r.data
+        .then(r => {
+            this.codeSystems = r.data.content
         })
         return this.codeSystems
     }
