@@ -1,13 +1,15 @@
 <template>
   <expandable-card :title="t('code', 2)" :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
     <template #default>
-      <q-input
+      <q-select
         v-if="!readonly"
         ref="codeInput"
         v-model="local.code"
-        type="text"
+        use-input
         debounce="200"
         class="col"
+        :options="autoSuggestOptions"
+        @filter="autoSuggest"
         @keyup.enter="addEntry"
       >
         <template #before>
@@ -21,7 +23,7 @@
         <template #after>
           <q-btn color="primary" icon="add" :label="t('addThing', { thing: t('code') })" :disable="!isValid" @click="addEntry" />
         </template>
-      </q-input>
+      </q-select>
     </template>
 
     <template #append>
@@ -52,13 +54,18 @@
 </template>
 
 <script lang="ts">
-import { Code, CodeSystem } from '@onto-med/top-api'
-import { computed, defineComponent, ref } from 'vue'
+import { Code, CodeSystem, CodeApi } from '@onto-med/top-api'
+import { computed, defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import { QInput } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
+import { CodeApiKey } from 'src/boot/axios'
+
+const stringOptions = [
+  'Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'
+]
 
 export default defineComponent({
   name: 'CodeInput',
@@ -83,14 +90,18 @@ export default defineComponent({
 
     const entityStore = useEntity()
 
+    const codeApi     = inject(CodeApiKey)
+
     const codeSystems = await entityStore.getCodeSystems() || []
     
     const local = ref({ codeSystem : codeSystems[0] } as Code)
 
     const isValid = computed(() => !!local.value && local.value.code && local.value.codeSystem?.uri)
 
+    const autoSuggestOptions = ref(stringOptions)
+
     return {
-      t, local, codeSystems, isValid, codeInput,
+      t, local, codeSystems, isValid, codeInput, autoSuggestOptions,
 
       codeUrl (code: Code) {
         if (!code || !code.codeSystem) return undefined
@@ -117,6 +128,28 @@ export default defineComponent({
         let newModelValue = props.modelValue.slice()
         newModelValue.splice(index, 1)
         emit('update:modelValue', newModelValue)
+      },
+
+      autoSuggest (searchString: string, update: (p: object) => void, abort: () => void) {
+        if (searchString.length < 2) {
+          abort()
+          return
+        }
+        update(() => {
+          codeApi?.getCodeSuggestions(undefined, searchString.toLowerCase(), [])
+          .then(
+            (result) => {
+              autoSuggestOptions.value = result.data.map(code => code.code || '')
+          },
+          (error) => {
+            console.log(error)
+          }
+          )
+        })
+      },
+
+      abortAutoSuggest () {
+        // do nothing for now
       }
     }
   }
