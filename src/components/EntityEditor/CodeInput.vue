@@ -59,7 +59,7 @@ import { computed, defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import { QInput } from 'quasar'
+import { QSelect } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
 import { CodeApiKey } from 'src/boot/axios'
 
@@ -86,7 +86,7 @@ export default defineComponent({
   async setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
-    const codeInput = ref(null as unknown as QInput)
+    const codeInput = ref(null as unknown as QSelect)
 
     const entityStore = useEntity()
 
@@ -121,7 +121,7 @@ export default defineComponent({
           codeSystem: { uri: local.value.codeSystem.uri, name: local.value.codeSystem.name }
         })
         emit('update:modelValue', newModelValue)
-        codeInput.value?.select()
+        codeInput.value.$data
       },
 
       removeEntryByIndex (index: number) {
