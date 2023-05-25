@@ -1,11 +1,14 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <expandable-card :title="t('code', 2)" :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
     <template #default>
       <q-select
         v-if="!readonly"
         ref="codeInput"
-        v-model="local.code"
+        v-model="local"
+        option-label="code"
         use-input
+        clearable
         emit-value
         debounce="200"
         class="col"
@@ -14,25 +17,26 @@
         @filter="autoSuggest"
         @virtual-scroll="onScroll"
         @keyup.enter="addEntry"
+        @clear="clearAutoSuggestion"
       >
-        <template #selected>
-          <span v-if="local.code">
-            {{ local.code }}
-          </span>
-        </template>
         <template #option="scope">
           <q-item v-bind="scope.itemProps">
             <q-item-section>
-              <q-item-label v-if="scope.opt.codeSystem" overline>
-                {{ scope.opt.codeSystem.name }}
-              </q-item-label>
-              <q-item-label>{{ scope.opt.name ||scope.opt.code }}</q-item-label>
-              <template v-if="showDetails">
-                <q-item-label v-for="(synonym, index) in scope.opt.synonyms" :key="index" caption class="ellipsis">
-                  {{ synonym }}
-                </q-item-label>
-              </template>
+              <q-item-label v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.code" />
+              <q-item-label caption v-html="scope.opt.highlightSynonym ? scope.opt.highlightSynonym : scope.opt.name" />
             </q-item-section>
+            <q-item-section avatar>
+              <q-badge color="teal">
+                {{ scope.opt.codeSystemShortName }}
+              </q-badge>
+            </q-item-section>
+            <q-tooltip anchor="bottom middle" self="bottom start">
+              <q-list dense>
+                <q-item v-for="synonym in scope.opt.synonyms" :key="synonym">
+                  {{ synonym }}
+                </q-item>
+              </q-list>
+            </q-tooltip>
           </q-item>
         </template>
         <template #no-option>
@@ -48,6 +52,7 @@
             :options="codeSystems"
             :readonly="readonly"
             class="system-input"
+            @update:model-value="(value) => codeSystemSelected(value)"
           />
         </template>
         <template #after>
@@ -62,7 +67,7 @@
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
               <a :href="codeUrl(modelValue[index])" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
-                {{ getCodeSystem(entry.codeSystem?.uri)?.name }}: {{ entry.code }}
+                {{ getCodeSystem(entry.codeSystem?.uri)?.shortName }}: {{ entry.code }}
               </a>
             </q-item-section>
             <q-item-section avatar>
@@ -84,7 +89,7 @@
 </template>
 
 <script lang="ts">
-import { Code, CodePage } from '@onto-med/top-api'
+import { Code, CodePage, CodeSystem } from '@onto-med/top-api'
 import { computed, defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
@@ -108,8 +113,7 @@ export default defineComponent({
     },
     expanded: Boolean,
     showHelp: Boolean,
-    readonly: Boolean,
-    showDetails: Boolean
+    readonly: Boolean
   },
   emits: ['update:modelValue'],
   async setup (props, { emit }) {
@@ -120,7 +124,14 @@ export default defineComponent({
 
     const codeApi     = inject(CodeApiKey)
     const codeSystems = await entityStore.getCodeSystems() || []
-    const local = ref({ codeSystem : codeSystems[0] } as Code)
+
+    const emptyCode = {
+      code: '',
+      codeSystem: codeSystems[0]
+    } as Code
+
+    const local = ref(emptyCode)
+
     const isValid = computed(() => !!local.value && local.value.code && local.value.codeSystem?.uri)
 
     const autoSuggestOptions = ref<Code[]>([])
@@ -142,6 +153,7 @@ export default defineComponent({
       isValid,
       codeInput,
       autoSuggestOptions,
+      emptyCode,
       loading,
 
       codeUrl (code: Code) {
@@ -159,10 +171,11 @@ export default defineComponent({
         newModelValue.push({
           code: local.value.code,
           name: local.value.name,
+          uri: local.value.uri,
           codeSystem: {
-            external_id: local.value.codeSystem.external_id,
             uri: local.value.codeSystem.uri,
-            name: local.value.codeSystem.name
+            name: local.value.codeSystem.name,
+            external_id: local.value.codeSystem.external_id
           }
         })
         emit('update:modelValue', newModelValue)
@@ -175,7 +188,7 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
 
-      autoSuggest (searchString: string, update: (arg0: () => void) => void, abort: () => void) {
+      autoSuggest (searchString: string, update: (callBackFn: () => void) => void, abort: () => void) {
         if (searchString.length < 2) {
           abort()
           return
@@ -216,6 +229,19 @@ export default defineComponent({
 
       abortAutoSuggest () {
         // do nothing for now
+      },
+
+      clearAutoSuggestion() {
+        local.value = emptyCode
+      },
+
+      codeSystemSelected (selectedCodeSystem: CodeSystem) {
+        if (local.value !== undefined) {
+          local.value = {
+            code: '',
+            codeSystem: selectedCodeSystem
+          }
+        }
       }
     }
   }

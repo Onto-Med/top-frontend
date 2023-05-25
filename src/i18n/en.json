@@ -392,5 +392,8 @@
   "notAuthorised": {
     "onlyPrimaryVisible": "You do not have required permissions, so only primary repositories are visible to you."
   },
-  "boolean": "Boolean"
+  "boolean": "Boolean",
+  "codeInput": {
+    "allCodeSystems": "all"
+  }
 }
