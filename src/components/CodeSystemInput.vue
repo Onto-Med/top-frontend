@@ -4,7 +4,7 @@
     :options="options"
     :readonly="readonly"
     option-value="uri"
-    option-label="name"
+    option-label="shortName"
     @update:model-value="$emit('update:modelValue', $event)"
   />
 </template>

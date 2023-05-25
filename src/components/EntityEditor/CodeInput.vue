@@ -1,23 +1,48 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <expandable-card :title="t('code', 2)" :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
     <template #default>
       <q-select
         v-if="!readonly"
         ref="codeInput"
-        v-model="local.code"
+        v-model="local"
+        option-label="code"
         use-input
+        clearable
         debounce="200"
         class="col"
         :options="autoSuggestOptions"
         @filter="autoSuggest"
         @keyup.enter="addEntry"
+        @clear="clearAutoSuggestion"
       >
+        <template #option="scope">
+          <q-item v-bind="scope.itemProps">
+            <q-item-section>
+              <q-item-label v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.code" />
+              <q-item-label caption v-html="scope.opt.highlightSynonym ? scope.opt.highlightSynonym : scope.opt.name" />
+            </q-item-section>
+            <q-item-section avatar>
+              <q-badge color="teal">
+                {{ scope.opt.codeSystemShortName }}
+              </q-badge>
+            </q-item-section>
+            <q-tooltip anchor="bottom middle" self="bottom start">
+              <q-list dense>
+                <q-item v-for="synonym in scope.opt.synonyms" :key="synonym">
+                  {{ synonym }}
+                </q-item>
+              </q-list>
+            </q-tooltip>
+          </q-item>
+        </template>
         <template #before>
           <code-system-input
             v-model="local.codeSystem"
             :options="codeSystems"
             :readonly="readonly"
             class="system-input"
+            @update:model-value="(value) => codeSystemSelected(value)"
           />
         </template>
         <template #after>
@@ -32,7 +57,7 @@
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
               <a :href="codeUrl(modelValue[index])" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
-                {{ getCodeSystem(entry.codeSystem?.uri)?.name }}: {{ entry.code }}
+                {{ getCodeSystem(entry.codeSystem?.uri)?.shortName }}: {{ entry.code }}
               </a>
             </q-item-section>
             <q-item-section avatar>
@@ -54,7 +79,7 @@
 </template>
 
 <script lang="ts">
-import { Code, CodeSystem, CodeApi } from '@onto-med/top-api'
+import { Code, CodeSystem } from '@onto-med/top-api'
 import { computed, defineComponent, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
@@ -63,9 +88,7 @@ import { QSelect } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
 import { CodeApiKey } from 'src/boot/axios'
 
-const stringOptions = [
-  'Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'
-]
+const codeOptions: Code[] = []
 
 export default defineComponent({
   name: 'CodeInput',
@@ -92,16 +115,29 @@ export default defineComponent({
 
     const codeApi     = inject(CodeApiKey)
 
+    const codeSystemAll = {
+      base: {} as CodeSystem,
+        uri: '',
+        name: '',
+        shortName: '- ' + t('codeInput.allCodeSystems') + ' -'
+    }
+
     const codeSystems = await entityStore.getCodeSystems() || []
-    
-    const local = ref({ codeSystem : codeSystems[0] } as Code)
+    codeSystems.unshift(codeSystemAll)
+
+    const emptyCode = {
+      code: '',
+      codeSystem: codeSystems[0]
+    } as Code
+
+    const local = ref(emptyCode)
 
     const isValid = computed(() => !!local.value && local.value.code && local.value.codeSystem?.uri)
 
-    const autoSuggestOptions = ref(stringOptions)
+    const autoSuggestOptions = ref(codeOptions)
 
     return {
-      t, local, codeSystems, isValid, codeInput, autoSuggestOptions,
+      t, local, codeSystems, isValid, codeInput, autoSuggestOptions, emptyCode,
 
       codeUrl (code: Code) {
         if (!code || !code.codeSystem) return undefined
@@ -118,7 +154,12 @@ export default defineComponent({
         newModelValue.push({
           code: local.value.code,
           name: local.value.name,
-          codeSystem: { uri: local.value.codeSystem.uri, name: local.value.codeSystem.name }
+          uri: local.value.uri,
+          codeSystem: {
+            uri: local.value.codeSystem.uri,
+            name: local.value.codeSystem.name,
+            externalId: local.value.codeSystem.externalId
+          }
         })
         emit('update:modelValue', newModelValue)
         codeInput.value.$data
@@ -130,26 +171,40 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
       },
 
-      autoSuggest (searchString: string, update: (p: object) => void, abort: () => void) {
+      autoSuggest (searchString: string, update: (callBackFn: () => void) => void, abort: () => void) {
         if (searchString.length < 2) {
           abort()
           return
         }
         update(() => {
-          codeApi?.getCodeSuggestions(undefined, searchString.toLowerCase(), [])
+          codeApi?.getCodeSuggestions(undefined, searchString.toLowerCase(), [ local.value.codeSystem.externalId || '' ])
           .then(
             (result) => {
-              autoSuggestOptions.value = result.data.map(code => code.code || '')
+              autoSuggestOptions.value = result.data.content
+              autoSuggestOptions.value.forEach(code => code.codeSystem = codeSystems.find(c => c.shortName === code.codeSystemShortName) || codeSystemAll)
           },
           (error) => {
             console.log(error)
-          }
-          )
+          })
         })
       },
 
       abortAutoSuggest () {
         // do nothing for now
+      },
+
+      clearAutoSuggestion() {
+        emptyCode.codeSystem = codeSystemAll
+        local.value = emptyCode
+      },
+
+      codeSystemSelected (selectedCodeSystem: CodeSystem) {
+        if (local.value !== undefined) {
+          local.value = {
+            code: '',
+            codeSystem: selectedCodeSystem
+          }
+        }
       }
     }
   }

@@ -166,7 +166,7 @@ export default defineComponent({
     const showForkCreateDialog = ref(false)
     const isLoggedIn = computed(() => !keycloak.value || keycloak.value.authenticated)
 
-    const loadOptions = async (input: string, page = 1): Promise<Entity[]> => {
+    const loadOptions = async (input: string, page = 1): Promise<EntityPage> => {
       if (!entityApi) return Promise.reject({ message: 'Could not load data from the server.' })
       let repositoryIds = undefined
       if (props.organisationId && props.repositoryId) {
