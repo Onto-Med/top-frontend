@@ -19,10 +19,20 @@
         @virtual-scroll="onScroll"
         @keyup.enter="addEntry"
       >
+        <template #selected>
+          <span v-show="selection">
+            {{ selection?.codeSystem.shortName || selection?.codeSystem.externalId }}:
+            {{ selection?.name }}
+            <small v-show="selection?.code">[{{ selection?.code }}]</small>
+          </span>
+        </template>
         <template #option="scope">
           <q-item v-bind="scope.itemProps">
             <q-item-section>
-              <q-item-label v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.code" />
+              <q-item-label>
+                <span v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.label" />
+                <small v-show="scope.opt.code"> [{{ scope.opt.code }}]</small>
+              </q-item-label>
               <q-item-label caption v-html="scope.opt.highlightSynonym ? scope.opt.highlightSynonym : scope.opt.name" />
             </q-item-section>
             <q-item-section avatar>
@@ -65,9 +75,10 @@
         <q-list dense separator>
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
-              <a :href="modelValue[index].uri" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
-                {{ entry.codeSystem?.shortName || t('unknownCodeSystem') }}:
-                {{ entry.code }}
+              <a :href="entry.uri" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
+                {{ entry.codeSystem?.shortName || entry.codeSystem?.externalId || t('unknownCodeSystem') }}:
+                {{ entry.name }}
+                <small v-show="entry.code">[{{ entry.code }}]</small>
               </a>
             </q-item-section>
             <q-item-section avatar>
