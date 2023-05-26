@@ -138,14 +138,12 @@
         @update:model-value="$emit('update:descriptions', $event)"
       />
 
-      <Suspense>
-        <code-input
-          :model-value="codes"
-          :readonly="readonly"
-          :expanded="codes && codes.length > 0"
-          @update:model-value="$emit('update:codes', $event)"
-        />
-      </Suspense>
+      <code-input
+        :model-value="codes"
+        :readonly="readonly"
+        :expanded="codes && codes.length > 0"
+        @update:model-value="$emit('update:codes', $event)"
+      />
     </div>
   </q-scroll-area>
 </template>
