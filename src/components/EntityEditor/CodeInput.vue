@@ -1,9 +1,24 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <expandable-card :title="t('code', 2)" :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
+  <expandable-card :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
+    <template #title>
+      <q-toolbar-title class="row items-center">
+        {{ t('code', 2) }}
+        <span class="text-subtitle1 q-ml-md">
+          <q-toggle
+            v-model:model-value="showManualForm"
+            :label="showManualForm ? t('manualEntry') : t('codeSearch')"
+            color="primary"
+            size="sm"
+          />
+        </span>
+      </q-toolbar-title>
+    </template>
+
     <template #default>
       <q-select
         v-if="!readonly"
+        v-show="!showManualForm"
         ref="codeInput"
         v-model="selection"
         option-label="code"
@@ -71,10 +86,24 @@
             icon="add"
             :label="t('addThing', { thing: t('code') })"
             :disable="!isValid"
-            @click="addEntry"
+            @click="addEntry(selection)"
           />
         </template>
       </q-select>
+
+      <q-input v-show="showManualForm" ref="manualCodeInput" v-model:model-value="manualCode.code" :label="t('code')">
+        <template #before>
+          <q-input v-model:model-value="manualCode.codeSystem.uri" :label="t('codeSystemUri')" />
+        </template>
+        <template #after>
+          <q-btn
+            color="secondary"
+            icon="add"
+            :label="t('addManually')"
+            @click="addEntry(manualCode, true)"
+          />
+        </template>
+      </q-input>
     </template>
 
     <template #append>
@@ -83,9 +112,14 @@
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
               <a :href="entry.uri" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
-                {{ entry.codeSystem?.shortName || entry.codeSystem?.externalId || t('unknownCodeSystem') }}:
-                {{ entry.name }}
-                <small v-show="entry.code">[{{ entry.code }}]</small>
+                {{ entry.codeSystem?.shortName || entry.codeSystem?.externalId || entry.codeSystem?.uri || t('unknownCodeSystem') }}:
+                <span v-if="entry.name">
+                  {{ entry.name }}
+                  <small v-show="entry.code">[{{ entry.code }}]</small>
+                </span>
+                <span v-else>
+                  {{ entry.code }}
+                </span>
               </a>
             </q-item-section>
             <q-item-section avatar>
@@ -114,7 +148,7 @@ import ExpandableCard from 'src/components/ExpandableCard.vue'
 import { CodeApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import ScrollDetails from 'src/mixins/ScrollDetails'
-import { QSelect } from 'quasar'
+import { QInput, QSelect } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -135,13 +169,18 @@ export default defineComponent({
     const { t } = useI18n()
     const { renderError } = useNotify()
     const codeInput = ref<QSelect>()
+    const manualCodeInput = ref<QInput>()
     const codeApi   = inject(CodeApiKey)
     const codeSystemFilter = ref<CodeSystem>()
 
     const selection = ref<Code>()
 
+    const validateCode = (code?: Code) => {
+      return !!code && code.code && code.codeSystem?.uri
+    }
+
     const isValid = computed(() =>
-      !!selection.value && selection.value.code && selection.value.codeSystem?.uri
+      validateCode(selection.value)
     )
 
     const autoSuggestOptions = ref<Code[]>([])
@@ -149,6 +188,8 @@ export default defineComponent({
     const prevInput  = ref(undefined as string|undefined)
     const nextPage   = ref(2)
     const totalPages = ref(0)
+
+    const manualCode = ref<Code>({ code: '', codeSystem: { uri: '' } })
 
     const loadOptions = async (input?: string, codeSystems?: CodeSystem[], page = 1): Promise<CodePage> => {
       if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
@@ -168,14 +209,20 @@ export default defineComponent({
       loading,
       codeSystemFilter,
       codeInput,
+      manualCodeInput,
+      showManualForm: ref(false),
+      manualCode,
 
-      addEntry () {
-        if (!isValid.value) return
+      addEntry (entry?: Code, manual = false) {
+        if (!validateCode(entry)) return
         const newModelValue = props.modelValue.slice()
-        newModelValue.push(selection.value as Code)
+        newModelValue.push(entry as Code)
         emit('update:modelValue', newModelValue)
         selection.value = undefined
-        codeInput.value?.focus()
+        if (manual)
+          manualCodeInput.value?.select()
+        else
+          codeInput.value?.focus()
       },
 
       removeEntryByIndex (index: number) {
