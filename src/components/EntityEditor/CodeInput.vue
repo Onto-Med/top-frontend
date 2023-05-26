@@ -221,10 +221,6 @@ export default defineComponent({
           })
           .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
-      },
-
-      abortAutoSuggest () {
-        // do nothing for now
       }
     }
   }
