@@ -398,5 +398,9 @@
   },
   "codeSystem": "Code system|Code systems",
   "unknownCodeSystem": "Unknown code system|Unknown code systems",
-  "searchForThing": "Search for {thing}..."
+  "searchForThing": "Search for {thing}...",
+  "addManually": "Add manually",
+  "codeSearch": "Code search",
+  "manualEntry": "Manual entry",
+  "codeSystemUri": "Code system URI"
 }
