@@ -175,7 +175,7 @@ export default defineComponent({
           codeSystem: {
             uri: local.value.codeSystem.uri,
             name: local.value.codeSystem.name,
-            external_id: local.value.codeSystem.external_id
+            externalId: local.value.codeSystem.externalId
           }
         })
         emit('update:modelValue', newModelValue)
