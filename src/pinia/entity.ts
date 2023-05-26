@@ -3,7 +3,7 @@ import {
   BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
   ExpressionFunction, NumberRestriction, Phenotype, StringRestriction,
   RepositoryApi, Repository, Organisation, OrganisationApi, Constant, ForkingInstruction,
-  DataSource, Quantifier, DefaultApi, Converter, CodeApi, CodeSystem, QueryApi
+  DataSource, Quantifier, DefaultApi, Converter, CodeApi, QueryApi, CodeSystemPage
 } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
@@ -27,8 +27,7 @@ export const useEntity = defineStore('entity', {
       repositoryApi: undefined as RepositoryApi | undefined,
       defaultApi: undefined as DefaultApi | undefined,
       queryApi: undefined as QueryApi | undefined,
-      codeApi: undefined as CodeApi | undefined,
-      codeSystems: undefined as CodeSystem[] | undefined
+      codeApi: undefined as CodeApi | undefined
     }
   },
   getters: {
@@ -387,12 +386,14 @@ export const useEntity = defineStore('entity', {
         this.converters = (await this.entityApi?.getConverters())?.data
     },
 
-    async getCodeSystems(): Promise<CodeSystem[] | undefined> {
-      await this.codeApi?.getCodeSystems(undefined, undefined, undefined, 1)
-        .then(r => {
-            this.codeSystems = r.data.content
-        })
-        return this.codeSystems
+    async getCodeSystems(name?: string, page = 1): Promise<CodeSystemPage> {
+      if (!this.codeApi)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+      return await this.codeApi.getCodeSystems(undefined, undefined, name, page)
+        .then(r => r.data)
     }
   }
 })

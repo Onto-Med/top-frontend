@@ -4,7 +4,6 @@
     <template #default>
       <q-select
         v-if="!readonly"
-        ref="codeInput"
         v-model="selection"
         option-label="code"
         use-input
@@ -15,6 +14,7 @@
         :placeholder="selection ? '' : t('selectThing', { thing: t('code') })"
         :options="autoSuggestOptions"
         :loading="loading"
+        :virtual-scroll-item-size="70"
         @filter="autoSuggest"
         @virtual-scroll="onScroll"
         @keyup.enter="addEntry"
@@ -50,7 +50,6 @@
         <template #before>
           <code-system-input
             v-model="codeSystemFilter"
-            :options="codeSystems"
             :readonly="readonly"
             class="system-input"
           />
@@ -94,14 +93,11 @@ import { computed, defineComponent, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import { QSelect } from 'quasar'
-import { useEntity } from 'src/pinia/entity'
 import { CodeApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import ScrollDetails from 'src/mixins/ScrollDetails'
 
 export default defineComponent({
-  name: 'CodeInput',
   components: {
     CodeSystemInput,
     ExpandableCard
@@ -116,14 +112,11 @@ export default defineComponent({
     readonly: Boolean
   },
   emits: ['update:modelValue'],
-  async setup (props, { emit }) {
+  setup (props, { emit }) {
     const { t } = useI18n()
-    const codeInput = ref(null as unknown as QSelect)
     const { renderError } = useNotify()
-    const entityStore = useEntity()
 
     const codeApi     = inject(CodeApiKey)
-    const codeSystems = await entityStore.getCodeSystems() || []
     const codeSystemFilter = ref<CodeSystem>()
 
     const selection = ref<Code>()
@@ -151,16 +144,10 @@ export default defineComponent({
     return {
       t,
       selection,
-      codeSystems,
       isValid,
-      codeInput,
       autoSuggestOptions,
       loading,
       codeSystemFilter,
-
-      getCodeSystem (uri: string) {
-        return codeSystems === undefined ? undefined : codeSystems.find(c => c.uri === uri)
-      },
 
       addEntry () {
         if (!isValid.value) return
