@@ -12,7 +12,7 @@
         emit-value
         debounce="200"
         class="col"
-        :placeholder="selection ? '' : t('selectThing', { thing: t('code') })"
+        :placeholder="selection ? '' : t('searchForThing', { thing: t('code') })"
         :options="autoSuggestOptions"
         :loading="loading"
         :virtual-scroll-item-size="70"
