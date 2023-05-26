@@ -4,6 +4,7 @@
     <template #default>
       <q-select
         v-if="!readonly"
+        ref="codeInput"
         v-model="selection"
         option-label="code"
         use-input
@@ -65,7 +66,13 @@
           />
         </template>
         <template #after>
-          <q-btn color="primary" icon="add" :label="t('addThing', { thing: t('code') })" :disable="!isValid" @click="addEntry" />
+          <q-btn
+            color="primary"
+            icon="add"
+            :label="t('addThing', { thing: t('code') })"
+            :disable="!isValid"
+            @click="addEntry"
+          />
         </template>
       </q-select>
     </template>
@@ -107,6 +114,7 @@ import ExpandableCard from 'src/components/ExpandableCard.vue'
 import { CodeApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import ScrollDetails from 'src/mixins/ScrollDetails'
+import { QSelect } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -126,8 +134,8 @@ export default defineComponent({
   setup (props, { emit }) {
     const { t } = useI18n()
     const { renderError } = useNotify()
-
-    const codeApi     = inject(CodeApiKey)
+    const codeInput = ref<QSelect>()
+    const codeApi   = inject(CodeApiKey)
     const codeSystemFilter = ref<CodeSystem>()
 
     const selection = ref<Code>()
@@ -159,6 +167,7 @@ export default defineComponent({
       autoSuggestOptions,
       loading,
       codeSystemFilter,
+      codeInput,
 
       addEntry () {
         if (!isValid.value) return
@@ -166,6 +175,7 @@ export default defineComponent({
         newModelValue.push(selection.value as Code)
         emit('update:modelValue', newModelValue)
         selection.value = undefined
+        codeInput.value?.focus()
       },
 
       removeEntryByIndex (index: number) {
