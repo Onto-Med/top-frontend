@@ -396,5 +396,6 @@
   "codeInput": {
     "allCodeSystems": "all"
   },
-  "codeSystem": "Code system|Code systems"
+  "codeSystem": "Code system|Code systems",
+  "unknownCodeSystem": "Unknown code system|Unknown code systems"
 }

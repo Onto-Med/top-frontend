@@ -5,19 +5,19 @@
       <q-select
         v-if="!readonly"
         ref="codeInput"
-        v-model="local"
+        v-model="selection"
         option-label="code"
         use-input
         clearable
         emit-value
         debounce="200"
         class="col"
+        :placeholder="selection ? '' : t('selectThing', { thing: t('code') })"
         :options="autoSuggestOptions"
         :loading="loading"
         @filter="autoSuggest"
         @virtual-scroll="onScroll"
         @keyup.enter="addEntry"
-        @clear="clearAutoSuggestion"
       >
         <template #option="scope">
           <q-item v-bind="scope.itemProps">
@@ -26,8 +26,8 @@
               <q-item-label caption v-html="scope.opt.highlightSynonym ? scope.opt.highlightSynonym : scope.opt.name" />
             </q-item-section>
             <q-item-section avatar>
-              <q-badge color="teal">
-                {{ scope.opt.codeSystemShortName }}
+              <q-badge v-if="scope.opt.codeSystem" color="teal">
+                {{ scope.opt.codeSystem.shortName || scope.opt.codeSystem.externalId }}
               </q-badge>
             </q-item-section>
             <q-tooltip v-if="scope.opt.synonyms?.length" anchor="bottom middle" self="bottom start">
@@ -49,11 +49,10 @@
         </template>
         <template #before>
           <code-system-input
-            v-model="local.codeSystem"
+            v-model="codeSystemFilter"
             :options="codeSystems"
             :readonly="readonly"
             class="system-input"
-            @update:model-value="(value) => codeSystemSelected(value)"
           />
         </template>
         <template #after>
@@ -67,8 +66,9 @@
         <q-list dense separator>
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
-              <a :href="codeUrl(modelValue[index])" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
-                {{ getCodeSystem(entry.codeSystem?.uri)?.shortName }}: {{ entry.code }}
+              <a :href="modelValue[index].uri" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
+                {{ entry.codeSystem?.shortName || t('unknownCodeSystem') }}:
+                {{ entry.code }}
               </a>
             </q-item-section>
             <q-item-section avatar>
@@ -76,7 +76,6 @@
                 dense
                 color="red"
                 icon="remove"
-                class="remove-localized-text-btn"
                 :disable="readonly"
                 :title="t('remove')"
                 @click="removeEntryByIndex(index)"
@@ -125,15 +124,13 @@ export default defineComponent({
 
     const codeApi     = inject(CodeApiKey)
     const codeSystems = await entityStore.getCodeSystems() || []
+    const codeSystemFilter = ref<CodeSystem>()
 
-    const emptyCode = {
-      code: '',
-      codeSystem: codeSystems[0]
-    } as Code
+    const selection = ref<Code>()
 
-    const local = ref(emptyCode)
-
-    const isValid = computed(() => !!local.value && local.value.code && local.value.codeSystem?.uri)
+    const isValid = computed(() =>
+      !!selection.value && selection.value.code && selection.value.codeSystem?.uri
+    )
 
     const autoSuggestOptions = ref<Code[]>([])
     const loading = ref(false)
@@ -141,26 +138,25 @@ export default defineComponent({
     const nextPage   = ref(2)
     const totalPages = ref(0)
 
-    const loadOptions = async (input: string|undefined, page = 1): Promise<CodePage> => {
+    const loadOptions = async (input?: string, codeSystems?: CodeSystem[], page = 1): Promise<CodePage> => {
       if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
-      return codeApi?.getCodeSuggestions(undefined, input?.toLowerCase(), [], page)
-        .then(r => r.data)
+      return codeApi?.getCodeSuggestions(
+        undefined,
+        input?.toLowerCase(),
+        codeSystems?.filter(cs => cs.externalId).map(cs => cs.externalId as string),
+        page
+      ).then(r => r.data)
     }
 
     return {
       t,
-      local,
+      selection,
       codeSystems,
       isValid,
       codeInput,
       autoSuggestOptions,
-      emptyCode,
       loading,
-
-      codeUrl (code: Code) {
-        if (!code || !code.codeSystem) return undefined
-        return code.codeSystem.uri + '/' + code.code
-      },
+      codeSystemFilter,
 
       getCodeSystem (uri: string) {
         return codeSystems === undefined ? undefined : codeSystems.find(c => c.uri === uri)
@@ -169,18 +165,9 @@ export default defineComponent({
       addEntry () {
         if (!isValid.value) return
         const newModelValue = props.modelValue.slice()
-        newModelValue.push({
-          code: local.value.code,
-          name: local.value.name,
-          uri: local.value.uri,
-          codeSystem: {
-            uri: local.value.codeSystem.uri,
-            name: local.value.codeSystem.name,
-            externalId: local.value.codeSystem.externalId
-          }
-        })
+        newModelValue.push(selection.value as Code)
         emit('update:modelValue', newModelValue)
-        codeInput.value.$data
+        selection.value = undefined
       },
 
       removeEntryByIndex (index: number) {
@@ -198,7 +185,7 @@ export default defineComponent({
         loading.value = true
         nextPage.value = 2
         totalPages.value = 0
-        loadOptions(searchString)
+        loadOptions(searchString, codeSystemFilter.value ? [codeSystemFilter.value] : undefined)
           .then(page => {
             totalPages.value = page.totalPages
             update(() => autoSuggestOptions.value = page.content)
@@ -212,7 +199,7 @@ export default defineComponent({
         if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
           return
         loading.value = true
-        loadOptions(prevInput.value, nextPage.value)
+        loadOptions(prevInput.value, codeSystemFilter.value ? [codeSystemFilter.value] : undefined, nextPage.value)
           .then(page => {
             totalPages.value = page.totalPages
             if (page.content.length > 0) {
@@ -230,19 +217,6 @@ export default defineComponent({
 
       abortAutoSuggest () {
         // do nothing for now
-      },
-
-      clearAutoSuggestion() {
-        local.value = emptyCode
-      },
-
-      codeSystemSelected (selectedCodeSystem: CodeSystem) {
-        if (local.value !== undefined) {
-          local.value = {
-            code: '',
-            codeSystem: selectedCodeSystem
-          }
-        }
       }
     }
   }
