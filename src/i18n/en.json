@@ -395,5 +395,6 @@
   "boolean": "Boolean",
   "codeInput": {
     "allCodeSystems": "all"
-  }
+  },
+  "codeSystem": "Code system|Code systems"
 }
