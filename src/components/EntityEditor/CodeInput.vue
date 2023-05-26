@@ -30,12 +30,13 @@
                 {{ scope.opt.codeSystemShortName }}
               </q-badge>
             </q-item-section>
-            <q-tooltip anchor="bottom middle" self="bottom start">
-              <q-list dense>
-                <q-item v-for="synonym in scope.opt.synonyms" :key="synonym">
+            <q-tooltip v-if="scope.opt.synonyms?.length" anchor="bottom middle" self="bottom start">
+              <b>{{ t('synonym', 2) }}:</b>
+              <ul class="q-pl-md q-my-none">
+                <li v-for="synonym in scope.opt.synonyms" :key="synonym">
                   {{ synonym }}
-                </q-item>
-              </q-list>
+                </li>
+              </ul>
             </q-tooltip>
           </q-item>
         </template>
