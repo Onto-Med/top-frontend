@@ -23,11 +23,17 @@
               v-if="create"
               color="primary"
               :disabled="loading"
-              :label="t('createThing', { thing: name })"
+              :label="$q.screen.gt.xs ? t('createThing', { thing: name }) : ''"
               icon="add"
               @click="$emit('create-clicked')"
             />
-            <q-btn color="secondary" :disabled="loading" :label="t('reload')" icon="refresh" @click="reload()" />
+            <q-btn
+              color="secondary"
+              :disabled="loading"
+              :label="$q.screen.gt.xs ? t('reload') : ''"
+              icon="refresh"
+              @click="reload()"
+            />
           </q-btn-group>
         </template>
         <template #header="props">

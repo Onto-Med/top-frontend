@@ -49,7 +49,7 @@
                 color="primary"
                 icon="file_upload"
                 :disabled="!importFile"
-                :label="t('import')"
+                :label="$q.screen.gt.sm ? t('import') : ''"
                 @click="importQuery"
               />
             </template>
