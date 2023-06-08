@@ -14,7 +14,7 @@
         <q-avatar>
           <img src="images/logo.svg">
         </q-avatar>
-        <q-toolbar-title to="/" shrink class="text-weight-bold">
+        <q-toolbar-title to="/" shrink class="text-weight-bold gt-sm">
           <router-link class="brand-link" to="/">
             {{ productName }}
           </router-link>
