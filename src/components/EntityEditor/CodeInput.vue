@@ -4,7 +4,7 @@
     <template #title>
       <q-toolbar-title class="row items-center">
         {{ t('code', 2) }}
-        <span class="text-subtitle1 q-ml-md">
+        <span v-if="!readonly" class="text-subtitle1 q-ml-md">
           <q-toggle
             v-model:model-value="showManualForm"
             :label="showManualForm ? t('manualEntry') : t('codeSearch')"
@@ -91,7 +91,13 @@
         </template>
       </q-select>
 
-      <q-input v-show="showManualForm" ref="manualCodeInput" v-model:model-value="manualCode.code" :label="t('code')">
+      <q-input
+        v-if="!readonly"
+        v-show="showManualForm"
+        ref="manualCodeInput"
+        v-model:model-value="manualCode.code"
+        :label="t('code')"
+      >
         <template #before>
           <q-input v-model:model-value="manualCode.codeSystem.uri" :label="t('codeSystemUri')" />
         </template>
