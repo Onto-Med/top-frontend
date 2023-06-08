@@ -16,7 +16,8 @@
           dense
           no-caps
           :disabled="readonly"
-          :label="t('restore')"
+          :icon="$q.screen.lt.md ? 'undo' : undefined"
+          :label="$q.screen.gt.sm ? t('restore') : ''"
           :title="t('versionRestoreDescription')"
           @click.stop="$emit('restoreVersion', local)"
         />
@@ -25,7 +26,8 @@
           dense
           no-caps
           color="primary"
-          :label="t('save')"
+          :icon="$q.screen.lt.md ? 'save' : undefined"
+          :label="$q.screen.gt.sm ? t('save') : ''"
           :title="t('ctrl') + '+S'"
           :disabled="readonly || !dirty && !isNew"
           @click="save()"
@@ -35,7 +37,8 @@
           dense
           no-caps
           color="grey-7"
-          :label="t('backToCurrentVersion')"
+          :icon="$q.screen.lt.md ? 'fast_forward' : undefined"
+          :label="$q.screen.gt.sm ? t('backToCurrentVersion') : ''"
           @click="reset()"
         />
         <q-btn
@@ -43,7 +46,8 @@
           dense
           no-caps
           color="grey-7"
-          :label="t('reset')"
+          :icon="$q.screen.lt.md ? 'undo' : undefined"
+          :label="$q.screen.gt.sm ? t('reset') : ''"
           :disable="!dirty"
           @click="showClearDialog"
         />

@@ -1,16 +1,15 @@
 <template>
   <q-page>
-    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
+    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px" :limits="[15, 50]">
       <template #before>
         <div class="column fit">
           <div v-if="repository" class="row items-center q-pl-sm bg-primary text-white shadow-2 entity-editor-tabs-bar">
-            <q-icon
-              :name="repositoryIcon(repository)"
-              :title="t(repository.repositoryType || 'repository')"
-              class="q-mr-sm q-tree__icon"
-            />
-
             <div class="col ellipsis" :title="repository.name || repository.id">
+              <q-icon
+                :name="repositoryIcon(repository)"
+                :title="t(repository.repositoryType || 'repository')"
+                class="q-mr-sm q-tree__icon"
+              />
               {{ repository.name || repository.id }}
             </div>
 
@@ -34,7 +33,7 @@
             :nodes="entities"
             :loading="treeLoading"
             :allowed-entity-types="allowedEntityTypes"
-            class="col column"
+            class="col column full-width"
             :show-context-menu="canWrite"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"

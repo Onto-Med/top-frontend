@@ -84,7 +84,7 @@
           <q-btn
             color="primary"
             icon="add"
-            :label="t('addThing', { thing: t('code') })"
+            :label="$q.screen.gt.sm ? t('addThing', { thing: t('code') }) : ''"
             :disable="!isValid"
             @click="addEntry(selection)"
           />
@@ -106,7 +106,7 @@
             color="secondary"
             icon="add"
             :disabled="readonly || !manualCode || !manualCode.code || !manualCode.codeSystem.uri"
-            :label="t('addManually')"
+            :label="$q.screen.gt.sm ? t('addManually') : ''"
             @click="addEntry(manualCode, true)"
           />
         </template>

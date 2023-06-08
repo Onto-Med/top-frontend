@@ -13,6 +13,7 @@
         <slot name="toolbar" />
         <q-btn
           v-if="helpText"
+          v-show="$q.screen.gt.sm"
           flat
           round
           dense
@@ -32,9 +33,9 @@
             <slot />
           </div>
 
-          <q-separator v-show="isHelpVisible" vertical />
+          <q-separator v-show="$q.screen.gt.sm && isHelpVisible" vertical />
 
-          <div v-show="isHelpVisible" class="col-6 q-pa-md">
+          <div v-show="$q.screen.gt.sm && isHelpVisible" class="col-6 q-pa-md">
             <div class="text-subtitle1">
               {{ t('help') }}:
             </div>
@@ -64,12 +65,15 @@ export default defineComponent({
     error: Boolean
   },
   setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t } = useI18n()
     const isExpanded    = ref(props.expanded)
     const isHelpVisible = ref(props.showHelp)
 
-    return { t, isExpanded, isHelpVisible }
+    return {
+      t,
+      isExpanded,
+      isHelpVisible
+    }
   },
 })
 </script>

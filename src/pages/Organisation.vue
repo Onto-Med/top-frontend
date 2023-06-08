@@ -8,7 +8,7 @@
               <q-icon name="groups" :title="t('organisation')" class="q-mr-sm q-tree__icon" />
               {{ organisation.name }}
             </div>
-            <small v-if="organisation.createdAt">
+            <small v-if="organisation.createdAt" class="gt-xs">
               {{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}
             </small>
           </div>
@@ -16,7 +16,7 @@
             <q-btn
               color="primary"
               icon="settings"
-              :label="t('manageThing', { thing: t('permission', 2) })"
+              :label="$q.screen.gt.xs ? t('manageThing', { thing: t('permission', 2) }) : ''"
               @click="showMembershipDialog()"
             />
           </div>
@@ -51,13 +51,14 @@
         <q-icon
           :name="repositoryIcon(row)"
           :title="t(row.repositoryType || 'repository')"
-          class="q-ml-sm q-tree__icon"
+          class="q-ml-sm q-tree__icon gt-xs"
         />
         <q-chip
           v-if="row.primary"
           size="sm"
           color="primary"
           text-color="white"
+          class="gt-xs"
           :label="t('primary')"
           :title="t('primaryRepositoryDescription')"
         />

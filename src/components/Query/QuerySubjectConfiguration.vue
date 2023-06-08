@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-btn flat icon="settings" :title="t('setting', 2)" @click="showDialog = true" />
+    <q-btn dense flat icon="settings" :title="t('setting', 2)" @click="showDialog = true" />
     <q-dialog v-model="showDialog">
       <q-card class="criterion-config">
         <q-card-section class="row items-center">

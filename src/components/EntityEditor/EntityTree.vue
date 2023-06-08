@@ -14,7 +14,7 @@
           @entity-selected="handleSearch"
         >
           <template #append>
-            <q-btn dense flat icon="search" :title="t('search')" />
+            <q-btn class="gt-sm" dense flat icon="search" :title="t('search')" />
           </template>
         </entity-search-input>
       </q-toolbar-title>

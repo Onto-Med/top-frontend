@@ -49,7 +49,7 @@
                 color="primary"
                 icon="file_upload"
                 :disabled="!importFile"
-                :label="t('import')"
+                :label="$q.screen.gt.sm ? t('import') : ''"
                 @click="importQuery"
               />
             </template>
@@ -59,13 +59,13 @@
 
       <q-separator />
 
-      <q-splitter v-model="splitterModel" style="height: 50vh">
+      <q-splitter v-model="splitterModel" style="height: 50vh" :limits="[15, 50]">
         <template #before>
           <div class="column fit">
             <entity-tree
               :nodes="entities"
               :loading="treeLoading"
-              class="col column"
+              class="col column full-width"
               @refresh-clicked="reloadEntities"
               @update:selected="addCriterion($event); addSelection($event)"
             >
@@ -94,10 +94,10 @@
                     {{ t('projection') }}
                     <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('projectionSelection') }}
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('emptyProjectionBehaviour') }}
                   </q-item-label>
                 </q-item-section>
@@ -135,10 +135,10 @@
                     {{ t('eligibilityCriterion', 2) }}
                     <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('eligibilityCriterionSelection') }}
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('emptyCriteriaBehaviour') }}
                   </q-item-label>
                 </q-item-section>

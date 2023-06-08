@@ -22,6 +22,7 @@
       <q-toggle
         v-if="excludable"
         :model-value="inclusion"
+        dense
         :icon="inclusion ? 'check' : 'block'"
         color="positive"
         :title="inclusion ? t('inclusion') : t('exclusion')"
@@ -33,9 +34,9 @@
     </q-item-section>
     <q-item-section v-else :title="getSynonyms(subject)">
       <div class="row items-center fit non-selectable ellipsis">
-        <q-icon size="1.3rem" class="q-mr-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
+        <q-icon size="1.3rem" class="q-mr-sm gt-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
         {{ getTitle(subject, true) }}
-        <small v-if="requiresAggregationFunction" class="q-ml-md">
+        <small v-if="requiresAggregationFunction" class="q-ml-md gt-xs">
           (
           <span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">
             {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
@@ -60,7 +61,7 @@
           @update:date-time-restriction="$emit('update:dateTimeRestriction', $event)"
           @update:default-aggregation-function-id="$emit('update:defaultAggregationFunctionId', $event)"
         />
-        <q-btn icon="remove" :title="t('remove')" @click="$emit('remove')" />
+        <q-btn dense icon="remove" :title="t('remove')" @click="$emit('remove')" />
       </q-btn-group>
     </q-item-section>
   </q-item>
