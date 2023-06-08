@@ -34,7 +34,7 @@
             :nodes="entities"
             :loading="treeLoading"
             :allowed-entity-types="allowedEntityTypes"
-            class="col column"
+            class="col column full-width"
             :show-context-menu="canWrite"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
