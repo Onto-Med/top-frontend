@@ -118,7 +118,7 @@
         <q-list dense separator>
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
-              <a :href="entry.uri" target="_blank" class="code-link" :title="t('showThing', { thing: t('code') })">
+              <a :href="entry.uri" target="_blank" class="code-link" :title="entry.uri ? t('showThing', { thing: t('code') }) : ''">
                 {{ entry.codeSystem?.shortName || entry.codeSystem?.externalId || entry.codeSystem?.uri || t('unknownCodeSystem') }}:
                 <span v-if="entry.name">
                   {{ entry.name }}
