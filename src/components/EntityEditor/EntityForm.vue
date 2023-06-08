@@ -32,7 +32,7 @@
         </q-toolbar>
       </q-card>
 
-      <div class="row q-gutter-x-md q-mx-none">
+      <div class="row q-gutter-y-md q-mt-none">
         <localized-text-input
           :model-value="titles"
           unique
@@ -41,11 +41,11 @@
           :required="true"
           :label="t('title', 2)"
           :help-text="t('entityEditor.titlesHelp')"
-          class="col"
+          class="q-mr-md col-12 col-md"
           @update:model-value="$emit('update:titles', $event)"
         />
 
-        <q-card v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-4">
+        <q-card v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-12 col-md-4">
           <q-card-section>
             <item-type-select
               v-if="hasItemType(entityType)"
