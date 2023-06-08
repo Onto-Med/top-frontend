@@ -105,6 +105,7 @@
           <q-btn
             color="secondary"
             icon="add"
+            :disabled="readonly || !manualCode || !manualCode.code || !manualCode.codeSystem.uri"
             :label="t('addManually')"
             @click="addEntry(manualCode, true)"
           />
