@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
+    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px" :limits="[15, 50]">
       <template #before>
         <div class="column fit">
           <div v-if="repository" class="row items-center q-pl-sm bg-primary text-white shadow-2 entity-editor-tabs-bar">
