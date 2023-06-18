@@ -22,17 +22,18 @@ const datetimeFormats = {
       hour: 'numeric', minute: 'numeric'
     }
   }
-}
+};
+
+const language = navigator.language.split('-')[0];
+const i18n = createI18n({
+  legacy: false,
+  locale: language,
+  messages,
+  datetimeFormats
+});
 
 export default boot(({ app }) => {
-  const language = navigator.language.split('-')[0]
-  const i18n = createI18n({
-    legacy: false,
-    locale: language,
-    messages,
-    datetimeFormats
-  })
-
-  // Set i18n instance on app
   app.use(i18n)
 });
+
+export { i18n };

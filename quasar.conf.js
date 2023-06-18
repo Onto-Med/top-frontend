@@ -30,6 +30,7 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
       'i18n',
+      'gdpr',
       'axios',
       'pinia',
       'keycloak'
@@ -63,7 +64,9 @@ module.exports = configure(function (ctx) {
         OAUTH2_URL:       process.env.OAUTH2_URL       || 'http://127.0.0.1:8081',
         OAUTH2_REALM:     process.env.OAUTH2_REALM     || 'top-realm',
         OAUTH2_CLIENT_ID: process.env.OAUTH2_CLIENT_ID || 'top-frontend',
-        API_URL:          process.env.API_URL          || 'http://127.0.0.1:8080'
+        API_URL:          process.env.API_URL          || 'http://127.0.0.1:8080',
+        GDPR_NOTICE:      process.env.GDPR_NOTICE == 'true' ? true : false,
+        GDPR_POLICY_URL:  process.env.GDPR_POLICY_URL
       },
 
       // transpile: false,
