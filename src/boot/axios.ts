@@ -3,6 +3,7 @@ import axios, { AxiosInstance, AxiosStatic } from 'axios'
 import { DocumentApi, PhraseApi, ConceptApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, UserApi, CodeApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
+import { env } from 'src/config'
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -24,7 +25,7 @@ export const CodeApiKey: InjectionKey<CodeApi> = Symbol('codeApi')
 
 export default boot(({ app }) => {
   const axiosInstance = axios.create({
-    baseURL: process.env.API_URL
+    baseURL: env.API_URL
   })
   axiosInstance.interceptors.request.use(config => {
     const keycloak = app.config.globalProperties.$keycloak as Keycloak

@@ -2,9 +2,10 @@ import { Cookies, Notify, openURL } from 'quasar'
 import { computed } from 'vue'
 import { i18n } from 'src/boot/i18n'
 import packageInfo from '../../package.json'
+import { env } from 'src/config'
 
-if (process.env.GDPR_NOTICE && Cookies.has('gdpr') !== true) {
-  const policyUrl = process.env.GDPR_POLICY_URL
+if (env.GDPR_NOTICE && Cookies.has('gdpr') !== true) {
+  const policyUrl = env.GDPR_POLICY_URL
   const t = i18n.global.t
 
   const actions = [
