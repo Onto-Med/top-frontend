@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import { createI18n } from 'vue-i18n';
-
+import { LocalStorage } from 'quasar';
 import messages from 'src/i18n';
 
 const datetimeFormats = {
@@ -24,7 +24,8 @@ const datetimeFormats = {
   }
 };
 
-const language = navigator.language.split('-')[0];
+const language = LocalStorage.getItem('language') || navigator.language.split('-')[0];
+
 const i18n = createI18n({
   legacy: false,
   locale: language,
