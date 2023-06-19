@@ -1,6 +1,6 @@
-if [[ ! -z "${AUTH_ENABLED}" ]]
+if [[ ! -z "${OAUTH2_ENABLED}" ]]
 then
-    sed -i "s|AUTH_ENABLED\\:!1|AUTH_ENABLED:${AUTH_ENABLED}|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_ENABLED\\:!1|OAUTH2_ENABLED:${OAUTH2_ENABLED}|g" /usr/share/nginx/html/js/app.*.js
 fi
 
 if [[ ! -z "${API_URL}" ]]
