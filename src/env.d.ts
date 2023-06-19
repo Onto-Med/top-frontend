@@ -10,5 +10,6 @@ declare namespace NodeJS {
     API_URL: string;
     GDPR_NOTICE: boolean;
     GDPR_POLICY_URL: string | undefined;
+    SYSTEM_NOTICE: string | undefined;
   }
 }
