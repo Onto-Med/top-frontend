@@ -43,7 +43,10 @@
           </span>
         </template>
         <template #option="scope">
-          <q-item v-bind="scope.itemProps">
+          <q-item
+            v-bind="scope.itemProps"
+            :disable="modelValue.some(code => code.uri == scope.opt.uri)"
+          >
             <q-item-section>
               <q-item-label>
                 <span v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.label" />
@@ -110,7 +113,7 @@
           <q-btn
             color="secondary"
             icon="add"
-            :disabled="readonly || !manualCode || !manualCode.code || !manualCode.codeSystem.uri"
+            :disabled="!isValidManualCode"
             :label="$q.screen.gt.sm ? t('addManually') : ''"
             @click="addEntry(manualCode, true)"
           />
@@ -188,12 +191,13 @@ export default defineComponent({
     const selection = ref<Code>()
 
     const validateCode = (code?: Code) => {
-      return !!code && code.code && code.codeSystem?.uri
+      return !!code
+        && code.code
+        && code.codeSystem?.uri
+        && !props.modelValue.some(code =>
+          manualCode.value.code == code.code && manualCode.value.codeSystem?.uri == code.codeSystem?.uri
+        )
     }
-
-    const isValid = computed(() =>
-      validateCode(selection.value)
-    )
 
     const autoSuggestOptions = ref<Code[]>([])
     const loading = ref(false)
@@ -216,7 +220,8 @@ export default defineComponent({
     return {
       t,
       selection,
-      isValid,
+      isValid: computed(() => validateCode(selection.value)),
+      isValidManualCode: computed(() => validateCode(manualCode.value)),
       autoSuggestOptions,
       loading,
       codeSystemFilter,
