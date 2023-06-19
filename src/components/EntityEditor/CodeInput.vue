@@ -33,7 +33,7 @@
         :virtual-scroll-item-size="70"
         @filter="autoSuggest"
         @virtual-scroll="onScroll"
-        @keyup.enter="addEntry"
+        @keyup.enter="addEntry(selection)"
       >
         <template #selected>
           <span v-show="selection">
@@ -97,9 +97,14 @@
         ref="manualCodeInput"
         v-model:model-value="manualCode.code"
         :label="t('code')"
+        @keyup.enter="addEntry(manualCode, true)"
       >
         <template #before>
-          <q-input v-model:model-value="manualCode.codeSystem.uri" :label="t('codeSystemUri')" />
+          <q-input
+            v-model:model-value="manualCode.codeSystem.uri"
+            :label="t('codeSystemUri')"
+            @keyup.enter="($refs.manualCodeInput as any).$el.focus()"
+          />
         </template>
         <template #after>
           <q-btn
@@ -226,8 +231,11 @@ export default defineComponent({
         newModelValue.push(entry as Code)
         emit('update:modelValue', newModelValue)
         selection.value = undefined
-        if (manual)
+        if (manual) {
+          if (entry)
+            manualCode.value = { code: entry.code, codeSystem: entry.codeSystem }
           manualCodeInput.value?.select()
+        }
         else
           codeInput.value?.focus()
       },
