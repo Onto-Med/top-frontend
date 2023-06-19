@@ -402,5 +402,8 @@
   "addManually": "Manuell hinzufügen",
   "codeSearch": "Codesuche",
   "manualEntry": "Manuelle Eingabe",
-  "codeSystemUri": "Codesystem-URI"
+  "codeSystemUri": "Codesystem-URI",
+  "gdprNotice": "{productName} verwendet technisch notwendige Cookies, die für Grundfunktionalitäten erforderlich sind und somit den Betrieb der Anwendung ermöglichen.",
+  "accept": "Akzeptieren",
+  "learnMore": "Mehr erfahren"
 }

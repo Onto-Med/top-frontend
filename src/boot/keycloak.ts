@@ -3,12 +3,13 @@ import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
 import { VueKeycloakOptions } from '@dsb-norge/vue-keycloak-js/dist/types'
+import { env } from 'src/config'
 
 export default boot(async ({ app }) => {
   const { notify } = useNotify()
 
   return new Promise(resolve => {
-    if (process.env.AUTH_ENABLED) {
+    if (env.AUTH_ENABLED) {
       app.use(VueKeyCloak, {
         init: {
           onLoad: 'check-sso',
@@ -17,9 +18,9 @@ export default boot(async ({ app }) => {
           'public-client': true
         },
         config: {
-          url:      process.env.OAUTH2_URL,
-          realm:    process.env.OAUTH2_REALM,
-          clientId: process.env.OAUTH2_CLIENT_ID
+          url:      env.OAUTH2_URL,
+          realm:    env.OAUTH2_REALM,
+          clientId: env.OAUTH2_CLIENT_ID
         },
         onReady: (keycloak) => {
           const entityStore = useEntity()
