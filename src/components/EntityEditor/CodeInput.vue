@@ -43,7 +43,10 @@
           </span>
         </template>
         <template #option="scope">
-          <q-item v-bind="scope.itemProps">
+          <q-item
+            v-bind="scope.itemProps"
+            :disable="modelValue.some( code => code.uri == scope.opt.uri )"
+          >
             <q-item-section>
               <q-item-label>
                 <span v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.label" />
@@ -110,7 +113,7 @@
           <q-btn
             color="secondary"
             icon="add"
-            :disabled="readonly || !manualCode || !manualCode.code || !manualCode.codeSystem.uri"
+            :disabled="readonly || !manualCode || !manualCode.code || !manualCode.codeSystem.uri || modelValue.some( code => manualCode.code == code.code && manualCode.codeSystem?.uri == code.codeSystem?.uri )"
             :label="$q.screen.gt.sm ? t('addManually') : ''"
             @click="addEntry(manualCode, true)"
           />
