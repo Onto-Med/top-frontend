@@ -212,17 +212,18 @@ import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { defineComponent, onMounted, ref, computed, inject } from 'vue'
+import { defineComponent, onMounted, ref, computed, inject, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { QueryApiKey } from 'src/boot/axios'
-import { exportFile } from 'quasar'
+import { exportFile, useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 
 export default defineComponent({
   components: { EntityTree, QuerySubject, QueryResultsTable },
   setup () {
     const { t } = useI18n()
+    const $q = useQuasar()
     const { isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
     const entityStore = useEntity()
     const { renderError } = useNotify()
@@ -246,6 +247,8 @@ export default defineComponent({
       totalPages: 0,
       type: 'query'
     })
+
+    const splitterModel = ref<number>($q.localStorage.getItem('phenotypeQuerySplitterWidth') || 25)
 
     const prefillQuery = (oldQuery: Query) => {
       query.value = JSON.parse(JSON.stringify(oldQuery)) as Query
@@ -284,6 +287,11 @@ export default defineComponent({
       loadQueryPage(1)
     })
 
+    watch(
+      splitterModel,
+      (newVal) => $q.localStorage.set('editorSplitterWidth', newVal)
+    )
+
     return {
       t,
       EntityType,
@@ -292,7 +300,7 @@ export default defineComponent({
       organisation,
       repository,
       entities,
-      splitterModel: ref(25),
+      splitterModel,
       reloadEntities,
       treeLoading,
       dataSources,
