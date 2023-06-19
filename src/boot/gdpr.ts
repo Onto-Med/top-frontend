@@ -12,7 +12,7 @@ if (env.GDPR_NOTICE && Cookies.has('gdpr') !== true) {
     {
       label: computed(() => t('accept')) as unknown as string,
       color: 'yellow',
-      noDismiss: true,
+      noDismiss: false,
       handler () {
         Cookies.set('gdpr', 'true', { expires: 5 * 365 })
       }
