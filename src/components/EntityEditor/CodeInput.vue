@@ -232,8 +232,9 @@ export default defineComponent({
         emit('update:modelValue', newModelValue)
         selection.value = undefined
         if (manual) {
+          if (entry)
+            manualCode.value = { code: entry.code, codeSystem: entry.codeSystem }
           manualCodeInput.value?.select()
-          manualCode.value = {code: '', codeSystem: (entry?.codeSystem as CodeSystem)}
         }
         else
           codeInput.value?.focus()
