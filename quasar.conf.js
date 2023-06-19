@@ -60,7 +60,7 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history', // available values: 'hash', 'history'
 
       env: {
-        AUTH_ENABLED:     process.env.AUTH_ENABLED == 'true',
+        OAUTH2_ENABLED:   process.env.OAUTH2_ENABLED == 'true',
         OAUTH2_URL:       process.env.OAUTH2_URL,
         OAUTH2_REALM:     process.env.OAUTH2_REALM,
         OAUTH2_CLIENT_ID: process.env.OAUTH2_CLIENT_ID,

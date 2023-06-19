@@ -9,7 +9,7 @@ export default boot(async ({ app }) => {
   const { notify } = useNotify()
 
   return new Promise(resolve => {
-    if (env.AUTH_ENABLED) {
+    if (env.OAUTH2_ENABLED) {
       app.use(VueKeyCloak, {
         init: {
           onLoad: 'check-sso',

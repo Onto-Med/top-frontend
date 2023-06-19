@@ -1,6 +1,6 @@
-if [[ ! -z "${AUTH_ENABLED}" ]]
+if [[ ! -z "${OAUTH2_ENABLED}" ]]
 then
-    sed -i "s|AUTH_ENABLED\\:!1|AUTH_ENABLED:${AUTH_ENABLED}|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_ENABLED\\:!1|OAUTH2_ENABLED:${OAUTH2_ENABLED}|g" /usr/share/nginx/html/js/app.*.js
 fi
 
 if [[ ! -z "${API_URL}" ]]
@@ -10,17 +10,17 @@ fi
 
 if [[ ! -z "${OAUTH2_URL}" ]]
 then
-    sed -i "s|OAUTH2_URL\\:\"http\\://127\\.0\\.0\\.1\\:8081\"|OAUTH_URL:'${OAUTH2_URL}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_URL\\:\"http\\://127\\.0\\.0\\.1\\:8081\"|OAUTH2_URL:'${OAUTH2_URL}'|g" /usr/share/nginx/html/js/app.*.js
 fi
 
 if [[ ! -z "${OAUTH2_REALM}" ]]
 then
-    sed -i "s|OAUTH2_REALM\\:\"top-realm\"|OAUTH_REALM:'${OAUTH2_REALM}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_REALM\\:\"top-realm\"|OAUTH2_REALM:'${OAUTH2_REALM}'|g" /usr/share/nginx/html/js/app.*.js
 fi
 
 if [[ ! -z "${OAUTH2_CLIENT_ID}" ]]
 then
-    sed -i "s|OAUTH2_CLIENT_ID\\:\"top-frontend\"|OAUTH_CLIENT_ID:'${OAUTH2_CLIENT_ID}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_CLIENT_ID\\:\"top-frontend\"|OAUTH2_CLIENT_ID:'${OAUTH2_CLIENT_ID}'|g" /usr/share/nginx/html/js/app.*.js
 fi
 
 if [[ ! -z "${GDPR_NOTICE}" ]]
