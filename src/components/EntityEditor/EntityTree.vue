@@ -41,6 +41,7 @@
 
     <q-scroll-area class="col">
       <q-tree
+        ref="tree"
         v-model:expanded="expansion"
         :selected="selected ? selected.id : ''"
         :nodes="treeNodes"
@@ -105,6 +106,7 @@ import { Category, EntityType, Entity, DataType, ItemType } from '@onto-med/top-
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
 import useNotify from 'src/mixins/useNotify'
+import { QTree } from 'quasar'
 
 export default defineComponent({
   name: 'EntityTree',
@@ -142,6 +144,7 @@ export default defineComponent({
     const entityStore = useEntity()
     const { renderError } = useNotify()
     const { organisationId, repositoryId } = storeToRefs(entityStore)
+    const tree              = ref<QTree>()
     const expansion         = ref([] as string[])
     const filterEntityType  = ref(undefined as EntityType|undefined)
     const filterDataType    = ref(undefined as DataType|undefined)
@@ -165,9 +168,10 @@ export default defineComponent({
     })
 
     const expand = (entity: Entity|undefined): void => {
-      if (!entity || !entity.id) return
-      if (!expansion.value.includes(entity.id))
-        expansion.value.push(entity.id)
+      if (!entity || !entity.id || !tree.value?.getNodeByKey(entity.id))
+        return
+      if (!tree.value?.isExpanded(entity.id))
+        tree.value?.setExpanded(entity.id, true)
 
       if (isRestricted(entity))
         expand(props.nodes?.find(n => n.id === entity.superPhenotype?.id))
@@ -245,6 +249,7 @@ export default defineComponent({
 
     return {
       t,
+      tree,
       expansion,
       filterDataType,
       filterItemType,
