@@ -205,18 +205,28 @@
 </template>
 
 <script lang="ts">
-import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, Query, QueryPage, TypeEnum } from '@onto-med/top-api'
-import { storeToRefs } from 'pinia'
+import {
+  DataSource,
+  DataType,
+  EntityType,
+  ExpressionFunction,
+  Phenotype,
+  PhenotypeQuery,
+  Query,
+  QueryPage,
+  TypeEnum
+} from '@onto-med/top-api'
+import {storeToRefs} from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { useEntity } from 'src/pinia/entity'
+import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { defineComponent, onMounted, ref, computed, inject } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { v4 as uuidv4 } from 'uuid'
-import { QueryApiKey } from 'src/boot/axios'
-import { exportFile } from 'quasar'
+import {computed, defineComponent, inject, onMounted, ref} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {v4 as uuidv4} from 'uuid'
+import {QueryApiKey} from 'src/boot/axios'
+import {exportFile} from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 
 export default defineComponent({
@@ -231,8 +241,9 @@ export default defineComponent({
       id: (uuidv4 as () => string)(),
       dataSources: [],
       criteria: [],
-      projection: []
-    } as Query)
+      projection: [],
+      type: TypeEnum.Phenotype
+    } as PhenotypeQuery)
     const treeLoading = ref(false)
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
