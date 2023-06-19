@@ -32,3 +32,8 @@ if [[ ! -z "${GDPR_POLICY_URL}" ]]
 then
     sed -i "s|GDPR_POLICY_URL\\:void 0|GDPR_POLICY_URL:'${GDPR_POLICY_URL}'|g" /usr/share/nginx/html/js/app.*.js
 fi
+
+if [[ ! -z "${SYSTEM_NOTICE}" ]]
+then
+    sed -i "s|SYSTEM_NOTICE\\:void 0|SYSTEM_NOTICE:'${SYSTEM_NOTICE}'|g" /usr/share/nginx/html/js/app.*.js
+fi
