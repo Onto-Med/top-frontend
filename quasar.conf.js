@@ -30,7 +30,7 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
       'i18n',
-      'gdpr',
+      'notices',
       'axios',
       'pinia',
       'keycloak'
@@ -60,13 +60,14 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history', // available values: 'hash', 'history'
 
       env: {
-        AUTH_ENABLED:     process.env.AUTH_ENABLED == 'true' ? true : false,
-        OAUTH2_URL:       process.env.OAUTH2_URL       || 'http://127.0.0.1:8081',
-        OAUTH2_REALM:     process.env.OAUTH2_REALM     || 'top-realm',
-        OAUTH2_CLIENT_ID: process.env.OAUTH2_CLIENT_ID || 'top-frontend',
-        API_URL:          process.env.API_URL          || 'http://127.0.0.1:8080',
-        GDPR_NOTICE:      process.env.GDPR_NOTICE == 'true' ? true : false,
-        GDPR_POLICY_URL:  process.env.GDPR_POLICY_URL
+        AUTH_ENABLED:     process.env.AUTH_ENABLED,
+        OAUTH2_URL:       process.env.OAUTH2_URL,
+        OAUTH2_REALM:     process.env.OAUTH2_REALM,
+        OAUTH2_CLIENT_ID: process.env.OAUTH2_CLIENT_ID,
+        API_URL:          process.env.API_URL,
+        GDPR_NOTICE:      process.env.GDPR_NOTICE,
+        GDPR_POLICY_URL:  process.env.GDPR_POLICY_URL,
+        SYSTEM_NOTICE:    process.env.SYSTEM_NOTICE
       },
 
       // transpile: false,
