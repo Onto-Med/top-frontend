@@ -30,6 +30,7 @@ You can specify the following environment variables via `.env` file or command l
 | API_URL          | http://127.0.0.1:8080  | URL of top-backend                             |
 | GDPR_NOTICE      | false                  | Show GDPR notice                               |
 | GDPR_POLICY_URL  |                        | Policy URL that is linked from the GDPR notice |
+| SYSTEM_NOTICE    |                        | Text that should be displayed as system notice |
 
 ### Lint the files
 ```bash
