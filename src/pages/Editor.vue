@@ -139,6 +139,7 @@ import { Category, Entity, EntityType, LocalisableText, Phenotype, Repository } 
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { RepositoryType } from '@onto-med/top-api'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   name: 'Editor',
@@ -153,13 +154,14 @@ export default defineComponent({
   },
   setup (props) {
     const { t, locale } = useI18n()
+    const $q = useQuasar()
     const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { notify, renderError } = useNotify()
     const entityApi        = inject(EntityApiKey)
     const showJson         = ref(false)
-    const splitterModel    = ref(25)
+    const splitterModel    = ref<number>($q.localStorage.getItem('editorSplitterWidth') || 25)
     const showExportDialog = ref(false)
     const { entities, repository, organisationId, organisation } = storeToRefs(entityStore)
     const selected    = ref<Entity|undefined>(undefined)
@@ -252,6 +254,11 @@ export default defineComponent({
           selected.value = undefined
         }
       }
+    )
+
+    watch(
+      splitterModel,
+      (newVal) => $q.localStorage.set('editorSplitterWidth', newVal)
     )
 
     const switchTab = (offset: number) => {
