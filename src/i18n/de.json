@@ -44,7 +44,12 @@
     "If": "Wenn das erste Argument wahr ist, wird das zweite zurückgegeben, andernfalls das dritte.",
     "CutLast": "Gibt die Phänotypwerte mit Ausnahme des letzten zurück.",
     "CutFirst": "Gibt die Phänotypwerte mit Ausnahme des ersten zurück.",
-    "Switch": "Die switch-Funktion erhält Paare von Werten als Argumente. Wenn der erste Wert eines Paares wahr ist, wird der zweite Wert als Ergebnis der Funktion zurückgegeben. Die Paare werden nacheinander geprüft, und nur das erste Paar, das als wahr ausgewertet wird, wird berücksichtigt. Darüber hinaus haben Sie die Möglichkeit, einen Standardwert als letztes Argument zu definieren."
+    "Switch": "Die switch-Funktion erhält Paare von Werten als Argumente. Wenn der erste Wert eines Paares wahr ist, wird der zweite Wert als Ergebnis der Funktion zurückgegeben. Die Paare werden nacheinander geprüft, und nur das erste Paar, das als wahr ausgewertet wird, wird berücksichtigt. Darüber hinaus haben Sie die Möglichkeit, einen Standardwert als letztes Argument zu definieren.",
+    "TimeDistance": "Diese Funktion hat 3 oder 6 Argumente: TimeDistance(Phänotyp, [Anzahl], Operator1, TimeDistance, [Operator2, TimeDistance2])\nDer Phänotyp muss mindestens die angegebene Anzahl von Werten aufweisen (Standardwert ist 2). Die Werte müssen den angegebenen Zeitabstand in Stunden haben.",
+    "StartsBefore": "Diese Funktion benötigt zwei Phänotypen als Argumente.\nDie Auswertung ergibt true, wenn das Zeitintervall des ersten Phänotyps vor dem Zweiten beginnt.",
+    "EndsBefore": "Diese Funktion benötigt zwei Phänotypen als Argumente.\nDie Auswertung ergibt true, wenn das Zeitintervall des ersten Phänotyps vor dem Zweiten endet.",
+    "Overlap1": "Diese Funktion erfordert mindestens zwei Argumente. Bei den ersten beiden handelt es sich um Phänotypen, deren Zeitintervalle sich überschneiden (das Zeitintervall des ersten Phänotyps muss vor dem zweiten beginnen).\nSie können ein drittes Argument angeben, um einen maximalen Zeitabstand in Stunden festzulegen, der zwischen beiden Phänotyp-Zeitintervallen vergehen kann.",
+    "Overlap2": "Diese Funktion verhält sich wie Overlap1, ist jedoch bidirektional, d.h. der erste Phänotyp kann vor oder nach dem zweiten beginnen.\nSie können bis zu zwei Zeitabstände in Stunden angeben, um den maximalen Abstand zwischen dem ersten und zweiten Phänotyp und den maximalen Abstand zwischen dem zweiten und ersten Phänotyp anzugeben."
   },
   "functions": {
     "Sum": "Summe",
@@ -86,7 +91,13 @@
     "If": "If",
     "CutLast": "CutLast",
     "CutFirst": "CutFirst",
-    "Switch": "Switch"
+    "Switch": "Switch",
+    "Exists": "Existiert",
+    "EndsBefore": "EndsBefore",
+    "StartsBefore": "StartsBefore",
+    "TimeDistance": "Zeitabstand",
+    "Overlap1": "Overlap1",
+    "Overlap2": "Overlap2"
   },
   "import": "Importieren",
   "includeThing": "{thing} einschließen",
@@ -314,6 +325,7 @@
     "allergy_intolerance": "Allergische Unverträglichkeit|Allergische Unverträglichkeiten",
     "clinical_impression": "Klinischer Eindruck|Klinische Eindrücke",
     "condition": "Zustand|Zustände",
+    "medication": "Medikation",
     "medication_administration": "Medikamentenverabreichung|Medikamentenverabreichungen",
     "medication_request": "Arzneimittelanforderung|Arzneimittelanforderungen",
     "medication_statement": "Arzneimittelverordnung|Arzneimittelverordnungen",

@@ -44,7 +44,12 @@
     "CutFirst": "Returns the phenotype values except for the first one.",
     "CutLast": "Returns the phenotype values except for the last one.",
     "If": "If the first argument is true, the second one is returned, otherwise the third.",
-    "Switch": "The switch function receives pairs of values as arguments. If the first value of a pair is true, the second value is returned as the result of the function. The pairs are checked sequentially and only the first pair that evaluates to true is considered. In addition, you have the option to define a default value as the last argument."
+    "Switch": "The switch function receives pairs of values as arguments. If the first value of a pair is true, the second value is returned as the result of the function. The pairs are checked sequentially and only the first pair that evaluates to true is considered. In addition, you have the option to define a default value as the last argument.",
+    "TimeDistance": "This function has 3 or 6 arguments: TimeDistance(phenotype, [count], operator1, timeDistance, [operator2, timeDistance2])\nThe phenotype muss at least have the specified count of values (defaults to 2). The values must have the specified time distance in hours.",
+    "StartsBefore": "This function needs two phenotypes as arguments.\nIt evaluates to true if the time interval of the first phenotype starts before the second one.",
+    "EndsBefore": "This function needs two phenotypes as arguments.\nIt evaluates to true if the time interval of the first phenotype ends before the second one.",
+    "Overlap1": "This function requires at least two arguments. The first two are phenotypes, of which time intervals are overlaping (first phenotype's time interval must start before the second one).\nYou can provide a third argument to set a maximal time distance in hours that might pass between both phenotype time intervals.",
+    "Overlap2": "This function acts like Overlap1 but is bidirectional, i.e., the first phenotype can start before or after the second one.\nYou can provide up to two time distances in hours to specify maximal distance between first and second phenotype and maximal distance between second and first phenotype."
   },
   "functions": {
     "CutFirst": "CutFirst",
@@ -86,7 +91,13 @@
     "Power": "^",
     "Li": "List",
     "Filter": "Filter",
-    "Switch": "Switch"
+    "Switch": "Switch",
+    "Exists": "Exists",
+    "EndsBefore": "EndsBefore",
+    "StartsBefore": "StartsBefore",
+    "TimeDistance": "TimeDistance",
+    "Overlap1": "Overlap1",
+    "Overlap2": "Overlap2"
   },
   "import": "Import",
   "includeThing": "Include {thing}",
@@ -315,6 +326,7 @@
     "observation": "Observation|Observations",
     "allergy_intolerance": "Allergy intolerance|Allergy intolerances",
     "clinical_impression": "Clinical impression|Clinical impressions",
+    "medication": "Medication",
     "medication_administration": "Medication administration|Medication administrations",
     "medication_request": "Medication request|Medication requests",
     "medication_statement": "Medication statement|Medication statements",
