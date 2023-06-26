@@ -32,66 +32,69 @@
         </q-toolbar>
       </q-card>
 
-      <div class="row q-gutter-y-md q-mt-none">
-        <localized-text-input
-          :model-value="titles"
-          unique
-          expanded
-          :readonly="readonly"
-          :required="true"
-          :label="t('title', 2)"
-          :help-text="t('entityEditor.titlesHelp')"
-          class="q-mr-md col-12 col-md"
-          @update:model-value="$emit('update:titles', $event)"
-        />
+      <div class="row q-col-gutter-md q-ma-none">
+        <div class="col-12 col-md">
+          <localized-text-input
+            :model-value="titles"
+            unique
+            expanded
+            :readonly="readonly"
+            :required="true"
+            :label="t('title', 2)"
+            :help-text="t('entityEditor.titlesHelp')"
+            @update:model-value="$emit('update:titles', $event)"
+          />
+        </div>
 
-        <q-card v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-12 col-md-4">
-          <q-card-section>
-            <item-type-select
-              v-if="hasItemType(entityType)"
-              :model-value="itemType"
-              :readonly="readonly"
-              required
-              description
-              tooltip
-              @update:model-value="$emit('update:itemType', $event)"
-            />
-
-            <data-type-select
-              v-if="hasDataType(entityType)"
-              :model-value="dataType"
-              :readonly="readonly || version !== undefined"
-              required
-              @update:model-value="$emit('update:dataType', $event)"
-            />
-
-            <data-type-select
-              v-else
-              :model-value="DataType.Boolean"
-              readonly
-            />
-
-            <unit-input
-              v-if="[EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entityType) && dataType === DataType.Number"
-              :model-value="unit"
-              :readonly="readonly"
-              show-label
-              @update:model-value="$emit('update:unit', $event)"
-            />
-
-            <div v-if="isRestricted(entityType) && superPhenotype">
-              {{ t('restrictionOf') }}:
-              <q-btn
-                flat
-                dense
-                no-caps
-                :label="getTitle(superPhenotype, false, true)"
-                :title="t('showThing', { thing: t('phenotype') })"
-                @click="routeToEntity(superPhenotype)"
+        <div v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-12 col-md-4">
+          <q-card>
+            <q-card-section>
+              <item-type-select
+                v-if="hasItemType(entityType)"
+                :model-value="itemType"
+                :readonly="readonly"
+                required
+                description
+                tooltip
+                @update:model-value="$emit('update:itemType', $event)"
               />
-            </div>
-          </q-card-section>
-        </q-card>
+
+              <data-type-select
+                v-if="hasDataType(entityType)"
+                :model-value="dataType"
+                :readonly="readonly || version !== undefined"
+                required
+                @update:model-value="$emit('update:dataType', $event)"
+              />
+
+              <data-type-select
+                v-else
+                :model-value="DataType.Boolean"
+                readonly
+              />
+
+              <unit-input
+                v-if="[EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entityType) && dataType === DataType.Number"
+                :model-value="unit"
+                :readonly="readonly"
+                show-label
+                @update:model-value="$emit('update:unit', $event)"
+              />
+
+              <div v-if="isRestricted(entityType) && superPhenotype">
+                {{ t('restrictionOf') }}:
+                <q-btn
+                  flat
+                  dense
+                  no-caps
+                  :label="getTitle(superPhenotype, false, true)"
+                  :title="t('showThing', { thing: t('phenotype') })"
+                  @click="routeToEntity(superPhenotype)"
+                />
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
 
       <expression-input
