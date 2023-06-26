@@ -49,7 +49,7 @@
                 color="primary"
                 icon="file_upload"
                 :disabled="!importFile"
-                :label="t('import')"
+                :label="$q.screen.gt.sm ? t('import') : ''"
                 @click="importQuery"
               />
             </template>
@@ -59,13 +59,13 @@
 
       <q-separator />
 
-      <q-splitter v-model="splitterModel" style="height: 50vh">
+      <q-splitter v-model="splitterModel" style="height: 50vh" :limits="[15, 50]">
         <template #before>
           <div class="column fit">
             <entity-tree
               :nodes="entities"
               :loading="treeLoading"
-              class="col column"
+              class="col column full-width"
               @refresh-clicked="reloadEntities"
               @update:selected="addCriterion($event); addSelection($event)"
             >
@@ -94,10 +94,10 @@
                     {{ t('projection') }}
                     <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('projectionSelection') }}
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('emptyProjectionBehaviour') }}
                   </q-item-label>
                 </q-item-section>
@@ -135,10 +135,10 @@
                     {{ t('eligibilityCriterion', 2) }}
                     <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('eligibilityCriterionSelection') }}
                   </q-item-label>
-                  <q-item-label caption>
+                  <q-item-label caption class="gt-sm">
                     {{ t('emptyCriteriaBehaviour') }}
                   </q-item-label>
                 </q-item-section>
@@ -205,34 +205,25 @@
 </template>
 
 <script lang="ts">
-import {
-  DataSource,
-  DataType,
-  EntityType,
-  ExpressionFunction,
-  Phenotype,
-  PhenotypeQuery,
-  Query,
-  QueryPage,
-  TypeEnum
-} from '@onto-med/top-api'
-import {storeToRefs} from 'pinia'
+import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, PhenotypeQuery, Query, QueryPage, TypeEnum } from '@onto-med/top-api'
+import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import {useEntity} from 'src/pinia/entity'
+import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import {computed, defineComponent, inject, onMounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
-import {v4 as uuidv4} from 'uuid'
-import {QueryApiKey} from 'src/boot/axios'
-import {exportFile} from 'quasar'
+import { defineComponent, onMounted, ref, computed, inject, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { v4 as uuidv4 } from 'uuid'
+import { QueryApiKey } from 'src/boot/axios'
+import { exportFile, useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 
 export default defineComponent({
   components: { EntityTree, QuerySubject, QueryResultsTable },
   setup () {
     const { t } = useI18n()
+    const $q = useQuasar()
     const { isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
     const entityStore = useEntity()
     const { renderError } = useNotify()
@@ -257,6 +248,8 @@ export default defineComponent({
       totalPages: 0,
       type: 'query'
     })
+
+    const splitterModel = ref<number>($q.localStorage.getItem('phenotypeQuerySplitterWidth') || 25)
 
     const prefillQuery = (oldQuery: Query) => {
       query.value = JSON.parse(JSON.stringify(oldQuery)) as Query
@@ -295,6 +288,11 @@ export default defineComponent({
       loadQueryPage(1)
     })
 
+    watch(
+      splitterModel,
+      (newVal) => $q.localStorage.set('editorSplitterWidth', newVal)
+    )
+
     return {
       t,
       EntityType,
@@ -303,7 +301,7 @@ export default defineComponent({
       organisation,
       repository,
       entities,
-      splitterModel: ref(25),
+      splitterModel,
       reloadEntities,
       treeLoading,
       dataSources,

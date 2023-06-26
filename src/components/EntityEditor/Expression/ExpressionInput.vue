@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import ExpressionArgumentInput from 'src/components/EntityEditor/Expression/ExpressionArgumentInput.vue'
@@ -121,11 +121,23 @@ export default defineComponent({
   setup (props, { emit }) {
     const { t } = useI18n()
     const $q = useQuasar()
+    const expandExpression = ref<boolean>($q.localStorage.getItem('expandExpression') || false)
+    const indent = ref<number>($q.localStorage.getItem('expressionIndentSize') || 2)
+
+    watch(
+      expandExpression,
+      (newVal) => $q.localStorage.set('expandExpression', newVal)
+    )
+
+    watch(
+      indent,
+      (newVal) => $q.localStorage.set('expressionIndentSize', newVal)
+    )
 
     return {
       t,
-      expandExpression: ref(false),
-      indent: ref(2),
+      expandExpression,
+      indent,
       scores: computed(() => props.modelValue && props.modelValue.functionId === 'switch'),
 
       showClearDialog () {

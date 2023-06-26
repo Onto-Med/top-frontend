@@ -5,7 +5,7 @@
         <span class="absolute-bottom-right text-h6 text-grey-4 q-pr-sm">
           v{{ version }}
         </span>
-        <span class="absolute-bottom text-grey-4 text-center">
+        <span class="absolute-bottom text-grey-4 text-center gt-sm">
           <div v-t="'appDescription'" class="text-h6" />
           <div v-t="'projectState'" />
         </span>

@@ -44,7 +44,12 @@
     "If": "Wenn das erste Argument wahr ist, wird das zweite zurückgegeben, andernfalls das dritte.",
     "CutLast": "Gibt die Phänotypwerte mit Ausnahme des letzten zurück.",
     "CutFirst": "Gibt die Phänotypwerte mit Ausnahme des ersten zurück.",
-    "Switch": "Die switch-Funktion erhält Paare von Werten als Argumente. Wenn der erste Wert eines Paares wahr ist, wird der zweite Wert als Ergebnis der Funktion zurückgegeben. Die Paare werden nacheinander geprüft, und nur das erste Paar, das als wahr ausgewertet wird, wird berücksichtigt. Darüber hinaus haben Sie die Möglichkeit, einen Standardwert als letztes Argument zu definieren."
+    "Switch": "Die switch-Funktion erhält Paare von Werten als Argumente. Wenn der erste Wert eines Paares wahr ist, wird der zweite Wert als Ergebnis der Funktion zurückgegeben. Die Paare werden nacheinander geprüft, und nur das erste Paar, das als wahr ausgewertet wird, wird berücksichtigt. Darüber hinaus haben Sie die Möglichkeit, einen Standardwert als letztes Argument zu definieren.",
+    "TimeDistance": "Diese Funktion hat 3 oder 6 Argumente: TimeDistance(Phänotyp, [Anzahl], Operator1, TimeDistance, [Operator2, TimeDistance2])\nDer Phänotyp muss mindestens die angegebene Anzahl von Werten aufweisen (Standardwert ist 2). Die Werte müssen den angegebenen Zeitabstand in Stunden haben.",
+    "StartsBefore": "Diese Funktion benötigt zwei Phänotypen als Argumente.\nDie Auswertung ergibt true, wenn das Zeitintervall des ersten Phänotyps vor dem Zweiten beginnt.",
+    "EndsBefore": "Diese Funktion benötigt zwei Phänotypen als Argumente.\nDie Auswertung ergibt true, wenn das Zeitintervall des ersten Phänotyps vor dem Zweiten endet.",
+    "Overlap1": "Diese Funktion erfordert mindestens zwei Argumente. Bei den ersten beiden handelt es sich um Phänotypen, deren Zeitintervalle sich überschneiden (das Zeitintervall des ersten Phänotyps muss vor dem zweiten beginnen).\nSie können ein drittes Argument angeben, um einen maximalen Zeitabstand in Stunden festzulegen, der zwischen beiden Phänotyp-Zeitintervallen vergehen kann.",
+    "Overlap2": "Diese Funktion verhält sich wie Overlap1, ist jedoch bidirektional, d.h. der erste Phänotyp kann vor oder nach dem zweiten beginnen.\nSie können bis zu zwei Zeitabstände in Stunden angeben, um den maximalen Abstand zwischen dem ersten und zweiten Phänotyp und den maximalen Abstand zwischen dem zweiten und ersten Phänotyp anzugeben."
   },
   "functions": {
     "Sum": "Summe",
@@ -86,7 +91,13 @@
     "If": "If",
     "CutLast": "CutLast",
     "CutFirst": "CutFirst",
-    "Switch": "Switch"
+    "Switch": "Switch",
+    "Exists": "Existiert",
+    "EndsBefore": "EndsBefore",
+    "StartsBefore": "StartsBefore",
+    "TimeDistance": "Zeitabstand",
+    "Overlap1": "Overlap1",
+    "Overlap2": "Overlap2"
   },
   "import": "Importieren",
   "includeThing": "{thing} einschließen",
@@ -240,7 +251,7 @@
     "titlesHelp": "Sie können je Sprache genau einen Titel angeben. Die Titel sollten dabei kurz und verständlich sein. Bei der Darstellung einer Entität wird der für die aktuelle Spracheinstellung passende Titel gewählt. Ist für die Spracheinstellung kein passender Titel angegeben, wird der erste Eintrag in der Liste verwendet.",
     "synonymsHelp": "Synonyme sind alternative Bezeichnungen für Entitäten. Beispielsweise könnte der Phänotyp \"BMI\" das Synonym \"Body Mass Index\" besitzen.",
     "descriptionsHelp": "Hier können Sie weiterführende Beschreibungen oder Definitionen der Entität in verschiedenen Sprachen angeben.",
-    "codesHelp": "Geben Sie in diesem Abschnitt Verknüpfungen zu Taxonomien an (z.B. SNOMED CT), sodass der Phänotyp auf die Standards gemappt ist und mit anderen IT-Systemen verbunden werden kann. Auf diese Weise können zum einen Daten aus anderen Quellen eingelesen und zur Phänotypisierung verwendet werden. Auf der anderen Seite können Ergebnisse an externe IT-Systeme zurückgespielt werden.",
+    "codesHelp": "Geben Sie in diesem Abschnitt Verknüpfungen zu Taxonomien an (z.B. SNOMED CT), sodass der Phänotyp auf die Standards gemappt ist und mit anderen IT-Systemen verbunden werden kann. Auf diese Weise können zum einen Daten aus anderen Quellen eingelesen und zur Phänotypisierung verwendet werden. Auf der anderen Seite können Ergebnisse an externe IT-Systeme zurückgespielt werden. Geben Sie einfach einen Code oder einen Code-Titel ein, um mit der Suche zu beginnen. Optional können Sie nach Codesystem filtern.",
     "formulaHelp": "Hier können mathematische und Boolesche Formeln eingegeben werden, mit denen die Werte des Phänotyps berechnet werden. Formeln können sowohl andere Phänotypen als auch Konstanten enthalten.",
     "restrictionHelp": "Spezifizieren Sie die Einschränkungen, die auf Werte des Phänotyps angewendet werden sollen. Wählen Sie dafür bitte zunächst einen passenden Quantor aus. Anschließend müssen Sie für den Typ der Restriktion zwischen Wertebereich (mit Minimum und/oder Maximum) oder Aufzählung (beliebige Anzahl von vordefinierten Werten) wählen. Für die Quantoren \"Werte vorhanden\" und \"Keine Werte vorhanden\" kann kein Restriktionstyp gewählt werden, da die Beschränkung der Werte implizit ist.",
     "emptyTab": {
@@ -314,6 +325,7 @@
     "allergy_intolerance": "Allergische Unverträglichkeit|Allergische Unverträglichkeiten",
     "clinical_impression": "Klinischer Eindruck|Klinische Eindrücke",
     "condition": "Zustand|Zustände",
+    "medication": "Medikation",
     "medication_administration": "Medikamentenverabreichung|Medikamentenverabreichungen",
     "medication_request": "Arzneimittelanforderung|Arzneimittelanforderungen",
     "medication_statement": "Arzneimittelverordnung|Arzneimittelverordnungen",
@@ -392,5 +404,18 @@
   "notAuthorised": {
     "onlyPrimaryVisible": "Sie verfügen nicht über die erforderlichen Berechtigungen, daher sind nur primäre Repositories für Sie sichtbar."
   },
-  "boolean": "Boolean"
+  "boolean": "Boolean",
+  "codeInput": {
+    "allCodeSystems": "alle"
+  },
+  "codeSystem": "Codesystem|Codesysteme",
+  "unknownCodeSystem": "Unbekanntes Codesystem|Unbekannte Codesysteme",
+  "searchForThing": "Nach {thing} suchen...",
+  "addManually": "Manuell hinzufügen",
+  "codeSearch": "Codesuche",
+  "manualEntry": "Manuelle Eingabe",
+  "codeSystemUri": "Codesystem-URI",
+  "gdprNotice": "{productName} verwendet technisch notwendige Cookies, die für Grundfunktionalitäten erforderlich sind und somit den Betrieb der Anwendung ermöglichen.",
+  "accept": "Akzeptieren",
+  "learnMore": "Mehr erfahren"
 }

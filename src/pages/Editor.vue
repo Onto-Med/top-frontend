@@ -1,16 +1,15 @@
 <template>
   <q-page>
-    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
+    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px" :limits="[15, 50]">
       <template #before>
         <div class="column fit">
           <div v-if="repository" class="row items-center q-pl-sm bg-primary text-white shadow-2 entity-editor-tabs-bar">
-            <q-icon
-              :name="repositoryIcon(repository)"
-              :title="t(repository.repositoryType || 'repository')"
-              class="q-mr-sm q-tree__icon"
-            />
-
             <div class="col ellipsis" :title="repository.name || repository.id">
+              <q-icon
+                :name="repositoryIcon(repository)"
+                :title="t(repository.repositoryType || 'repository')"
+                class="q-mr-sm q-tree__icon"
+              />
               {{ repository.name || repository.id }}
             </div>
 
@@ -34,7 +33,7 @@
             :nodes="entities"
             :loading="treeLoading"
             :allowed-entity-types="allowedEntityTypes"
-            class="col column"
+            class="col column full-width"
             :show-context-menu="canWrite"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
@@ -140,6 +139,7 @@ import { Category, Entity, EntityType, LocalisableText, Phenotype, Repository } 
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { RepositoryType } from '@onto-med/top-api'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   name: 'Editor',
@@ -154,13 +154,14 @@ export default defineComponent({
   },
   setup (props) {
     const { t, locale } = useI18n()
+    const $q = useQuasar()
     const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { notify, renderError } = useNotify()
     const entityApi        = inject(EntityApiKey)
     const showJson         = ref(false)
-    const splitterModel    = ref(25)
+    const splitterModel    = ref<number>($q.localStorage.getItem('editorSplitterWidth') || 25)
     const showExportDialog = ref(false)
     const { entities, repository, organisationId, organisation } = storeToRefs(entityStore)
     const selected    = ref<Entity|undefined>(undefined)
@@ -253,6 +254,11 @@ export default defineComponent({
           selected.value = undefined
         }
       }
+    )
+
+    watch(
+      splitterModel,
+      (newVal) => $q.localStorage.set('editorSplitterWidth', newVal)
     )
 
     const switchTab = (offset: number) => {

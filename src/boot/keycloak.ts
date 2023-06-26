@@ -1,14 +1,15 @@
 import { boot } from 'quasar/wrappers'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
-import { KeycloakInstance } from '@dsb-norge/vue-keycloak-js/dist/types'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
+import { VueKeycloakOptions } from '@dsb-norge/vue-keycloak-js/dist/types'
+import { env } from 'src/config'
 
 export default boot(async ({ app }) => {
   const { notify } = useNotify()
 
   return new Promise(resolve => {
-    if (process.env.AUTH_ENABLED) {
+    if (env.OAUTH2_ENABLED) {
       app.use(VueKeyCloak, {
         init: {
           onLoad: 'check-sso',
@@ -17,11 +18,11 @@ export default boot(async ({ app }) => {
           'public-client': true
         },
         config: {
-          url:      process.env.OAUTH2_URL,
-          realm:    process.env.OAUTH2_REALM,
-          clientId: process.env.OAUTH2_CLIENT_ID
+          url:      env.OAUTH2_URL,
+          realm:    env.OAUTH2_REALM,
+          clientId: env.OAUTH2_CLIENT_ID
         },
-        onReady: (keycloak: KeycloakInstance) => {
+        onReady: (keycloak) => {
           const entityStore = useEntity()
           entityStore.keycloak = keycloak
           resolve()
@@ -30,7 +31,7 @@ export default boot(async ({ app }) => {
           notify('Keycloak initialisation failed!')
           resolve()
         }
-      })
+      } as VueKeycloakOptions)
     } else {
       resolve()
     }

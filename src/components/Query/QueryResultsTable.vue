@@ -25,7 +25,7 @@
                 {{ getResult(props.row) }}
               </q-td>
               <q-td auto-width class="col-auto text-grey text-right" :title="t('elapsedTime')">
-                {{ getEllapsedTime(props.row) }}
+                <span class="gt-sm">{{ getEllapsedTime(props.row) }}</span>
               </q-td>
               <q-td auto-width class="text-right">
                 <q-btn-group flat class="q-ml-sm">

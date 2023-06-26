@@ -14,7 +14,7 @@
         <q-avatar>
           <img src="images/logo.svg">
         </q-avatar>
-        <q-toolbar-title to="/" shrink class="text-weight-bold">
+        <q-toolbar-title to="/" shrink class="text-weight-bold gt-xs">
           <router-link class="brand-link" to="/">
             {{ productName }}
           </router-link>
@@ -210,7 +210,7 @@ import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import packageInfo from '../../package.json'
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed, watch } from 'vue'
 import { Entity } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
@@ -227,8 +227,8 @@ export default defineComponent({
     const { t } = useI18n()
     const router = useRouter()
     const entityStore = useEntity()
-    const leftDrawerOpen = ref(true)
     const $q = useQuasar()
+    const leftDrawerOpen = ref<boolean>(!($q.localStorage.getItem('minimiseDrawer') as boolean))
     const { keycloak, organisation } = storeToRefs(entityStore)
     const drawer = ref(undefined as QMenu|undefined)
 
@@ -241,6 +241,11 @@ export default defineComponent({
         isHidden: keycloak.value && !keycloak.value.authenticated
       }
     ])
+
+    watch(
+      leftDrawerOpen,
+      (newVal) => $q.localStorage.set('minimiseDrawer', !newVal)
+    )
 
     return {
       t,

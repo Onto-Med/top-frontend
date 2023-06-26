@@ -1,6 +1,6 @@
 {
   "name": "top-frontend",
-  "version": "0.6.11",
+  "version": "0.7.0",
   "description": "An app for ontological modelling and managing of phenotypes.",
   "productName": "TOP Framework",
   "repository": {
@@ -22,7 +22,7 @@
     "concurrently:dev:jest": "concurrently \"quasar dev\" \"jest --watch\""
   },
   "dependencies": {
-    "@dsb-norge/vue-keycloak-js": "^2.1.5-beta",
+    "@dsb-norge/vue-keycloak-js": "^2.2.0",
     "@lhncbc/ucum-lhc": "^4.1.5",
     "@onto-med/top-api": "file:../top-api/target/generated-sources/openapi/axios",
     "@quasar/extras": "^1.15.1",

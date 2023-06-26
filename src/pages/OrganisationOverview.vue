@@ -30,7 +30,7 @@
           :title="t('editThing', { thing: t('organisation') })"
           @click.stop="organisation = row; showForm = true"
         />
-        <permission-icon :permission="row.permission" class="q-ml-sm" size="sm" />
+        <permission-icon :permission="row.permission" class="q-ml-sm gt-xs" size="sm" />
       </template>
     </table-with-actions>
 
