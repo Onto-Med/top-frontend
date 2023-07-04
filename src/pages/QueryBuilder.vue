@@ -205,7 +205,7 @@
 </template>
 
 <script lang="ts">
-import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, Query, QueryPage, TypeEnum } from '@onto-med/top-api'
+import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, PhenotypeQuery, QueryPage, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
@@ -232,8 +232,9 @@ export default defineComponent({
       id: (uuidv4 as () => string)(),
       dataSources: [],
       criteria: [],
-      projection: []
-    } as Query)
+      projection: [],
+      type: TypeEnum.Phenotype
+    } as PhenotypeQuery)
     const treeLoading = ref(false)
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
@@ -250,12 +251,12 @@ export default defineComponent({
 
     const splitterModel = ref<number>($q.localStorage.getItem('phenotypeQuerySplitterWidth') || 25)
 
-    const prefillQuery = (oldQuery: Query) => {
-      query.value = JSON.parse(JSON.stringify(oldQuery)) as Query
+    const prefillQuery = (oldQuery: PhenotypeQuery) => {
+      query.value = JSON.parse(JSON.stringify(oldQuery)) as PhenotypeQuery
       step.value = 1
     }
 
-    fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as Query)
+    fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as PhenotypeQuery)
 
     const reloadEntities = async () => {
       treeLoading.value = true
@@ -350,7 +351,7 @@ export default defineComponent({
 
       execute: () => {
         if (!queryApi || !organisation.value || !repository.value) return
-        const currentQuery = JSON.parse(JSON.stringify(query.value)) as Query
+        const currentQuery = JSON.parse(JSON.stringify(query.value)) as PhenotypeQuery
         currentQuery.id = (uuidv4 as () => string)()
 
         queryApi.enqueueQuery(organisation.value.id, repository.value.id, currentQuery)
@@ -369,7 +370,7 @@ export default defineComponent({
         importFile.value = undefined
       },
 
-      deleteQuery: (query: Query) => {
+      deleteQuery: (query: PhenotypeQuery) => {
         if (!queryApi || !organisation.value || !repository.value) return
 
         queryApi?.deleteQuery(organisation.value.id, repository.value.id, query.id)

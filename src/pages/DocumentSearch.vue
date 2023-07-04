@@ -24,7 +24,31 @@
                         <q-icon :name="scope.opt.icon" />
                       </q-item-section>
                       <q-item-section>
-                        <q-item-label>{{ scope.opt.label }}</q-item-label>
+                        <q-item-label>
+                          {{ scope.opt.label }}
+                        </q-item-label>
+                        <q-item-label caption>
+                          {{ scope.opt.description }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+              <div class="col-10">
+                <q-select
+                  v-model="mostImportantNodes"
+                  :options="mostImportantNodesOptions"
+                  :label="t('importantNodesOnly')"
+                  emit-value
+                  map-options
+                >
+                  <template #option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label>
+                          {{ scope.opt.label }}
+                        </q-item-label>
                         <q-item-label caption>
                           {{ scope.opt.description }}
                         </q-item-label>
@@ -61,29 +85,29 @@
             <q-card class="col">
               <q-card-section>
                 <div class="text-subtitle2">
-                  {{ t('document', 2) }} <a v-if="documentIds.length > 0">
-                    ({{ t('resultCount', documentIds.length) }})
+                  {{ t('document', 2) }} <a v-if="documents.length > 0">
+                    ({{ t('resultCount', documents.length) }})
                   </a>
                 </div>
               </q-card-section>
               <!--  TODO: need to find a better solution for style height -->
               <q-virtual-scroll
-                v-slot="{ item, index }"
+                v-slot="{ item }"
                 style="height: 94%"
-                :items="documentIds"
+                :items="documents"
                 separator
               >
                 <q-item
-                  :key="index + item"
+                  :key="item.id"
                   class="cursor-pointer relative-position"
                   clickable
-                  @click="chooseDocument(item)"
+                  @click="chooseDocument(item.id)"
                 >
                   <q-item-section>
                     <q-item-label
                       :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
                     >
-                      {{ item }}
+                      {{ item.name }}
                     </q-item-label>
                     <q-item-label
                       caption
@@ -106,13 +130,11 @@
               <q-scroll-area v-if="document_" style="height: 94%">
                 <q-card-section>
                   <div class="text-h6">
-                    {{ document_.id }}
+                    {{ document_.name }}
                   </div>
                 </q-card-section>
                 <q-card-section>
-                  <div>
-                    {{ document_.text }}
-                  </div>
+                  <div style="line-height: 1.6" v-html="document_.highlightedText" />
                 </q-card-section>
               </q-scroll-area>
             </q-card>
@@ -126,19 +148,19 @@
 <script lang="ts">
 import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DocumentApiKey, ConceptApiKey } from 'src/boot/axios'
-import { Document, Concept } from '@onto-med/top-api'
+import { DocumentApiKey, ConceptClusterApiKey } from 'src/boot/axios'
+import { Document, ConceptCluster } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({
   setup () {
     const { t } = useI18n()
-    const { renderError } = useNotify()
+    const { renderError }  = useNotify()
     const documentApi      = inject(DocumentApiKey)
-    const conceptApi       = inject(ConceptApiKey)
-    const documentIds      = ref<string[]>([])
+    const conceptApi       = inject(ConceptClusterApiKey)
+    const documents        = ref<Document[]>([])
     const document_        = ref<Document>()
-    const concepts         = ref<Concept[]>([])
+    const concepts         = ref<ConceptCluster[]>([])
     const loading          = ref(false)
     const selectedConcepts = ref<number[]>([])
     const distinctColors   = [
@@ -164,19 +186,20 @@ export default defineComponent({
     const conceptColors: ConceptColor[] = [] //ToDo: const? or ref?
     const selectedColors                = ref<ConceptColor[]>([])
     const conceptMode                   = ref('exclusive')
+    const mostImportantNodes            = ref(true)
 
     let lastSelectedConcept = -1
 
     const reload = async () => {
       if (!conceptApi || !documentApi) return
       loading.value = true
-      await conceptApi.getConcepts()
-        .then(r => {
+      await conceptApi.getConceptClusters()
+        .then((r: { data: { id: string; labels?: string | undefined }[] }) => {
           concepts.value = r.data
           concepts.value.forEach(function (concept, index) {
             conceptColors.push({
               'background-color': distinctColors[index],
-              color: distinctColorsFont[index]
+              'color': distinctColorsFont[index]
             })
           });
 
@@ -187,32 +210,37 @@ export default defineComponent({
         .finally(() => loading.value = false)
     }
 
-    const chooseConcept = async (idx: number, changedConceptMode: boolean | undefined) => {
+    const chooseConcept = async (idx: number | undefined, changedConceptMode: boolean | undefined) => {
       if (!documentApi) return
-
-      documentIds.value.length = 0
-      if (changedConceptMode !== true) {
-        if (conceptMode.value === 'exclusive') {
-          selectedConcepts.value.length = 0
-          selectedConcepts.value.push(idx)
-        } else if (selectedConcepts.value.includes(idx)) {
-          selectedConcepts.value = selectedConcepts.value.filter(function (item) {
-            return item !== idx
-          })
-        } else {
-          selectedConcepts.value.push(idx)
+      console.log('Concept ID: ', idx)
+      console.log(documents.value.length)
+      if (idx !== undefined) {
+        documents.value.length = 0;
+        if (changedConceptMode !== true) {
+          if (conceptMode.value === 'exclusive') {
+            selectedConcepts.value.length = 0
+            selectedConcepts.value.push(idx)
+          } else if (selectedConcepts.value.includes(idx)) {
+            selectedConcepts.value = selectedConcepts.value.filter(function (item) {
+              return item !== idx
+            })
+          } else {
+            selectedConcepts.value.push(idx)
+          }
+          lastSelectedConcept = idx
         }
-        lastSelectedConcept = idx
       }
 
       if (selectedConcepts.value.length !== 0) {
-        await documentApi.getDocumentsByConceptIds(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        await documentApi.getDocumentIdsByConceptClusterIds(
           selectedConcepts.value.map(selConcept => {
             return concepts.value[selConcept].id
-          }), true, conceptMode.value, undefined
+          }), conceptMode.value, undefined, mostImportantNodes.value
         )
           .then(r => {
-            documentIds.value = r.data.map(doc => doc.id).filter(id => id !== undefined) as string[]
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+            documents.value = r.data//.map(doc => doc.id).filter(id => id !== undefined) as string[]
           })
           .catch((e: Error) => renderError(e))
       } else {document_.value = undefined}
@@ -232,12 +260,6 @@ export default defineComponent({
 
         if (conceptMode.value === 'exclusive') {
           chooseConcept(lastSelectedConcept, false)
-            .then(() => {
-              // selectedConcepts.value.length = 0;
-              // documentIds.value.length = 0;
-              // document_.value = undefined;
-              // selectedColors.value.fill({'background-color': '', 'color': ''});
-            })
             .catch((e: Error) => renderError(e))
         } else {
           chooseConcept(lastSelectedConcept, true)
@@ -246,21 +268,35 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => mostImportantNodes.value,
+      () => {
+        chooseConcept(undefined, undefined)
+          .catch((e: Error) => renderError(e))
+      }
+    )
+
     return {
       t,
       splitterModel: ref(20),
       document_,
-      documentIds,
+      documents,
       concepts,
       loading,
       reload,
       alert,
       selectedColors,
       conceptMode,
+      mostImportantNodes,
       chooseConcept,
       async chooseDocument (documentId: string) {
         if (!documentApi) return
-        await documentApi.getDocumentById(documentId)
+        console.log(documentId)
+        await documentApi.getDocumentById(documentId,
+          selectedConcepts.value.map(selConcept => {
+            return concepts.value[selConcept].id
+          })
+        )
           .then(r => {
             document_.value = r.data
           })
@@ -282,6 +318,16 @@ export default defineComponent({
           label: t('intersection'),
           value: 'intersection',
           icon: 'mdi-set-center'
+        }
+      ]),
+      mostImportantNodesOptions: computed(() => [
+        {
+          label: t('yes'),
+          value: true,
+        },
+        {
+          label: t('no'),
+          value: false,
         }
       ])
     }
