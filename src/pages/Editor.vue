@@ -23,6 +23,12 @@
                 :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder', params: { organisationId, repositoryId: repository.id } }"
               />
+              <q-btn
+                v-else-if="isConceptRepository && canWrite"
+                icon="find_in_page"
+                :title="t('buildDocQuery')"
+                :to="{ name: 'docQueryBuilder' }"
+              />
             </q-btn-group>
 
             <export-dialog v-model:show="showExportDialog" :repository="repository" @import="reloadEntities()" />
@@ -126,20 +132,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick, computed } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
-import { useEntity } from 'src/pinia/entity'
+import {computed, defineComponent, inject, nextTick, onMounted, ref, Ref, watch} from 'vue'
+import {storeToRefs} from 'pinia'
+import {useRouter} from 'vue-router'
+import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
-import { Category, Entity, EntityType, LocalisableText, Phenotype, Repository } from '@onto-med/top-api'
-import { EntityApiKey } from 'src/boot/axios'
+import {Category, Entity, EntityType, LocalisableText, Phenotype, Repository, RepositoryType} from '@onto-med/top-api'
+import {EntityApiKey} from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { RepositoryType } from '@onto-med/top-api'
-import { useQuasar } from 'quasar'
+import {useQuasar} from 'quasar'
 
 export default defineComponent({
   name: 'Editor',
@@ -395,6 +400,10 @@ export default defineComponent({
 
       isPhenotypeRepository: computed(() =>
         repository.value && repository.value.repositoryType === RepositoryType.PhenotypeRepository
+      ),
+
+      isConceptRepository: computed( () =>
+        repository.value && repository.value.repositoryType === RepositoryType.ConceptRepository
       ),
 
       handleTabUpdate,

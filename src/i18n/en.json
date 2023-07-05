@@ -449,5 +449,6 @@
   },
   "repositoryContainingModel": "Repository containing the model",
   "confirmClearQuery": "If you switch to another repository, your current query will be lost. Are you sure?",
-  "repeatThing": "Repeat {thing}"
+  "repeatThing": "Repeat {thing}",
+  "buildDocQuery": "Start Document Search"
 }

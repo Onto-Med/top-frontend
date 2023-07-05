@@ -450,5 +450,6 @@
     "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um Auswahlkriterien und Projektion festzulegen."
   },
   "confirmClearQuery": "Wenn Sie zu einem anderen Repositorium wechseln, geht Ihre aktuelle Abfrage verloren. Sind Sie sicher?",
-  "repeatThing": "{thing} wiederholen"
+  "repeatThing": "{thing} wiederholen",
+  "buildDocQuery": "Dokumentensuche starten"
 }
