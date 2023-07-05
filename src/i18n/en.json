@@ -417,5 +417,6 @@
   "codeSystemUri": "Code system URI",
   "gdprNotice": "{productName} uses technically necessary cookies that are required for basic functionalities and thus enable the operation of the application.",
   "accept": "Accept",
-  "learnMore": "Learn more"
+  "learnMore": "Learn more",
+  "buildDocQuery": "Start Document Search"
 }
