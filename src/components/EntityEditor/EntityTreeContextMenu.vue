@@ -1,6 +1,6 @@
 <template>
   <q-menu context-menu>
-    <q-list v-if="!entity || entity.createdAt && entity.entityType === EntityType.Category" dense>
+    <q-list v-if="!entity || entity.createdAt && [EntityType.Category,EntityType.SingleConcept].includes(entity.entityType)" dense>
       <q-item
         v-for="entityType in abstractEntityTypes"
         :key="entityType"
@@ -46,11 +46,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { EntityType, Entity } from '@onto-med/top-api'
+import {computed, defineComponent} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {Entity, EntityType} from '@onto-med/top-api'
 import Dialog from 'src/components/Dialog.vue'
-import { useQuasar } from 'quasar'
+import {useQuasar} from 'quasar'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
@@ -85,7 +85,8 @@ export default defineComponent({
       ],
 
       abstractEntityTypes: computed(() =>
-        [EntityType.Category, EntityType.SinglePhenotype, EntityType.CompositePhenotype]
+        [EntityType.Category, EntityType.SinglePhenotype, EntityType.CompositePhenotype,
+          EntityType.SingleConcept, EntityType.CompositeConcept]
           .filter(e => props.allowedEntityTypes.includes(e))
       ),
 

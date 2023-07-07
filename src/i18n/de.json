@@ -418,5 +418,8 @@
   "gdprNotice": "{productName} verwendet technisch notwendige Cookies, die für Grundfunktionalitäten erforderlich sind und somit den Betrieb der Anwendung ermöglichen.",
   "accept": "Akzeptieren",
   "learnMore": "Mehr erfahren",
-  "buildDocQuery": "Dokumentensuche starten"
+  "buildDocQuery": "Dokumentensuche starten",
+  "single_concept": "Einfaches Konzept|Einfache Konzepte",
+  "composite_concept": "Zusammengesetztes Konzept|Zusammengesetzte Konzepte",
+  "unnamedConcept": "Unbenanntes Konzept"
 }

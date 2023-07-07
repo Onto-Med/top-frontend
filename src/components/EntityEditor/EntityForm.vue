@@ -98,7 +98,7 @@
       </div>
 
       <expression-input
-        v-if="entityType === EntityType.CompositePhenotype"
+        v-if="[EntityType.CompositePhenotype, EntityType.CompositeConcept].includes(entityType)"
         :model-value="expression"
         expanded
         :readonly="readonly"
@@ -106,7 +106,7 @@
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :entity-types="[EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.SinglePhenotype, EntityType.SingleRestriction]"
+        :entity-types="[EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.SinglePhenotype, EntityType.SingleRestriction, EntityType.CompositeConcept, EntityType.SingleConcept]"
         function-type="math"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
