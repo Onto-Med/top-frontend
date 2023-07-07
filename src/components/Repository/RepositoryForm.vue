@@ -25,6 +25,7 @@
           v-model="state.name"
           type="text"
           :label="t('name')"
+          :error="!state.name"
           autocomplete="Off"
           @update:model-value="setId"
         />
@@ -38,6 +39,7 @@
           autocomplete="Off"
           :label="t('id')"
           :readonly="!isNew"
+          :error="!state.id"
           @update:model-value="setId"
         />
 
@@ -59,7 +61,7 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn flat :label="t('save')" color="primary" @click="$emit('update:model-value', state)" />
+        <q-btn flat :label="t('save')" color="primary" :disable="!isValid" @click="$emit('update:model-value', state)" />
         <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
       </q-card-actions>
 
@@ -72,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Repository } from '@onto-med/top-api'
 import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
@@ -120,10 +122,12 @@ export default defineComponent({
         })
       },
 
-      setId (id: string|undefined) {
+      setId (id: string|number|null) {
         if (!isNew.value) return
-        state.value.id = id ? id.replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
-      }
+        state.value.id = id ? (id as string).replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
+      },
+
+      isValid: computed(() => state.value.id && state.value.name && state.value.repositoryType)
     }
   }
 })

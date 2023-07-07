@@ -25,6 +25,7 @@
           type="text"
           autocomplete="Off"
           :label="t('name')"
+          :error="!state.name"
           @update:model-value="setId"
         />
 
@@ -36,6 +37,7 @@
           autocomplete="Off"
           :readonly="!isNew"
           :label="t('id')"
+          :error="!state.id"
           @update:model-value="setId"
         />
 
@@ -45,7 +47,7 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat :label="t('save')" color="primary" @click="$emit('update:model-value', state)" />
+        <q-btn flat :label="t('save')" color="primary" :disable="!isValid" @click="$emit('update:model-value', state)" />
         <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
       </q-card-actions>
 
@@ -106,10 +108,12 @@ export default defineComponent({
         })
       },
 
-      setId (id: string|undefined) {
+      setId (id: string|number|null) {
         if (!isNew.value) return
-        state.value.id = id ? id.replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
-      }
+        state.value.id = id ? (id as string).replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
+      },
+
+      isValid: computed(() => state.value.name && state.value.id)
     }
   }
 })
