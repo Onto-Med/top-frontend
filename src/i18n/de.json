@@ -451,5 +451,8 @@
   },
   "confirmClearQuery": "Wenn Sie zu einem anderen Repositorium wechseln, geht Ihre aktuelle Abfrage verloren. Sind Sie sicher?",
   "repeatThing": "{thing} wiederholen",
-  "buildDocQuery": "Dokumentensuche starten"
+  "buildDocQuery": "Dokumentensuche starten",
+  "single_concept": "Einfaches Konzept|Einfache Konzepte",
+  "composite_concept": "Zusammengesetztes Konzept|Zusammengesetzte Konzepte",
+  "unnamedConcept": "Unbenanntes Konzept"
 }

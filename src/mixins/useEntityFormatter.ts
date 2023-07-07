@@ -1,6 +1,18 @@
-import { Category, DataType, Entity, EntityType, LocalisableText, Organisation, Permission, Phenotype, Repository, RepositoryType } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity'
-import { useI18n } from 'vue-i18n'
+import {
+  Category,
+  Concept,
+  DataType,
+  Entity,
+  EntityType,
+  LocalisableText,
+  Organisation,
+  Permission,
+  Phenotype,
+  Repository,
+  RepositoryType
+} from '@onto-med/top-api'
+import {useEntity} from 'src/pinia/entity'
+import {useI18n} from 'vue-i18n'
 
 export default function (this: void) {
   // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -29,6 +41,10 @@ export default function (this: void) {
 
   const isCategory = (entity: Entity): entity is Category => {
     return entity.entityType === EntityType.Category
+  }
+
+  const isConcept = (entity: Entity): entity is Concept => {
+    return [EntityType.CompositeConcept, EntityType.SingleConcept].includes(entity.entityType)
   }
 
   /**
@@ -75,6 +91,8 @@ export default function (this: void) {
         title = t('unnamedPhenotype')
       else if (isRestricted(entity))
         title = t('unnamedRestriction')
+      else if (isConcept(entity))
+        title = t('unnamedConcept')
     }
 
     if (unit && isPhenotype(entity) && entity.unit)
@@ -87,6 +105,7 @@ export default function (this: void) {
     isPhenotype,
     isCategory,
     isRestricted,
+    isConcept,
     getTitle,
 
     hasDataType: (entity: Entity | EntityType) => {
@@ -108,7 +127,7 @@ export default function (this: void) {
      * @returns Material icon name as string
      */
     getIcon(this: void, entity: Entity): string {
-      if ([EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(entity.entityType)) {
+      if ([EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.CompositeConcept].includes(entity.entityType)) {
         return 'apps'
       } else if ([EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(entity.entityType)) {
         switch ((entity as Phenotype).dataType) {
@@ -123,6 +142,8 @@ export default function (this: void) {
           default:
             return 'help_center'
         }
+      } else if (entity.entityType === EntityType.SingleConcept) {
+        return 'font_download'
       }
       return 'folder'
     },

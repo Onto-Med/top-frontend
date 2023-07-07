@@ -392,9 +392,9 @@ export default defineComponent({
 
       allowedEntityTypes: computed(() => {
         if (repository.value?.repositoryType === RepositoryType.ConceptRepository)
-          return [EntityType.Category]
+          return [EntityType.SingleConcept, EntityType.CompositeConcept]
         if (repository.value?.repositoryType === RepositoryType.PhenotypeRepository)
-          return undefined
+          return [EntityType.SinglePhenotype, EntityType.CompositePhenotype, EntityType.Category]
         return []
       }),
 

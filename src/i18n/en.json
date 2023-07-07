@@ -450,5 +450,8 @@
   "repositoryContainingModel": "Repository containing the model",
   "confirmClearQuery": "If you switch to another repository, your current query will be lost. Are you sure?",
   "repeatThing": "Repeat {thing}",
-  "buildDocQuery": "Start Document Search"
+  "buildDocQuery": "Start Document Search",
+  "single_concept": "Single Concept|Single Concepts",
+  "composite_concept": "Composite Concept|Composite Concepts",
+  "unnamedConcept": "Unnamed Concept"
 }
