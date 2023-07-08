@@ -4,30 +4,62 @@
       <q-card>
         <q-toolbar v-if="!isRestricted(entityType)" class="q-my-none">
           <q-toolbar-title class="row items-center">
-            <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
-            <entity-chip
-              v-for="(category, index) in superCategories"
-              :key="index"
-              :organisation-id="organisationId"
-              :repository-id="repositoryId"
-              :entity-types="[EntityType.Category]"
-              :entity-id="category ? category.id : undefined"
-              :disable="readonly"
-              :label="t('selectThing', { thing: t('category') }) + '...'"
-              removeable
-              @removeClicked="removeSuperCategory(index)"
-              @entity-set="setSuperCategory(index, $event)"
-              @entityClicked="$emit('entityClicked', $event)"
-            />
-            <q-chip
-              icon="add"
-              round
-              clickable
-              :disable="readonly"
-              :label="t('more')"
-              :title="t('addThing', { thing: t('superCategory') })"
-              @click="addSuperCategory(undefined)"
-            />
+            <div
+              v-if="![EntityType.SingleConcept, EntityType.CompositeConcept].includes(entityType)"
+            >
+              <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
+              <entity-chip
+                v-for="(category, index) in superCategories"
+                :key="index"
+                :organisation-id="organisationId"
+                :repository-id="repositoryId"
+                :entity-types="[EntityType.Category]"
+                :entity-id="category ? category.id : undefined"
+                :disable="readonly"
+                :label="t('selectThing', { thing: t('category') }) + '...'"
+                removeable
+                @removeClicked="removeSuperCategory(index)"
+                @entity-set="setSuperCategory(index, $event)"
+                @entityClicked="$emit('entityClicked', $event)"
+              />
+              <q-chip
+                icon="add"
+                round
+                clickable
+                :disable="readonly"
+                :label="t('more')"
+                :title="t('addThing', { thing: t('superCategory') })"
+                @click="addSuperCategory(undefined)"
+              />
+            </div>
+            <div
+              v-if="[EntityType.SingleConcept, EntityType.CompositeConcept].includes(entityType)"
+            >
+              <span class="q-mr-sm">{{ t('superConcept', 2) }}:</span>
+              <entity-chip
+                v-for="(category, index) in superConcepts"
+                :key="index"
+                :organisation-id="organisationId"
+                :repository-id="repositoryId"
+                :entity-types="[EntityType.Concept]"
+                :entity-id="category ? category.id : undefined"
+                :disable="readonly"
+                :label="t('selectThing', { thing: t('concept') }) + '...'"
+                removeable
+                @removeClicked="removeSuperConcept(index)"
+                @entity-set="setSuperConcept(index, $event)"
+                @entityClicked="$emit('entityClicked', $event)"
+              />
+              <q-chip
+                icon="add"
+                round
+                clickable
+                :disable="readonly"
+                :label="t('more')"
+                :title="t('addThing', { thing: t('superConcept') })"
+                @click="addSuperConcept(undefined)"
+              />
+            </div>
           </q-toolbar-title>
         </q-toolbar>
       </q-card>
@@ -154,7 +186,19 @@
 <script lang="ts">
 import { ref, defineComponent, PropType, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, LocalisableText, Code, Expression, Restriction, Category, Entity, ItemType, Phenotype  } from '@onto-med/top-api'
+import {
+  EntityType,
+  DataType,
+  LocalisableText,
+  Code,
+  Expression,
+  Restriction,
+  Category,
+  Entity,
+  ItemType,
+  Phenotype,
+  Concept
+} from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
@@ -234,6 +278,10 @@ export default defineComponent({
       type: Array as () => Category[],
       default: () => []
     },
+    superConcepts: {
+      type: Array as () => Concept[],
+      default: () => []
+    },
     restrictionKey: Number
   },
   emits: [
@@ -289,6 +337,26 @@ export default defineComponent({
 
       removeSuperCategory (index: number): void {
         const newValue = props.superCategories
+        if (!newValue) return
+        newValue.splice(index, 1)
+        emit('update:superCategories', newValue)
+      },
+      addSuperConcept (concept: Concept|undefined): void {
+        const newValue = props.superConcepts || []
+        if (!concept || newValue.findIndex(c => c && c.id === concept.id) === -1)
+          if (props.entityId !== concept?.id) newValue.push(concept as Concept)
+        emit('update:superCategories', newValue)
+      },
+
+      setSuperConcept (index: number, concept: Concept): void {
+        const newValue = props.superConcepts || []
+        if (newValue.findIndex(c => c && c.id === concept.id) === -1)
+          if (props.entityId !== concept.id) newValue[index] = concept
+        emit('update:superCategories', newValue)
+      },
+
+      removeSuperConcept (index: number): void {
+        const newValue = props.superConcepts
         if (!newValue) return
         newValue.splice(index, 1)
         emit('update:superCategories', newValue)

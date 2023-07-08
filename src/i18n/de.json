@@ -421,5 +421,6 @@
   "buildDocQuery": "Dokumentensuche starten",
   "single_concept": "Einfaches Konzept|Einfache Konzepte",
   "composite_concept": "Zusammengesetztes Konzept|Zusammengesetzte Konzepte",
-  "unnamedConcept": "Unbenanntes Konzept"
+  "unnamedConcept": "Unbenanntes Konzept",
+  "superConcept": "Super-Konzept|Super-Konzepte"
 }

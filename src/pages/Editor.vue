@@ -141,7 +141,7 @@ import {useI18n} from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
-import {Category, Entity, EntityType, LocalisableText, Phenotype, Repository, RepositoryType} from '@onto-med/top-api'
+import {Category, Entity, EntityType, LocalisableText, Phenotype, Repository, RepositoryType, Concept} from '@onto-med/top-api'
 import {EntityApiKey} from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import {useQuasar} from 'quasar'
@@ -160,7 +160,7 @@ export default defineComponent({
   setup (props) {
     const { t, locale } = useI18n()
     const $q = useQuasar()
-    const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
+    const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon, isConcept } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { notify, renderError } = useNotify()
@@ -174,8 +174,8 @@ export default defineComponent({
     const treeLoading = ref(false)
     const { isAuthenticated } = storeToRefs(entityStore)
 
-    const clone = (value: Category|Phenotype) =>
-      JSON.parse(JSON.stringify(value)) as Category|Phenotype
+    const clone = (value: Category|Phenotype|Concept) =>
+      JSON.parse(JSON.stringify(value)) as Category|Phenotype|Concept
     const equals = (expected: unknown, actual: unknown): boolean =>
       JSON.stringify(expected) === JSON.stringify(actual)
 
