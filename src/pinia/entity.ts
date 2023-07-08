@@ -1,9 +1,32 @@
 import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
 import {
-  BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
-  ExpressionFunction, NumberRestriction, Phenotype, StringRestriction,
-  RepositoryApi, Repository, Organisation, OrganisationApi, Constant, ForkingInstruction,
-  DataSource, Quantifier, DefaultApi, Converter, CodeApi, QueryApi, CodeSystemPage, DataType
+  BooleanRestriction,
+  Category,
+  CodeApi,
+  CodeSystemPage,
+  Concept,
+  Constant,
+  Converter,
+  DataSource,
+  DataType,
+  DateTimeRestriction,
+  DefaultApi,
+  Entity,
+  EntityApi,
+  EntityDeleteOptions,
+  EntityType,
+  ExpressionFunction,
+  ForkingInstruction,
+  NumberRestriction,
+  Organisation,
+  OrganisationApi,
+  Phenotype,
+  Quantifier,
+  QueryApi,
+  Repository,
+  RepositoryApi,
+  SingleConcept,
+  StringRestriction
 } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
@@ -167,11 +190,17 @@ export const useEntity = defineStore('entity', {
         .then((e) => {
           const superPhenotype = (e as Phenotype).superPhenotype
           const categories = (e as Category).superCategories
+          const concepts = (e as Concept).superConcepts
           if (superPhenotype && superPhenotype.id) {
             if (this.getEntity(superPhenotype.id)) return Promise.resolve(e)
             return this.loadEntity(superPhenotype.id, ignoreLocal).then(() => e)
           } else if (categories) {
             return Promise.all(categories.map(c => {
+              if (!c || !c.id || this.getEntity(c.id)) return Promise.resolve(e)
+              return this.loadEntity(c.id, ignoreLocal)
+            })).then(() => e)
+          } else if (concepts) {
+            return Promise.all(concepts.map(c => {
               if (!c || !c.id || this.getEntity(c.id)) return Promise.resolve(e)
               return this.loadEntity(c.id, ignoreLocal)
             })).then(() => e)
@@ -194,7 +223,7 @@ export const useEntity = defineStore('entity', {
           } as NumberRestriction | StringRestriction | BooleanRestriction | DateTimeRestriction
       }
 
-      //ToDo: something for when superClass is of {Single,Composite}Concept category
+      //ToDo: something for when superClass is of {Single,Composite}Concept category?
 
       if (superClass) {
         const short = {
@@ -204,6 +233,8 @@ export const useEntity = defineStore('entity', {
         } as Entity
         if (this.isPhenotype(superClass)) {
           (entity as Phenotype).superPhenotype = short
+        } else if (this.isConcept(superClass)) {
+          (entity as Concept).superConcepts = [short]
         } else {
           (entity as Category).superCategories = [short]
         }
@@ -320,6 +351,11 @@ export const useEntity = defineStore('entity', {
         })
       } else if (this.isPhenotype(entity)) {
         this.entities = this.entities.filter((p: Phenotype) => p.superPhenotype?.id !== entity.id)
+      } else if (this.isConcept(entity)) {
+        this.entities.filter((e: Concept) => this.hasSuperConcept(e, entity)).forEach((e: Concept) => {
+          e.superConcepts = e.superConcepts?.filter(c => c.id !== entity.id)
+          if (entity.superConcepts) e.superConcepts?.push(...(entity.superConcepts))
+        })
       }
     },
 
@@ -365,8 +401,16 @@ export const useEntity = defineStore('entity', {
       return entity.superCategories?.findIndex(c => c.id === category.id) !== -1
     },
 
+    hasSuperConcept(entity: Concept, concept: SingleConcept): boolean {
+      return entity.superConcepts?.findIndex(c => c.id === c.id) !== -1
+    },
+
     isCategory(entity: Entity): entity is Category {
       return EntityType.Category === entity.entityType
+    },
+
+    isConcept(entity: Entity): entity is Concept {
+      return [EntityType.SingleConcept, EntityType.CompositeConcept].includes(entity.entityType)
     },
 
     isPhenotype(entity: Entity): entity is Phenotype {
