@@ -393,7 +393,7 @@ export const useEntity = defineStore('entity', {
     },
 
     hasSuperConcept(entity: Concept, concept: SingleConcept): boolean {
-      return entity.superConcepts?.findIndex(c => c.id === c.id) !== -1
+      return entity.superConcepts?.findIndex(c => c.id === concept.id) !== -1
     },
 
     isCategory(entity: Entity): entity is Category {

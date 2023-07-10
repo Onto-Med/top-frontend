@@ -328,6 +328,10 @@ export default defineComponent({
               tabs.value
                 .filter(t => (t.state as Phenotype).superPhenotype?.id === entity.id)
                 .forEach(t => closeTab(t.state))
+            if (isConcept(entity))
+              tabs.value
+                .filter(t => (t.state as Concept).superConcepts?.filter(c => (c as Concept).id === entity.id))
+                .forEach(t => closeTab(t.state))
           })
           .catch((e: Error) => renderError(e))
           .finally(() => treeLoading.value = false)

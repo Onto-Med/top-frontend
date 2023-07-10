@@ -253,6 +253,7 @@
     "descriptionsHelp": "Hier können Sie weiterführende Beschreibungen oder Definitionen der Entität in verschiedenen Sprachen angeben.",
     "codesHelp": "Geben Sie in diesem Abschnitt Verknüpfungen zu Taxonomien an (z.B. SNOMED CT), sodass der Phänotyp auf die Standards gemappt ist und mit anderen IT-Systemen verbunden werden kann. Auf diese Weise können zum einen Daten aus anderen Quellen eingelesen und zur Phänotypisierung verwendet werden. Auf der anderen Seite können Ergebnisse an externe IT-Systeme zurückgespielt werden. Geben Sie einfach einen Code oder einen Code-Titel ein, um mit der Suche zu beginnen. Optional können Sie nach Codesystem filtern.",
     "formulaHelp": "Hier können mathematische und Boolesche Formeln eingegeben werden, mit denen die Werte des Phänotyps berechnet werden. Formeln können sowohl andere Phänotypen als auch Konstanten enthalten.",
+    "textFormulaHelp": "Hier können Konzept mithilfe Bool'scher Variablen verknüpft werden bzw. Unschärfen definiert werden.",
     "restrictionHelp": "Spezifizieren Sie die Einschränkungen, die auf Werte des Phänotyps angewendet werden sollen. Wählen Sie dafür bitte zunächst einen passenden Quantor aus. Anschließend müssen Sie für den Typ der Restriktion zwischen Wertebereich (mit Minimum und/oder Maximum) oder Aufzählung (beliebige Anzahl von vordefinierten Werten) wählen. Für die Quantoren \"Werte vorhanden\" und \"Keine Werte vorhanden\" kann kein Restriktionstyp gewählt werden, da die Beschränkung der Werte implizit ist.",
     "emptyTab": {
       "tree": {

@@ -229,7 +229,7 @@ export default defineComponent({
                 && (e as Category).phenotypes && (e as Category).phenotypes?.length === 0
               )
               || (
-                props.isConceptRepository && (e.entityType === EntityType.CompositeConcept
+                isConcept(e) && (e.entityType === EntityType.CompositeConcept
                 || ((e as SingleConcept).subConcepts && (e as SingleConcept).subConcepts?.length === 0))
               )
             ) (map.get(e.id as string) as TreeNode).lazy = false;
