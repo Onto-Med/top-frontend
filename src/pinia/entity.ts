@@ -3,7 +3,7 @@ import {
   BooleanRestriction, Category, DateTimeRestriction, Entity, EntityApi, EntityDeleteOptions, EntityType,
   ExpressionFunction, NumberRestriction, Phenotype, StringRestriction,
   RepositoryApi, Repository, Organisation, OrganisationApi, Constant, ForkingInstruction,
-  DataSource, Quantifier, DefaultApi, Converter, CodeApi, QueryApi, CodeSystemPage
+  DataSource, Quantifier, DefaultApi, Converter, CodeApi, QueryApi, CodeSystemPage, DataType
 } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
@@ -178,10 +178,10 @@ export const useEntity = defineStore('entity', {
 
       const superClass = this.getEntity(superClassId)
       if (superClass && [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(superClass.entityType)) {
-        (entity as Phenotype).dataType = (superClass as Phenotype).dataType
+        (entity as Phenotype).dataType = DataType.Boolean
         if (this.hasRestriction(entity))
           entity.restriction = {
-            type: entity.dataType,
+            type: (superClass as Phenotype).dataType,
             quantifier: Quantifier.Min,
             cardinality: 1
           } as NumberRestriction | StringRestriction | BooleanRestriction | DateTimeRestriction
