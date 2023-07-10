@@ -3,10 +3,10 @@
     <q-card>
       <q-card-section class="text-h6 row items-center q-gutter-sm">
         <div class="col text-right ellipsis" :title="getTitle(origin)">
-          {{ getTitle(origin) }}
+          {{ getTitle(origin, true) }}
         </div>
         <q-icon name="arrow_forward" size="sm" />
-        <div class="col ellipsis" :title="repository.name">
+        <div v-if="repository" class="col ellipsis" :title="repository.name">
           {{ repository.name }}
         </div>
       </q-card-section>
@@ -16,16 +16,22 @@
       <q-card-section>
         <i18n-t keypath="forkEntityToRepository" tag="p" scope="global">
           <template #entity>
-            <b>{{ getTitle(origin) }}</b>
+            <b>{{ getTitle(origin, true) }}</b>
           </template>
           <template #repository>
-            <b>{{ repository.name }}</b>
+            <b v-if="repository">{{ repository.name }}</b>
+          </template>
+        </i18n-t>
+
+        <i18n-t v-if="origin && isRestricted(origin)" keypath="superEntityIsForkedToo" tag="p" scope="global">
+          <template #superEntity>
+            <b>{{ getTitle(origin.superPhenotype) }}</b>
           </template>
         </i18n-t>
 
         {{ t('pleaseModifySettings') }}:
         <q-list dense>
-          <q-item>
+          <q-item v-show="!origin || !isRestricted(origin)">
             <q-checkbox v-model="cascade" :label="t('includeThing', { thing: t('restriction', 2) })" />
           </q-item>
           <q-item>
@@ -68,7 +74,7 @@ export default defineComponent({
   emits: ['update:show', 'createFork'],
   setup (props, { emit }) {
     const { t }          = useI18n()
-    const { getTitle }   = useEntityFormatter()
+    const { getTitle, isRestricted }   = useEntityFormatter()
     const { repository } = storeToRefs(useEntity())
     const cascade = ref(false)
     const update  = ref(false)
@@ -81,6 +87,7 @@ export default defineComponent({
     return {
       t,
       getTitle,
+      isRestricted,
       repository,
       cascade,
       update,
