@@ -41,6 +41,7 @@
             :allowed-entity-types="allowedEntityTypes"
             class="col column full-width"
             :show-context-menu="canWrite"
+            :is-concept-repository="isConceptRepository"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
