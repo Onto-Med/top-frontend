@@ -37,12 +37,12 @@
             >
               <span class="q-mr-sm">{{ t('superConcept', 2) }}:</span>
               <entity-chip
-                v-for="(category, index) in superConcepts"
+                v-for="(concept, index) in superConcepts"
                 :key="index"
                 :organisation-id="organisationId"
                 :repository-id="repositoryId"
-                :entity-types="[EntityType.Concept]"
-                :entity-id="category ? category.id : undefined"
+                :entity-types="[EntityType.SingleConcept]"
+                :entity-id="concept ? concept.id : undefined"
                 :disable="readonly"
                 :label="t('selectThing', { thing: t('concept') }) + '...'"
                 removeable
@@ -130,7 +130,7 @@
       </div>
 
       <expression-input
-        v-if="[EntityType.CompositePhenotype, EntityType.CompositeConcept].includes(entityType)"
+        v-if="EntityType.CompositePhenotype === entityType"
         :model-value="expression"
         expanded
         :readonly="readonly"
@@ -138,8 +138,23 @@
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :entity-types="[EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.SinglePhenotype, EntityType.SingleRestriction, EntityType.CompositeConcept, EntityType.SingleConcept]"
+        :entity-types="[EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.SinglePhenotype, EntityType.SingleRestriction]"
         function-type="math"
+        @entity-clicked="$emit('entityClicked', $event)"
+        @update:model-value="$emit('update:expression', $event)"
+      />
+
+      <text-expression-input
+        v-if="EntityType.CompositeConcept === entityType"
+        :model-value="expression"
+        expanded
+        :readonly="readonly"
+        :label="t('formula')"
+        :help-text="t('entityEditor.textFormulaHelp')"
+        :organisation-id="organisationId"
+        :repository-id="repositoryId"
+        :entity-types="[EntityType.CompositeConcept, EntityType.SingleConcept]"
+        function-type="boolean"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />
@@ -184,35 +199,37 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import {defineComponent, onMounted, PropType, ref} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {
-  EntityType,
-  DataType,
-  LocalisableText,
-  Code,
-  Expression,
-  Restriction,
   Category,
+  Code,
+  Concept,
+  DataType,
   Entity,
+  EntityType,
+  Expression,
   ItemType,
+  LocalisableText,
   Phenotype,
-  Concept
+  Restriction
 } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
+import TextExpressionInput from 'components/EntityEditor/Expression/TextExpressionInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UnitInput from 'src/components/UnitInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { useEntity } from 'src/pinia/entity'
-import { useRouter } from 'vue-router'
+import {useEntity} from 'src/pinia/entity'
+import {useRouter} from 'vue-router'
 
 export default defineComponent({
   components: {
+    TextExpressionInput,
     LocalizedTextInput,
     DataTypeSelect,
     ItemTypeSelect,
@@ -341,6 +358,7 @@ export default defineComponent({
         newValue.splice(index, 1)
         emit('update:superCategories', newValue)
       },
+
       addSuperConcept (concept: Concept|undefined): void {
         const newValue = props.superConcepts || []
         if (!concept || newValue.findIndex(c => c && c.id === concept.id) === -1)

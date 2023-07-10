@@ -252,6 +252,7 @@
     "descriptionsHelp": "Here you can specify further descriptions or definitions of the entity in different languages.",
     "codesHelp": "In this section, specify links to taxonomies (e.g. SNOMED CT) so that the phenotype is mapped to the standards and can be linked to other IT systems. In this way, on the one hand, data from other sources can be read in and used for phenotyping. On the other hand, results can be fed back to external IT systems. Just type in a code or code title to start the search. You can optionally filter by code system.",
     "formulaHelp": "Mathematical and Boolean formulas can be entered here to calculate the values of the phenotype. Formulas can contain other phenotypes as well as constants.",
+    "textFormulaHelp": "Concepts can be connected here via Boolean variables or fuzzy matching defined.",
     "restrictionHelp": "Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantifier. Then you have to choose between value range (with minimum and/or maximum) or enumeration (any number of predefined values) for the type of restriction. No restriction type can be selected for the quantifiers \"Values present\" and \"No values present\" because the restriction of the values is implicit.",
     "emptyTab": {
       "tree": {
