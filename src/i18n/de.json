@@ -417,5 +417,6 @@
   "codeSystemUri": "Codesystem-URI",
   "gdprNotice": "{productName} verwendet technisch notwendige Cookies, die für Grundfunktionalitäten erforderlich sind und somit den Betrieb der Anwendung ermöglichen.",
   "accept": "Akzeptieren",
-  "learnMore": "Mehr erfahren"
+  "learnMore": "Mehr erfahren",
+  "superEntityIsForkedToo": "Die Entität {superEntity} wird ebenfalls übertragen."
 }
