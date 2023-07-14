@@ -5,14 +5,12 @@
     :outlined="outlined"
     :dense="dense"
     hide-bottom-space
-    hide-dropdown-icon
     use-input
     emit-value
     clearable
-    clear-icon="close"
+    input-debounce="500"
     :autofocus="autofocus"
-    class="inline"
-    :placeholder="modelValue ? '' : label || t('selectThing', { thing: t('repository') })"
+    :label="modelValue ? '' : label || t('repository')"
     :options="options"
     :loading="loading"
     :virtual-scroll-item-size="50"
@@ -57,7 +55,7 @@ import useNotify from 'src/mixins/useNotify'
 import { RepositoryApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import { Repository, RepositoryPage } from '@onto-med/top-api'
-import ScrollDetails from 'src/mixins/ScrollDetails'
+import { ScrollDetails } from 'src/mixins/ScrollDetails'
 
 export default defineComponent({
   props: {
@@ -65,7 +63,7 @@ export default defineComponent({
     label: String,
     minLength: {
       type: Number,
-      default: 2
+      default: 0
     },
     showDetails: Boolean,
     rounded: Boolean,
