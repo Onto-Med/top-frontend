@@ -216,7 +216,18 @@
 </template>
 
 <script lang="ts">
-import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, PhenotypeQuery, QueryPage, QueryType, Repository, TypeEnum } from '@onto-med/top-api'
+import {
+  DataSource,
+  DataType,
+  EntityType,
+  ExpressionFunction,
+  Phenotype,
+  PhenotypeQuery,
+  QueryPage,
+  QueryType,
+  Repository,
+  TypeEnum
+} from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
@@ -295,7 +306,7 @@ export default defineComponent({
       .catch((e: Error) => renderError(e))
 
     const dataSources = ref([] as DataSource[])
-    entityStore.getDataSources()
+    entityStore.getDataSources(QueryType.Phenotype)
       .then(r => dataSources.value = r)
       .catch((e: Error) => renderError(e))
 
