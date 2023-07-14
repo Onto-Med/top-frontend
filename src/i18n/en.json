@@ -214,7 +214,6 @@
   "repository": "Repository|Repositories",
   "organisation": "Organisation|Organisations",
   "superOrganisation": "Super organisation|Super organisations",
-  "collaborativeWork": "Browse and build collaboratively",
   "formula": "Formula|Formulas",
   "closeAll": "Close all",
   "closeOthers": "Close others",
@@ -435,5 +434,13 @@
       "header": "This instance has the following content:"
     }
   },
-  "model": "Model|Models"
+  "model": "Model|Models",
+  "navbar": {
+    "model": {
+      "caption": "Browse and build collaboratively"
+    },
+    "query": {
+      "caption": "Search for individuals and documents"
+    }
+  }
 }

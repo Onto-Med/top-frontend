@@ -16,8 +16,8 @@ const routes: RouteRecordRaw[] = [
       },
       {
         name: 'queryBuilder',
-        path: '/:organisationId/:repositoryId/query',
-        component: () => import('pages/QueryBuilder.vue')
+        path: '/query',
+        component: () => import('pages/QueryBuilder.vue'),
       },
       {
         name: 'editor',

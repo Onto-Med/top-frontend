@@ -28,7 +28,7 @@
         </q-card-section>
       </q-card>
 
-      <q-card v-ripple class="col-4 text-center cursor-pointer q-hoverable" @click="routeTo('queries')">
+      <q-card v-ripple class="col-4 text-center cursor-pointer q-hoverable" @click="routeTo('queryBuilder')">
         <span class="q-focus-helper" />
         <q-card-section class="row justify-center items-center">
           <q-icon name="person_search" size="lg" />

@@ -120,7 +120,7 @@
             :to="{ name: 'organisations' }"
             :label="t('model', 2)"
             :title="t('model', 2)"
-            :caption="t('collaborativeWork')"
+            :caption="t('navbar.model.caption')"
             :hide-expand-icon="!organisation"
             icon="build"
             tag="a"
@@ -222,6 +222,13 @@ export default defineComponent({
     const drawer = ref(undefined as QMenu|undefined)
 
     const linksList = computed(() => [
+      {
+        title: t('query', 2),
+        icon: 'person_search',
+        caption: t('navbar.query.caption'),
+        routeName: 'queryBuilder',
+        isHidden: keycloak.value && !keycloak.value.authenticated
+      },
       {
         title: t('document', 2),
         icon: 'article',
