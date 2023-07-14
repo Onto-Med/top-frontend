@@ -448,5 +448,6 @@
     "description": "You first need to select the phenotype model that you want to use and a data source to perform the query on. You can then use the model content to specify query criteria and projection."
   },
   "repositoryContainingModel": "Repository containing the model",
-  "confirmClearQuery": "If you switch to another repository, your current query will be lost. Are you sure?"
+  "confirmClearQuery": "If you switch to another repository, your current query will be lost. Are you sure?",
+  "repeatThing": "Repeat {thing}"
 }
