@@ -214,7 +214,7 @@
   "repository": "Repositorium|Repositorien",
   "organisation": "Organisation|Organisationen",
   "superOrganisation": "Super Organisation|Super Organisationen",
-  "collaborativeWork": "Kollaborative Arbeit",
+  "collaborativeWork": "Durchsuchen und gemeinsam erstellen",
   "formula": "Formel|Formeln",
   "closeAll": "Alle schließen",
   "closeOthers": "Andere schließen",
@@ -421,5 +421,20 @@
   "superEntityIsForkedToo": "Die Entität {superEntity} wird ebenfalls übertragen.",
   "filterBy": "Filtern nach",
   "fetchDataFailed": "Daten konnten nicht vom Server abgerufen werden.",
-  "entitySearchDescription": "Suchen Sie nach Entitäten, indem Sie Text eingeben und/oder die obigen Filteroptionen verwenden."
+  "entitySearchDescription": "Suchen Sie nach Entitäten, indem Sie Text eingeben und/oder die obigen Filteroptionen verwenden.",
+  "greeting": "Willkommen zum {productName}!",
+  "home_": {
+    "createModels": {
+      "header": "Ein Modell erstellen|Modelle erstellen",
+      "content": "Erstellen Sie standardisiert Phänotypdefinitionen und kombinieren Sie diese zu komplexen Modellen. \nModelle können zum Ausführen von Abfragen oder zur Integration in andere Software verwendet werden. \nNeben Phänotypen können Sie auch Konzeptmodelle erstellen, um diese auf medizinische Dokumente anzuwenden."
+    },
+    "runQuery": {
+      "header": "Eine Abfrage ausführen|Abfragen ausführen",
+      "content": "Erstellen Sie auf Modellen basierende Abfragen, um in verbundenen Datenquellen wie Gesundheitsdatenspeichern nach Personen oder medizinischen Dokumenten zu suchen."
+    },
+    "content": {
+      "header": "Diese Instanz hat folgenden Inhalt:"
+    }
+  },
+  "model": "Modell|Modelle"
 }

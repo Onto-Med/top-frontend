@@ -214,7 +214,7 @@
   "repository": "Repository|Repositories",
   "organisation": "Organisation|Organisations",
   "superOrganisation": "Super organisation|Super organisations",
-  "collaborativeWork": "Collaborative Work",
+  "collaborativeWork": "Browse and build collaboratively",
   "formula": "Formula|Formulas",
   "closeAll": "Close all",
   "closeOthers": "Close others",
@@ -388,8 +388,7 @@
   "add": "Add",
   "editAccount": "Edit account",
   "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
-  "projectState": "Currently, the framework is under heavy development and will be extended with further functionalities.",
-  "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based text search.",
+  "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based document search.",
   "emptyProjectionBehaviour": "A projection is mandatory, if no criteria are defined.",
   "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
   "updatedAt": "Updated at {date}",
@@ -421,5 +420,20 @@
   "superEntityIsForkedToo": "The entity {superEntity} will get transferred too.",
   "filterBy": "Filter by",
   "fetchDataFailed": "Could not fetch data from the server.",
-  "entitySearchDescription": "Search for entities by entering text and/or using the filter options above."
+  "entitySearchDescription": "Search for entities by entering text and/or using the filter options above.",
+  "greeting": "Welcom to the {productName}!",
+  "home_": {
+    "createModels": {
+      "header": "Create a Model|Create Models",
+      "content": "Create phenotype definitions in a standardised way and combine them to complex models. Models can be used to run queries or integrate with other software. In addition to phenotypes, you can also create models of concepts to apply them to medical documents."
+    },
+    "runQuery": {
+      "header": "Run a Query|Run Queries",
+      "content": "Build queries based on models to search for individuals or medical documents in connected data sources, such as health data stores."
+    },
+    "content": {
+      "header": "This instance has the following content:"
+    }
+  },
+  "model": "Model|Models"
 }

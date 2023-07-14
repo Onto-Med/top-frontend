@@ -118,12 +118,11 @@
             exact
             default-opened
             :to="{ name: 'organisations' }"
-            :label="t('organisation', 2)"
-            :title="t('organisation', 2)"
+            :label="t('model', 2)"
+            :title="t('model', 2)"
             :caption="t('collaborativeWork')"
-            :content-inset-level="1"
             :hide-expand-icon="!organisation"
-            icon="groups"
+            icon="build"
             tag="a"
           >
             <q-item
@@ -134,6 +133,9 @@
               :active="!!organisation"
               tag="a"
             >
+              <q-item-section avatar>
+                <q-icon name="groups" />
+              </q-item-section>
               <q-item-section>
                 {{ organisation.name }}
               </q-item-section>
