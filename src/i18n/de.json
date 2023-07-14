@@ -268,7 +268,7 @@
     }
   },
   "organisationPage": {
-    "description": "Organisationen können Repositories enthalten. Benutzer mit entsprechenden Berechtigungen können den Inhalt einer Organisation anzeigen oder ändern.",
+    "description": "Organisationen können Repositoriens enthalten. Benutzer mit entsprechenden Berechtigungen können den Inhalt einer Organisation anzeigen oder ändern.",
     "confirmDelete": "Möchten Sie diese Organisation wirklich löschen?"
   },
   "repositoryPage": {
@@ -352,7 +352,7 @@
   "saveAsFile": "Als Datei speichern",
   "importAndExport": "Import und Export",
   "importOrExportThing": "{thing} importieren oder exportieren",
-  "importDescription": "Wählen Sie eine Datei und das entsprechende Format aus, um ihren Inhalt in dieses Repository hochzuladen.",
+  "importDescription": "Wählen Sie eine Datei und das entsprechende Format aus, um ihren Inhalt in dieses Repositorium hochzuladen.",
   "importFormat": "Importformat|Importformate",
   "exportFormat": "Exportformat|Exportformate",
   "importFinished": "Import abgeschlossen",
@@ -395,13 +395,13 @@
   "goToThing": "Gehe zu {thing}",
   "downloadDataSet": "Gesamten Datensatz herunterladen",
   "includePrimaryRepositories": "Primäre Repositorien einschließen",
-  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositories zu erweitern.",
-  "forkCouldNotBeCreated": "Es konnte kein Fork erstellt werden, da möglicherweise bereits ein aktueller Fork in diesem Repository vorhanden ist.",
+  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositorien zu erweitern.",
+  "forkCouldNotBeCreated": "Es konnte kein Fork erstellt werden, da möglicherweise bereits ein aktueller Fork in diesem Repositorium vorhanden ist.",
   "previousQuery": "Vorherige Abfrage|Vorherige Abfragen",
   "result": "Ergebnis",
   "queued": "In Warteschlange",
   "notAuthorised": {
-    "onlyPrimaryVisible": "Sie verfügen nicht über die erforderlichen Berechtigungen, daher sind nur primäre Repositories für Sie sichtbar."
+    "onlyPrimaryVisible": "Sie verfügen nicht über die erforderlichen Berechtigungen, daher sind nur primäre Repositorien für Sie sichtbar."
   },
   "boolean": "Boolean",
   "codeInput": {
@@ -445,7 +445,7 @@
     }
   },
   "for": "für",
-  "repositoryContainingModel": "Modell enthaltendes Repository",
+  "repositoryContainingModel": "Modell enthaltendes Repositorium",
   "queryBuilder": {
     "description": "Um Abfragen auszuführen, müssen Sie zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um Auswahlkriterien und Projektion festzulegen."
   },
