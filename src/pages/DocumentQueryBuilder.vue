@@ -151,18 +151,26 @@
 </template>
 
 <script lang="ts">
-import {Concept, ConceptQuery, DataSource, EntityType, ExpressionFunction, QueryPage, TypeEnum} from '@onto-med/top-api'
-import { storeToRefs } from 'pinia'
+import {
+  Concept,
+  ConceptQuery,
+  DataSource,
+  EntityType,
+  ExpressionFunction,
+  QueryPage,
+  QueryType,
+} from '@onto-med/top-api'
+import {storeToRefs} from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { useEntity } from 'src/pinia/entity'
+import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { defineComponent, onMounted, ref, computed, inject, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { v4 as uuidv4 } from 'uuid'
-import { QueryApiKey } from 'src/boot/axios'
-import { exportFile, useQuasar } from 'quasar'
+import {computed, defineComponent, inject, onMounted, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {v4 as uuidv4} from 'uuid'
+import {QueryApiKey} from 'src/boot/axios'
+import {exportFile, useQuasar} from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 
 export default defineComponent({
@@ -178,7 +186,7 @@ export default defineComponent({
       id: (uuidv4 as () => string)(),
       entityId: '',
       dataSources: [],
-      type: TypeEnum.Concept
+      type: QueryType.Concept
     } as ConceptQuery)
     const treeLoading = ref(false)
     const importFile = ref(undefined as Blob|undefined)
@@ -217,7 +225,7 @@ export default defineComponent({
       .catch((e: Error) => renderError(e))
 
     const dataSources = ref([] as DataSource[])
-    entityStore.getDataSources()
+    entityStore.getDataSources(QueryType.Concept)
       .then(r => dataSources.value = r)
       .catch((e: Error) => renderError(e))
 

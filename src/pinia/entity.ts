@@ -22,8 +22,10 @@ import {
   Phenotype,
   Quantifier,
   QueryApi,
+  QueryType,
   Repository,
-  RepositoryApi, SingleConcept,
+  RepositoryApi,
+  SingleConcept,
   StringRestriction
 } from '@onto-med/top-api'
 import {AxiosResponse} from 'axios'
@@ -38,7 +40,7 @@ export const useEntity = defineStore('entity', {
       organisation: undefined as Organisation | undefined,
       repository: undefined as Repository | undefined,
       entities: [] as Entity[],
-      dataSources: undefined as DataSource[] | undefined,
+      dataSources: undefined as Map<QueryType, DataSource[]> | undefined,
       constants: undefined as Constant[] | undefined,
       functions: undefined as ExpressionFunction[] | undefined,
       converters: undefined as Converter[] | undefined,
@@ -72,8 +74,11 @@ export const useEntity = defineStore('entity', {
     },
 
     async reloadDataSources() {
-      await this.queryApi?.getDataSources()
-        .then(r => this.dataSources = r.data)
+      this.dataSources = new Map<QueryType, DataSource[]>()
+      for (const qType of [QueryType.Concept, QueryType.Phenotype]) {
+        await this.queryApi?.getDataSources(qType)
+          .then(r => this.dataSources?.set(qType, r.data))
+      }
     },
 
     async reloadConstants() {
@@ -141,10 +146,10 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async getDataSources(): Promise<DataSource[]> {
+    async getDataSources(queryType: QueryType): Promise<DataSource[]> {
       if (!this.dataSources)
         await this.reloadDataSources()
-      return this.dataSources || []
+      return this.dataSources?.get(queryType) || []
     },
 
     async getConstants(): Promise<Constant[]> {
