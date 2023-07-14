@@ -1,16 +1,5 @@
 <template>
   <div class="row">
-    <repository-select-field
-      v-if="repositoryFilter"
-      v-model="repository"
-      :show-details="showDetails"
-      :rounded="rounded"
-      :outlined="outlined"
-      :dense="dense"
-      :organisation-id="organisationId"
-      :label="t('repository')"
-      class="inline col-3 q-mr-xs"
-    />
     <q-select
       ref="select"
       v-model="selection"
@@ -101,11 +90,10 @@
 <script lang="ts">
 import { defineComponent, ref, inject, nextTick, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, Entity, Repository, DataType, ItemType, EntityPage, ForkingInstruction } from '@onto-med/top-api'
+import { EntityType, Entity, DataType, ItemType, EntityPage, ForkingInstruction } from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import ScrollDetails from 'src/mixins/ScrollDetails'
-import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
+import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
 import { QSelect } from 'quasar'
@@ -114,7 +102,6 @@ import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDial
 
 export default defineComponent({
   components: {
-    RepositorySelectField,
     ForkCreateDialog
   },
   props: {
@@ -143,8 +130,7 @@ export default defineComponent({
     /** Whether search field supports forking from other repositories. */
     fork: Boolean,
     /** Whether fork is done by clicking a copy btn (default) or implicitly by selecting an entity. */
-    implicitFork: Boolean,
-    repositoryFilter: Boolean
+    implicitFork: Boolean
   },
   emits: ['btnClicked', 'entitySelected', 'forkClicked'],
   setup(props, { emit }) {
@@ -155,7 +141,6 @@ export default defineComponent({
     const options    = ref([] as Entity[])
     const selection  = ref(null)
     const loading    = ref(false)
-    const repository = ref(undefined as (Repository|undefined))
     const select     = ref(null as unknown as QSelect)
     const prevInput  = ref(undefined as string|undefined)
     const nextPage   = ref(2)
@@ -171,8 +156,6 @@ export default defineComponent({
       let repositoryIds = undefined
       if (props.organisationId && props.repositoryId) {
         repositoryIds = [props.repositoryId]
-      } else if (repository.value && repository.value.organisation) {
-        repositoryIds = [repository.value.id]
       }
       return entityApi.getEntities(
         undefined, input, props.entityTypes, props.dataType, props.itemType, repositoryIds, props.fork, page
@@ -200,7 +183,6 @@ export default defineComponent({
       isLoggedIn,
 
       select,
-      repository,
       options,
       selection,
       loading,
@@ -247,9 +229,8 @@ export default defineComponent({
       handleSelectionChanged (entity: Entity) {
         if (props.clearOnSelect) {
           selection.value = null
-          repository.value = undefined
         }
-        if (isLoggedIn.value && props.fork && props.implicitFork && repositoryId.value && repositoryId.value !== entity.repository?.id && entity.repository?.primary) {
+        if (isLoggedIn.value && props.fork && props.implicitFork && repositoryId.value !== entity.repository?.id && entity.repository?.primary) {
           handleFork(entity)
         } else {
           emit('entitySelected', entity)

@@ -162,7 +162,7 @@ import CodeSystemInput from 'src/components/CodeSystemInput.vue'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import { CodeApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import ScrollDetails from 'src/mixins/ScrollDetails'
+import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import { QInput, QSelect } from 'quasar'
 
 export default defineComponent({

@@ -32,7 +32,7 @@ import { CodeSystem, CodeSystemPage } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import ScrollDetails from 'src/mixins/ScrollDetails'
+import { ScrollDetails } from 'src/mixins/ScrollDetails'
 
 export default defineComponent({
   name: 'CodeSystemInput',

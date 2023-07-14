@@ -4,6 +4,7 @@
     :stack-label="required"
     emit-value
     map-options
+    hide-bottom-space
     :readonly="readonly"
     :label="label || t('dataType')"
     :options="localOptions"

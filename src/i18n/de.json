@@ -418,5 +418,8 @@
   "gdprNotice": "{productName} verwendet technisch notwendige Cookies, die für Grundfunktionalitäten erforderlich sind und somit den Betrieb der Anwendung ermöglichen.",
   "accept": "Akzeptieren",
   "learnMore": "Mehr erfahren",
-  "superEntityIsForkedToo": "Die Entität {superEntity} wird ebenfalls übertragen."
+  "superEntityIsForkedToo": "Die Entität {superEntity} wird ebenfalls übertragen.",
+  "filterBy": "Filtern nach",
+  "fetchDataFailed": "Daten konnten nicht vom Server abgerufen werden.",
+  "entitySearchDescription": "Suchen Sie nach Entitäten, indem Sie Text eingeben und/oder die obigen Filteroptionen verwenden."
 }

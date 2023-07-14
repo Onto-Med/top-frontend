@@ -43,7 +43,7 @@ import { defineComponent, nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { Organisation, OrganisationPage } from '@onto-med/top-api'
-import ScrollDetails from 'src/mixins/ScrollDetails'
+import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import useNotify from 'src/mixins/useNotify'
 
 export default defineComponent({

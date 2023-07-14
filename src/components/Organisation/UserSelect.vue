@@ -44,7 +44,7 @@ import { defineComponent, nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { UserApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify';
-import ScrollDetails from 'src/mixins/ScrollDetails';
+import { ScrollDetails } from 'src/mixins/ScrollDetails';
 
 export default defineComponent({
   props: {

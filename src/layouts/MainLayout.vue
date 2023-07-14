@@ -23,20 +23,7 @@
         <q-space />
 
         <div class="toolbar-input-container row no-wrap gt-sm">
-          <entity-search-input
-            :label="t('searchThing', { thing: t('entity') }) + '...'"
-            outlined
-            dense
-            clear-on-select
-            show-details
-            fork
-            class="q-mr-sm fit"
-            @entity-selected="routeToEntity"
-          >
-            <template #append>
-              <q-btn dense flat icon="search" :title="t('search')" />
-            </template>
-          </entity-search-input>
+          <fancy-entity-search fork @entity-selected="routeToEntity" />
         </div>
 
         <q-space />
@@ -208,7 +195,7 @@ import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
 import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
-import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
+import FancyEntitySearch from 'src/components/EntityEditor/FancyEntitySearch.vue'
 import packageInfo from '../../package.json'
 import { defineComponent, ref, computed, watch } from 'vue'
 import { Entity } from '@onto-med/top-api'
@@ -220,7 +207,7 @@ export default defineComponent({
   components: {
     NavbarLink,
     LanguageSwitch,
-    EntitySearchInput
+    FancyEntitySearch
   },
 
   setup () {
@@ -278,6 +265,7 @@ export default defineComponent({
       },
 
       routeToEntity (entity: Entity) {
+        console.log(entity)
         if (!entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
       },
