@@ -44,12 +44,12 @@ export default route(function (/* { store, ssrContext } */) {
       if (entityStore.keycloak && !entityStore.keycloak.authenticated)
         return void entityStore.keycloak.login()
     }
-    await entityStore.setOrganisation(to.params.organisationId as string | undefined)
+    await entityStore.setOrganisationById(to.params.organisationId as string | undefined)
       .catch((e: AxiosError) => {
         renderError(e)
         void Router.push({ name: 'organisations' })
       })
-      .then(() => entityStore.setRepository(to.params.repositoryId as string | undefined))
+      .then(() => entityStore.setRepositoryById(to.params.repositoryId as string | undefined))
       .catch((e: AxiosError) => {
         renderError(e)
         void Router.push({ name: 'showOrganisation', params: { organisationId: to.params.organisationId } })

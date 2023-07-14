@@ -7,13 +7,14 @@
     hide-bottom-space
     use-input
     emit-value
-    clearable
     input-debounce="500"
     :autofocus="autofocus"
     :label="modelValue ? '' : label || t('repository')"
     :options="options"
     :loading="loading"
     :virtual-scroll-item-size="50"
+    :error="required && !modelValue"
+    :clearable="!required"
     @filter="filterFn"
     @virtual-scroll="onScroll"
     @update:model-value="$emit('update:modelValue', $event)"
@@ -70,7 +71,8 @@ export default defineComponent({
     outlined: Boolean,
     dense: Boolean,
     autofocus: Boolean,
-    organisationId: String
+    organisationId: String,
+    required: Boolean
   },
   emits: ['update:modelValue'],
   setup(props) {

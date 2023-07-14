@@ -88,7 +88,7 @@ export const useEntity = defineStore('entity', {
       return this.functions?.filter(f => f.type === type && id.includes(f.id)) || []
     },
 
-    async setOrganisation(organisationId: string | undefined) {
+    async setOrganisationById(organisationId: string | undefined) {
       if (this.organisationId !== organisationId) {
         this.entities = []
         this.organisationId = organisationId
@@ -104,7 +104,14 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    async setRepository(repositoryId: string | undefined) {
+    setRepository(repository?: Repository) {
+      this.repository = repository
+      this.repositoryId = repository?.id
+      this.organisation = repository?.organisation
+      this.organisationId = repository?.organisation?.id
+    },
+
+    async setRepositoryById(repositoryId: string | undefined) {
       if (this.repositoryId !== repositoryId) {
         this.entities = []
         this.repositoryId = repositoryId

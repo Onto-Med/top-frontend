@@ -1,14 +1,18 @@
 <template>
-  <q-page v-if="organisation && repository" class="q-pa-md q-gutter-md">
+  <q-page class="q-pa-md q-gutter-md">
     <q-card>
       <q-card-section>
-        <div class="text-h6 row">
-          <b>{{ t('buildQueryFor') }}:</b>
-          <q-breadcrumbs class="q-ml-sm">
-            <q-breadcrumbs-el :label="organisation.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation.id } }" />
-            <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation.id, repositoryId: repository.id } }" />
-          </q-breadcrumbs>
+        <div class="text-h6">
+          {{ t('home_.runQuery.header') }}
+          <span v-if="repository">
+            {{ t('for') }}:
+            <q-breadcrumbs class="inline-block">
+              <q-breadcrumbs-el :label="repository.organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
+              <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
+            </q-breadcrumbs>
+          </span>
         </div>
+        <span class="q-pt-md">{{ t('queryBuilder.description') }}</span>
       </q-card-section>
 
       <q-separator />
@@ -16,6 +20,12 @@
       <q-card-section class="row q-pa-none">
         <div class="col-12 col-sm-6 col-md-7 q-pa-md">
           <q-input v-model="query.name" :label="t('queryName')" type="text" />
+          <repository-select-field
+            :model-value="repository"
+            :label="t('repositoryContainingModel')"
+            required
+            @update:model-value="setRepository"
+          />
           <q-select
             v-model="query.dataSources"
             :options="dataSources"
@@ -205,7 +215,7 @@
 </template>
 
 <script lang="ts">
-import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, PhenotypeQuery, QueryPage, TypeEnum } from '@onto-med/top-api'
+import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, PhenotypeQuery, QueryPage, Repository, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
@@ -218,9 +228,16 @@ import { v4 as uuidv4 } from 'uuid'
 import { QueryApiKey } from 'src/boot/axios'
 import { exportFile, useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
+import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
+import Dialog from 'src/components/Dialog.vue'
 
 export default defineComponent({
-  components: { EntityTree, QuerySubject, QueryResultsTable },
+  components: {
+    EntityTree,
+    QuerySubject,
+    QueryResultsTable,
+    RepositorySelectField
+  },
   setup () {
     const { t } = useI18n()
     const $q = useQuasar()
@@ -284,6 +301,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      if (!organisation.value || !repository.value) return
       reloadEntities().catch((e: Error) => renderError(e))
       loadQueryPage(1)
     })
@@ -292,6 +310,20 @@ export default defineComponent({
       splitterModel,
       (newVal) => $q.localStorage.set('editorSplitterWidth', newVal)
     )
+
+    const reset = (repository?: Repository) => {
+      entityStore.setRepository(repository)
+      void loadQueryPage(1)
+      void reloadEntities().then(() => {
+        query.value = {
+          id: (uuidv4 as () => string)(),
+          dataSources: [],
+          criteria: [],
+          projection: [],
+          type: TypeEnum.Phenotype
+        } as PhenotypeQuery
+      })
+    }
 
     return {
       t,
@@ -379,6 +411,19 @@ export default defineComponent({
             const index = queryPage.value.content.findIndex(q => q.id === query.id)
             if (index !== -1) queryPage.value.content.splice(index, 1)
           })
+      },
+
+      setRepository (repo?: Repository) {
+        if (repo !== repository.value && (query.value.criteria?.length || query.value.projection?.length)) {
+          $q.dialog({
+            component: Dialog,
+            componentProps: {
+              message: t('confirmClearQuery')
+            }
+          }).onOk(() => reset(repo))
+        } else {
+          reset(repo)
+        }
       }
     }
   }
