@@ -447,7 +447,7 @@
   "for": "für",
   "repositoryContainingModel": "Modell enthaltendes Repositorium",
   "queryBuilder": {
-    "description": "Um Abfragen auszuführen, müssen Sie zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um Auswahlkriterien und Projektion festzulegen."
+    "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um Auswahlkriterien und Projektion festzulegen."
   },
   "confirmClearQuery": "Wenn Sie zu einem anderen Repositorium wechseln, geht Ihre aktuelle Abfrage verloren. Sind Sie sicher?"
 }
