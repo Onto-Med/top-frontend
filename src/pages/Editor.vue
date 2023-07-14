@@ -21,7 +21,7 @@
                 v-if="isPhenotypeRepository && canWrite"
                 icon="manage_search"
                 :title="t('buildQuery')"
-                :to="{ name: 'queryBuilder' }"
+                :to="{ name: 'queryBuilder', params: { organisationId, repositoryId: repository.id } }"
               />
             </q-btn-group>
 
