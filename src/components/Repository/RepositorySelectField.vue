@@ -9,7 +9,7 @@
     emit-value
     input-debounce="500"
     :autofocus="autofocus"
-    :label="modelValue ? '' : label || t('repository')"
+    :label="label || t('repository')"
     :options="options"
     :loading="loading"
     :virtual-scroll-item-size="50"
