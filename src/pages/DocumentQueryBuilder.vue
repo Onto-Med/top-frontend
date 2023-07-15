@@ -186,6 +186,7 @@ export default defineComponent({
       id: (uuidv4 as () => string)(),
       entityId: '',
       dataSources: [],
+      language: 'de',
       type: QueryType.Concept
     } as ConceptQuery)
     const treeLoading = ref(false)
@@ -277,7 +278,6 @@ export default defineComponent({
           !subject || !isConcept(subject) || !subject.id
         ) return
         query.value.entityId = subject.id
-        console.log(query)
       },
 
       // moveSelectEntry: (oldIndex: number, newIndex: number) => {
