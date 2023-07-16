@@ -423,5 +423,8 @@
   "single_concept": "Single Concept|Single Concepts",
   "composite_concept": "Composite Concept|Composite Concepts",
   "unnamedConcept": "Unnamed Concept",
-  "superConcept": "Super concept|Super concepts"
+  "superConcept": "Super concept|Super concepts",
+  "conceptEntity": "Query Concept",
+  "conceptEntitySelection": "",
+  "emptyConceptEntity": ""
 }
