@@ -456,5 +456,8 @@
   "single_concept": "Einfaches Konzept|Einfache Konzepte",
   "composite_concept": "Zusammengesetztes Konzept|Zusammengesetzte Konzepte",
   "unnamedConcept": "Unbenanntes Konzept",
-  "superConcept": "Super-Konzept|Super-Konzepte"
+  "superConcept": "Super-Konzept|Super-Konzepte",
+  "conceptEntity": "Such-Konzept",
+  "conceptEntitySelection": "",
+  "emptyConceptEntity": ""
 }

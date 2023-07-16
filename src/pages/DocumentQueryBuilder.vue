@@ -88,14 +88,14 @@
               <q-item class="col-auto">
                 <q-item-section>
                   <q-item-label class="text-h6">
-                    {{ t('projection') }}
+                    {{ t('conceptEntity') }}
                     <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
                   </q-item-label>
                   <q-item-label caption class="gt-sm">
-                    {{ t('projectionSelection') }}
+                    {{ t('conceptEntitySelection') }}
                   </q-item-label>
                   <q-item-label caption class="gt-sm">
-                    {{ t('emptyProjectionBehaviour') }}
+                    {{ t('emptyConceptEntity') }}
                   </q-item-label>
                 </q-item-section>
               </q-item>
