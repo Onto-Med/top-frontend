@@ -34,6 +34,7 @@
             :error="query.dataSources?.length == 0"
             option-value="id"
             option-label="title"
+            class="data-sources-input"
             multiple
             counter
             use-chips
@@ -430,11 +431,9 @@ export default defineComponent({
 </script>
 
 <style lang="sass">
-.phenotype-step, .projection-step
-  min-height: 200px
-  .q-stepper__step-inner
-    padding: 0 !important
 .and-separator
   height: 0px
   margin-top: -16px
+.data-sources-input .q-field__native
+  min-height: 37px !important
 </style>
