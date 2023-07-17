@@ -6,7 +6,11 @@ import messages from 'src/i18n';
 const datetimeFormats = {
   en: {
     short: {
-      year: 'numeric', month: 'short', day: 'numeric'
+      year: 'numeric', month: 'numeric', day: 'numeric'
+    },
+    shortWithTime: {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric'
     },
     long: {
       year: 'numeric', month: 'short', day: 'numeric',
@@ -17,8 +21,12 @@ const datetimeFormats = {
     short: {
       year: 'numeric', month: 'numeric', day: 'numeric'
     },
-    long: {
+    shortWithTime: {
       year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric'
+    },
+    long: {
+      year: 'numeric', month: 'short', day: 'numeric',
       hour: 'numeric', minute: 'numeric'
     }
   }
