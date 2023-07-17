@@ -55,7 +55,7 @@ import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { RepositoryApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
-import { Repository, RepositoryPage } from '@onto-med/top-api'
+import { Repository, RepositoryPage, RepositoryType } from '@onto-med/top-api'
 import { ScrollDetails } from 'src/mixins/ScrollDetails'
 
 export default defineComponent({
@@ -72,7 +72,9 @@ export default defineComponent({
     dense: Boolean,
     autofocus: Boolean,
     organisationId: String,
-    required: Boolean
+    required: Boolean,
+    /** Restrict the result set by repositoryType. */
+    repositoryType: String as () => RepositoryType
   },
   emits: ['update:modelValue'],
   setup(props) {
@@ -89,9 +91,9 @@ export default defineComponent({
       if (!repositoryApi) return Promise.reject({ message: 'Could not load data from the server.' })
       let promise: Promise<AxiosResponse<RepositoryPage>>
       if (props.organisationId) {
-        promise = repositoryApi.getRepositoriesByOrganisationId(props.organisationId, undefined, input, undefined, page)
+        promise = repositoryApi.getRepositoriesByOrganisationId(props.organisationId, undefined, input, props.repositoryType, page)
       } else {
-        promise = repositoryApi.getRepositories(undefined, input, undefined, undefined, page)
+        promise = repositoryApi.getRepositories(undefined, input, undefined, props.repositoryType, page)
       }
       return promise.then(r => r.data)
     }

@@ -1,13 +1,13 @@
 <template>
   <q-select
     v-model="repositoryType"
-    stack-label
+    :stack-label="required"
     emit-value
     map-options
     :readonly="readonly"
     :label="label || t('repositoryType')"
     :options="options || defaultOptions"
-    :error="!repositoryType"
+    :error="required && !repositoryType"
   />
 </template>
 
@@ -21,7 +21,11 @@ export default defineComponent({
     modelValue: String,
     label: String,
     options: Array,
-    readonly: Boolean
+    readonly: Boolean,
+    required: {
+      type: Boolean,
+      default: true
+    }
   },
   emits: ['update:modelValue'],
   setup (props, { emit }) {
