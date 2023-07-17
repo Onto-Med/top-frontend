@@ -9,6 +9,7 @@
         :rows="rows"
         :rows-per-page-options="[0]"
         :title="t('previousQuery', 2)"
+        :no-data-label="t('noDataPresent')"
         row-key="id"
       >
         <template #body="props">
