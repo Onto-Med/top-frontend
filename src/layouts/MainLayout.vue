@@ -181,7 +181,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :key="repositoryId" />
+      <q-scroll-area class="main-content">
+        <router-view :key="repositoryId" />
+      </q-scroll-area>
     </q-page-container>
 
     <q-ajax-bar
@@ -294,4 +296,6 @@ export default defineComponent({
 .brand-link
   text-decoration: none
   color: inherit
+.main-content
+  height: calc(100vh - 58px)
 </style>
