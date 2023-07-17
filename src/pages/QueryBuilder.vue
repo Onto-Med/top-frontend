@@ -215,7 +215,7 @@
 </template>
 
 <script lang="ts">
-import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, PhenotypeQuery, QueryPage, Repository, TypeEnum } from '@onto-med/top-api'
+import { DataSource, DataType, EntityType, ExpressionFunction, Phenotype, PhenotypeQuery, QueryPage, QueryType, Repository, TypeEnum } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
@@ -245,13 +245,18 @@ export default defineComponent({
     const entityStore = useEntity()
     const { renderError } = useNotify()
     const { entities, repository, organisation } = storeToRefs(entityStore)
-    const query = ref({
-      id: (uuidv4 as () => string)(),
-      dataSources: [],
-      criteria: [],
-      projection: [],
-      type: TypeEnum.Phenotype
-    } as PhenotypeQuery)
+
+    const emptyQuery = () => {
+      return {
+        id: (uuidv4 as () => string)(),
+        dataSources: [],
+        criteria: [],
+        projection: [],
+        type: QueryType.Phenotype
+      } as PhenotypeQuery
+    }
+
+    const query = ref(emptyQuery())
     const treeLoading = ref(false)
     const importFile = ref(undefined as Blob|undefined)
     const fileReader = new FileReader()
@@ -315,13 +320,7 @@ export default defineComponent({
       entityStore.setRepository(repository)
       void loadQueryPage(1)
       void reloadEntities().then(() => {
-        query.value = {
-          id: (uuidv4 as () => string)(),
-          dataSources: [],
-          criteria: [],
-          projection: [],
-          type: TypeEnum.Phenotype
-        } as PhenotypeQuery
+        query.value = emptyQuery()
       })
     }
 
