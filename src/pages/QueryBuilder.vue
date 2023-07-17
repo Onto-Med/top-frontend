@@ -258,7 +258,7 @@ export default defineComponent({
 
     const query = ref(emptyQuery())
     const treeLoading = ref(false)
-    const importFile = ref(undefined as Blob|undefined)
+    const importFile = ref<File>()
     const fileReader = new FileReader()
     const queryApi = inject(QueryApiKey)
     const step = ref(1)
