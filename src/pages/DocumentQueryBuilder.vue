@@ -103,7 +103,7 @@
               <q-card-section class="col fit q-pa-none">
                 <q-scroll-area class="fit q-px-sm">
                   <q-list v-if="query.entityId && query.entityId.length" dense separator>
-                    <query-subject
+                    <query-subject-concept
                       :key="query.entityId"
                       v-model:date-time-restriction="query.dateTimeRestriction"
                       :subject-id="query.entityId"
@@ -162,7 +162,6 @@ import {
 } from '@onto-med/top-api'
 import {storeToRefs} from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
@@ -172,9 +171,10 @@ import {v4 as uuidv4} from 'uuid'
 import {QueryApiKey} from 'src/boot/axios'
 import {exportFile, useQuasar} from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
+import QuerySubjectConcept from 'components/Query/QuerySubjectConcept.vue';
 
 export default defineComponent({
-  components: { QueryResultsTable, EntityTree, QuerySubject },
+  components: { QuerySubjectConcept, QueryResultsTable, EntityTree },
   setup () {
     const { t } = useI18n()
     const $q = useQuasar()

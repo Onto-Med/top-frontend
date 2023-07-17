@@ -29,12 +29,6 @@
                 :title="t('buildDocQuery')"
                 :to="{ name: 'docQueryBuilder' }"
               />
-              <q-btn
-                v-else-if="isConceptRepository && canWrite"
-                icon="find_in_page"
-                :title="t('buildDocQuery')"
-                :to="{ name: 'docQueryBuilder' }"
-              />
             </q-btn-group>
 
             <export-dialog v-model:show="showExportDialog" :repository="repository" @import="reloadEntities()" />
