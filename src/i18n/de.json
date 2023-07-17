@@ -268,7 +268,7 @@
     }
   },
   "organisationPage": {
-    "description": "Organisationen können Repositoriens enthalten. Benutzer mit entsprechenden Berechtigungen können den Inhalt einer Organisation anzeigen oder ändern.",
+    "description": "Organisationen können Repositorien enthalten. Benutzer mit entsprechenden Berechtigungen können den Inhalt einer Organisation anzeigen oder ändern.",
     "confirmDelete": "Möchten Sie diese Organisation wirklich löschen?"
   },
   "repositoryPage": {
