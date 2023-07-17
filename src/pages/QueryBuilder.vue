@@ -387,7 +387,10 @@ export default defineComponent({
         currentQuery.id = (uuidv4 as () => string)()
 
         queryApi.enqueueQuery(organisation.value.id, repository.value.id, currentQuery)
-          .then(() => queryPage.value.content.unshift(currentQuery))
+          .then(() => {
+            queryPage.value.content.unshift(currentQuery)
+            queryPage.value.totalElements++
+          })
           .catch((e: Error) => renderError(e))
       },
 
@@ -405,7 +408,8 @@ export default defineComponent({
       deleteQuery: (query: PhenotypeQuery) => {
         if (!queryApi || !organisation.value || !repository.value) return
 
-        queryApi?.deleteQuery(organisation.value.id, repository.value.id, query.id)
+        queryApi.deleteQuery(organisation.value.id, repository.value.id, query.id)
+          .then(() => queryPage.value.totalElements--)
           .catch((e: Error) => renderError(e))
           .finally(() => {
             const index = queryPage.value.content.findIndex(q => q.id === query.id)
