@@ -118,12 +118,11 @@
             exact
             default-opened
             :to="{ name: 'organisations' }"
-            :label="t('organisation', 2)"
-            :title="t('organisation', 2)"
-            :caption="t('collaborativeWork')"
-            :content-inset-level="1"
+            :label="t('model', 2)"
+            :title="t('model', 2)"
+            :caption="t('navbar.model.caption')"
             :hide-expand-icon="!organisation"
-            icon="groups"
+            icon="build"
             tag="a"
           >
             <q-item
@@ -134,6 +133,9 @@
               :active="!!organisation"
               tag="a"
             >
+              <q-item-section avatar>
+                <q-icon name="groups" />
+              </q-item-section>
               <q-item-section>
                 {{ organisation.name }}
               </q-item-section>
@@ -179,7 +181,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :key="repositoryId" />
+      <q-scroll-area class="main-content">
+        <router-view :key="repositoryId" />
+      </q-scroll-area>
     </q-page-container>
 
     <q-ajax-bar
@@ -220,6 +224,13 @@ export default defineComponent({
     const drawer = ref(undefined as QMenu|undefined)
 
     const linksList = computed(() => [
+      {
+        title: t('query', 2),
+        icon: 'person_search',
+        caption: t('navbar.query.caption'),
+        routeName: 'queryBuilder',
+        isHidden: keycloak.value && !keycloak.value.authenticated
+      },
       {
         title: t('document', 2),
         icon: 'article',
@@ -285,4 +296,6 @@ export default defineComponent({
 .brand-link
   text-decoration: none
   color: inherit
+.main-content
+  height: calc(100vh - 58px)
 </style>

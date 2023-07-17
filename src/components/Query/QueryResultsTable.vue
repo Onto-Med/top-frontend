@@ -9,6 +9,7 @@
         :rows="rows"
         :rows-per-page-options="[0]"
         :title="t('previousQuery', 2)"
+        :no-data-label="t('noDataPresent')"
         row-key="id"
       >
         <template #body="props">
@@ -30,14 +31,14 @@
               <q-td auto-width class="text-right">
                 <q-btn-group flat class="q-ml-sm">
                   <q-btn
-                    icon="save"
+                    icon="file_download"
                     :disable="!isFinished(props.row)"
                     :title="t('downloadDataSet')"
                     @click.stop="download(props.row)"
                   />
                   <q-btn
-                    icon="file_upload"
-                    :title="t('loadThing', { thing: t('query') })"
+                    icon="replay"
+                    :title="t('repeatThing', { thing: t('query') })"
                     @click.stop="$emit('prefill', props.row)"
                   />
                   <q-btn

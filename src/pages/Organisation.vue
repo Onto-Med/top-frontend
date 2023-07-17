@@ -1,7 +1,7 @@
 <template>
-  <q-page v-if="organisation" class="q-gutter-md">
+  <q-page v-if="organisation" class="q-pa-md q-gutter-md">
     <q-card>
-      <q-card-section class="q-pb-none">
+      <q-card-section>
         <div class="row">
           <div class="col">
             <div class="text-h6">
@@ -9,7 +9,7 @@
               {{ organisation.name }}
             </div>
             <small v-if="organisation.createdAt" class="gt-xs">
-              {{ t('createdAt') }}: {{ d(organisation.createdAt, 'long') }}
+              {{ t('createdAt', { date: d(organisation.createdAt, 'long') }) }}
             </small>
           </div>
           <div v-if="canManage" class="col-auto">
@@ -23,13 +23,16 @@
         </div>
       </q-card-section>
       <q-separator />
-      <q-card-section class="q-pt-sm">
+      <q-card-section v-show="organisation.description">
         <b>{{ t('description') }}:</b>
-        <p>{{ organisation.description }}</p>
+        <p class="q-my-none">
+          {{ organisation.description }}
+        </p>
       </q-card-section>
     </q-card>
 
     <table-with-actions
+      :title="t('repository', 2)"
       :name="t('repository')"
       :page="repositories"
       :loading="loading"

@@ -12,12 +12,23 @@
         row-key="id"
       >
         <template #top>
-          <q-input v-model="filter" dense debounce="300" color="primary" @update:model-value="onFilter">
+          <div class="text-h6">
+            {{ title || name }}
+          </div>
+          <q-space />
+          <q-input
+            v-model="filter"
+            :label="t('searchThing', { thing: title || name })"
+            dense
+            debounce="300"
+            color="primary"
+            class="q-pr-md"
+            @update:model-value="onFilter"
+          >
             <template #append>
               <q-icon name="search" />
             </template>
           </q-input>
-          <q-space />
           <q-btn-group>
             <q-btn
               v-if="create"
@@ -98,13 +109,18 @@ import { OrganisationPage, RepositoryPage } from '@onto-med/top-api'
 
 export default defineComponent({
   props: {
+    /** The title to be displayed above the table. It is recommended to use a plural noun. */
+    title: String,
+    /** The name to be used for button labels. It should be singular noun. */
     name: String,
+    /** The page holding the content if the table. */
     page: {
       type: Object as () => OrganisationPage|RepositoryPage,
       required: true
     },
     columns: Array as () => QTableProps['columns'],
     loading: Boolean,
+    /** Whether creating new entries is allowed. A respective button is displayed if true. */
     create: Boolean
   },
   emits: ['row-clicked', 'create-clicked', 'request'],

@@ -1,17 +1,18 @@
 <template>
-  <q-page class="q-gutter-md">
+  <q-page class="q-pa-md q-gutter-md">
     <q-card>
       <q-card-section>
-        <div class="text-h6">
+        <div class="text-h5 q-pb-md">
           {{ t('organisation', 2) }}
         </div>
-      </q-card-section>
-      <q-card-section>
-        {{ t('organisationPage.description') }}
+        <p class="q-mb-none">
+          {{ t('organisationPage.description', { productName }) }}
+        </p>
       </q-card-section>
     </q-card>
 
     <table-with-actions
+      :title="t('organisation', 2)"
       :name="t('organisation')"
       :page="organisations"
       :loading="loading"
@@ -58,6 +59,7 @@ import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
+import packageInfo from '../../package.json'
 
 export default defineComponent({
   components: {
@@ -130,6 +132,7 @@ export default defineComponent({
       newOrganisation,
       routeToOrganisation,
       Permission,
+      productName: packageInfo.productName,
 
       async saveOrganisation (organisation: Organisation) {
         if (!organisationApi) return
