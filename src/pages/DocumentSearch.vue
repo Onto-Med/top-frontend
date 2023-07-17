@@ -134,6 +134,7 @@
                   </div>
                 </q-card-section>
                 <q-card-section>
+                  <!-- eslint-disable-next-line vue/no-v-html -->
                   <div style="line-height: 1.6" v-html="document_.highlightedText" />
                 </q-card-section>
               </q-scroll-area>
