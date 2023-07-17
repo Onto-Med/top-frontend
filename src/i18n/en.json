@@ -268,7 +268,7 @@
     }
   },
   "organisationPage": {
-    "description": "Organisations can contain repositories. Users with appropriate permissions can view or modify the content of an organisation.",
+    "description": "The content of the {productName} is structured into organisations. Bundle models into an organisation if you want them to have the same access rights. You can invite other users to your organisations by giving them read, write, or manage rights. All available organisations are listed below. The icons on the left indicate your access rights.",
     "confirmDelete": "Do you really want to delete this organisation?"
   },
   "repositoryPage": {
