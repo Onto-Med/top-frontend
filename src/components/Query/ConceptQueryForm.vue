@@ -51,11 +51,11 @@
     <template #before>
       <div class="column fit">
         <entity-tree
+          v-model:selected="entity"
           :nodes="entities"
           :loading="treeLoading"
           class="col column full-width"
           @refresh-clicked="reloadEntities"
-          @update:selected="entity = $event"
         />
       </div>
     </template>
