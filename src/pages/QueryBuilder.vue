@@ -118,15 +118,19 @@ onMounted(() => {
 })
 
 function reset (repository?: Repository) {
-  entityStore.setRepository(repository)
-  if (isConceptQuery.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    conceptQueryForm.value?.reset()
-  } else if (isPhenotypeQuery.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    phenotypeQueryForm.value?.reset()
-  }
-  void loadQueryPage(1)
+  entityStore
+    .setRepository(repository)
+    .then(() => {
+      if (isConceptQuery.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        conceptQueryForm.value?.reset()
+      } else if (isPhenotypeQuery.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        phenotypeQueryForm.value?.reset()
+      }
+    })
+    .then(() => loadQueryPage(1))
+    .catch((e: Error) => renderError(e))
 }
 
 const isPhenotypeQuery = computed(

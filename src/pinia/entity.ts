@@ -131,11 +131,9 @@ export const useEntity = defineStore('entity', {
         })
     },
 
-    setRepository(repository?: Repository) {
-      this.repository = repository
-      this.repositoryId = repository?.id
-      this.organisation = repository?.organisation
-      this.organisationId = repository?.organisation?.id
+    async setRepository(repository?: Repository) {
+      await this.setOrganisationById(repository?.organisation?.id)
+        .then(() => this.setRepositoryById(repository?.id))
     },
 
     async setRepositoryById(repositoryId: string | undefined) {
