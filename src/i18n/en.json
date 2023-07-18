@@ -457,6 +457,6 @@
   "unnamedConcept": "Unnamed Concept",
   "superConcept": "Super concept|Super concepts",
   "conceptEntity": "Query Concept",
-  "conceptEntitySelection": "",
+  "conceptEntitySelection": "Select one of the concepts in the left tree by clicking on it.",
   "emptyConceptEntity": ""
 }

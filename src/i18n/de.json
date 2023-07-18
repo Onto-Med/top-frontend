@@ -458,6 +458,6 @@
   "unnamedConcept": "Unbenanntes Konzept",
   "superConcept": "Super-Konzept|Super-Konzepte",
   "conceptEntity": "Such-Konzept",
-  "conceptEntitySelection": "",
+  "conceptEntitySelection": "Wählen Sie eines der Konzepte im linken Baum aus, indem Sie darauf klicken.",
   "emptyConceptEntity": ""
 }

@@ -260,7 +260,7 @@ onMounted(() => {
 
 watch(
   splitterModel,
-  (newVal) => $q.localStorage.set('editorSplitterWidth', newVal)
+  (newVal) => $q.localStorage.set('phenotypeQuerySplitterWidth', newVal)
 )
 
 const configurationComplete = computed(() =>

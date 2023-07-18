@@ -20,16 +20,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/QueryBuilder.vue'),
       },
       {
-        name: 'docQueryBuilder',
-        path: '/:organisationId/:repositoryId/search_ontology',
-        component: () => import('pages/DocumentQueryBuilder.vue')
-      },
-      {
-        name: 'docQueryBuilder',
-        path: '/:organisationId/:repositoryId/search_ontology',
-        component: () => import('pages/DocumentQueryBuilder.vue')
-      },
-      {
         name: 'editor',
         path: '/:organisationId/:repositoryId/:entityId?',
         props: route => {

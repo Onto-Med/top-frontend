@@ -18,16 +18,10 @@
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
               <q-btn
-                v-if="isPhenotypeRepository && canWrite"
-                icon="manage_search"
+                v-if="canWrite"
+                :icon="isConceptRepository ? 'find_in_page' : 'manage_search'"
                 :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder', params: { organisationId, repositoryId: repository.id } }"
-              />
-              <q-btn
-                v-else-if="isConceptRepository && canWrite"
-                icon="find_in_page"
-                :title="t('buildDocQuery')"
-                :to="{ name: 'docQueryBuilder' }"
               />
             </q-btn-group>
 

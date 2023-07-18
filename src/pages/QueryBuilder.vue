@@ -34,6 +34,11 @@
 
       <q-separator />
 
+      <concept-query-form
+        v-if="isConceptQuery"
+        ref="conceptQueryForm"
+        @execute="execute"
+      />
       <phenotype-query-form
         v-if="isPhenotypeQuery"
         ref="phenotypeQueryForm"
@@ -53,6 +58,7 @@
 
 <script setup lang="ts">
 import {
+ConceptQuery,
   DataSource,
   PhenotypeQuery,
   Query,
@@ -72,6 +78,7 @@ import { useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import Dialog from 'src/components/Dialog.vue'
+import ConceptQueryForm from 'src/components/Query/ConceptQueryForm.vue'
 import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
 import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
 
@@ -90,10 +97,8 @@ const queryPage = ref<QueryPage>({
   type: 'query'
 })
 const repositoryTypeFilter = ref<RepositoryType>()
-// TODO: const conceptQueryForm = ref<InstanceType<typeof ConceptQueryForm>>()
-const conceptQueryForm = ref()
+const conceptQueryForm = ref<InstanceType<typeof ConceptQueryForm>>()
 const phenotypeQueryForm = ref<InstanceType<typeof PhenotypeQueryForm>>()
-  console.log(typeof PhenotypeQueryForm)
 
 const dataSources = ref([] as DataSource[])
 entityStore.getDataSources(QueryType.Phenotype)
@@ -155,7 +160,7 @@ function deleteQuery (query: PhenotypeQuery) {
 function prefillQuery (query: Query) {
   if (isConceptQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    conceptQueryForm.value?.prefillQuery(query)
+    conceptQueryForm.value?.prefillQuery(query as ConceptQuery)
   } else if (isPhenotypeQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     phenotypeQueryForm.value?.prefillQuery(query)
