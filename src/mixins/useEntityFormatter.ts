@@ -181,8 +181,8 @@ export default function (this: void) {
     },
 
     hasExpression(this: void, entity: Entity | EntityType): entity is Phenotype {
-      const entityType = entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity
-      return entityType === EntityType.CompositePhenotype
+      const entityType = (entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity) as EntityType
+      return [EntityType.CompositePhenotype, EntityType.CompositeConcept].includes(entityType)
     },
 
     restrictionEntityTypes(this: void): EntityType[] {

@@ -10,6 +10,7 @@
         {{ label }}
         <span class="text-subtitle1 q-ml-md">
           <q-toggle
+            v-show="!readonly"
             :model-value="scores"
             :label="scores ? t('score', 2) : t('expression')"
             color="primary"
@@ -110,11 +111,6 @@ export default defineComponent({
     entityTypes: {
       type: Array as () => EntityType[],
       default: () => []
-    },
-    functionType: {
-      type: String,
-      required: true,
-      validator: (value: string) => ['math', 'boolean'].includes(value)
     }
   },
   emits: ['update:modelValue', 'entityClicked'],

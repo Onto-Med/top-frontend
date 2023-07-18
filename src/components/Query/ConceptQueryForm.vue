@@ -75,11 +75,16 @@
             </q-item-section>
           </q-item>
           <q-separator />
-          <q-card-section class="col fit q-pa-none">
-            <query-subject-concept
+          <q-card-section class="col fit q-pa-none q-pt-sm">
+            <entity-display
               v-if="entity"
-              :subject-id="query.entityId"
-              sortable
+              :entity="entity"
+              show-descriptions
+              show-entity-type
+              show-expression
+              show-repository
+              show-synonyms
+              @entity-clicked="entity = entityStore.getEntity($event)"
             />
             <div v-else class="q-pa-sm">
               {{ t('nothingSelectedYet') }}
@@ -120,7 +125,7 @@ import { computed, onMounted, ref, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { exportFile, useQuasar } from 'quasar'
-import QuerySubjectConcept from 'components/Query/QuerySubjectConcept.vue'
+import EntityDisplay from '../EntityEditor/EntityDisplay.vue'
 
 const emit = defineEmits(['execute'])
 const { t } = useI18n()

@@ -11,7 +11,7 @@
         :label="t('selectThing', { thing: t('entity') })"
         :disable="readonly"
         include-primary
-        changeable
+        :changeable="!readonly"
         removeable
         dense
         @entity-clicked="$emit('entityClicked', $event)"
