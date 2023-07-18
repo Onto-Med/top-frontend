@@ -75,20 +75,23 @@
             </q-item-section>
           </q-item>
           <q-separator />
-          <q-card-section class="col fit q-pa-none q-pt-sm">
-            <entity-display
-              v-if="entity"
-              :entity="entity"
-              show-descriptions
-              show-entity-type
-              show-expression
-              show-repository
-              show-synonyms
-              @entity-clicked="entity = entityStore.getEntity($event)"
-            />
-            <div v-else class="q-pa-sm">
-              {{ t('nothingSelectedYet') }}
-            </div>
+          <q-card-section class="col fit q-pa-none">
+            <q-scroll-area class="fit">
+              <entity-display
+                v-if="entity"
+                :entity="entity"
+                show-descriptions
+                show-entity-type
+                show-expression
+                show-repository
+                show-synonyms
+                class="q-pt-sm"
+                @entity-clicked="entity = entityStore.getEntity($event)"
+              />
+              <div v-else class="q-pa-sm">
+                {{ t('nothingSelectedYet') }}
+              </div>
+            </q-scroll-area>
           </q-card-section>
         </q-card>
       </div>
