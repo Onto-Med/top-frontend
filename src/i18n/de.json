@@ -388,7 +388,6 @@
   "add": "Hinzufügen",
   "editAccount": "Konto bearbeiten",
   "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse",
-  "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
   "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
   "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
@@ -458,6 +457,5 @@
   "unnamedConcept": "Unbenanntes Konzept",
   "superConcept": "Super-Konzept|Super-Konzepte",
   "conceptEntity": "Such-Konzept",
-  "conceptEntitySelection": "Wählen Sie eines der Konzepte im linken Baum aus, indem Sie darauf klicken.",
-  "emptyConceptEntity": ""
+  "conceptEntitySelection": "Wählen Sie eines der Konzepte im linken Baum aus, indem Sie darauf klicken."
 }
