@@ -80,7 +80,7 @@ import { exportFile, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
-import { computed, defineComponent, inject, onMounted, ref } from 'vue'
+import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -99,6 +99,7 @@ export default defineComponent({
     const { renderError } = useNotify()
     const { organisationId, repositoryId } = storeToRefs(entityStore)
     const results = ref<QueryResult[]>([])
+    const interval = ref<number>()
 
     const loadResult = async (query: Query) => {
       if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
@@ -122,12 +123,16 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      window.setInterval(() => {
+      interval.value = window.setInterval(() => {
         props.page.content.map(async (query) => {
           if (getQueryResult(query)?.finishedAt) return
           await loadResult(query)
         })
       }, 5000)
+    })
+
+    onUnmounted(() => {
+      window.clearInterval(interval.value)
     })
 
     return {
