@@ -1,13 +1,14 @@
 <template>
   <q-select
     v-model="repositoryType"
-    :stack-label="required"
     emit-value
     map-options
-    :readonly="readonly"
+    :clearable="!required"
+    :error="required && !repositoryType"
     :label="label || t('repositoryType')"
     :options="options || defaultOptions"
-    :error="required && !repositoryType"
+    :readonly="readonly"
+    :stack-label="required"
   />
 </template>
 
