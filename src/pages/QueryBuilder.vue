@@ -53,6 +53,7 @@
         :mini="minifyResults"
         :width="drawerWidth"
         :class="{ 'bg-grey-2': !isDarkModeActive }"
+        :breakpoint="0"
         bordered
         elevated
         overlay
@@ -134,7 +135,7 @@ const minifyResults = ref(true)
 const resultsScrollArea = ref<QScrollArea>()
 
 const drawerWidth = computed(() => {
-  return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.5)
+  return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
 })
 
 const dataSources = ref([] as DataSource[])
