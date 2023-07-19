@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md q-gutter-lg">
+  <q-page class="q-pa-md q-gutter-y-lg">
     <div class="row justify-center">
       <q-img src="/images/framework_overview.svg" fit="cover" height="300px" class="mood-img">
         <span class="absolute-bottom-right text-h6 text-grey-4 q-pr-sm">
@@ -13,34 +13,38 @@
       <p>{{ t('appDescription') }}</p>
     </div>
 
-    <div class="row justify-center q-gutter-md">
-      <q-card class="col-4 text-center cursor-pointer q-hoverable" @click="routeTo('organisations')">
-        <span class="q-focus-helper" />
-        <q-card-section class="row justify-center items-center">
-          <q-icon name="build" size="md" />
-          <div class="q-ml-sm text-h6">
-            {{ t('home_.createModels.header') }}
-          </div>
-        </q-card-section>
-        <q-separator inset />
-        <q-card-section>
-          {{ t('home_.createModels.content') }}
-        </q-card-section>
-      </q-card>
+    <div class="row justify-center q-col-gutter-md">
+      <div class="col-lg-4 col-sm-6 col-12">
+        <q-card class="fit text-center cursor-pointer q-hoverable" @click="routeTo('organisations')">
+          <span class="q-focus-helper" />
+          <q-card-section class="row justify-center items-center">
+            <q-icon name="build" size="md" />
+            <div class="q-ml-sm text-h6">
+              {{ t('home_.createModels.header') }}
+            </div>
+          </q-card-section>
+          <q-separator inset />
+          <q-card-section>
+            {{ t('home_.createModels.content') }}
+          </q-card-section>
+        </q-card>
+      </div>
 
-      <q-card v-ripple class="col-4 text-center cursor-pointer q-hoverable" @click="routeTo('queryBuilder')">
-        <span class="q-focus-helper" />
-        <q-card-section class="row justify-center items-center">
-          <q-icon name="person_search" size="lg" />
-          <div class="q-ml-sm text-h6">
-            {{ t('home_.runQuery.header') }}
-          </div>
-        </q-card-section>
-        <q-separator inset />
-        <q-card-section>
-          {{ t('home_.runQuery.content') }}
-        </q-card-section>
-      </q-card>
+      <div class="col-lg-4 col-sm-6 col-12">
+        <q-card v-ripple class="fit text-center cursor-pointer q-hoverable" @click="routeTo('queryBuilder')">
+          <span class="q-focus-helper" />
+          <q-card-section class="row justify-center items-center">
+            <q-icon name="person_search" size="lg" />
+            <div class="q-ml-sm text-h6">
+              {{ t('home_.runQuery.header') }}
+            </div>
+          </q-card-section>
+          <q-separator inset />
+          <q-card-section>
+            {{ t('home_.runQuery.content') }}
+          </q-card-section>
+        </q-card>
+      </div>
     </div>
 
     <q-card class="text-center">
