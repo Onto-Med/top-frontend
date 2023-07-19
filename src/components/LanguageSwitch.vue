@@ -1,7 +1,7 @@
 <template>
   <q-select
     v-model="locale"
-    :options="localeOptions"
+    :options="languages"
     label="Language"
     dense
     borderless
@@ -12,28 +12,17 @@
   />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useQuasar } from 'quasar'
 import { watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { languages } from 'src/config'
 
-export default {
-  setup () {
-    const $q = useQuasar()
-    const { locale } = useI18n({ useScope: 'global' })
+const $q = useQuasar()
+const { locale } = useI18n()
 
-    watch(
-      locale,
-      (newVal) => $q.localStorage.set('language', newVal)
-    )
-
-    return {
-      locale,
-      localeOptions: [
-        { value: 'en', label: 'English' },
-        { value: 'de', label: 'Deutsch' }
-      ]
-    }
-  }
-}
+watch(
+  locale,
+  (newVal) => $q.localStorage.set('language', newVal)
+)
 </script>

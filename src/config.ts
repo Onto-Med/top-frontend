@@ -8,3 +8,32 @@ export const env = {
   GDPR_POLICY_URL:  process.env.GDPR_POLICY_URL,
   SYSTEM_NOTICE:    process.env.SYSTEM_NOTICE
 } as NodeJS.ProcessEnv
+
+/**
+ * To add new languages please insert respective configurations to the following exports.
+ */
+export const languages = [
+  { value: 'en', label: 'English' },
+  { value: 'de', label: 'Deutsch' }
+]
+
+export const datetimeFormats = {
+  en: {
+    short: {
+      year: 'numeric', month: 'short', day: 'numeric'
+    },
+    long: {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: 'numeric'
+    }
+  },
+  de: {
+    short: {
+      year: 'numeric', month: 'numeric', day: 'numeric'
+    },
+    long: {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric'
+    }
+  }
+}

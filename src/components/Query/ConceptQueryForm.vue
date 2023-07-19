@@ -2,7 +2,15 @@
   <q-card-section class="row q-pa-none">
     <div class="col-12 col-sm-6 col-md-7 q-pa-md">
       <q-input v-model="query.name" :label="t('queryName')" type="text" />
-      <q-input v-model="language" type="text" :label="t('language')" :error="!language" hide-bottom-space />
+      <q-select
+        v-model="language"
+        :options="languages"
+        :label="t('language')"
+        :error="!language"
+        emit-value
+        map-options
+        hide-bottom-space
+      />
       <q-select
         v-model="queryDataSources"
         :options="dataSources"
@@ -129,9 +137,10 @@ import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { exportFile, useQuasar } from 'quasar'
 import EntityDisplay from '../EntityEditor/EntityDisplay.vue'
+import { languages } from 'src/config'
 
 const emit = defineEmits(['execute'])
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const $q = useQuasar()
 const entityStore = useEntity()
 const { renderError } = useNotify()
@@ -140,7 +149,7 @@ const { entities, repository, organisation } = storeToRefs(entityStore)
 const name = ref<string>()
 const queryDataSources = ref<string[]>([])
 const entity = ref<SingleConcept|CompositeConcept>()
-const language = ref<string>()
+const language = ref<string|undefined>(`${locale.value}`)
 
 const treeLoading = ref(false)
 const importFile = ref(undefined as File|undefined)
@@ -219,7 +228,7 @@ function reset () {
   name.value = undefined
   queryDataSources.value = []
   entity.value = undefined
-  language.value = undefined
+  language.value = `${locale.value}`
   reloadEntities().catch((e: Error) => renderError(e))
 }
 
