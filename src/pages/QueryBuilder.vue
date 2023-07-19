@@ -1,59 +1,89 @@
 <template>
-  <q-page class="q-pa-md q-gutter-md">
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">
-          {{ t('home_.runQuery.header') }}
-          <span v-if="repository">
-            {{ t('for') }}:
-            <q-breadcrumbs class="inline-block">
-              <q-breadcrumbs-el :label="repository.organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
-              <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
-            </q-breadcrumbs>
-          </span>
-        </div>
-        <span class="q-pt-md">{{ t('queryBuilder.description') }}</span>
+  <q-layout>
+    <q-page class="q-pa-md q-gutter-md q-mr-xl">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">
+            {{ t('home_.runQuery.header') }}
+            <span v-if="repository">
+              {{ t('for') }}:
+              <q-breadcrumbs class="inline-block">
+                <q-breadcrumbs-el :label="repository.organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
+                <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
+              </q-breadcrumbs>
+            </span>
+          </div>
+          <span class="q-pt-md">{{ t('queryBuilder.description') }}</span>
 
-        <div class="row q-gutter-md">
-          <repository-type-select
-            v-model="repositoryTypeFilter"
-            :required="false"
-            hide-bottom-space
-            class="col-lg-2 col-4"
+          <div class="row q-gutter-md">
+            <repository-type-select
+              v-model="repositoryTypeFilter"
+              :required="false"
+              hide-bottom-space
+              class="col-lg-2 col-4"
+            />
+            <repository-select-field
+              :model-value="repository"
+              :repository-type="repositoryTypeFilter"
+              :label="t('repositoryContainingModel')"
+              required
+              class="col-4 col"
+              @update:model-value="setRepository"
+            />
+          </div>
+        </q-card-section>
+
+        <q-separator />
+
+        <concept-query-form
+          v-if="isConceptQuery"
+          ref="conceptQueryForm"
+          @execute="execute"
+        />
+        <phenotype-query-form
+          v-if="isPhenotypeQuery"
+          ref="phenotypeQueryForm"
+          @execute="execute"
+        />
+      </q-card>
+
+      <q-drawer
+        v-if="repository"
+        :model-value="true"
+        :mini="minifyResults"
+        :width="drawerWidth"
+        :class="{ 'bg-grey-2': !isDarkModeActive }"
+        bordered
+        elevated
+        overlay
+        side="right"
+      >
+        <q-scroll-area v-show="!minifyResults" ref="resultsScrollArea" class="fit">
+          <query-results-table
+            class="fit"
+            :page="queryPage"
+            @delete="deleteQuery"
+            @prefill="prefillQuery"
+            @request="loadQueryPage($event)"
           />
-          <repository-select-field
-            :model-value="repository"
-            :repository-type="repositoryTypeFilter"
-            :label="t('repositoryContainingModel')"
-            required
-            class="col-4 col"
-            @update:model-value="setRepository"
+        </q-scroll-area>
+
+        <div v-show="minifyResults" class="q-mt-xl rotate-90 q-table__title">
+          {{ t('queryResult', 2) }}
+        </div>
+        <div class="absolute drawer-icon">
+          <q-btn
+            dense
+            round
+            unelevated
+            color="primary"
+            :icon="minifyResults ? 'chevron_left' : 'chevron_right'"
+            @click="minifyResults = !minifyResults"
           />
         </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <concept-query-form
-        v-if="isConceptQuery"
-        ref="conceptQueryForm"
-        @execute="execute"
-      />
-      <phenotype-query-form
-        v-if="isPhenotypeQuery"
-        ref="phenotypeQueryForm"
-        @execute="execute"
-      />
-    </q-card>
-
-    <query-results-table
-      v-if="repository"
-      :page="queryPage"
-      @delete="deleteQuery"
-      @prefill="prefillQuery"
-      @request="loadQueryPage($event)"
-    />
-  </q-page>
+      </q-drawer>
+    </q-page>
+  </q-layout>
 </template>
 
 <script setup lang="ts">
@@ -74,7 +104,7 @@ import { onMounted, ref, computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { QueryApiKey } from 'src/boot/axios'
-import { useQuasar } from 'quasar'
+import { QScrollArea, useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import Dialog from 'src/components/Dialog.vue'
@@ -99,6 +129,13 @@ const queryPage = ref<QueryPage>({
 const repositoryTypeFilter = ref<RepositoryType>()
 const conceptQueryForm = ref<InstanceType<typeof ConceptQueryForm>>()
 const phenotypeQueryForm = ref<InstanceType<typeof PhenotypeQueryForm>>()
+const isDarkModeActive = computed(() => $q.dark.isActive)
+const minifyResults = ref(true)
+const resultsScrollArea = ref<QScrollArea>()
+
+const drawerWidth = computed(() => {
+  return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.5)
+})
 
 const dataSources = ref([] as DataSource[])
 entityStore.getDataSources(QueryType.Phenotype)
@@ -140,13 +177,17 @@ const isConceptQuery = computed(
   () => repository.value?.repositoryType === RepositoryType.ConceptRepository
 )
 
-
 function execute (query: Query) {
   if (!queryApi || !organisation.value || !repository.value) return
   query.id = (uuidv4 as () => string)()
 
   queryApi.enqueueQuery(organisation.value.id, repository.value.id, query)
-    .then(() => queryPage.value.content.unshift(query))
+    .then(() => {
+      queryPage.value.content.unshift(query)
+      queryPage.value.totalElements++
+      resultsScrollArea.value?.setScrollPosition('vertical', 0)
+      minifyResults.value = false
+    })
     .catch((e: Error) => renderError(e))
 }
 
@@ -169,6 +210,7 @@ function prefillQuery (query: Query) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     phenotypeQueryForm.value?.prefillQuery(query)
   }
+  minifyResults.value = true
 }
 
 function setRepository (repo?: Repository) {
@@ -184,3 +226,9 @@ function setRepository (repo?: Repository) {
   }
 }
 </script>
+
+<style lang="sass">
+.drawer-icon
+  top: 30px
+  left: -17px
+</style>

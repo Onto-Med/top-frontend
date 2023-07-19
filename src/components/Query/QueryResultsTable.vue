@@ -8,12 +8,12 @@
         :loading="loading"
         :rows="rows"
         :rows-per-page-options="[0]"
-        :title="t('previousQuery', 2)"
+        :title="t('queryResult', 2)"
         :no-data-label="t('noDataPresent')"
         row-key="id"
       >
         <template #body="props">
-          <q-tr :props="props">
+          <q-tr :props="props" class="cursor-pointer">
             <slot name="row-cells" :row="props.row">
               <q-td auto-width>
                 <q-spinner v-if="isRunning(props.row)" :title="t('running')" size="sm" />
@@ -28,26 +28,26 @@
               <q-td auto-width class="col-auto text-grey text-right" :title="t('elapsedTime')">
                 <span class="gt-sm">{{ getEllapsedTime(props.row) }}</span>
               </q-td>
-              <q-td auto-width class="text-right">
-                <q-btn-group flat class="q-ml-sm">
-                  <q-btn
-                    icon="file_download"
-                    :disable="!isFinished(props.row)"
-                    :title="t('downloadDataSet')"
-                    @click.stop="download(props.row)"
-                  />
-                  <q-btn
-                    icon="replay"
-                    :title="t('repeatThing', { thing: t('query') })"
-                    @click.stop="$emit('prefill', props.row)"
-                  />
-                  <q-btn
-                    icon="clear"
-                    :title="t('removeThing', { thing: t('queryResult') })"
-                    @click.stop="$emit('delete', props.row)"
-                  />
-                </q-btn-group>
-              </q-td>
+              <q-menu>
+                <q-list dense>
+                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="download(props.row)">
+                    <q-item-section>
+                      {{ t('downloadDataSet') }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item v-close-popup clickable @click="$emit('prefill', props.row)">
+                    <q-item-section>
+                      {{ t('repeatThing', { thing: t('query') }) }}
+                    </q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item v-close-popup clickable @click="$emit('delete', props.row)">
+                    <q-item-section>
+                      {{ t('removeThing', { thing: t('queryResult') }) }}
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
             </slot>
           </q-tr>
         </template>
@@ -138,8 +138,7 @@ export default defineComponent({
           { name: 'state' },
           { name: 'name', field: 'name', label: t('name'), align: 'left' },
           { name: 'result', field: 'result', label: t('result'), align: 'left' },
-          { name: 'elappsedTime', align: 'right' },
-          { name: 'actions', align: 'right' }
+          { name: 'elappsedTime', align: 'right' }
       ] as QTableProps['columns']),
 
       isRunning(query: Query): boolean {
