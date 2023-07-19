@@ -49,7 +49,7 @@
 
       <q-drawer
         v-if="repository"
-        :model-value="true"
+        :model-value="resultsDrawer"
         :mini="minifyResults"
         :width="drawerWidth"
         :class="{ 'bg-grey-2': !isDarkModeActive }"
@@ -58,6 +58,7 @@
         elevated
         overlay
         side="right"
+        @update:model-value="resultsDrawer = true"
       >
         <q-scroll-area v-show="!minifyResults" ref="resultsScrollArea" class="fit">
           <query-results-table
@@ -69,7 +70,7 @@
           />
         </q-scroll-area>
 
-        <div v-show="minifyResults" class="q-mt-xl rotate-90 q-table__title">
+        <div v-show="minifyResults" class="q-mt-xl rotate-90 q-table__title text-no-wrap">
           {{ t('queryResult', 2) }}
         </div>
         <div class="absolute drawer-icon">
@@ -112,9 +113,11 @@ import Dialog from 'src/components/Dialog.vue'
 import ConceptQueryForm from 'src/components/Query/ConceptQueryForm.vue'
 import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
 import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 const $q = useQuasar()
+const router = useRouter()
 const entityStore = useEntity()
 const { renderError } = useNotify()
 const { repository, organisation } = storeToRefs(entityStore)
@@ -133,6 +136,7 @@ const phenotypeQueryForm = ref<InstanceType<typeof PhenotypeQueryForm>>()
 const isDarkModeActive = computed(() => $q.dark.isActive)
 const minifyResults = ref(true)
 const resultsScrollArea = ref<QScrollArea>()
+const resultsDrawer = ref(true)
 
 const drawerWidth = computed(() => {
   return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
@@ -166,6 +170,12 @@ function reset (repository?: Repository) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         phenotypeQueryForm.value?.reset()
       }
+    })
+    .then(() => {
+      void router.replace({
+        name: 'queryBuilder',
+        params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id }
+      })
     })
     .then(() => loadQueryPage(1))
     .catch((e: Error) => renderError(e))
