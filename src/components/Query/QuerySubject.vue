@@ -1,6 +1,12 @@
 <template>
-  <q-item>
-    <q-item-section avatar>
+  <q-item v-if="!subject">
+    <q-item-section v-if="!subject" class="text-bold text-negative">
+      {{ t('thingIsInvalid', { thing: t('entity') }) }}
+    </q-item-section>
+  </q-item>
+
+  <q-item v-else>
+    <q-item-section avatar class="col-auto">
       <q-btn-group v-if="sortable" flat class="column">
         <q-btn
           dense
@@ -29,27 +35,33 @@
         @update:model-value="$emit('update:inclusion', $event)"
       />
     </q-item-section>
-    <q-item-section v-if="!subject" class="text-bold text-negative">
-      {{ t('thingIsInvalid', { thing: t('entity') }) }}
+    <q-item-section avatar class="col-auto gt-sm">
+      <q-icon
+        size="1.3rem"
+        :class="{ restriction: isRestricted(subject) }"
+        :name="getIcon(subject)"
+        :title="getIconTooltip(subject)"
+      />
     </q-item-section>
-    <q-item-section v-else :title="getSynonyms(subject)">
-      <div class="row items-center fit non-selectable ellipsis">
-        <q-icon size="1.3rem" class="q-mr-sm gt-sm" :class="{ restriction: isRestricted(subject) }" :name="getIcon(subject)" />
+    <q-item-section :title="getSynonyms(subject)">
+      <q-item-label>
         {{ getTitle(subject, true) }}
-        <small v-if="requiresAggregationFunction" class="q-ml-md gt-xs">
-          (
-          <span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">
+      </q-item-label>
+      <q-item-label v-if="requiresAggregationFunction" caption class="gt-xs non-selectable">
+        <small>
+          (<span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">
             {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
           </span>
           <span v-if="dateTimeRestrictionValues" :title="t('dateTimeRestriction')">
             , {{ dateTimeRestrictionValues.join(' - ') }}
-          </span>
-          )
+          </span>)
         </small>
-        <small v-else-if="dateTimeRestrictionValues" class="q-ml-md" :title="t('dateTimeRestriction')">
-          ( {{ dateTimeRestrictionValues.join(' - ') }} )
+      </q-item-label>
+      <q-item-label v-else-if="dateTimeRestrictionValues" caption :title="t('dateTimeRestriction')" class="gt-xs non-selectable">
+        <small>
+          ({{ dateTimeRestrictionValues.join(' - ') }})
         </small>
-      </div>
+      </q-item-label>
     </q-item-section>
     <q-item-section side>
       <q-btn-group flat>
@@ -109,7 +121,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d, te } = useI18n()
     const entityStore = useEntity()
-    const { getSynonyms, isRestricted, getIcon, getTitle, requiresAggregationFunction } = useEntityFormatter()
+    const { getSynonyms, isRestricted, getIcon, getIconTooltip, getTitle, requiresAggregationFunction } = useEntityFormatter()
     const subject = ref<Entity>()
 
     const loadEntity = (subjectId: string) => entityStore.loadEntity(subjectId).then(e => subject.value = e)
@@ -128,6 +140,7 @@ export default defineComponent({
       getSynonyms,
       isRestricted,
       getIcon,
+      getIconTooltip,
       getTitle,
 
       requiresAggregationFunction: computed(() => subject.value ? requiresAggregationFunction(subject.value) : false),
@@ -138,7 +151,7 @@ export default defineComponent({
           || !props.dateTimeRestriction.values.length
           || !props.dateTimeRestriction.values.find(v => !!v)
         ) return undefined
-        return props.dateTimeRestriction.values.map(e => e ? d(e, 'long') : 'NA')
+        return props.dateTimeRestriction.values.map(e => e ? d(e, 'shortWithTime') : 'NA')
       })
     }
   }

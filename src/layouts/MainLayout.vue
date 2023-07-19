@@ -111,7 +111,7 @@
     >
       <q-scroll-area class="fit">
         <q-list padding>
-          <NavbarLink v-bind="{ title: t('home'), icon: 'house', routeName: 'home' }" />
+          <NavbarLink v-bind="{ title: t('home'), icon: 'house', routeName: 'home', exact: true }" />
 
           <q-expansion-item
             clickable

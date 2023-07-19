@@ -198,7 +198,10 @@ function deleteQuery (query: PhenotypeQuery) {
     .catch((e: Error) => renderError(e))
     .finally(() => {
       const index = queryPage.value.content.findIndex(q => q.id === query.id)
-      if (index !== -1) queryPage.value.content.splice(index, 1)
+      if (index !== -1) {
+        queryPage.value.content.splice(index, 1)
+        queryPage.value.totalElements--
+      }
     })
 }
 

@@ -22,6 +22,10 @@ export const datetimeFormats = {
     short: {
       year: 'numeric', month: 'short', day: 'numeric'
     },
+    shortWithTime: {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric'
+    },
     long: {
       year: 'numeric', month: 'short', day: 'numeric',
       hour: 'numeric', minute: 'numeric'
@@ -30,6 +34,10 @@ export const datetimeFormats = {
   de: {
     short: {
       year: 'numeric', month: 'numeric', day: 'numeric'
+    },
+    shortWithTime: {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric'
     },
     long: {
       year: 'numeric', month: 'numeric', day: 'numeric',

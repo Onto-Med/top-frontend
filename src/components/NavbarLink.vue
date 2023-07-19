@@ -1,7 +1,7 @@
 <template>
   <q-item
     clickable
-    exact
+    :exact="exact"
     :to="{ name: routeName }"
     :title="title"
     tag="a"
@@ -44,7 +44,9 @@ export default defineComponent({
     icon: {
       type: String,
       default: ''
-    }
+    },
+
+    exact: Boolean
   },
   setup () {
     const route = useRoute()
