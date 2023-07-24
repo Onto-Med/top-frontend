@@ -101,6 +101,7 @@ export default defineComponent({
     const { organisationId, repositoryId } = storeToRefs(entityStore)
     const results = ref<QueryResult[]>([])
     const interval = ref<number>()
+    const skippedQueries = ref<Set<string>>(new Set<string>())
 
     const loadResult = async (query: Query) => {
       if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
@@ -111,7 +112,6 @@ export default defineComponent({
           if (index !== -1) results.value.splice(index, 1)
           results.value.push(r.data)
         })
-        .catch((e: Error) => renderError(e))
     }
 
     const getQueryResult = (query: Query) => results.value.find(r => r.id === query.id)
@@ -126,8 +126,12 @@ export default defineComponent({
     onMounted(() => {
       interval.value = window.setInterval(() => {
         props.page.content.map(async (query) => {
-          if (getQueryResult(query)?.finishedAt) return
+          if (getQueryResult(query)?.finishedAt || skippedQueries.value.has(query.id)) return
           await loadResult(query)
+            .catch((e: Error) => {
+              skippedQueries.value.add(query.id)
+              renderError(e)
+            })
         })
       }, 5000)
     })
