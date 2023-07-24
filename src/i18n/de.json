@@ -97,7 +97,11 @@
     "StartsBefore": "StartsBefore",
     "TimeDistance": "Zeitabstand",
     "Overlap1": "Overlap1",
-    "Overlap2": "Overlap2"
+    "Overlap2": "Overlap2",
+    "Vals": "Werte",
+    "Union": "Vereinigung",
+    "EncAge": "Alter bei Begegnung",
+    "EncType": "Typ der Begegnung"
   },
   "import": "Importieren",
   "includeThing": "{thing} einschließen",
@@ -366,7 +370,9 @@
     "comparison": "Vergleichsfunktionen",
     "component": "Komponenten",
     "date_time": "Datum- und Zeit-Funktionen",
-    "none": "Unspezifizierte Funktionen"
+    "encounter": "Begegnungsbezogene Funktionen",
+    "none": "Unspezifizierte Funktionen",
+    "set": "Mengen-Funtionen"
   },
   "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
   "permission": "Keine Berechtigungen|Berechtigung|Berechtigungen",

@@ -97,7 +97,11 @@
     "StartsBefore": "StartsBefore",
     "TimeDistance": "TimeDistance",
     "Overlap1": "Overlap1",
-    "Overlap2": "Overlap2"
+    "Overlap2": "Overlap2",
+    "Vals": "Values",
+    "Union": "Union",
+    "EncAge": "Encounter age",
+    "EncType": "Encounter type"
   },
   "import": "Import",
   "includeThing": "Include {thing}",
@@ -365,8 +369,10 @@
     "advanced": "Advanced functions",
     "comparison": "Comparison functions",
     "date_time": "Date and time functions",
+    "encounter": "Encouter related functions",
     "component": "Components",
-    "none": "Unspecified functions"
+    "none": "Unspecified functions",
+    "set": "Set functions"
   },
   "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
   "permission": "No permissions|Permission|Permissions",
