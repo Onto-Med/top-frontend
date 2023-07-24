@@ -73,9 +73,11 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
+    includeFunctionTypes: Array as () => string[],
+    excludeFunctionTypes: Array as () => string[]
   },
   emits: ['enclose', 'remove', 'select'],
-  setup () {
+  setup (props) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
     const entityStore = useEntity()
@@ -85,6 +87,8 @@ export default defineComponent({
     const functionTypes = computed(() => {
       return functions.value?.map(f => f.type)
         .filter((t, index, self) => self.indexOf(t) === index)
+        .filter(t => !props.includeFunctionTypes || !!t && props.includeFunctionTypes.includes(t))
+        .filter(t => !props.excludeFunctionTypes || !!t && !props.excludeFunctionTypes.includes(t))
         .map(type => {
           const x = type || 'none'
           return {

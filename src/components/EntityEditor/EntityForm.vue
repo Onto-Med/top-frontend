@@ -132,6 +132,7 @@
       <expression-input
         v-if="EntityType.CompositePhenotype === entityType"
         :model-value="expression"
+        can-be-switch
         expanded
         :readonly="readonly"
         :label="t('formula')"
@@ -139,12 +140,12 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         :entity-types="[EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.SinglePhenotype, EntityType.SingleRestriction]"
-        function-type="math"
+        :exclude-function-types="['textFunction']"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />
 
-      <text-expression-input
+      <expression-input
         v-if="EntityType.CompositeConcept === entityType"
         :model-value="expression"
         expanded
@@ -154,7 +155,7 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         :entity-types="[EntityType.CompositeConcept, EntityType.SingleConcept]"
-        function-type="boolean"
+        :include-function-types="['textFunction']"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />
@@ -219,7 +220,6 @@ import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
-import TextExpressionInput from 'components/EntityEditor/Expression/TextExpressionInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UnitInput from 'src/components/UnitInput.vue'
 import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
@@ -229,7 +229,6 @@ import {useRouter} from 'vue-router'
 
 export default defineComponent({
   components: {
-    TextExpressionInput,
     LocalizedTextInput,
     DataTypeSelect,
     ItemTypeSelect,
