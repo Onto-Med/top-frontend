@@ -97,7 +97,11 @@
     "StartsBefore": "StartsBefore",
     "TimeDistance": "TimeDistance",
     "Overlap1": "Overlap1",
-    "Overlap2": "Overlap2"
+    "Overlap2": "Overlap2",
+    "Vals": "Values",
+    "Union": "Union",
+    "EncAge": "Encounter age",
+    "EncType": "Encounter type"
   },
   "import": "Import",
   "includeThing": "Include {thing}",
@@ -252,6 +256,7 @@
     "descriptionsHelp": "Here you can specify further descriptions or definitions of the entity in different languages.",
     "codesHelp": "In this section, specify links to taxonomies (e.g. SNOMED CT) so that the phenotype is mapped to the standards and can be linked to other IT systems. In this way, on the one hand, data from other sources can be read in and used for phenotyping. On the other hand, results can be fed back to external IT systems. Just type in a code or code title to start the search. You can optionally filter by code system.",
     "formulaHelp": "Mathematical and Boolean formulas can be entered here to calculate the values of the phenotype. Formulas can contain other phenotypes as well as constants.",
+    "textFormulaHelp": "Concepts can be connected here via Boolean variables or fuzzy matching defined.",
     "restrictionHelp": "Specify the restrictions to be applied to values of the phenotype. To do this, please first select a suitable quantifier. Then you have to choose between value range (with minimum and/or maximum) or enumeration (any number of predefined values) for the type of restriction. No restriction type can be selected for the quantifiers \"Values present\" and \"No values present\" because the restriction of the values is implicit.",
     "emptyTab": {
       "tree": {
@@ -364,8 +369,10 @@
     "advanced": "Advanced functions",
     "comparison": "Comparison functions",
     "date_time": "Date and time functions",
+    "encounter": "Encouter related functions",
     "component": "Components",
-    "none": "Unspecified functions"
+    "none": "Unspecified functions",
+    "set": "Set functions"
   },
   "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
   "permission": "No permissions|Permission|Permissions",
@@ -420,7 +427,7 @@
   "filterBy": "Filter by",
   "fetchDataFailed": "Could not fetch data from the server.",
   "entitySearchDescription": "Search for entities by entering text and/or using the filter options above.",
-  "greeting": "Welcom to the {productName}!",
+  "greeting": "Welcome to the {productName}!",
   "home_": {
     "createModels": {
       "header": "Create a Model|Create Models",
@@ -449,5 +456,12 @@
   },
   "repositoryContainingModel": "Repository containing the model",
   "confirmClearQuery": "If you switch to another repository, your current query will be lost. Are you sure?",
-  "repeatThing": "Repeat {thing}"
+  "repeatThing": "Repeat {thing}",
+  "buildDocQuery": "Start Document Search",
+  "single_concept": "Single Concept|Single Concepts",
+  "composite_concept": "Composite Concept|Composite Concepts",
+  "unnamedConcept": "Unnamed Concept",
+  "superConcept": "Super concept|Super concepts",
+  "conceptEntity": "Query Concept",
+  "conceptEntitySelection": "Select one of the concepts in the left tree by clicking on it."
 }

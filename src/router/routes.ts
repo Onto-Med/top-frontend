@@ -50,7 +50,10 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'documentSearch',
         path: '/document',
-        component: () => import('pages/DocumentSearch.vue')
+        component: () => import('pages/DocumentSearch.vue'),
+        meta: {
+          disabled: !process.env.DOCUMENTS_ENABLED
+        }
       }
     ],
   },

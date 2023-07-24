@@ -2,35 +2,7 @@ import { boot } from 'quasar/wrappers';
 import { createI18n } from 'vue-i18n';
 import { LocalStorage } from 'quasar';
 import messages from 'src/i18n';
-
-const datetimeFormats = {
-  en: {
-    short: {
-      year: 'numeric', month: 'numeric', day: 'numeric'
-    },
-    shortWithTime: {
-      year: 'numeric', month: 'numeric', day: 'numeric',
-      hour: 'numeric', minute: 'numeric'
-    },
-    long: {
-      year: 'numeric', month: 'short', day: 'numeric',
-      hour: 'numeric', minute: 'numeric'
-    }
-  },
-  de: {
-    short: {
-      year: 'numeric', month: 'numeric', day: 'numeric'
-    },
-    shortWithTime: {
-      year: 'numeric', month: 'numeric', day: 'numeric',
-      hour: 'numeric', minute: 'numeric'
-    },
-    long: {
-      year: 'numeric', month: 'short', day: 'numeric',
-      hour: 'numeric', minute: 'numeric'
-    }
-  }
-};
+import { datetimeFormats } from 'src/config';
 
 const language = LocalStorage.getItem('language') || navigator.language.split('-')[0];
 

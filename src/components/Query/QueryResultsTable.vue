@@ -2,18 +2,19 @@
   <q-card>
     <q-card-section class="q-pa-none">
       <q-table
+        dense
         flat
         hide-pagination
         :columns="cols"
         :loading="loading"
         :rows="rows"
         :rows-per-page-options="[0]"
-        :title="t('previousQuery', 2)"
+        :title="t('queryResult', 2)"
         :no-data-label="t('noDataPresent')"
         row-key="id"
       >
         <template #body="props">
-          <q-tr :props="props">
+          <q-tr :props="props" class="cursor-pointer">
             <slot name="row-cells" :row="props.row">
               <q-td auto-width>
                 <q-spinner v-if="isRunning(props.row)" :title="t('running')" size="sm" />
@@ -28,26 +29,26 @@
               <q-td auto-width class="col-auto text-grey text-right" :title="t('elapsedTime')">
                 <span class="gt-sm">{{ getEllapsedTime(props.row) }}</span>
               </q-td>
-              <q-td auto-width class="text-right">
-                <q-btn-group flat class="q-ml-sm">
-                  <q-btn
-                    icon="file_download"
-                    :disable="!isFinished(props.row)"
-                    :title="t('downloadDataSet')"
-                    @click.stop="download(props.row)"
-                  />
-                  <q-btn
-                    icon="replay"
-                    :title="t('repeatThing', { thing: t('query') })"
-                    @click.stop="$emit('prefill', props.row)"
-                  />
-                  <q-btn
-                    icon="clear"
-                    :title="t('removeThing', { thing: t('queryResult') })"
-                    @click.stop="$emit('delete', props.row)"
-                  />
-                </q-btn-group>
-              </q-td>
+              <q-menu>
+                <q-list dense>
+                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="download(props.row)">
+                    <q-item-section>
+                      {{ t('downloadDataSet') }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item v-close-popup clickable @click="$emit('prefill', props.row)">
+                    <q-item-section>
+                      {{ t('repeatThing', { thing: t('query') }) }}
+                    </q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item v-close-popup clickable @click="$emit('delete', props.row)">
+                    <q-item-section>
+                      {{ t('removeThing', { thing: t('queryResult') }) }}
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
             </slot>
           </q-tr>
         </template>
@@ -80,7 +81,7 @@ import { exportFile, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
-import { computed, defineComponent, inject, onMounted, ref } from 'vue'
+import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -99,6 +100,8 @@ export default defineComponent({
     const { renderError } = useNotify()
     const { organisationId, repositoryId } = storeToRefs(entityStore)
     const results = ref<QueryResult[]>([])
+    const interval = ref<number>()
+    const skippedQueries = ref<Set<string>>(new Set<string>())
 
     const loadResult = async (query: Query) => {
       if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
@@ -109,7 +112,6 @@ export default defineComponent({
           if (index !== -1) results.value.splice(index, 1)
           results.value.push(r.data)
         })
-        .catch((e: Error) => renderError(e))
     }
 
     const getQueryResult = (query: Query) => results.value.find(r => r.id === query.id)
@@ -122,12 +124,20 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      window.setInterval(() => {
+      interval.value = window.setInterval(() => {
         props.page.content.map(async (query) => {
-          if (getQueryResult(query)?.finishedAt) return
+          if (getQueryResult(query)?.finishedAt || skippedQueries.value.has(query.id)) return
           await loadResult(query)
+            .catch((e: Error) => {
+              skippedQueries.value.add(query.id)
+              renderError(e)
+            })
         })
       }, 5000)
+    })
+
+    onUnmounted(() => {
+      window.clearInterval(interval.value)
     })
 
     return {
@@ -138,8 +148,7 @@ export default defineComponent({
           { name: 'state' },
           { name: 'name', field: 'name', label: t('name'), align: 'left' },
           { name: 'result', field: 'result', label: t('result'), align: 'left' },
-          { name: 'elappsedTime', align: 'right' },
-          { name: 'actions', align: 'right' }
+          { name: 'elappsedTime', align: 'right' }
       ] as QTableProps['columns']),
 
       isRunning(query: Query): boolean {

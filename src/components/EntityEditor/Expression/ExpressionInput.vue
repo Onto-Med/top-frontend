@@ -10,6 +10,7 @@
         {{ label }}
         <span class="text-subtitle1 q-ml-md">
           <q-toggle
+            v-show="!readonly && canBeSwitch"
             :model-value="scores"
             :label="scores ? t('score', 2) : t('expression')"
             color="primary"
@@ -39,6 +40,8 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         :entity-types="entityTypes"
+        :include-function-types="includeFunctionTypes"
+        :exclude-function-types="excludeFunctionTypes"
         root
         @update:model-value="$emit('update:modelValue', $event)"
         @entity-clicked="$emit('entityClicked', $event)"
@@ -111,11 +114,9 @@ export default defineComponent({
       type: Array as () => EntityType[],
       default: () => []
     },
-    functionType: {
-      type: String,
-      required: true,
-      validator: (value: string) => ['math', 'boolean'].includes(value)
-    }
+    canBeSwitch: Boolean,
+    includeFunctionTypes: Array as () => string[],
+    excludeFunctionTypes: Array as () => string[]
   },
   emits: ['update:modelValue', 'entityClicked'],
   setup (props, { emit }) {
@@ -138,7 +139,7 @@ export default defineComponent({
       t,
       expandExpression,
       indent,
-      scores: computed(() => props.modelValue && props.modelValue.functionId === 'switch'),
+      scores: computed(() => props.canBeSwitch && props.modelValue && props.modelValue.functionId === 'switch'),
 
       showClearDialog () {
         $q.dialog({

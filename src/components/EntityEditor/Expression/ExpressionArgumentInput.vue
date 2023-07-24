@@ -11,7 +11,7 @@
         :label="t('selectThing', { thing: t('entity') })"
         :disable="readonly"
         include-primary
-        changeable
+        :changeable="!readonly"
         removeable
         dense
         @entity-clicked="$emit('entityClicked', $event)"
@@ -52,6 +52,8 @@
         {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b :title="functionTooltip">{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
+          :include-function-types="includeFunctionTypes"
+          :exclude-function-types="excludeFunctionTypes"
           @enclose="enclose()"
           @remove="clear()"
           @select="setFunction($event)"
@@ -82,6 +84,8 @@
             </span>
             <expression-context-menu
               v-if="!readonly"
+              :include-function-types="includeFunctionTypes"
+              :exclude-function-types="excludeFunctionTypes"
               @enclose="enclose()"
               @remove="clear()"
               @select="setFunction($event)"
@@ -135,6 +139,8 @@
           <slot name="append" />
           <expression-context-menu
             v-if="!readonly"
+            :include-function-types="includeFunctionTypes"
+            :exclude-function-types="excludeFunctionTypes"
             @enclose="enclose()"
             @remove="clear()"
             @select="setFunction($event)"
@@ -156,6 +162,8 @@
       <expression-context-menu
         v-if="!readonly"
         :enclosable="false"
+        :include-function-types="includeFunctionTypes"
+        :exclude-function-types="excludeFunctionTypes"
         @select="setFunction($event)"
         @remove="clear()"
       />
@@ -208,7 +216,9 @@ export default defineComponent({
     },
     organisationId: String,
     repositoryId: String,
-    entityTypes: Array as () => EntityType[]
+    entityTypes: Array as () => EntityType[],
+    includeFunctionTypes: Array as () => string[],
+    excludeFunctionTypes: Array as () => string[]
   },
   emits: ['update:modelValue', 'entityClicked'],
   setup(props, { emit }) {

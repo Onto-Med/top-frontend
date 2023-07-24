@@ -26,10 +26,10 @@
             <q-item>
               <entity-type-select v-model="filterEntityType" :options="entityTypeOptions" class="fit" dense />
             </q-item>
-            <q-item>
+            <q-item v-if="!isConceptRepository">
               <item-type-select v-model="filterItemType" class="fit" dense />
             </q-item>
-            <q-item>
+            <q-item v-if="!isConceptRepository">
               <data-type-select v-model="filterDataType" class="fit" dense />
             </q-item>
           </q-list>
@@ -94,19 +94,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch, nextTick } from 'vue'
-import { useI18n } from 'vue-i18n'
+import {computed, defineComponent, nextTick, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
 import EntityTypeSelect from 'src/components/EntityEditor/EntityTypeSelect.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
-import { Category, EntityType, Entity, DataType, ItemType } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity'
-import { storeToRefs } from 'pinia'
+import {Category, Concept, DataType, Entity, EntityType, ItemType, SingleConcept} from '@onto-med/top-api'
+import {useEntity} from 'src/pinia/entity'
+import {storeToRefs} from 'pinia'
 import useNotify from 'src/mixins/useNotify'
-import { QTree } from 'quasar'
+import {QTree} from 'quasar'
 
 export default defineComponent({
   name: 'EntityTree',
@@ -135,12 +135,16 @@ export default defineComponent({
     allowedEntityTypes: {
       type: Array as () => EntityType[],
       default: () => Object.values(EntityType)
-    }
+    },
+    isConceptRepository: {
+      type: Boolean,
+      default: false
+    },
   },
   emits: ['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity'],
   setup (props, { emit }) {
     const { t } = useI18n()
-    const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted } = useEntityFormatter()
+    const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted, isConcept } = useEntityFormatter()
     const entityStore = useEntity()
     const { renderError } = useNotify()
     const { organisationId, repositoryId } = storeToRefs(entityStore)
@@ -149,14 +153,18 @@ export default defineComponent({
     const filterEntityType  = ref(undefined as EntityType|undefined)
     const filterDataType    = ref(undefined as DataType|undefined)
     const filterItemType    = ref(undefined as ItemType|undefined)
-    const entityTypeOptions = [EntityType.SinglePhenotype, EntityType.CompositePhenotype]
+
+    const entityTypeOptions = computed( (): EntityType[] => {
+      if (props.isConceptRepository) return [EntityType.SingleConcept, EntityType.CompositeConcept]
+      return [EntityType.SinglePhenotype, EntityType.CompositePhenotype]
+    })
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
       if (!filterEntityType.value && !filterDataType.value && !filterItemType.value) return props.nodes
       return props.nodes.filter(n => {
         if (!props.allowedEntityTypes.includes(n.entityType)) return false
-        if (filterEntityType.value && entityTypeOptions.includes(n.entityType) && n.entityType !== filterEntityType.value) return false
+        if (filterEntityType.value && entityTypeOptions.value.includes(n.entityType) && n.entityType !== filterEntityType.value) return false
         if (filterDataType.value) {
           if (isPhenotype(n) && n.dataType !== filterDataType.value) return false
         }
@@ -175,6 +183,9 @@ export default defineComponent({
 
       if (isRestricted(entity))
         expand(props.nodes?.find(n => n.id === entity.superPhenotype?.id))
+      else if (props.isConceptRepository)
+        (entity as Concept).superConcepts?.forEach(c =>
+          expand(props.nodes?.find(n => n.id === c.id)))
       else
         (entity as Category).superCategories?.forEach(c =>
           expand(props.nodes?.find(n => n.id === c.id)))
@@ -204,8 +215,8 @@ export default defineComponent({
       list
         .filter(e => e.id)
         .sort((a, b) => {
-          if (a.entityType === EntityType.Category && b.entityType !== EntityType.Category) return -1
-          if (a.entityType !== EntityType.Category && b.entityType === EntityType.Category) return 1
+          if ([EntityType.Category, EntityType.SingleConcept].includes(a.entityType) && ![EntityType.Category, EntityType.SingleConcept].includes(b.entityType)) return -1
+          if (![EntityType.Category, EntityType.SingleConcept].includes(a.entityType) && [EntityType.Category, EntityType.SingleConcept].includes(b.entityType)) return 1
           return getTitle(a).localeCompare(getTitle(b))
         })
         .forEach(e => {
@@ -217,6 +228,10 @@ export default defineComponent({
                 (isPhenotype(e) || (e as Category).subCategories && (e as Category).subCategories?.length === 0)
                 && (e as Category).phenotypes && (e as Category).phenotypes?.length === 0
               )
+              || (
+                isConcept(e) && (e.entityType === EntityType.CompositeConcept
+                || ((e as SingleConcept).subConcepts && (e as SingleConcept).subConcepts?.length === 0))
+              )
             ) (map.get(e.id as string) as TreeNode).lazy = false;
 
           (e as Category).superCategories?.forEach(c => {
@@ -225,7 +240,16 @@ export default defineComponent({
               const parent = map.get(c.id)
               if (parent) parent.children.push(map.get(e.id as string) as TreeNode)
             }
-          })
+          });
+
+          (e as Concept).superConcepts?.forEach(c => {
+            if (c.id) {
+              root = false
+              const parent = map.get(c.id)
+              if (parent) parent.children.push(map.get(e.id as string) as TreeNode)
+            }
+          });
+
           if (isRestricted(e)) {
             root = false
             const node = map.get(e.id as string)

@@ -18,8 +18,8 @@
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
               <q-btn
-                v-if="isPhenotypeRepository && canWrite"
-                icon="manage_search"
+                v-if="canWrite"
+                :icon="isConceptRepository ? 'find_in_page' : 'manage_search'"
                 :title="t('buildQuery')"
                 :to="{ name: 'queryBuilder', params: { organisationId, repositoryId: repository.id } }"
               />
@@ -35,6 +35,7 @@
             :allowed-entity-types="allowedEntityTypes"
             class="col column full-width"
             :show-context-menu="canWrite"
+            :is-concept-repository="isConceptRepository"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
@@ -126,20 +127,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, watch, onMounted, inject, nextTick, computed } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
-import { useEntity } from 'src/pinia/entity'
+import {computed, defineComponent, inject, nextTick, onMounted, ref, Ref, watch} from 'vue'
+import {storeToRefs} from 'pinia'
+import {useRouter} from 'vue-router'
+import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
-import { Category, Entity, EntityType, LocalisableText, Phenotype, Repository } from '@onto-med/top-api'
-import { EntityApiKey } from 'src/boot/axios'
+import {Category, Entity, EntityType, LocalisableText, Phenotype, Repository, RepositoryType, Concept} from '@onto-med/top-api'
+import {EntityApiKey} from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { RepositoryType } from '@onto-med/top-api'
-import { useQuasar } from 'quasar'
+import {useQuasar} from 'quasar'
 
 export default defineComponent({
   name: 'Editor',
@@ -155,7 +155,7 @@ export default defineComponent({
   setup (props) {
     const { t, locale } = useI18n()
     const $q = useQuasar()
-    const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon } = useEntityFormatter()
+    const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon, isConcept } = useEntityFormatter()
     const router           = useRouter()
     const entityStore      = useEntity()
     const { notify, renderError } = useNotify()
@@ -169,8 +169,8 @@ export default defineComponent({
     const treeLoading = ref(false)
     const { isAuthenticated } = storeToRefs(entityStore)
 
-    const clone = (value: Category|Phenotype) =>
-      JSON.parse(JSON.stringify(value)) as Category|Phenotype
+    const clone = (value: Category|Phenotype|Concept) =>
+      JSON.parse(JSON.stringify(value)) as Category|Phenotype|Concept
     const equals = (expected: unknown, actual: unknown): boolean =>
       JSON.stringify(expected) === JSON.stringify(actual)
 
@@ -322,6 +322,10 @@ export default defineComponent({
               tabs.value
                 .filter(t => (t.state as Phenotype).superPhenotype?.id === entity.id)
                 .forEach(t => closeTab(t.state))
+            if (isConcept(entity))
+              tabs.value
+                .filter(t => (t.state as Concept).superConcepts?.filter(c => (c as Concept).id === entity.id))
+                .forEach(t => closeTab(t.state))
           })
           .catch((e: Error) => renderError(e))
           .finally(() => treeLoading.value = false)
@@ -387,14 +391,18 @@ export default defineComponent({
 
       allowedEntityTypes: computed(() => {
         if (repository.value?.repositoryType === RepositoryType.ConceptRepository)
-          return [EntityType.Category]
+          return [EntityType.SingleConcept, EntityType.CompositeConcept]
         if (repository.value?.repositoryType === RepositoryType.PhenotypeRepository)
-          return undefined
+          return [EntityType.SinglePhenotype, EntityType.CompositePhenotype, EntityType.Category]
         return []
       }),
 
       isPhenotypeRepository: computed(() =>
         repository.value && repository.value.repositoryType === RepositoryType.PhenotypeRepository
+      ),
+
+      isConceptRepository: computed( () =>
+        repository.value && repository.value.repositoryType === RepositoryType.ConceptRepository
       ),
 
       handleTabUpdate,

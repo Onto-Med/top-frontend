@@ -97,7 +97,11 @@
     "StartsBefore": "StartsBefore",
     "TimeDistance": "Zeitabstand",
     "Overlap1": "Overlap1",
-    "Overlap2": "Overlap2"
+    "Overlap2": "Overlap2",
+    "Vals": "Werte",
+    "Union": "Vereinigung",
+    "EncAge": "Alter bei Begegnung",
+    "EncType": "Typ der Begegnung"
   },
   "import": "Importieren",
   "includeThing": "{thing} einschließen",
@@ -252,6 +256,7 @@
     "descriptionsHelp": "Hier können Sie weiterführende Beschreibungen oder Definitionen der Entität in verschiedenen Sprachen angeben.",
     "codesHelp": "Geben Sie in diesem Abschnitt Verknüpfungen zu Taxonomien an (z.B. SNOMED CT), sodass der Phänotyp auf die Standards gemappt ist und mit anderen IT-Systemen verbunden werden kann. Auf diese Weise können zum einen Daten aus anderen Quellen eingelesen und zur Phänotypisierung verwendet werden. Auf der anderen Seite können Ergebnisse an externe IT-Systeme zurückgespielt werden. Geben Sie einfach einen Code oder einen Code-Titel ein, um mit der Suche zu beginnen. Optional können Sie nach Codesystem filtern.",
     "formulaHelp": "Hier können mathematische und Boolesche Formeln eingegeben werden, mit denen die Werte des Phänotyps berechnet werden. Formeln können sowohl andere Phänotypen als auch Konstanten enthalten.",
+    "textFormulaHelp": "Hier können Konzept mithilfe Bool'scher Variablen verknüpft werden bzw. Unschärfen definiert werden.",
     "restrictionHelp": "Spezifizieren Sie die Einschränkungen, die auf Werte des Phänotyps angewendet werden sollen. Wählen Sie dafür bitte zunächst einen passenden Quantor aus. Anschließend müssen Sie für den Typ der Restriktion zwischen Wertebereich (mit Minimum und/oder Maximum) oder Aufzählung (beliebige Anzahl von vordefinierten Werten) wählen. Für die Quantoren \"Werte vorhanden\" und \"Keine Werte vorhanden\" kann kein Restriktionstyp gewählt werden, da die Beschränkung der Werte implizit ist.",
     "emptyTab": {
       "tree": {
@@ -365,7 +370,9 @@
     "comparison": "Vergleichsfunktionen",
     "component": "Komponenten",
     "date_time": "Datum- und Zeit-Funktionen",
-    "none": "Unspezifizierte Funktionen"
+    "encounter": "Begegnungsbezogene Funktionen",
+    "none": "Unspezifizierte Funktionen",
+    "set": "Mengen-Funtionen"
   },
   "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
   "permission": "Keine Berechtigungen|Berechtigung|Berechtigungen",
@@ -387,7 +394,6 @@
   "add": "Hinzufügen",
   "editAccount": "Konto bearbeiten",
   "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse",
-  "projectState": "Das Framework befindet sich derzeit noch in der Entwicklung und wird um weitere Funktionalitäten erweitert.",
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
   "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
   "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
@@ -450,5 +456,12 @@
     "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um Auswahlkriterien und Projektion festzulegen."
   },
   "confirmClearQuery": "Wenn Sie zu einem anderen Repositorium wechseln, geht Ihre aktuelle Abfrage verloren. Sind Sie sicher?",
-  "repeatThing": "{thing} wiederholen"
+  "repeatThing": "{thing} wiederholen",
+  "buildDocQuery": "Dokumentensuche starten",
+  "single_concept": "Einfaches Konzept|Einfache Konzepte",
+  "composite_concept": "Zusammengesetztes Konzept|Zusammengesetzte Konzepte",
+  "unnamedConcept": "Unbenanntes Konzept",
+  "superConcept": "Super-Konzept|Super-Konzepte",
+  "conceptEntity": "Such-Konzept",
+  "conceptEntitySelection": "Wählen Sie eines der Konzepte im linken Baum aus, indem Sie darauf klicken."
 }

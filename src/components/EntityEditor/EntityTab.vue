@@ -138,6 +138,7 @@
     </div>
 
     <entity-form
+      v-if="![EntityType.SingleConcept, EntityType.CompositeConcept].includes(local.entityType)"
       :titles="local.titles"
       :synonyms="local.synonyms"
       :descriptions="local.descriptions"
@@ -146,7 +147,38 @@
       :restriction="local.restriction"
       :expression="local.expression"
       :unit="local.unit"
-      :super-categories="local.superCategories"
+      :super-categories="local.superConcepts"
+      :codes="local.codes"
+      :entity-id="local.id"
+      :entity-type="local.entityType"
+      :version="version"
+      :repository-id="repositoryId"
+      :organisation-id="organisationId"
+      :readonly="isOtherVersion || readonly"
+      :restriction-key="restrictionKey"
+      @update:titles="$emit('update:entity', { ...local, titles: $event })"
+      @update:synonyms="$emit('update:entity', { ...local, synonyms: $event })"
+      @update:descriptions="$emit('update:entity', { ...local, descriptions: $event })"
+      @update:data-type="$emit('update:entity', { ...local, dataType: $event })"
+      @update:item-type="$emit('update:entity', { ...local, itemType: $event })"
+      @update:restriction="$emit('update:entity', { ...local, restriction: $event })"
+      @update:expression="$emit('update:entity', { ...local, expression: $event })"
+      @update:unit="$emit('update:entity', { ...local, unit: $event })"
+      @update:super-categories="$emit('update:entity', { ...local, superCategories: $event })"
+      @update:codes="$emit('update:entity', { ...local, codes: $event })"
+      @entity-clicked="$emit('entityClicked', $event)"
+    />
+    <entity-form
+      v-else-if="[EntityType.SingleConcept, EntityType.CompositeConcept].includes(local.entityType)"
+      :titles="local.titles"
+      :synonyms="local.synonyms"
+      :descriptions="local.descriptions"
+      :data-type="undefined"
+      :item-type="undefined"
+      :restriction="undefined"
+      :expression="local.expression"
+      :unit="undefined"
+      :super-concepts="local.superConcepts"
       :codes="local.codes"
       :entity-id="local.id"
       :entity-type="local.entityType"
@@ -178,7 +210,7 @@
 <script lang="ts">
 import { ref, computed, defineComponent, watch, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, DataType, Category, Phenotype } from '@onto-med/top-api'
+import {EntityType, DataType, Category, Phenotype, Concept} from '@onto-med/top-api'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import ForkingDialog from 'src/components/EntityEditor/Forking/ForkingDialog.vue'
 import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
@@ -199,7 +231,7 @@ export default defineComponent({
   },
   props: {
     entity: {
-      type: Object as () => Category|Phenotype,
+      type: Object as () => Category|Phenotype|Concept,
       required: true
     },
     version: Number,
@@ -225,10 +257,13 @@ export default defineComponent({
   emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'save', 'reset'],
   setup (props, { emit }) {
     const { t, d } = useI18n()
-    const clone = (value: Category|Phenotype) =>
-      JSON.parse(JSON.stringify(value)) as Phenotype
-
-    const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType } = useEntityFormatter()
+    const clone = (value: Category|Phenotype|Concept) => {
+      if (isConcept(value)) {
+        return JSON.parse(JSON.stringify(value)) as Concept
+      }
+      return JSON.parse(JSON.stringify(value)) as Phenotype
+    }
+    const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType, isConcept } = useEntityFormatter()
     const { notify, renderError } = useNotify()
     const router    = useRouter()
     const local     = ref(clone(props.entity))
@@ -245,7 +280,7 @@ export default defineComponent({
 
     watch(
       () => props.entity,
-      (value: Category|Phenotype) => {
+      (value: Category|Phenotype|Concept) => {
         local.value = clone(value)
       },
       { deep: true }

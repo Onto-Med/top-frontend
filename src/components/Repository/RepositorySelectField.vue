@@ -25,7 +25,7 @@
       </span>
     </template>
     <template #option="scope">
-      <q-item v-bind="scope.itemProps">
+      <q-item v-bind="scope.itemProps" :disable="!hasPermission(scope.opt)">
         <q-item-section>
           <q-item-label v-if="!organisationId && scope.opt.organisation" overline>
             {{ scope.opt.organisation.name }}
@@ -55,8 +55,10 @@ import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { RepositoryApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
-import { Repository, RepositoryPage } from '@onto-med/top-api'
+import { Permission, Repository, RepositoryPage, RepositoryType } from '@onto-med/top-api'
 import { ScrollDetails } from 'src/mixins/ScrollDetails'
+import { storeToRefs } from 'pinia'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   props: {
@@ -72,13 +74,18 @@ export default defineComponent({
     dense: Boolean,
     autofocus: Boolean,
     organisationId: String,
-    required: Boolean
+    required: Boolean,
+    /** Restrict the result set by repositoryType. */
+    repositoryType: String as () => RepositoryType,
+    /** Disable results that do not have one of the specified permissions. */
+    permissions: Array as () => Permission[]
   },
   emits: ['update:modelValue'],
   setup(props) {
     const { t } = useI18n()
     const repositoryApi = inject(RepositoryApiKey)
     const { renderError } = useNotify()
+    const { keycloak } = storeToRefs(useEntity())
     const options = ref([] as Repository[])
     const loading = ref(false)
     const prevInput  = ref(undefined as string|undefined)
@@ -89,9 +96,9 @@ export default defineComponent({
       if (!repositoryApi) return Promise.reject({ message: 'Could not load data from the server.' })
       let promise: Promise<AxiosResponse<RepositoryPage>>
       if (props.organisationId) {
-        promise = repositoryApi.getRepositoriesByOrganisationId(props.organisationId, undefined, input, undefined, page)
+        promise = repositoryApi.getRepositoriesByOrganisationId(props.organisationId, undefined, input, props.repositoryType, page)
       } else {
-        promise = repositoryApi.getRepositories(undefined, input, undefined, undefined, page)
+        promise = repositoryApi.getRepositories(undefined, input, undefined, props.repositoryType, page)
       }
       return promise.then(r => r.data)
     }
@@ -117,6 +124,11 @@ export default defineComponent({
           })
           .catch((e: Error) => renderError(e))
           .finally(() => loading.value = false)
+      },
+
+      hasPermission (repository: Repository) {
+        return !props.permissions || props.permissions.length == 0 || !keycloak.value
+          || keycloak.value.authenticated && repository.organisation?.permission && props.permissions.includes(repository.organisation?.permission)
       },
 
       onScroll ({ to, direction, ref }: ScrollDetails) {
