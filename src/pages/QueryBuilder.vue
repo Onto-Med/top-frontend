@@ -26,6 +26,7 @@
               :model-value="repository"
               :repository-type="repositoryTypeFilter"
               :label="t('repositoryContainingModel')"
+              :permissions="[Permission.Write, Permission.Manage]"
               required
               class="col-4 col"
               @update:model-value="setRepository"
@@ -91,6 +92,7 @@
 <script setup lang="ts">
 import {
   ConceptQuery,
+  Permission,
   PhenotypeQuery,
   Query,
   QueryPage,
