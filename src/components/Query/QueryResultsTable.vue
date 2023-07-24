@@ -2,6 +2,7 @@
   <q-card>
     <q-card-section class="q-pa-none">
       <q-table
+        dense
         flat
         hide-pagination
         :columns="cols"

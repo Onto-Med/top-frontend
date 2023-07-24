@@ -4,17 +4,13 @@
       <q-input v-model="query.name" :label="t('queryName')" type="text" />
           
       <q-select
-        v-model="query.dataSources"
+        v-model="query.dataSource"
         :options="dataSources"
         :label="t('dataSource', 2)"
         :error-message="t('dataSourceDescription')"
-        :error="query.dataSources?.length == 0"
+        :error="!query.dataSource"
         option-value="id"
         option-label="title"
-        class="data-sources-input"
-        multiple
-        counter
-        use-chips
         emit-value
         map-options
       />
@@ -215,7 +211,7 @@ const { entities, repository, organisation } = storeToRefs(entityStore)
 const emptyQuery = () => {
   return {
     id: (uuidv4 as () => string)(),
-    dataSources: [],
+    dataSource: undefined as string|undefined,
     criteria: [],
     projection: [],
     type: QueryType.Phenotype
@@ -264,7 +260,7 @@ watch(
 )
 
 const configurationComplete = computed(() =>
-  query.value.dataSources && query.value.dataSources.length > 0
+  query.value.dataSource
 )
 
 const querySubjectPresent = computed(() =>
@@ -332,6 +328,4 @@ defineExpose({
 .and-separator
   height: 0px
   margin-top: -16px
-.data-sources-input .q-field__native
-  min-height: 37px !important
 </style>

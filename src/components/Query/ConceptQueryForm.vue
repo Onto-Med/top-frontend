@@ -12,17 +12,13 @@
         hide-bottom-space
       />
       <q-select
-        v-model="queryDataSources"
+        v-model="dataSource"
         :options="dataSources"
         :label="t('dataSource', 2)"
         :error-message="t('dataSourceDescription')"
-        :error="queryDataSources.length == 0"
+        :error="!dataSource"
         option-value="id"
         option-label="title"
-        class="data-sources-input"
-        multiple
-        counter
-        use-chips
         emit-value
         map-options
       />
@@ -147,7 +143,7 @@ const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
 
 const name = ref<string>()
-const queryDataSources = ref<string[]>([])
+const dataSource = ref<string>()
 const entity = ref<SingleConcept|CompositeConcept>()
 const language = ref<string|undefined>(`${locale.value}`)
 
@@ -191,8 +187,7 @@ watch(
 )
 
 const configurationComplete = computed(() =>
-  queryDataSources.value
-    && queryDataSources.value.length > 0
+  dataSource.value
     && language.value
     && entity.value
 )
@@ -201,7 +196,7 @@ const query = computed(() => {
   return {
     id: (uuidv4 as () => string)(),
     name: name.value,
-    dataSources: queryDataSources.value,
+    dataSource: dataSource.value,
     entityId: entity.value?.id,
     language: language.value,
     type: QueryType.Concept
@@ -226,7 +221,7 @@ function onExecute () {
 
 function reset () {
   name.value = undefined
-  queryDataSources.value = []
+  dataSource.value = undefined
   entity.value = undefined
   language.value = `${locale.value}`
   reloadEntities().catch((e: Error) => renderError(e))
@@ -237,8 +232,3 @@ defineExpose({
   reset
 })
 </script>
-
-<style lang="sass">
-.data-sources-input .q-field__native
-  min-height: 37px !important
-</style>

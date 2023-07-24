@@ -90,12 +90,10 @@
 
 <script setup lang="ts">
 import {
-ConceptQuery,
-  DataSource,
+  ConceptQuery,
   PhenotypeQuery,
   Query,
   QueryPage,
-  QueryType,
   Repository,
   RepositoryType
 } from '@onto-med/top-api'
@@ -141,11 +139,6 @@ const resultsDrawer = ref(true)
 const drawerWidth = computed(() => {
   return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
 })
-
-const dataSources = ref([] as DataSource[])
-entityStore.getDataSources(QueryType.Phenotype)
-  .then(r => dataSources.value = r)
-  .catch((e: Error) => renderError(e))
 
 function loadQueryPage (page: number) {
   if (queryApi && organisation.value && repository.value)
