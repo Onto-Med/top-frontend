@@ -60,14 +60,15 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history', // available values: 'hash', 'history'
 
       env: {
-        OAUTH2_ENABLED:   process.env.OAUTH2_ENABLED == 'true',
-        OAUTH2_URL:       process.env.OAUTH2_URL,
-        OAUTH2_REALM:     process.env.OAUTH2_REALM,
-        OAUTH2_CLIENT_ID: process.env.OAUTH2_CLIENT_ID,
-        API_URL:          process.env.API_URL,
-        GDPR_NOTICE:      process.env.GDPR_NOTICE == 'true',
-        GDPR_POLICY_URL:  process.env.GDPR_POLICY_URL,
-        SYSTEM_NOTICE:    process.env.SYSTEM_NOTICE
+        OAUTH2_ENABLED:    process.env.OAUTH2_ENABLED == 'true',
+        OAUTH2_URL:        process.env.OAUTH2_URL,
+        OAUTH2_REALM:      process.env.OAUTH2_REALM,
+        OAUTH2_CLIENT_ID:  process.env.OAUTH2_CLIENT_ID,
+        API_URL:           process.env.API_URL,
+        GDPR_NOTICE:       process.env.GDPR_NOTICE == 'true',
+        GDPR_POLICY_URL:   process.env.GDPR_POLICY_URL,
+        SYSTEM_NOTICE:     process.env.SYSTEM_NOTICE,
+        DOCUMENTS_ENABLED: process.env.DOCUMENTS_ENABLED == 'true'
       },
 
       // transpile: false,

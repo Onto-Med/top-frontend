@@ -223,22 +223,27 @@ export default defineComponent({
     const { keycloak, organisation } = storeToRefs(entityStore)
     const drawer = ref(undefined as QMenu|undefined)
 
-    const linksList = computed(() => [
-      {
-        title: t('query', 2),
-        icon: 'person_search',
-        caption: t('navbar.query.caption'),
-        routeName: 'queryBuilder',
-        isHidden: keycloak.value && !keycloak.value.authenticated
-      },
-      {
-        title: t('document', 2),
-        icon: 'article',
-        caption: t('documentSearch', 2),
-        routeName: 'documentSearch',
-        isHidden: keycloak.value && !keycloak.value.authenticated
+    const linksList = computed(() => {
+      const links = [
+        {
+          title: t('query', 2),
+          icon: 'person_search',
+          caption: t('navbar.query.caption'),
+          routeName: 'queryBuilder',
+          isHidden: keycloak.value && !keycloak.value.authenticated
+        }
+      ]
+      if (process.env.DOCUMENTS_ENABLED) {
+        links.push({
+          title: t('document', 2),
+          icon: 'article',
+          caption: t('documentSearch', 2),
+          routeName: 'documentSearch',
+          isHidden: keycloak.value && !keycloak.value.authenticated
+        })
       }
-    ])
+      return links
+    })
 
     watch(
       leftDrawerOpen,

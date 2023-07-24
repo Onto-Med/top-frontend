@@ -40,9 +40,12 @@ export default route(function (/* { store, ssrContext } */) {
     const entityStore = useEntity()
     const { renderError } = useNotify()
 
+    if (to.meta.disabled) {
+      return await Router.replace({ name: 'home' })
+    }
     if (!to.meta.allowAnonymous) {
       if (entityStore.keycloak && !entityStore.keycloak.authenticated)
-        return void entityStore.keycloak.login()
+        return await entityStore.keycloak.login()
     }
     await entityStore.setOrganisationById(to.params.organisationId as string | undefined)
       .catch((e: AxiosError) => {
