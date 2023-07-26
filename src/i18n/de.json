@@ -372,7 +372,8 @@
     "date_time": "Datum- und Zeit-Funktionen",
     "encounter": "Begegnungsbezogene Funktionen",
     "none": "Unspezifizierte Funktionen",
-    "set": "Mengen-Funtionen"
+    "set": "Mengen-Funtionen",
+    "textFunction": "Text-Funktionen"
   },
   "confirmChangeExpressionType": "Wenn Sie den Ausdruckstyp ändern, gehen alle bereits eingegebenen Daten verloren.\nMöchten Sie fortfahren?",
   "permission": "Keine Berechtigungen|Berechtigung|Berechtigungen",
