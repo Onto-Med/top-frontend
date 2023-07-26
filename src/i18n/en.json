@@ -372,7 +372,8 @@
     "encounter": "Encouter related functions",
     "component": "Components",
     "none": "Unspecified functions",
-    "set": "Set functions"
+    "set": "Set functions",
+    "textFunction": "Text functions"
   },
   "confirmChangeExpressionType": "If you change the expression type, any data already entered will be lost.\nDo you want to continue?",
   "permission": "No permissions|Permission|Permissions",
