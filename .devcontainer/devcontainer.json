@@ -12,7 +12,7 @@
 			"nodeGypDependencies": true,
 			"version": "lts"
 		},
-		"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
+		"ghcr.io/devcontainers-contrib/features/quasar-cli": {
 			"version": "latest"
 		}
 	},
