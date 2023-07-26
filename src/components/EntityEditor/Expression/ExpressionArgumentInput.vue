@@ -101,6 +101,8 @@
             :organisation-id="organisationId"
             :repository-id="repositoryId"
             :entity-types="entityTypes"
+            :include-function-types="includeFunctionTypes"
+            :exclude-function-types="excludeFunctionTypes"
             @update:model-value="handleArgumentUpdate(index, $event)"
             @entity-clicked="$emit('entityClicked', $event)"
           >
