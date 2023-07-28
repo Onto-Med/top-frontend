@@ -329,6 +329,7 @@
     "allergy_intolerance": "Allergische Unverträglichkeit|Allergische Unverträglichkeiten",
     "clinical_impression": "Klinischer Eindruck|Klinische Eindrücke",
     "condition": "Zustand|Zustände",
+    "encounter": "Begegnung",
     "medication": "Medikation",
     "medication_administration": "Medikamentenverabreichung|Medikamentenverabreichungen",
     "medication_request": "Arzneimittelanforderung|Arzneimittelanforderungen",
