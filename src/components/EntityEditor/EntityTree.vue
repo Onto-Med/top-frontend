@@ -161,7 +161,6 @@ export default defineComponent({
 
     const visibleNodes = computed((): Entity[] => {
       if (!props.nodes) return []
-      if (!filterEntityType.value && !filterDataType.value && !filterItemType.value) return props.nodes
       return props.nodes.filter(n => {
         if (!props.allowedEntityTypes.includes(n.entityType)) return false
         if (filterEntityType.value && entityTypeOptions.value.includes(n.entityType) && n.entityType !== filterEntityType.value) return false
