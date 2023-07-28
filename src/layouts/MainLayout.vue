@@ -304,3 +304,8 @@ export default defineComponent({
 .main-content
   height: calc(100vh - 58px)
 </style>
+
+<style lang="sass">
+.main-content > .q-scrollarea__container > .q-scrollarea__content
+  width: 100%
+</style>
