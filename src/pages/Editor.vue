@@ -393,7 +393,13 @@ export default defineComponent({
         if (repository.value?.repositoryType === RepositoryType.ConceptRepository)
           return [EntityType.SingleConcept, EntityType.CompositeConcept]
         if (repository.value?.repositoryType === RepositoryType.PhenotypeRepository)
-          return [EntityType.SinglePhenotype, EntityType.CompositePhenotype, EntityType.Category]
+          return [
+            EntityType.SinglePhenotype,
+            EntityType.SingleRestriction,
+            EntityType.CompositePhenotype,
+            EntityType.CompositeRestriction,
+            EntityType.Category
+          ]
         return []
       }),
 
