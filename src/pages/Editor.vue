@@ -355,7 +355,7 @@ export default defineComponent({
           .then(() => {
             notify(t('thingRestored', { thing: t('version') }), 'positive')
             const index = tabs.value.findIndex(t => t.state.id == entity.id)
-            if (index !== -1) Object.assign(tabs.value[index].state, entity)
+            if (index !== -1) tabs.value[index].state = entity
           })
           .catch((e: Error) => renderError(e))
       },
