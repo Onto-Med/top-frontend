@@ -313,14 +313,19 @@ export const useEntity = defineStore('entity', {
         .then((r) => {
           if (organisationId !== this.organisationId || repositoryId !== this.repositoryId)
             throw new Error('Entity saved, but repository has been changed in the meantime.')
-          const existing = this.getEntity(r.data.id)
-          if (existing)
-            return Object.assign(existing, r.data)
-          else {
-            this.entities.push(r.data)
-            return this.getEntity(r.data.id) as Entity
-          }
+          return this.pushOrReplaceEntity(r.data) as Entity
         })
+    },
+
+    pushOrReplaceEntity(entity: Entity) {
+      if (!entity || !entity.id) return undefined
+      const index = this.entities.findIndex(e => e.id === entity.id)
+      if (index !== -1) {
+        this.entities[index] = entity
+      } else {
+        this.entities.push(entity)
+      }
+      return this.getEntity(entity.id)
     },
 
     async deleteEntity(entity: Entity, cascade?: boolean) {
@@ -379,10 +384,7 @@ export const useEntity = defineStore('entity', {
         }
 
       await this.entityApi.setCurrentEntityVersion(this.organisationId, this.repositoryId, entity.id, entity.version, undefined, undefined)
-        .then(() => {
-          const old = this.entities.find(e => e.id == entity.id)
-          if (old) Object.assign(old, entity)
-        })
+        .then(() => this.pushOrReplaceEntity(entity))
     },
 
     async loadChildren(entity: Entity): Promise<Entity[]> {
