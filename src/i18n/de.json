@@ -465,5 +465,12 @@
   "unnamedConcept": "Unbenanntes Konzept",
   "superConcept": "Super-Konzept|Super-Konzepte",
   "conceptEntity": "Such-Konzept",
-  "conceptEntitySelection": "Wählen Sie eines der Konzepte im linken Baum aus, indem Sie darauf klicken."
+  "conceptEntitySelection": "Wählen Sie eines der Konzepte im linken Baum aus, indem Sie darauf klicken.",
+  "select": "Wählen",
+  "terminologyImport": {
+    "title": "Import aus Terminologie",
+    "description": "Bitte wählen Sie mit dem Formular oben einen Code vom Terminologieserver aus. Die resultierende Entität wird hier angezeigt."
+  },
+  "withRestriction": "Mit Einschränkung|Mit Einschränkungen",
+  "entityImported": "Es wurden keine Entitäten importiert|Eine Entität wurde importiert|{count} Entitäten wurden importiert"
 }

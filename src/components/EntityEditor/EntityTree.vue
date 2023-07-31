@@ -73,7 +73,7 @@
               :allowed-entity-types="allowedEntityTypes"
               @delete-entity-clicked="handleDelete"
               @create-entity-clicked="handleCreateEntityClicked"
-              @duplicate-entity-clicked="$emit('duplicateEntity', $event)"
+              @duplicate-entity-clicked="handleEntityDuplication"
             />
             <slot v-else name="entity-context-menu" :entity="node" />
           </div>
@@ -83,6 +83,7 @@
         v-if="showContextMenu"
         :allowed-entity-types="allowedEntityTypes"
         @create-entity-clicked="handleCreateEntityClicked"
+        @duplicate-entity-clicked="handleEntityDuplication"
       />
       <slot v-else name="empty-context-menu" />
     </q-scroll-area>
@@ -290,6 +291,10 @@ export default defineComponent({
       treeNodes: computed((): TreeNode[] => {
         return toTree(visibleNodes.value, props.excludeTypeIfEmpty)
       }),
+
+      handleEntityDuplication (entity: Entity) {
+        emit('duplicateEntity', entity)
+      },
 
       handleSelectedChange (key: string): void {
         if (!key || !props.nodes) {

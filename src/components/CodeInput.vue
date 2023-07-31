@@ -9,6 +9,7 @@
     emit-value
     debounce="200"
     class="col"
+    :autofocus="autofocus"
     :placeholder="selection ? '' : t('searchForThing', { thing: t('code') })"
     :options="autoSuggestOptions"
     :loading="loading"
@@ -114,6 +115,7 @@ import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import { QInput, QSelect } from 'quasar'
 
 const props = defineProps({
+  autofocus: Boolean,
   /** Label of the button that is used to select a code. */
   btnLabel: String,
   /** Label of the button that is used to select a manual code. */
