@@ -128,7 +128,8 @@ function showTerminologyImportDialog () {
   $q.dialog({
     component: TerminologyImportDialog,
     componentProps: {
-      repositoryType: repository.value?.repositoryType
+      repositoryType: repository.value?.repositoryType,
+      superEntity: props.entity
     }
   }).onOk((result: Entity) => {
     if (props.entity) {

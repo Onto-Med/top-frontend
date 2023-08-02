@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { Code, DataType, EntityType, ItemType, NumberRestriction, Phenotype, RepositoryType, SingleConcept } from '@onto-med/top-api'
+import { Code, DataType, Entity, EntityType, ItemType, NumberRestriction, Phenotype, RepositoryType, SingleConcept } from '@onto-med/top-api'
 import { useDialogPluginComponent } from 'quasar'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -97,7 +97,8 @@ const props = defineProps({
   repositoryType: {
     type: String as () => RepositoryType,
     default: RepositoryType.PhenotypeRepository
-  }
+  },
+  superEntity: Object as () => Entity
 })
 
 defineEmits(['hide', 'ok'])
@@ -146,6 +147,7 @@ function toEntity (code: Code) {
       codes: [ code ],
       entityType: EntityType.SingleConcept,
       id: (uuidv4 as () => string)(),
+      superConcepts: props.superEntity ? [ props.superEntity ]: [],
       synonyms: code.synonyms?.map(s => ({ lang: locale.value, text: s })),
       titles: [ {
         lang: locale.value,
@@ -160,6 +162,7 @@ function toEntity (code: Code) {
       entityType: EntityType.SinglePhenotype,
       id: (uuidv4 as () => string)(),
       itemType: itemType.value,
+      superCategories: props.superEntity ? [ props.superEntity ]: [],
       synonyms: code.synonyms?.map(s => ({ lang: locale.value, text: s })),
       titles: [ {
         lang: locale.value,
