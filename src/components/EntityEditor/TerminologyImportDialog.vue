@@ -144,10 +144,13 @@ function toEntity (code: Code) {
   if (props.repositoryType === RepositoryType.ConceptRepository) {
     return {
       codes: [ code ],
-      entityType: EntityType.SinglePhenotype,
+      entityType: EntityType.SingleConcept,
       id: (uuidv4 as () => string)(),
       synonyms: code.synonyms?.map(s => ({ lang: locale.value, text: s })),
-      titles: [ { lang: locale.value, text: code.name } ]
+      titles: [ {
+        lang: locale.value,
+        text: (code.name || t('unnamedConcept'))
+      } ]
     } as SingleConcept
   }
   if (props.repositoryType === RepositoryType.PhenotypeRepository) {
@@ -158,7 +161,10 @@ function toEntity (code: Code) {
       id: (uuidv4 as () => string)(),
       itemType: itemType.value,
       synonyms: code.synonyms?.map(s => ({ lang: locale.value, text: s })),
-      titles: [ { lang: locale.value, text: code.name } ],
+      titles: [ {
+        lang: locale.value,
+        text: (code.name || t('unnamedPhenotype'))
+      } ],
       unit: dataType.value === DataType.Number ? unit.value : undefined
     } as Phenotype
   }

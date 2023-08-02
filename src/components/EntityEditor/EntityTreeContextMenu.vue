@@ -1,6 +1,6 @@
 <template>
   <q-menu context-menu>
-    <q-list v-if="!entity || entity.createdAt && [EntityType.Category,EntityType.SingleConcept].includes(entity.entityType)" dense>
+    <q-list v-if="createable && (!entity || entity.createdAt && [EntityType.Category,EntityType.SingleConcept].includes(entity.entityType))" dense>
       <q-item
         v-for="entityType in abstractEntityTypes"
         :key="entityType"
@@ -11,7 +11,7 @@
         <q-item-section>{{ t('addThing', { thing: t(entityType) }) }}</q-item-section>
       </q-item>
     </q-list>
-    <q-list v-else-if="entity && entity.createdAt" dense>
+    <q-list v-else-if="entity && createable && entity.createdAt" dense>
       <template v-for="entry in entries" :key="entry.phenotype">
         <q-item
           v-if="entity.entityType === entry.phenotype && allowedEntityTypes.includes(entry.restriction)"
@@ -24,6 +24,8 @@
       </template>
     </q-list>
 
+    <slot />
+
     <q-separator />
 
     <q-list v-if="duplicatable && entity && entity.createdAt" dense>
@@ -35,7 +37,7 @@
         <q-item-section>{{ t('duplicate') }}</q-item-section>
       </q-item>
     </q-list>
-    <q-list v-if="!entity || entity.createdAt && [EntityType.Category,EntityType.SingleConcept].includes(entity.entityType)" dense>
+    <q-list v-if="importable && (!entity || entity.createdAt && [EntityType.Category,EntityType.SingleConcept].includes(entity.entityType))" dense>
       <q-item v-close-popup clickable @click="showTerminologyImportDialog">
         <q-item-section v-t="'terminologyImport.title'" />
       </q-item>
@@ -60,6 +62,8 @@ import Dialog from 'src/components/Dialog.vue'
 import { useQuasar } from 'quasar'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import TerminologyImportDialog from './TerminologyImportDialog.vue'
+import { storeToRefs } from 'pinia'
+import { useEntity } from 'src/pinia/entity'
 
 const props = defineProps({
   entity: Object as () => Entity,
@@ -74,16 +78,25 @@ const props = defineProps({
   duplicatable: {
     type: Boolean,
     default: true
+  },
+  importable: {
+    type: Boolean,
+    default: true
+  },
+  createable: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(
-  ['deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked']
-)
+const emit = defineEmits([
+  'deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked'
+])
 
 const { t } = useI18n()
 const $q = useQuasar()
 const { isPhenotype, isCategory, isConcept } = useEntityFormatter()
+const { repository } = storeToRefs(useEntity())
 
 const entries = [
   { phenotype: EntityType.SinglePhenotype, restriction: EntityType.SingleRestriction },
@@ -114,6 +127,9 @@ function showDeleteDialog () {
 function showTerminologyImportDialog () {
   $q.dialog({
     component: TerminologyImportDialog,
+    componentProps: {
+      repositoryType: repository.value?.repositoryType
+    }
   }).onOk((result: Entity) => {
     if (props.entity) {
       if (isCategory(result)) result.superCategories = [ props.entity ]

@@ -69,19 +69,28 @@
             <q-badge v-show="!node.createdAt" v-t="'new'" color="accent" class="q-ml-sm" />
             <entity-tree-context-menu
               v-if="showContextMenu"
-              :entity="node"
               :allowed-entity-types="allowedEntityTypes"
+              :createable="createable"
+              :deletable="deletable"
+              :duplicatable="duplicatable"
+              :entity="node"
+              :importable="importable"
               @delete-entity-clicked="handleDelete"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="handleEntityDuplication"
-            />
-            <slot v-else name="entity-context-menu" :entity="node" />
+            >
+              <slot name="entity-context-menu" :entity="node" />
+            </entity-tree-context-menu>
           </div>
         </template>
       </q-tree>
       <entity-tree-context-menu
         v-if="showContextMenu"
         :allowed-entity-types="allowedEntityTypes"
+        :createable="createable"
+        :deletable="deletable"
+        :duplicatable="duplicatable"
+        :importable="importable"
         @create-entity-clicked="handleCreateEntityClicked"
         @duplicate-entity-clicked="handleEntityDuplication"
       />
@@ -141,6 +150,22 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    createable: {
+      type: Boolean,
+      default: true
+    },
+    deletable: {
+      type: Boolean,
+      default: true
+    },
+    duplicatable: {
+      type: Boolean,
+      default: true
+    },
+    importable: {
+      type: Boolean,
+      default: true
+    }
   },
   emits: ['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity'],
   setup (props, { emit }) {
