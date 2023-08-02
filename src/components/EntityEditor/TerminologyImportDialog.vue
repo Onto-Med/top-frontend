@@ -71,7 +71,7 @@
 
       <q-card-actions align="right">
         <q-btn flat :label="t('cancel')" color="primary" @click="onCancelClick" />
-        <q-btn flat :disable="!entity" :label="t('import')" color="primary" @click="onOkClick" />
+        <q-btn flat :disable="!isValid" :label="t('import')" color="primary" @click="onOkClick" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -104,7 +104,7 @@ defineEmits(['hide', 'ok'])
 
 const { locale, t } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
-const { isPhenotype } = useEntityFormatter()
+const { isPhenotype, isConcept } = useEntityFormatter()
 const entityStore = useEntity()
 const { notify, renderError } = useNotify()
 const onCancelClick = onDialogCancel
@@ -119,6 +119,16 @@ const entity = computed(() => {
   if (selection.value)
     return toEntity(selection.value)
   return undefined
+})
+
+const isValid = computed(() => {
+  if (isPhenotype(entity.value)) {
+    return entity.value.dataType !== undefined
+  }
+  if (isConcept(entity.value)) {
+    return true
+  }
+  return false
 })
 
 function addRestriction () {
