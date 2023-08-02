@@ -49,7 +49,7 @@
                   v-model:minimum="(restriction.values as (number|Date|undefined)[])[0]"
                   v-model:max-operator="restriction.maxOperator"
                   v-model:maximum="(restriction.values as (number|Date|undefined)[])[1]"
-                  :type="restriction.type"
+                  :type="entity.dataType"
                   class="col no-wrap"
                 />
                 <q-btn flat class="col-auto" icon="clear" @click="restrictions.splice(index, 1)" />
@@ -104,7 +104,7 @@ defineEmits(['hide', 'ok'])
 
 const { locale, t } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
-const { isPhenotype, isConcept } = useEntityFormatter()
+const { isPhenotype, isConcept, restrictionToString } = useEntityFormatter()
 const entityStore = useEntity()
 const { notify, renderError } = useNotify()
 const onCancelClick = onDialogCancel
@@ -169,11 +169,23 @@ function onOkClick () {
   if (!entity.value) return
   entityStore.saveEntity(entity.value)
     .then(() => {
-      // TODO: create restrictions
-      // TODO: derive title from range specification
+      if (props.repositoryType === RepositoryType.PhenotypeRepository) {
+        return Promise.all(restrictions.value.map(async r => {
+          await entityStore.saveEntity({
+            id: (uuidv4 as () => string)(),
+            dataType: DataType.Boolean,
+            entityType: EntityType.SingleRestriction,
+            superPhenotype: entity.value,
+            titles: [ { lang: locale.value, text: restrictionToString(r) }],
+            restriction: r
+          } as Phenotype)
+        }))
+      }
     })
-    .then(() => onDialogOK())
-    .then(() => notify(t('entityImported', { count: restrictions.value.length + 1 }), 'positive'))
+    .then((r) => {
+      onDialogOK()
+      notify(t('entityImported', { count: (r?.length || 0) + 1 }), 'positive')
+    })
     .catch((e: Error) => renderError(e))
 }
 </script>

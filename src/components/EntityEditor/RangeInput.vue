@@ -56,78 +56,78 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { DataType, RestrictionOperator } from '@onto-med/top-api'
-import { computed, defineComponent } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  props: {
-    unit: String,
-    minimum: [Number, Date],
-    maximum: [Number, Date],
-    minOperator: String,
-    maxOperator: String,
-    minOperators: {
-      type: Array,
-      default: () => [
-        RestrictionOperator.GreaterThanOrEqualTo,
-        RestrictionOperator.GreaterThan
-      ]
-    },
-    maxOperators: {
-      type: Array,
-      default: () => [
-        RestrictionOperator.LessThanOrEqualTo,
-        RestrictionOperator.LessThan
-      ]
-    },
-    readonly: Boolean,
-    type: String
+const props = defineProps({
+  unit: String,
+  minimum: [Number, Date],
+  maximum: [Number, Date],
+  minOperator: String,
+  maxOperator: String,
+  minOperators: {
+    type: Array,
+    default: () => [
+      RestrictionOperator.GreaterThanOrEqualTo,
+      RestrictionOperator.GreaterThan
+    ]
   },
-  emits: ['update:minimum', 'update:maximum', 'update:minOperator', 'update:maxOperator'],
-  setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n()
-
-    return {
-      t,
-
-      minimumValue: computed(() => {
-        if (props.type === DataType.DateTime && props.minimum instanceof Date)
-          return props.minimum.toISOString().substr(0, 16)
-        return props.minimum
-      }),
-
-      maximumValue: computed(() => {
-        if (props.type === DataType.DateTime && props.maximum instanceof Date)
-          return props.maximum.toISOString().substr(0, 16)
-        return props.maximum
-      }),
-
-      inputType: computed(() => {
-        if (props.type === DataType.DateTime) return 'datetime-local'
-        return props.type
-      }),
-
-      updateMinimum: (value: number|Date) => {
-        if (props.type === DataType.Number) {
-          emit('update:minimum', value as number)
-        } else if (props.type === DataType.DateTime) {
-          emit('update:minimum', value ? new Date(value) : undefined)
-        }
-      },
-
-      updateMaximum: (value: number|Date) => {
-        if (props.type === DataType.Number) {
-          emit('update:maximum', value as number)
-        } else if (props.type === DataType.DateTime) {
-          emit('update:maximum', value ? new Date(value) : undefined)
-        }
-      }
-    }
-  }
+  maxOperators: {
+    type: Array,
+    default: () => [
+      RestrictionOperator.LessThanOrEqualTo,
+      RestrictionOperator.LessThan
+    ]
+  },
+  readonly: Boolean,
+  type: String
 })
+
+const emit = defineEmits([
+  'update:minimum', 'update:maximum', 'update:minOperator', 'update:maxOperator'
+])
+
+const { t } = useI18n()
+
+if (!props.minOperator)
+  emit('update:minOperator', RestrictionOperator.GreaterThanOrEqualTo)
+if (!props.maxOperator)
+  emit('update:maxOperator', RestrictionOperator.LessThan)
+
+const minimumValue = computed(() => {
+  if (props.type === DataType.DateTime && props.minimum instanceof Date)
+    return props.minimum.toISOString().substr(0, 16)
+  return props.minimum
+})
+
+const maximumValue = computed(() => {
+  if (props.type === DataType.DateTime && props.maximum instanceof Date)
+    return props.maximum.toISOString().substr(0, 16)
+  return props.maximum
+})
+
+const inputType = computed(() => {
+  if (props.type === DataType.DateTime) return 'datetime-local'
+  return props.type
+})
+
+function updateMinimum (value?: number|Date) {
+  if (props.type === DataType.Number) {
+    emit('update:minimum', value)
+  } else if (props.type === DataType.DateTime) {
+    emit('update:minimum', value ? new Date(value) : undefined)
+  }
+}
+
+function updateMaximum (value?: number|Date) {
+  if (props.type === DataType.Number) {
+    emit('update:maximum', value)
+  } else if (props.type === DataType.DateTime) {
+    emit('update:maximum', value ? new Date(value) : undefined)
+  }
+}
 </script>
 
 <style lang="sass" scoped>
