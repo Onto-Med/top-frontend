@@ -1,6 +1,6 @@
 <template #append>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
-    <q-card>
+    <q-card class="dialog-content">
       <q-card-section>
         <div v-t="'terminologyImport.title'" class="text-h6" />
       </q-card-section>
@@ -8,19 +8,17 @@
       <q-separator />
 
       <q-card-section>
-        <code-input
-          :btn-label="t('select')"
-          :btn-manual-label="t('select')"
-          btn-icon-name="file_download"
-          autofocus
-          @select="selection = $event"
-        />
+        <code-input no-btn autofocus @select="selection = $event" />
       </q-card-section>
 
       <q-separator />
 
       <q-card-section class="q-pa-none">
-        <div v-if="!entity" v-t="'terminologyImport.description'" class="text-italic q-pa-md" />
+        <div
+          v-if="!entity"
+          v-t="'terminologyImport.description'"
+          class="text-italic q-pa-md"
+        />
         <div v-else>
           <div class="row q-px-sm q-pb-sm">
             <entity-display
@@ -169,3 +167,8 @@ function onOkClick () {
     .catch((e: Error) => renderError(e))
 }
 </script>
+
+<style lang="sass">
+.dialog-content
+  min-width: 30vw
+</style>

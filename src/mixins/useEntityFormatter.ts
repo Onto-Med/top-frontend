@@ -35,16 +35,19 @@ export default function (this: void) {
      * @param entity the entity
      * @returns true if entity is a phenotype
      */
-  const isPhenotype = (entity: Entity): entity is Phenotype => {
-    return [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(entity.entityType)
+  const isPhenotype = (entity?: Entity): entity is Phenotype => {
+    return entity !== undefined
+      && [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(entity.entityType)
   }
 
-  const isCategory = (entity: Entity): entity is Category => {
-    return entity.entityType === EntityType.Category
+  const isCategory = (entity?: Entity): entity is Category => {
+    return entity !== undefined
+      && entity.entityType === EntityType.Category
   }
 
-  const isConcept = (entity: Entity): entity is Concept => {
-    return [EntityType.CompositeConcept, EntityType.SingleConcept].includes(entity.entityType)
+  const isConcept = (entity?: Entity): entity is Concept => {
+    return entity !== undefined
+      && [EntityType.CompositeConcept, EntityType.SingleConcept].includes(entity.entityType)
   }
 
   /**

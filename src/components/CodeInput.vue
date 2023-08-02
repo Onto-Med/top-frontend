@@ -17,6 +17,7 @@
     @filter="autoSuggest"
     @virtual-scroll="onScroll"
     @keyup.enter="select(selection)"
+    @update:model-value="noBtn ? select($event) : undefined"
   >
     <template #selected>
       <span v-show="selection">
@@ -67,7 +68,7 @@
         class="system-input"
       />
     </template>
-    <template #after>
+    <template v-if="!noBtn" #after>
       <q-btn
         color="primary"
         :icon="btnIconName"
@@ -134,7 +135,12 @@ const props = defineProps({
   manualEntry: {
     type: Boolean,
     default: false
-  }
+  },
+  /**
+   * Set to true to hide button next to the select field.
+   * Selecting a code will automatically emit 'select'.
+   */
+  noBtn: Boolean
 })
 
 const emit = defineEmits(['select'])
