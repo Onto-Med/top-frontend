@@ -23,6 +23,9 @@
         </q-item>
       </template>
     </q-list>
+
+    <q-separator />
+
     <q-list v-if="duplicatable && entity && entity.createdAt" dense>
       <q-item
         v-close-popup
@@ -37,7 +40,6 @@
         <q-item-section v-t="'terminologyImport.title'" />
       </q-item>
     </q-list>
-    <q-separator />
     <q-list v-if="deletable && entity" dense>
       <q-item
         v-close-popup
