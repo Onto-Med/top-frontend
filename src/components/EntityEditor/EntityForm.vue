@@ -189,7 +189,7 @@
         @update:model-value="$emit('update:descriptions', $event)"
       />
 
-      <code-input
+      <code-input-card
         :model-value="codes"
         :readonly="readonly"
         :expanded="codes && codes.length > 0"
@@ -222,7 +222,7 @@ import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UnitInput from 'src/components/UnitInput.vue'
-import CodeInput from 'src/components/EntityEditor/CodeInput.vue'
+import CodeInputCard from 'src/components/EntityEditor/CodeInputCard.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import {useEntity} from 'src/pinia/entity'
 import {useRouter} from 'vue-router'
@@ -235,7 +235,7 @@ export default defineComponent({
     RestrictionInput,
     ExpressionInput,
     UnitInput,
-    CodeInput,
+    CodeInputCard,
     EntityChip
   },
   props: {

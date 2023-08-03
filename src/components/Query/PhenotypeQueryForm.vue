@@ -49,21 +49,23 @@
         <entity-tree
           :nodes="entities"
           :loading="treeLoading"
+          show-context-menu
+          :createable="false"
+          :deletable="false"
+          :duplicatable="false"
           class="col column full-width"
           @refresh-clicked="reloadEntities"
           @update:selected="addCriterion($event); addSelection($event)"
         >
           <template #entity-context-menu="props">
-            <q-menu context-menu>
-              <q-list dense>
-                <q-item v-close-popup clickable @click="addSelection(props.entity)">
-                  <q-item-section>{{ t('addAsThing', { thing: t('projectionEntry') }) }}</q-item-section>
-                </q-item>
-                <q-item v-close-popup clickable @click="addCriterion(props.entity)">
-                  <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
+            <q-list v-show="!isCategory(props.entity)" dense>
+              <q-item v-close-popup clickable @click="addSelection(props.entity)">
+                <q-item-section>{{ t('addAsThing', { thing: t('projectionEntry') }) }}</q-item-section>
+              </q-item>
+              <q-item v-close-popup clickable :disable="isPhenotype(props.entity) && props.entity.dataType !== DataType.Boolean" @click="addCriterion(props.entity)">
+                <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
+              </q-item>
+            </q-list>
           </template>
         </entity-tree>
       </div>
@@ -203,7 +205,7 @@ import { exportFile, useQuasar } from 'quasar'
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
 const $q = useQuasar()
-const { isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
+const { isCategory, isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
 const entityStore = useEntity()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)

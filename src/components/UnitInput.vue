@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-select
+      :dense="dense"
       emit-value
       use-input
       input-debounce="200"
@@ -45,7 +46,8 @@ export default defineComponent({
     modelValue: String,
     readonly: Boolean,
     showLabel: Boolean,
-    fixedWidth: Boolean
+    fixedWidth: Boolean,
+    dense: Boolean
   },
   emits: ['update:modelValue'],
   setup (props) {

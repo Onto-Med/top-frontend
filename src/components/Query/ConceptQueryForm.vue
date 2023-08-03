@@ -58,6 +58,10 @@
           v-model:selected="entity"
           :nodes="entities"
           :loading="treeLoading"
+          show-context-menu
+          :createable="false"
+          :deletable="false"
+          :duplicatable="false"
           class="col column full-width"
           @refresh-clicked="reloadEntities"
         />

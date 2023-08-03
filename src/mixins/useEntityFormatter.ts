@@ -2,14 +2,17 @@ import {
   Category,
   Concept,
   DataType,
+  DateTimeRestriction,
   Entity,
   EntityType,
   LocalisableText,
+  NumberRestriction,
   Organisation,
   Permission,
   Phenotype,
   Repository,
-  RepositoryType
+  RepositoryType,
+  RestrictionOperator
 } from '@onto-med/top-api'
 import {useEntity} from 'src/pinia/entity'
 import {useI18n} from 'vue-i18n'
@@ -35,16 +38,19 @@ export default function (this: void) {
      * @param entity the entity
      * @returns true if entity is a phenotype
      */
-  const isPhenotype = (entity: Entity): entity is Phenotype => {
-    return [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(entity.entityType)
+  const isPhenotype = (entity?: Entity): entity is Phenotype => {
+    return entity !== undefined
+      && [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(entity.entityType)
   }
 
-  const isCategory = (entity: Entity): entity is Category => {
-    return entity.entityType === EntityType.Category
+  const isCategory = (entity?: Entity): entity is Category => {
+    return entity !== undefined
+      && entity.entityType === EntityType.Category
   }
 
-  const isConcept = (entity: Entity): entity is Concept => {
-    return [EntityType.CompositeConcept, EntityType.SingleConcept].includes(entity.entityType)
+  const isConcept = (entity?: Entity): entity is Concept => {
+    return entity !== undefined
+      && [EntityType.CompositeConcept, EntityType.SingleConcept].includes(entity.entityType)
   }
 
   /**
@@ -99,6 +105,15 @@ export default function (this: void) {
       title += ' [' + entity.unit + ']'
 
     return superPhenotypePrefix + title
+  }
+
+  const rotateOperator = (operator: RestrictionOperator): RestrictionOperator => {
+    switch (operator) {
+      case RestrictionOperator.GreaterThan: return RestrictionOperator.LessThan
+      case RestrictionOperator.GreaterThanOrEqualTo: return RestrictionOperator.LessThanOrEqualTo
+      case RestrictionOperator.LessThan: return RestrictionOperator.GreaterThan
+      case RestrictionOperator.LessThanOrEqualTo: return RestrictionOperator.GreaterThanOrEqualTo
+    }
   }
 
   return {
@@ -191,6 +206,23 @@ export default function (this: void) {
         EntityType.CompositeRestriction,
         EntityType.SingleRestriction
       ]
+    },
+
+    restrictionToString(this: void, restriction?: NumberRestriction|DateTimeRestriction): string {
+      let result = ''
+      if (restriction?.values?.length !== 0) {
+        const values = restriction?.values as (number|Date)[]
+        if (restriction?.minOperator && values[0]) {
+          result += `${values[0].toString()} ${rotateOperator(restriction.minOperator)} x`
+        }
+        if (restriction?.maxOperator && values[1]) {
+          if (result === '') result += 'x'
+          result += ` ${restriction.maxOperator} ${values[1].toString()}`
+        }
+      } else {
+        return t('unnamedRestriction')
+      }
+      return result
     },
 
     phenotypeEntityTypes(this: void): EntityType[] {
