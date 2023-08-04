@@ -60,6 +60,7 @@
 import { DataType, RestrictionOperator } from '@onto-med/top-api'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { date } from 'quasar'
 
 const props = defineProps({
   unit: String,
@@ -98,34 +99,36 @@ if (!props.maxOperator)
 
 const minimumValue = computed(() => {
   if (props.type === DataType.DateTime && props.minimum instanceof Date)
-    return props.minimum.toISOString().substr(0, 16)
-  return props.minimum
+    return date.formatDate(props.minimum, 'YYYY-MM-DDTHH:mm')
+  return props.minimum as number
 })
 
 const maximumValue = computed(() => {
   if (props.type === DataType.DateTime && props.maximum instanceof Date)
-    return props.maximum.toISOString().substr(0, 16)
-  return props.maximum
+    return date.formatDate(props.maximum, 'YYYY-MM-DDTHH:mm')
+  return props.maximum as number
 })
 
 const inputType = computed(() => {
-  if (props.type === DataType.DateTime) return 'datetime-local'
-  return props.type
+  if (props.type === DataType.DateTime) return 'datetime-local' as 'text'
+  return 'number'
 })
 
-function updateMinimum (value?: number|Date) {
+function updateMinimum (value?: number|string|null) {
+  if (!value) emit('update:minimum', undefined)
   if (props.type === DataType.Number) {
-    emit('update:minimum', value)
+    emit('update:minimum', value as number)
   } else if (props.type === DataType.DateTime) {
-    emit('update:minimum', value ? new Date(value) : undefined)
+    emit('update:minimum', new Date(value as string))
   }
 }
 
-function updateMaximum (value?: number|Date) {
+function updateMaximum (value?: number|string|null) {
+  if (!value) emit('update:maximum', undefined)
   if (props.type === DataType.Number) {
-    emit('update:maximum', value)
+    emit('update:maximum', value as number)
   } else if (props.type === DataType.DateTime) {
-    emit('update:maximum', value ? new Date(value) : undefined)
+    emit('update:maximum', new Date(value as string))
   }
 }
 </script>

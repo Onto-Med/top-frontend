@@ -211,13 +211,17 @@ export default function (this: void) {
     restrictionToString(this: void, restriction?: NumberRestriction|DateTimeRestriction): string {
       let result = ''
       if (restriction?.values?.length !== 0) {
-        const values = restriction?.values as (number|Date)[]
-        if (restriction?.minOperator && values[0]) {
-          result += `${values[0].toString()} ${rotateOperator(restriction.minOperator)} x`
-        }
-        if (restriction?.maxOperator && values[1]) {
-          if (result === '') result += 'x'
-          result += ` ${restriction.maxOperator} ${values[1].toString()}`
+        const values = restriction?.values as (number|Date|string)[]
+        if (restriction?.minOperator || restriction?.maxOperator) {
+          if (restriction?.minOperator && values[0]) {
+            result += `${values[0].toString()} ${rotateOperator(restriction.minOperator)} x`
+          }
+          if (restriction?.maxOperator && values[1]) {
+            if (result === '') result += 'x'
+            result += ` ${restriction.maxOperator} ${values[1].toString()}`
+          }
+        } else {
+          result += values.join(', ').substring(0, 100)
         }
       } else {
         return t('unnamedRestriction')
