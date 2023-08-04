@@ -50,13 +50,19 @@
             />
             <q-btn
               flat
-              icon="clear"
+              icon="delete"
               :title="t('clearThing', { thing: t('dateTimeRestriction') })"
               class="col-auto"
               @click="clearDateTimeRestriction()"
             />
           </div>
         </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn v-close-popup flat :label="t('close')" />
+        </q-card-actions>
       </q-card>
     </q-dialog>
   </div>
@@ -110,8 +116,6 @@ export default defineComponent({
       showDialog: ref(false),
 
       clearDateTimeRestriction () {
-        state.minOperator = undefined
-        state.maxOperator = undefined
         state.values = []
       },
 
