@@ -43,8 +43,8 @@
             <range-input
               v-model:minimum="minimum"
               v-model:maximum="maximum"
-              v-model:min-operator="state.minOperator"
-              v-model:max-operator="state.maxOperator"
+              v-model:min-operator="minOperator"
+              v-model:max-operator="maxOperator"
               :type="DataType.DateTime"
               class="col"
             />
@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, watch } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DateTimeRestriction, DataType, ExpressionFunction } from '@onto-med/top-api'
 import RangeInput from '../EntityEditor/RangeInput.vue'
@@ -100,40 +100,64 @@ export default defineComponent({
   setup (props, { emit }) {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
-    const state = reactive(JSON.parse(JSON.stringify(props.dateTimeRestriction)) as DateTimeRestriction)
 
-    watch(
-      () => state,
-      () => emit('update:dateTimeRestriction', state),
-      { deep: true }
-    )
+    const clone = (restriction: DateTimeRestriction) => (
+      {
+        type: DataType.DateTime,
+        minOperator: restriction.minOperator,
+        maxOperator: restriction.maxOperator,
+        values: restriction.values?.slice()
+      } as DateTimeRestriction)
 
     return {
       t,
       te,
-      state,
       DataType,
       showDialog: ref(false),
 
       clearDateTimeRestriction () {
-        state.values = []
+        let newModelValue = JSON.parse(JSON.stringify(props.dateTimeRestriction)) as DateTimeRestriction
+        newModelValue.values = []
+        emit('update:dateTimeRestriction', newModelValue)
       },
 
       minimum: computed({
-        get: () => state.values ? state.values[0] : undefined,
+        get: () => props.dateTimeRestriction.values ? props.dateTimeRestriction.values[0] : undefined,
         set: (val) => {
-          if (!state.values) state.values = []
-          state.values[0] = val as Date
-          state.values[1] = state.values[1]
+          let newModelValue = clone(props.dateTimeRestriction)
+          if (!newModelValue.values) newModelValue.values = []
+          newModelValue.values[0] = val as Date
+          newModelValue.values[1] = newModelValue.values[1]
+          emit('update:dateTimeRestriction', newModelValue)
         }
       }),
 
       maximum: computed({
-        get: () => state.values ? state.values[1] : undefined,
+        get: () => props.dateTimeRestriction.values ? props.dateTimeRestriction.values[1] : undefined,
         set: (val) => {
-          if (!state.values) state.values = []
-          state.values[1] = val as Date
-          state.values[0] = state.values[0]
+          let newModelValue = clone(props.dateTimeRestriction)
+          if (!newModelValue.values) newModelValue.values = []
+          newModelValue.values[1] = val as Date
+          newModelValue.values[0] = newModelValue.values[0]
+          emit('update:dateTimeRestriction', newModelValue)
+        }
+      }),
+
+      minOperator: computed({
+        get: () => props.dateTimeRestriction.minOperator,
+        set: (val) => {
+          let newModelValue = clone(props.dateTimeRestriction)
+          newModelValue.minOperator = val
+          emit('update:dateTimeRestriction', newModelValue)
+        }
+      }),
+
+      maxOperator: computed({
+        get: () => props.dateTimeRestriction.maxOperator,
+        set: (val) => {
+          let newModelValue = clone(props.dateTimeRestriction)
+          newModelValue.maxOperator = val
+          emit('update:dateTimeRestriction', newModelValue)
         }
       })
     }
