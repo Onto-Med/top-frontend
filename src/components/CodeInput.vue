@@ -189,11 +189,14 @@ function select (entry?: Code, manual = false) {
   selection.value = undefined
   if (manual) {
     if (entry)
-      manualCode.value = { code: entry.code, codeSystem: entry.codeSystem }
+      manualCode.value = {
+        code: entry.code,
+        codeSystem: JSON.parse(JSON.stringify(entry.codeSystem)) as CodeSystem
+      }
     manualCodeInput.value?.select()
-  }
-  else
+  } else {
     codeInput.value?.focus()
+  }
 }
 
 function autoSuggest (searchString: string, update: (callBackFn: () => void) => void, abort: () => void) {
