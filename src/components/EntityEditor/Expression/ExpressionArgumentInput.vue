@@ -53,7 +53,7 @@
         <expression-context-menu
           v-if="!readonly"
           :include-function-types="includeFunctionTypes"
-          :exclude-function-types="excludeFunctionTypes"
+          :exclude-functions="excludeFunctions"
           @enclose="enclose()"
           @remove="clear()"
           @select="setFunction($event)"
@@ -86,6 +86,7 @@
               v-if="!readonly"
               :include-function-types="includeFunctionTypes"
               :exclude-function-types="excludeFunctionTypes"
+              :exclude-functions="excludeFunctions"
               @enclose="enclose()"
               @remove="clear()"
               @select="setFunction($event)"
@@ -103,6 +104,7 @@
             :entity-types="entityTypes"
             :include-function-types="includeFunctionTypes"
             :exclude-function-types="excludeFunctionTypes"
+            :exclude-functions="excludeFunctions"
             @update:model-value="handleArgumentUpdate(index, $event)"
             @entity-clicked="$emit('entityClicked', $event)"
           >
@@ -143,6 +145,7 @@
             v-if="!readonly"
             :include-function-types="includeFunctionTypes"
             :exclude-function-types="excludeFunctionTypes"
+            :exclude-functions="excludeFunctions"
             @enclose="enclose()"
             @remove="clear()"
             @select="setFunction($event)"
@@ -166,6 +169,7 @@
         :enclosable="false"
         :include-function-types="includeFunctionTypes"
         :exclude-function-types="excludeFunctionTypes"
+        :exclude-functions="excludeFunctions"
         @select="setFunction($event)"
         @remove="clear()"
       />
@@ -220,7 +224,8 @@ export default defineComponent({
     repositoryId: String,
     entityTypes: Array as () => EntityType[],
     includeFunctionTypes: Array as () => string[],
-    excludeFunctionTypes: Array as () => string[]
+    excludeFunctionTypes: Array as () => string[],
+    excludeFunctions: Array as () => string[]
   },
   emits: ['update:modelValue', 'entityClicked'],
   setup(props, { emit }) {

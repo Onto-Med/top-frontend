@@ -74,7 +74,8 @@ export default defineComponent({
       default: true
     },
     includeFunctionTypes: Array as () => string[],
-    excludeFunctionTypes: Array as () => string[]
+    excludeFunctionTypes: Array as () => string[],
+    excludeFunctions: Array as () => string[]
   },
   emits: ['enclose', 'remove', 'select'],
   setup (props) {
@@ -117,7 +118,9 @@ export default defineComponent({
       ),
 
       functionGroups: computed(() => {
-        return functions.value?.reduce((map, f) => {
+        return functions.value?.filter(
+          f => !props.excludeFunctions || !!f && !props.excludeFunctions.includes(f.id)
+        ).reduce((map, f) => {
           const t = f.type || 'none'
           var entry = map.get(t)
           if (entry) entry.push(f)
