@@ -155,7 +155,8 @@
         :organisation-id="organisationId"
         :repository-id="repositoryId"
         :entity-types="[EntityType.CompositeConcept, EntityType.SingleConcept]"
-        :include-function-types="['textFunction']"
+        :include-function-types="['component', 'textFunction']"
+        :exclude-functions="['Constant']"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />

@@ -54,80 +54,75 @@
   </q-menu>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { ExpressionFunction } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
-import { computed, defineComponent, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  name: 'ExpressionContextMenu',
-  props: {
-    enclosable: {
-      type: Boolean,
-      default: true
-    },
-    removable: {
-      type: Boolean,
-      default: true
-    },
-    includeFunctionTypes: Array as () => string[],
-    excludeFunctionTypes: Array as () => string[]
+const props = defineProps({
+  enclosable: {
+    type: Boolean,
+    default: true
   },
-  emits: ['enclose', 'remove', 'select'],
-  setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, te } = useI18n()
-    const entityStore = useEntity()
-    const { renderError } = useNotify()
-    const { functions } = storeToRefs(entityStore)
-    const filter = ref<string[]|undefined>(undefined)
-    const functionTypes = computed(() => {
-      return functions.value?.map(f => f.type)
-        .filter((t, index, self) => self.indexOf(t) === index)
-        .filter(t => !props.includeFunctionTypes || !!t && props.includeFunctionTypes.includes(t))
-        .filter(t => !props.excludeFunctionTypes || !!t && !props.excludeFunctionTypes.includes(t))
-        .map(type => {
-          const x = type || 'none'
-          return {
-            label: te('functionType.' + x) ? t('functionType.' + x) : x,
-            value: x
-          }
-        })
-    })
-
-    onMounted(() => {
-      if (!functions.value)
-        entityStore.reloadFunctions()
-          .catch((e: Error) => renderError(e))
-    })
-
-    return {
-      t,
-      te,
-      filter,
-      functionTypes,
-
-      filteredFunctionTypes: computed(() =>
-        (!filter.value || filter.value.length === 0)
-          ? functionTypes.value
-          : functionTypes.value?.filter(t => filter.value?.includes(t.value))
-      ),
-
-      functionGroups: computed(() => {
-        return functions.value?.reduce((map, f) => {
-          const t = f.type || 'none'
-          var entry = map.get(t)
-          if (entry) entry.push(f)
-          else map.set(t, [ f ])
-          return map
-        }, new Map() as Map<string, ExpressionFunction[]>) || new Map()
-      })
-    };
+  removable: {
+    type: Boolean,
+    default: true
   },
+  includeFunctionTypes: Array as () => string[],
+  excludeFunctionTypes: Array as () => string[],
+  excludeFunctions: Array as () => string[]
 })
+defineEmits(['enclose', 'remove', 'select'])
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
+const entityStore = useEntity()
+const { renderError } = useNotify()
+const { functions } = storeToRefs(entityStore)
+const filter = ref<string[]|undefined>(undefined)
+const functionTypes = computed(() => {
+  return functions.value?.map(f => f.type)
+    .filter((t, index, self) => self.indexOf(t) === index)
+    .filter(t => !props.includeFunctionTypes || !!t && props.includeFunctionTypes.includes(t))
+    .filter(t => !props.excludeFunctionTypes || !!t && !props.excludeFunctionTypes.includes(t))
+    .map(type => {
+      const x = type || 'none'
+      return {
+        label: te('functionType.' + x) ? t('functionType.' + x) : x,
+        value: x
+      }
+    })
+})
+
+onMounted(() => {
+  if (!functions.value)
+    entityStore.reloadFunctions()
+      .catch((e: Error) => renderError(e))
+})
+
+const filteredFunctionTypes = computed(() =>
+  (!filter.value || filter.value.length === 0)
+    ? functionTypes.value
+    : functionTypes.value?.filter(t => filter.value?.includes(t.value))
+)
+
+const functionGroups = computed(() =>
+  functions.value?.filter(
+    f => !props.excludeFunctions || !!f && !props.excludeFunctions.includes(f.id)
+  ).reduce(
+    (map, f) => {
+      const t = f.type || 'none'
+      var entry = map.get(t)
+      if (entry) entry.push(f)
+      else map.set(t, [ f ])
+      return map
+    },
+    new Map() as Map<string, ExpressionFunction[]>
+  ) || new Map()
+)
 </script>
 
 <style lang="sass" scoped>

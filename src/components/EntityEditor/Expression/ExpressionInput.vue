@@ -42,6 +42,7 @@
         :entity-types="entityTypes"
         :include-function-types="includeFunctionTypes"
         :exclude-function-types="excludeFunctionTypes"
+        :exclude-functions="excludeFunctions"
         root
         @update:model-value="$emit('update:modelValue', $event)"
         @entity-clicked="$emit('entityClicked', $event)"
@@ -116,7 +117,8 @@ export default defineComponent({
     },
     canBeSwitch: Boolean,
     includeFunctionTypes: Array as () => string[],
-    excludeFunctionTypes: Array as () => string[]
+    excludeFunctionTypes: Array as () => string[],
+    excludeFunctions: Array as () => string[]
   },
   emits: ['update:modelValue', 'entityClicked'],
   setup (props, { emit }) {
