@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import { DataType, RestrictionOperator } from '@onto-med/top-api'
-import { computed } from 'vue'
+import { computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { date } from 'quasar'
 
@@ -92,10 +92,13 @@ const emit = defineEmits([
 
 const { t } = useI18n()
 
-if (!props.minOperator)
-  emit('update:minOperator', RestrictionOperator.GreaterThanOrEqualTo)
-if (!props.maxOperator)
-  emit('update:maxOperator', RestrictionOperator.LessThan)
+void nextTick(() => {
+  if (!props.minOperator)
+    emit('update:minOperator', RestrictionOperator.GreaterThanOrEqualTo)
+}).then(() => {
+  if (!props.maxOperator)
+    emit('update:maxOperator', RestrictionOperator.LessThan)
+})
 
 const minimumValue = computed(() => {
   if (props.type === DataType.DateTime && props.minimum instanceof Date)
