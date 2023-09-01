@@ -4,7 +4,7 @@
       <q-input v-model="query.name" :label="t('queryName')" type="text" />
       <q-select
         v-model="language"
-        :options="languages"
+        :options="languageOptions"
         :label="t('language')"
         :error="!language"
         emit-value
@@ -140,7 +140,7 @@ import EntityDisplay from '../EntityEditor/EntityDisplay.vue'
 import { languages } from 'src/config'
 
 const emit = defineEmits(['execute'])
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const $q = useQuasar()
 const entityStore = useEntity()
 const { renderError } = useNotify()
@@ -149,7 +149,12 @@ const { entities, repository, organisation } = storeToRefs(entityStore)
 const name = ref<string>()
 const dataSource = ref<string>()
 const entity = ref<SingleConcept|CompositeConcept>()
-const language = ref<string|undefined>(`${locale.value}`)
+const allString = 'all'
+const language = ref<string|undefined>(allString)
+
+const languageOptions = computed(
+  () => languages.concat({ value: allString, label: t('allLanguages', 2) })
+)
 
 const treeLoading = ref(false)
 const importFile = ref(undefined as File|undefined)
@@ -220,14 +225,18 @@ function importQuery () {
 }
 
 function onExecute () {
-  emit('execute', JSON.parse(JSON.stringify(query.value)) as ConceptQuery)
+  emit('execute', JSON.parse(
+    JSON.stringify(
+      query.value,
+      (key, value: string) => (key === 'language' && value === allString) ? undefined : value)
+  ) as ConceptQuery)
 }
 
 function reset () {
   name.value = undefined
   dataSource.value = undefined
   entity.value = undefined
-  language.value = `${locale.value}`
+  language.value = allString
   reloadEntities().catch((e: Error) => renderError(e))
 }
 

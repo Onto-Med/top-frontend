@@ -156,6 +156,7 @@
   "addThing": "{thing} hinzufügen",
   "oneThingPerThing": "Es kann nur ein {thing1} pro {thing2} existieren!",
   "language": "Sprache|Sprachen",
+  "allLanguages": "jede Sprache|alle Sprachen",
   "lightMode": "Heller Modus",
   "logOut": "Abmelden",
   "logIn": "Anmelden",

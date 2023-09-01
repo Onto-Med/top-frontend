@@ -156,6 +156,7 @@
   "addThing": "Add {thing}",
   "oneThingPerThing": "There can only exist one {thing1} per {thing2}!",
   "language": "Language|Languages",
+  "allLanguages": "any Language|all Languages",
   "lightMode": "Light mode",
   "remove": "Remove",
   "delete": "Delete",
