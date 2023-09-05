@@ -1,7 +1,7 @@
 <template>
   <q-card-section class="row q-pa-none">
     <div class="col-12 col-sm-6 col-md-7 q-pa-md">
-      <q-input v-model="query.name" :label="t('queryName')" type="text" />
+      <q-input v-model="name" :label="t('queryName')" type="text" />
       <q-select
         v-model="language"
         :options="languageOptions"
