@@ -316,7 +316,14 @@
     "emptyResult": "No result|No results"
   },
   "repositoryType": "Repository type|Repository types",
-  "documentSearch": "Document search",
+  "documentSearch":{
+    "title": "Document search",
+    "description": "Please select the type of the document representation.",
+    "type": {
+      "conceptCluster": "Concept Cluster",
+      "searchQuery": "Search Query"
+    }
+  },
   "phenotype_repository": "Phenotype repository",
   "concept_repository": "Concept repository",
   "exclusive": "Exclusive",
