@@ -319,6 +319,7 @@
   "documentSearch": {
     "title": "Dokumentensuche",
     "description": "Bitte wählen sie die Art der Dokumentrepräsentation aus.",
+    "short": "Explorative Dokumentensuche",
     "type": {
       "conceptCluster": "Konzept-Cluster",
       "searchQuery": "Such-Abfrage"

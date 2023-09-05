@@ -237,7 +237,7 @@ export default defineComponent({
         links.push({
           title: t('document', 2),
           icon: 'article',
-          caption: t('documentSearch', 2),
+          caption: t('documentSearch.short'),
           routeName: 'documentSearch',
           isHidden: keycloak.value && !keycloak.value.authenticated
         })
