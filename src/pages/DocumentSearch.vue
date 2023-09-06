@@ -1,6 +1,6 @@
 <template>
   <q-layout>
-    <q-page class="q-pa-md q-gutter-md q-mr-xl">
+    <q-page class="q-pa-md q-gutter-md">
       <q-card>
         <q-card-section>
           <div class="text-h6">

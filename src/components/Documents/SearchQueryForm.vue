@@ -1,6 +1,7 @@
 <template>
-  <q-card-section class="row q-pa-none">
+  <q-card-section class="q-pa-none">
     <table-with-actions
+      flat
       :title="t('document', 2)"
       :name="t('document')"
       :page="documents"
@@ -8,7 +9,32 @@
       :columns="cols"
       :create="false"
       @request="reload"
-    />
+    >
+      <template v-if="isAuthenticated" #actions="{ row }">
+        <q-btn
+          v-if="row.permission === Permission.Manage"
+          size="sm"
+          color="primary"
+          dense
+          icon="edit"
+          :title="t('editThing', { thing: t('organisation') })"
+          @click.stop="documents = row"
+        />
+      </template>
+      <template #row-cells="props">
+        <tr>
+          <q-td auto-width>
+            {{ props.row.id }}
+          </q-td>
+          <q-td auto-width>
+            {{ props.row.name }}
+          </q-td>
+          <q-td auto-width>
+            {{ props.row.text }}
+          </q-td>
+        </tr>
+      </template>
+    </table-with-actions>
   </q-card-section>
 </template>
 
@@ -66,6 +92,7 @@ export default defineComponent({
     }
 
     const cols = [
+      { name: 'actions' },
       { name: 'id', field: 'id', label: 'id', align: 'left' },
       { name: 'name', field: 'name', label: t('name'), align: 'left' },
       { name: 'highlightedText', field: 'highlightedText', label: 'Content', align: 'left' },
