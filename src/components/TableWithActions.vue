@@ -105,7 +105,7 @@
 import { QTableProps } from 'quasar'
 import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { OrganisationPage, RepositoryPage } from '@onto-med/top-api'
+import {DocumentPage, OrganisationPage, RepositoryPage} from '@onto-med/top-api'
 
 export default defineComponent({
   props: {
@@ -115,7 +115,7 @@ export default defineComponent({
     name: String,
     /** The page holding the content if the table. */
     page: {
-      type: Object as () => OrganisationPage|RepositoryPage,
+      type: Object as () => OrganisationPage|RepositoryPage|DocumentPage,
       required: true
     },
     columns: Array as () => QTableProps['columns'],
