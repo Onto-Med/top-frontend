@@ -207,7 +207,7 @@ export default defineComponent({
 
       onScroll ({ to, direction, ref }: ScrollDetails) {
         const lastIndex = options.value.length - 1
-        if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
+        if (loading.value || !prevInput.value && props.minLength > 0 || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
           return
         loading.value = true
         loadOptions(prevInput.value, nextPage.value)
