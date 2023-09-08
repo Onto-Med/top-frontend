@@ -482,6 +482,7 @@
   },
   "withRestriction": "Mit Restriktion|Mit Restriktionen",
   "entityImported": "Es wurden keine Entitäten importiert|Eine Entität wurde importiert|{count} Entitäten wurden importiert",
+  "showDocumentResults": "Datensatz anzeigen",
   "moveTo": "Verschieben nach...",
   "moveThing": "{thing} verschieben",
   "move": "Verschieben",

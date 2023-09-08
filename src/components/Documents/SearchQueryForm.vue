@@ -2,6 +2,8 @@
   <q-card-section class="q-pa-none">
     <table-with-actions
       flat
+      wrap-cells
+      :grid="$q.screen.xs"
       :title="t('document', 2)"
       :name="t('document')"
       :page="documents"
@@ -23,13 +25,13 @@
       </template>
       <template #row-cells="props">
         <tr>
-          <q-td auto-width>
+          <q-td>
             {{ props.row.id }}
           </q-td>
-          <q-td auto-width>
+          <q-td>
             {{ props.row.name }}
           </q-td>
-          <q-td auto-width>
+          <q-td>
             {{ props.row.text }}
           </q-td>
         </tr>
@@ -39,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, inject, ref} from 'vue';
+import {defineComponent, inject, ref, onMounted} from 'vue';
 import TableWithActions from 'components/TableWithActions.vue';
 import {useI18n} from 'vue-i18n';
 import useNotify from 'src/mixins/useNotify';
@@ -69,10 +71,10 @@ export default defineComponent({
     })
     const { isAuthenticated } = storeToRefs(useEntity())
 
-    const reload = async (page = 1) => {
+    const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!documentApi) return
       loading.value = true
-      await documentApi.getDocuments(undefined, undefined, page)
+      await documentApi.getDocuments(undefined, undefined, undefined, page)
         .then(
           r => {
             documents.value = r.data
@@ -85,18 +87,21 @@ export default defineComponent({
         )
         .finally(
           () => {
-            console.log(documents.value)
             loading.value = false
           }
         )
     }
 
     const cols = [
-      { name: 'actions' },
+      { name: 'actions'},
       { name: 'id', field: 'id', label: 'id', align: 'left' },
       { name: 'name', field: 'name', label: t('name'), align: 'left' },
-      { name: 'highlightedText', field: 'highlightedText', label: 'Content', align: 'left' },
+      { name: 'text', field: 'text', label: 'Content', align: 'left' },
     ] as QTableProps['columns']
+
+    onMounted(async () => {
+      await reload()
+    })
 
     return {
       t,

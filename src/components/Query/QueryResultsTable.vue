@@ -36,6 +36,11 @@
                       {{ t('downloadDataSet') }}
                     </q-item-section>
                   </q-item>
+                  <q-item v-if="isDocumentQuery" v-close-popup clickable :disable="!isFinished(props.row)">
+                    <q-item-section>
+                      {{ t('showDocumentResults') }}
+                    </q-item-section>
+                  </q-item>
                   <q-item v-close-popup clickable @click="$emit('prefill', props.row)">
                     <q-item-section>
                       {{ t('repeatThing', { thing: t('query') }) }}
@@ -90,7 +95,8 @@ export default defineComponent({
       type: Object as () => QueryPage,
       required: true
     },
-    loading: Boolean
+    loading: Boolean,
+    isConcept: Boolean
   },
   emits: ['delete', 'prefill', 'request'],
   setup(props, { emit }) {
@@ -188,6 +194,10 @@ export default defineComponent({
       onPageSelect (page: number) {
         emit('request', page)
       },
+
+      isDocumentQuery() {
+        return props.isConcept
+      }
     }
   }
 })
