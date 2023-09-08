@@ -481,5 +481,6 @@
     "description": "Bitte wählen Sie mit dem Formular oben einen Code vom Terminologieserver aus. Die resultierende Entität wird hier angezeigt."
   },
   "withRestriction": "Mit Restriktion|Mit Restriktionen",
-  "entityImported": "Es wurden keine Entitäten importiert|Eine Entität wurde importiert|{count} Entitäten wurden importiert"
+  "entityImported": "Es wurden keine Entitäten importiert|Eine Entität wurde importiert|{count} Entitäten wurden importiert",
+  "showDocumentResults": "Datensatz anzeigen"
 }
