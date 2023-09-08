@@ -36,7 +36,7 @@
                       {{ t('downloadDataSet') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-if="isDocumentQuery" v-close-popup clickable :disable="!isFinished(props.row)">
+                  <q-item v-if="isConceptQuery" v-close-popup clickable :disable="!isFinished(props.row)" @click="routeToDocumentView(props.row)">
                     <q-item-section>
                       {{ t('showDocumentResults') }}
                     </q-item-section>
@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
+import {Organisation, Query, QueryPage, QueryResult, QueryState} from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { exportFile, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
@@ -88,6 +88,7 @@ import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   props: {
@@ -96,7 +97,7 @@ export default defineComponent({
       required: true
     },
     loading: Boolean,
-    isConcept: Boolean
+    isConceptQuery: Boolean
   },
   emits: ['delete', 'prefill', 'request'],
   setup(props, { emit }) {
@@ -108,6 +109,7 @@ export default defineComponent({
     const results = ref<QueryResult[]>([])
     const interval = ref<number>()
     const skippedQueries = ref<Set<string>>(new Set<string>())
+    const router = useRouter()
 
     const loadResult = async (query: Query) => {
       if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
@@ -129,6 +131,11 @@ export default defineComponent({
       return result.state || QueryState.Running
     }
 
+    const routeToDocumentView = (query: Query) => {
+      console.log(query)
+      // void router.push({ name: 'showOrganisation', params: { organisationId: organisation.id } })
+    }
+
     onMounted(() => {
       interval.value = window.setInterval(() => {
         props.page.content.map(async (query) => {
@@ -147,6 +154,7 @@ export default defineComponent({
     })
 
     return {
+      routeToDocumentView,
       t,
 
       rows: computed(() => props.page.content),
@@ -194,10 +202,6 @@ export default defineComponent({
       onPageSelect (page: number) {
         emit('request', page)
       },
-
-      isDocumentQuery() {
-        return props.isConcept
-      }
     }
   }
 })
