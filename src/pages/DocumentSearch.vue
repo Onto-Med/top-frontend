@@ -24,29 +24,55 @@
         />
         <search-query-form
           v-if="searchType === 'searchQuery'"
+          document-ids=""
         />
       </q-card>
     </q-page>
   </q-layout>
 </template>
 
-<script setup lang="ts">
-import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue';
-import SearchQueryForm from 'components/Documents/SearchQueryForm.vue';
-import {useI18n} from 'vue-i18n';
-import {computed, ref} from 'vue';
+<script lang="ts">
+import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
+import SearchQueryForm from 'components/Documents/SearchQueryForm.vue'
+import {useI18n} from 'vue-i18n'
+import {computed, defineComponent, ref} from 'vue'
+import {useRoute} from 'vue-router'
 
-const { t } = useI18n()
+export default defineComponent({
+  components: {
+    ConceptClusterForm,
+    SearchQueryForm
+  },
+  setup() {
+    const {t} = useI18n()
+    const route = useRoute()
 
-const searchType = ref('conceptCluster')
-const searchTypeOptions = computed(() => [
-  {
-    label: t('documentSearch.type.conceptCluster'),
-    value: 'conceptCluster',
-  },
-  {
-    label: t('documentSearch.type.searchQuery'),
-    value: 'searchQuery',
-  },
-])
+    const documentIds = ref<Array<string>>([])
+    const searchType = ref('conceptCluster')
+    const searchTypeOptions = computed(() => [
+      {
+        label: t('documentSearch.type.conceptCluster'),
+        value: 'conceptCluster',
+      },
+      {
+        label: t('documentSearch.type.searchQuery'),
+        value: 'searchQuery',
+      },
+    ])
+
+    function setSearchType () {
+      if (route.query.hasOwnProperty('documentIds')) {
+        searchType.value = 'searchQuery'
+        route.query.documentIds?.[Symbol.iterator].apply((s: string) => documentIds.value.push(s))
+      }
+    }
+    setSearchType()
+
+    return {
+      t,
+      searchType,
+      searchTypeOptions
+    }
+  }
+})
 </script>
