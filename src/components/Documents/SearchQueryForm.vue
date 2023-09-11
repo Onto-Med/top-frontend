@@ -56,6 +56,11 @@ export default defineComponent({
     TableWithActions,
     // PermissionIcon
   },
+  props: {
+    documentIds: {
+      type: Array<string>
+    }
+  },
   setup () {
     const { t }     = useI18n()
     const { renderError } = useNotify()
