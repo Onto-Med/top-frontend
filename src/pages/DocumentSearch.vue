@@ -24,7 +24,9 @@
         />
         <search-query-form
           v-if="searchType === 'searchQuery'"
-          document-ids=""
+          :organisation-id="organisationId"
+          :repository-id="repositoryId"
+          :query-id="queryId"
         />
       </q-card>
     </q-page>
@@ -35,7 +37,7 @@
 import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
 import SearchQueryForm from 'components/Documents/SearchQueryForm.vue'
 import {useI18n} from 'vue-i18n'
-import {computed, defineComponent, ref} from 'vue'
+import {computed, defineComponent, onMounted, ref} from 'vue'
 import {useRoute} from 'vue-router'
 
 export default defineComponent({
@@ -46,8 +48,9 @@ export default defineComponent({
   setup() {
     const {t} = useI18n()
     const route = useRoute()
-
-    const documentIds = ref<Array<string>>([])
+    const queryId = ref<string|undefined>(undefined)
+    const organisationId = ref<string|undefined>(undefined)
+    const repositoryId = ref<string|undefined>(undefined)
     const searchType = ref('conceptCluster')
     const searchTypeOptions = computed(() => [
       {
@@ -60,18 +63,30 @@ export default defineComponent({
       },
     ])
 
-    function setSearchType () {
-      if (route.query.hasOwnProperty('documentIds')) {
+    const setSearchType = () => {
+      organisationId.value = undefined
+      repositoryId.value = undefined
+      queryId.value = undefined
+      if (route.query.hasOwnProperty('searchQueryId')) {
         searchType.value = 'searchQuery'
-        route.query.documentIds?.[Symbol.iterator].apply((s: string) => documentIds.value.push(s))
+        const searchQuery = route.query.searchQueryId?.toString().split('+')
+        organisationId.value = searchQuery?.at(0)
+        repositoryId.value = searchQuery?.at(1)
+        queryId.value = searchQuery?.at(2)
       }
     }
-    setSearchType()
+
+    onMounted( () => {
+      setSearchType()
+    })
 
     return {
       t,
       searchType,
-      searchTypeOptions
+      searchTypeOptions,
+      queryId,
+      organisationId,
+      repositoryId
     }
   }
 })

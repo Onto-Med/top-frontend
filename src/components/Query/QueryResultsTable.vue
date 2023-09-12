@@ -131,18 +131,9 @@ export default defineComponent({
       return result.state || QueryState.Running
     }
 
-    const routeToDocumentView = async (query: Query) => {
+    const routeToDocumentView = (query: Query) => {
       if (organisationId.value && repositoryId.value && query.id)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        await queryApi?.getQueryResultIds(organisationId.value, repositoryId.value, query.id)
-          .then(r => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            // console.log(r.data)
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-            void router.push({ name: 'documentSearch', query: { documentIds: r.data } })
-          })
-      // console.log(query)
-      // void router.push({ name: 'documents', query: { documentIds: do.id } })
+        void router.push({ name: 'documentSearch', query: { searchQueryId: organisationId.value + '+' + repositoryId.value + '+' + query.id } })
     }
 
     onMounted(() => {

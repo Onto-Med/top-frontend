@@ -45,7 +45,7 @@ import {defineComponent, inject, ref, onMounted} from 'vue';
 import TableWithActions from 'components/TableWithActions.vue';
 import {useI18n} from 'vue-i18n';
 import useNotify from 'src/mixins/useNotify';
-import {DocumentApiKey} from 'boot/axios';
+import {DocumentApiKey, QueryApiKey} from 'boot/axios';
 import {DocumentPage, Permission} from '@onto-med/top-api';
 import {QTableProps} from 'quasar';
 import {storeToRefs} from 'pinia';
@@ -57,15 +57,16 @@ export default defineComponent({
     // PermissionIcon
   },
   props: {
-    documentIds: {
-      type: Array<string>
-    }
+    organisationId: String,
+    repositoryId: String,
+    queryId: String
   },
-  setup () {
+  setup (props) {
     const { t }     = useI18n()
     const { renderError } = useNotify()
     const loading   = ref(false)
     const documentApi = inject(DocumentApiKey)
+    const queryApi = inject(QueryApiKey)
     const documents   = ref<DocumentPage>({
       content: [],
       number: 1,
@@ -79,22 +80,25 @@ export default defineComponent({
     const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!documentApi) return
       loading.value = true
-      await documentApi.getDocuments(undefined, undefined, undefined, page)
-        .then(
-          r => {
+      if (!(props.organisationId && props.repositoryId && props.queryId)) {
+        await documentApi.getDocuments(undefined, undefined, undefined, page)
+          .then( r => { documents.value = r.data } )
+          .catch( (e: Error) => { renderError(e) } )
+          .finally( () => { loading.value = false } )
+      } else {
+        if (!queryApi) return
+        let ids = new Array<string>()
+        await queryApi.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
+          .then(r => ids = r.data)
+          .catch( (e: Error) => { renderError(e) } )
+        await documentApi.getDocuments(undefined, undefined, ids, page)
+          .then( r => {
+            console.log(r.data)
             documents.value = r.data
-          }
-        )
-        .catch(
-          (e: Error) => {
-            renderError(e)
-          }
-        )
-        .finally(
-          () => {
-            loading.value = false
-          }
-        )
+          } )
+          .catch( (e: Error) => { renderError(e) } )
+          .finally( () => { loading.value = false } )
+      }
     }
 
     const cols = [
