@@ -27,6 +27,7 @@
           :organisation-id="organisationId"
           :repository-id="repositoryId"
           :query-id="queryId"
+          :query-name="queryName"
         />
       </q-card>
     </q-page>
@@ -51,6 +52,7 @@ export default defineComponent({
     const queryId = ref<string|undefined>(undefined)
     const organisationId = ref<string|undefined>(undefined)
     const repositoryId = ref<string|undefined>(undefined)
+    const queryName = ref<string|undefined>(undefined)
     const searchType = ref('conceptCluster')
     const searchTypeOptions = computed(() => [
       {
@@ -67,12 +69,21 @@ export default defineComponent({
       organisationId.value = undefined
       repositoryId.value = undefined
       queryId.value = undefined
-      if (route.query.hasOwnProperty('searchQueryId')) {
+      queryName.value = undefined
+      if (route.params.hasOwnProperty('organisationId') &&
+        route.params.hasOwnProperty('repositoryId') &&
+        route.params.hasOwnProperty('queryId')) {
         searchType.value = 'searchQuery'
-        const searchQuery = route.query.searchQueryId?.toString().split('+')
-        organisationId.value = searchQuery?.at(0)
-        repositoryId.value = searchQuery?.at(1)
-        queryId.value = searchQuery?.at(2)
+        organisationId.value = route.params.organisationId.toString()
+        repositoryId.value = route.params.repositoryId.toString()
+        queryId.value = route.params.queryId.toString()
+        queryName.value = route.query.queryName? route.query.queryName.toString(): 'Query'
+      } else {
+        if (route.query.redirect != null && route.query.redirect.toString().toLowerCase() === 'true') {
+          searchType.value = 'searchQuery'
+        } else {
+          searchType.value = 'conceptCluster'
+        }
       }
     }
 
@@ -86,7 +97,8 @@ export default defineComponent({
       searchTypeOptions,
       queryId,
       organisationId,
-      repositoryId
+      repositoryId,
+      queryName
     }
   }
 })

@@ -483,6 +483,7 @@
   "withRestriction": "With restriction|With restrictions",
   "entityImported": "No entities were imported|One entity has been imported|{count} entities have been imported",
   "showDocumentResults": "Show data set",
+  "clearDocumentQueryResult": "Clear query results",
   "moveTo": "Move to...",
   "moveThing": "Move {thing}",
   "move": "Move",

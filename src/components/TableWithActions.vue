@@ -15,6 +15,7 @@
           <div class="text-h6">
             {{ title || name }}
           </div>
+          <slot name="searchQuery" />
           <q-space />
           <q-input
             v-model="filter"

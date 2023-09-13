@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import {Organisation, Query, QueryPage, QueryResult, QueryState} from '@onto-med/top-api'
+import {Query, QueryPage, QueryResult, QueryState} from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { exportFile, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
@@ -133,7 +133,17 @@ export default defineComponent({
 
     const routeToDocumentView = (query: Query) => {
       if (organisationId.value && repositoryId.value && query.id)
-        void router.push({ name: 'documentSearch', query: { searchQueryId: organisationId.value + '+' + repositoryId.value + '+' + query.id } })
+        void router.push({
+          name: 'documentSearchByQuery',
+          params: {
+            organisationId: organisationId.value,
+            repositoryId: repositoryId.value,
+            queryId: query.id
+          },
+          query: {
+            queryName: query.name
+          }
+        })
     }
 
     onMounted(() => {
