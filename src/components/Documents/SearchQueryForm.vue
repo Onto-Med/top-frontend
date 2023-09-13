@@ -12,16 +12,25 @@
       :create="false"
       @request="reload"
     >
-      <template v-if="isAuthenticated" #actions="{ row }">
+      <template
+        v-if="querySearch"
+        #searchQuery
+      >
+        <q-space />
         <q-btn
-          v-if="row.permission === Permission.Manage"
-          size="sm"
           color="primary"
-          dense
-          icon="edit"
-          :title="t('editThing', { thing: t('organisation') })"
-          @click.stop="documents = row"
-        />
+          :label="$q.screen.gt.xs ? (queryDisplayName) : ''"
+        >
+          <q-menu>
+            <q-list dense>
+              <q-item v-close-popup clickable @click="deleteQueryResults()">
+                <q-item-section>
+                  {{ t('clearDocumentQueryResult') }}
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </template>
       <template #row-cells="props">
         <tr>
@@ -45,11 +54,12 @@ import {defineComponent, inject, ref, onMounted} from 'vue';
 import TableWithActions from 'components/TableWithActions.vue';
 import {useI18n} from 'vue-i18n';
 import useNotify from 'src/mixins/useNotify';
-import {DocumentApiKey, QueryApiKey} from 'boot/axios';
+import {DocumentApiKey} from 'boot/axios';
 import {DocumentPage, Permission} from '@onto-med/top-api';
 import {QTableProps} from 'quasar';
 import {storeToRefs} from 'pinia';
 import {useEntity} from 'src/pinia/entity';
+import {useRouter} from 'vue-router';
 
 export default defineComponent({
   components: {
@@ -59,14 +69,16 @@ export default defineComponent({
   props: {
     organisationId: String,
     repositoryId: String,
-    queryId: String
+    queryId: String,
+    queryName: String
   },
   setup (props) {
     const { t }     = useI18n()
     const { renderError } = useNotify()
     const loading   = ref(false)
+    const querySearch = ref(false)
+    const queryDisplayName = ref('')
     const documentApi = inject(DocumentApiKey)
-    const queryApi = inject(QueryApiKey)
     const documents   = ref<DocumentPage>({
       content: [],
       number: 1,
@@ -76,6 +88,7 @@ export default defineComponent({
       type: 'document'
     })
     const { isAuthenticated } = storeToRefs(useEntity())
+    const router = useRouter()
 
     const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!documentApi) return
@@ -84,20 +97,22 @@ export default defineComponent({
         await documentApi.getDocuments(undefined, undefined, undefined, page)
           .then( r => { documents.value = r.data } )
           .catch( (e: Error) => { renderError(e) } )
-          .finally( () => { loading.value = false } )
-      } else {
-        if (!queryApi) return
-        let ids = new Array<string>()
-        await queryApi.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
-          .then(r => ids = r.data)
-          .catch( (e: Error) => { renderError(e) } )
-        await documentApi.getDocuments(undefined, undefined, ids, page)
-          .then( r => {
-            console.log(r.data)
-            documents.value = r.data
+          .finally( () => {
+            loading.value = false
+            querySearch.value = false
+            queryDisplayName.value = ''
           } )
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        await documentApi.getDocumentIdsForQuery(props.organisationId, props.repositoryId, props.queryId, page)
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
+          .then(r => documents.value = r.data)
           .catch( (e: Error) => { renderError(e) } )
-          .finally( () => { loading.value = false } )
+          .finally( () => {
+            loading.value = false
+            querySearch.value = true
+            queryDisplayName.value = props.queryName? props.queryName: ''
+          } )
       }
     }
 
@@ -120,6 +135,14 @@ export default defineComponent({
       cols,
       isAuthenticated,
       Permission,
+      querySearch,
+      queryDisplayName,
+      deleteQueryResults(): void {
+        void router.push({
+          name: 'documentSearch',
+          query: { redirect: 'true' }
+        })
+      }
     }
   }
 })
