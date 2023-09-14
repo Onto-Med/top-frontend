@@ -28,6 +28,7 @@
           :repository-id="repositoryId"
           :query-id="queryId"
           :query-name="queryName"
+          @clear-query-results="clearQueryResults"
         />
       </q-card>
     </q-page>
@@ -39,7 +40,7 @@ import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
 import SearchQueryForm from 'components/Documents/SearchQueryForm.vue'
 import {useI18n} from 'vue-i18n'
 import {computed, defineComponent, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 
 export default defineComponent({
   components: {
@@ -49,46 +50,55 @@ export default defineComponent({
   setup() {
     const {t} = useI18n()
     const route = useRoute()
+    const router = useRouter()
     const queryId = ref<string|undefined>(undefined)
     const organisationId = ref<string|undefined>(undefined)
     const repositoryId = ref<string|undefined>(undefined)
     const queryName = ref<string|undefined>(undefined)
-    const searchType = ref('conceptCluster')
+    const SearchTypesEnum = Object.freeze({
+      CONCEPT_CLUSTER: 'conceptCluster',
+      SEARCH_QUERY: 'searchQuery'
+    })
+    const searchType = ref(SearchTypesEnum.CONCEPT_CLUSTER.toString())
     const searchTypeOptions = computed(() => [
       {
         label: t('documentSearch.type.conceptCluster'),
-        value: 'conceptCluster',
+        value: SearchTypesEnum.CONCEPT_CLUSTER,
       },
       {
         label: t('documentSearch.type.searchQuery'),
-        value: 'searchQuery',
+        value: SearchTypesEnum.SEARCH_QUERY,
       },
     ])
 
-    const setSearchType = () => {
+    const setSearchType = (set: string|undefined) => {
       organisationId.value = undefined
       repositoryId.value = undefined
       queryId.value = undefined
       queryName.value = undefined
+
+      if (set) {
+        searchType.value = set
+        return
+      }
+
       if (route.params.hasOwnProperty('organisationId') &&
         route.params.hasOwnProperty('repositoryId') &&
         route.params.hasOwnProperty('queryId')) {
-        searchType.value = 'searchQuery'
+
         organisationId.value = route.params.organisationId.toString()
         repositoryId.value = route.params.repositoryId.toString()
         queryId.value = route.params.queryId.toString()
         queryName.value = route.query.queryName? route.query.queryName.toString(): 'Query'
+
+        searchType.value = SearchTypesEnum.SEARCH_QUERY
       } else {
-        if (route.query.redirect != null && route.query.redirect.toString().toLowerCase() === 'true') {
-          searchType.value = 'searchQuery'
-        } else {
-          searchType.value = 'conceptCluster'
-        }
+        searchType.value = SearchTypesEnum.CONCEPT_CLUSTER
       }
     }
 
     onMounted( () => {
-      setSearchType()
+      setSearchType(undefined)
     })
 
     return {
@@ -98,8 +108,18 @@ export default defineComponent({
       queryId,
       organisationId,
       repositoryId,
-      queryName
+      queryName,
+      async clearQueryResults() {
+        await router.replace('/document')
+          .then(() => setSearchType(SearchTypesEnum.SEARCH_QUERY))
+      },
     }
   }
 })
+interface QueryData {
+  organisationId: string,
+  repositoryId: string,
+  queryId: string,
+  queryName: string
+}
 </script>
