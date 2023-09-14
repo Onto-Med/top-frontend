@@ -23,7 +23,7 @@
         >
           <q-menu>
             <q-list dense>
-              <q-item v-close-popup clickable @click="deleteQueryResults()">
+              <q-item v-close-popup clickable @click="$emit('clearQueryResults')">
                 <q-item-section>
                   {{ t('clearDocumentQueryResult') }}
                 </q-item-section>
@@ -50,18 +50,22 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, inject, ref, onMounted} from 'vue';
+import {defineComponent, inject, ref, onMounted, onUpdated} from 'vue';
 import TableWithActions from 'components/TableWithActions.vue';
 import {useI18n} from 'vue-i18n';
 import useNotify from 'src/mixins/useNotify';
 import {DocumentApiKey} from 'boot/axios';
 import {DocumentPage, Permission} from '@onto-med/top-api';
-import {QTableProps} from 'quasar';
+import {event, QTableProps} from 'quasar';
 import {storeToRefs} from 'pinia';
 import {useEntity} from 'src/pinia/entity';
-import {useRouter} from 'vue-router';
 
 export default defineComponent({
+  computed: {
+    event() {
+      return event
+    }
+  },
   components: {
     TableWithActions,
     // PermissionIcon
@@ -72,6 +76,7 @@ export default defineComponent({
     queryId: String,
     queryName: String
   },
+  emits: ['clearQueryResults'],
   setup (props) {
     const { t }     = useI18n()
     const { renderError } = useNotify()
@@ -88,7 +93,6 @@ export default defineComponent({
       type: 'document'
     })
     const { isAuthenticated } = storeToRefs(useEntity())
-    const router = useRouter()
 
     const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!documentApi) return
@@ -127,6 +131,10 @@ export default defineComponent({
       await reload()
     })
 
+    onUpdated( async() => {
+      await reload()
+    })
+
     return {
       t,
       documents,
@@ -136,13 +144,7 @@ export default defineComponent({
       isAuthenticated,
       Permission,
       querySearch,
-      queryDisplayName,
-      deleteQueryResults(): void {
-        void router.push({
-          name: 'documentSearch',
-          query: { redirect: 'true' }
-        })
-      }
+      queryDisplayName
     }
   }
 })
