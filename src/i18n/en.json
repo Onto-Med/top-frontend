@@ -473,5 +473,10 @@
     "description": "Please select a code from the terminology server with the form above. The resulting entity will be displayed here."
   },
   "withRestriction": "With restriction|With restrictions",
-  "entityImported": "No entities were imported|One entity has been imported|{count} entities have been imported"
+  "entityImported": "No entities were imported|One entity has been imported|{count} entities have been imported",
+  "moveTo": "Move to...",
+  "moveThing": "Move {thing}",
+  "move": "Move",
+  "thingMoved": "{thing} has been moved",
+  "movingNotPossible": "Moving is not possible for this content."
 }
