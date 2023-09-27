@@ -28,6 +28,16 @@
 
     <q-separator />
 
+    <q-list v-if="createable && entity && entity.createdAt && !isRestricted(entity)" dense>
+      <q-item
+        v-close-popup
+        clickable
+        @click="showMoveDialog"
+      >
+        <q-item-section>{{ t('moveTo') }}</q-item-section>
+      </q-item>
+    </q-list>
+
     <q-list v-if="duplicatable && entity && entity.createdAt" dense>
       <q-item
         v-close-popup
@@ -61,6 +71,7 @@ import { Entity, EntityType } from '@onto-med/top-api'
 import Dialog from 'src/components/Dialog.vue'
 import { useQuasar } from 'quasar'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import EntityMoveDialog from './EntityMoveDialog.vue'
 import TerminologyImportDialog from './TerminologyImportDialog.vue'
 import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
@@ -90,12 +101,12 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
-  'deleteEntityClicked', 'createEntityClicked', 'duplicateEntityClicked'
+  'createEntityClicked', 'deleteEntityClicked', 'duplicateEntityClicked'
 ])
 
 const { t } = useI18n()
 const $q = useQuasar()
-const { isPhenotype, isCategory, isConcept } = useEntityFormatter()
+const { isCategory, isRestricted } = useEntityFormatter()
 const { repository } = storeToRefs(useEntity())
 
 const entries = [
@@ -124,6 +135,14 @@ function showDeleteDialog () {
   })
 }
 
+function showMoveDialog () {
+  if (!props.entity) return
+  $q.dialog({
+    component: EntityMoveDialog,
+    componentProps: { entity: props.entity }
+  })
+}
+
 function showTerminologyImportDialog () {
   $q.dialog({
     component: TerminologyImportDialog,
@@ -131,13 +150,6 @@ function showTerminologyImportDialog () {
       repositoryType: repository.value?.repositoryType,
       superEntity: props.entity
     }
-  }).onOk((result: Entity) => {
-    if (props.entity) {
-      if (isCategory(result)) result.superCategories = [ props.entity ]
-      if (isConcept(result)) result.superConcepts = [ props.entity ]
-      if (isPhenotype(result)) result.superCategories = [ props.entity ]
-    }
-    emitDuplicateEntity(result)
   })
 }
 

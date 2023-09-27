@@ -88,11 +88,8 @@
         v-if="showContextMenu"
         :allowed-entity-types="allowedEntityTypes"
         :createable="createable"
-        :deletable="deletable"
-        :duplicatable="duplicatable"
         :importable="importable"
         @create-entity-clicked="handleCreateEntityClicked"
-        @duplicate-entity-clicked="handleEntityDuplication"
       />
       <slot v-else name="empty-context-menu" />
     </q-scroll-area>

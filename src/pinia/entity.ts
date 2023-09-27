@@ -401,6 +401,17 @@ export const useEntity = defineStore('entity', {
         })
     },
 
+    async moveEntity(entity: Entity, superEntities: Entity[]) {
+      if (!this.entityApi || !this.organisationId || !this.repositoryId || !entity.id)
+        throw {
+          name: 'MissingAttributesException',
+          message: 'attributesMissing'
+        }
+
+      await this.entityApi.moveEntity(this.organisationId, this.repositoryId, entity.id, superEntities.filter(e => !!e))
+        .then(r => this.pushOrReplaceEntity(r.data))
+    },
+
     hasSuperCategory(entity: Category | Phenotype, category: Category): boolean {
       return entity.superCategories?.findIndex(c => c.id === category.id) !== -1
     },

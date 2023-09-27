@@ -1,69 +1,6 @@
 <template>
   <q-scroll-area class="col entity-tab-content">
     <div v-if="entityType" class="q-gutter-md q-mt-none q-px-md q-pb-xl">
-      <q-card>
-        <q-toolbar v-if="!isRestricted(entityType)" class="q-my-none">
-          <q-toolbar-title class="row items-center">
-            <div
-              v-if="![EntityType.SingleConcept, EntityType.CompositeConcept].includes(entityType)"
-            >
-              <span class="q-mr-sm">{{ t('superCategory', 2) }}:</span>
-              <entity-chip
-                v-for="(category, index) in superCategories"
-                :key="index"
-                :organisation-id="organisationId"
-                :repository-id="repositoryId"
-                :entity-types="[EntityType.Category]"
-                :entity-id="category ? category.id : undefined"
-                :disable="readonly"
-                :label="t('selectThing', { thing: t('category') }) + '...'"
-                removeable
-                @removeClicked="removeSuperCategory(index)"
-                @entity-set="setSuperCategory(index, $event)"
-                @entityClicked="$emit('entityClicked', $event)"
-              />
-              <q-chip
-                icon="add"
-                round
-                clickable
-                :disable="readonly"
-                :label="t('more')"
-                :title="t('addThing', { thing: t('superCategory') })"
-                @click="addSuperCategory(undefined)"
-              />
-            </div>
-            <div
-              v-if="[EntityType.SingleConcept, EntityType.CompositeConcept].includes(entityType)"
-            >
-              <span class="q-mr-sm">{{ t('superConcept', 2) }}:</span>
-              <entity-chip
-                v-for="(concept, index) in superConcepts"
-                :key="index"
-                :organisation-id="organisationId"
-                :repository-id="repositoryId"
-                :entity-types="[EntityType.SingleConcept]"
-                :entity-id="concept ? concept.id : undefined"
-                :disable="readonly"
-                :label="t('selectThing', { thing: t('concept') }) + '...'"
-                removeable
-                @removeClicked="removeSuperConcept(index)"
-                @entity-set="setSuperConcept(index, $event)"
-                @entityClicked="$emit('entityClicked', $event)"
-              />
-              <q-chip
-                icon="add"
-                round
-                clickable
-                :disable="readonly"
-                :label="t('more')"
-                :title="t('addThing', { thing: t('superConcept') })"
-                @click="addSuperConcept(undefined)"
-              />
-            </div>
-          </q-toolbar-title>
-        </q-toolbar>
-      </q-card>
-
       <div class="row q-col-gutter-md q-ma-none">
         <div class="col-12 col-md">
           <localized-text-input
@@ -204,7 +141,6 @@
 import {defineComponent, onMounted, PropType, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import {
-  Category,
   Code,
   Concept,
   DataType,
@@ -221,7 +157,6 @@ import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
 import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
-import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import UnitInput from 'src/components/UnitInput.vue'
 import CodeInputCard from 'src/components/EntityEditor/CodeInputCard.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -236,8 +171,7 @@ export default defineComponent({
     RestrictionInput,
     ExpressionInput,
     UnitInput,
-    CodeInputCard,
-    EntityChip
+    CodeInputCard
   },
   props: {
     version: Number,
@@ -291,10 +225,6 @@ export default defineComponent({
     restriction: {
       type: Object as () => Restriction
     },
-    superCategories: {
-      type: Array as () => Category[],
-      default: () => []
-    },
     superConcepts: {
       type: Array as () => Concept[],
       default: () => []
@@ -303,9 +233,9 @@ export default defineComponent({
   },
   emits: [
     'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
-    'update:dataType', 'update:titles', 'update:superCategories', 'update:itemType'
+    'update:dataType', 'update:titles', 'update:itemType'
   ],
-  setup (props, { emit }) {
+  setup (props) {
     const { t } = useI18n()
     const router = useRouter()
     const { isRestricted, hasDataType, hasItemType, restrictionEntityTypes, getTitle } = useEntityFormatter()
@@ -336,49 +266,7 @@ export default defineComponent({
       routeToEntity (entity: Entity|undefined) {
         if (!entity || !entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
-      },
-
-      addSuperCategory (category: Category|undefined): void {
-        const newValue = props.superCategories || []
-        if (!category || newValue.findIndex(c => c && c.id === category.id) === -1)
-          if (props.entityId !== category?.id) newValue.push(category as Category)
-        emit('update:superCategories', newValue)
-      },
-
-      setSuperCategory (index: number, category: Category): void {
-        const newValue = props.superCategories || []
-        if (newValue.findIndex(c => c && c.id === category.id) === -1)
-          if (props.entityId !== category.id) newValue[index] = category
-        emit('update:superCategories', newValue)
-      },
-
-      removeSuperCategory (index: number): void {
-        const newValue = props.superCategories
-        if (!newValue) return
-        newValue.splice(index, 1)
-        emit('update:superCategories', newValue)
-      },
-
-      addSuperConcept (concept: Concept|undefined): void {
-        const newValue = props.superConcepts || []
-        if (!concept || newValue.findIndex(c => c && c.id === concept.id) === -1)
-          if (props.entityId !== concept?.id) newValue.push(concept as Concept)
-        emit('update:superCategories', newValue)
-      },
-
-      setSuperConcept (index: number, concept: Concept): void {
-        const newValue = props.superConcepts || []
-        if (newValue.findIndex(c => c && c.id === concept.id) === -1)
-          if (props.entityId !== concept.id) newValue[index] = concept
-        emit('update:superCategories', newValue)
-      },
-
-      removeSuperConcept (index: number): void {
-        const newValue = props.superConcepts
-        if (!newValue) return
-        newValue.splice(index, 1)
-        emit('update:superCategories', newValue)
-      },
+      }
     }
   }
 })
