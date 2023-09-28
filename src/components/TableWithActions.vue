@@ -18,6 +18,7 @@
           <slot name="searchQuery" />
           <q-space />
           <q-input
+            v-if="filterable"
             v-model="filter"
             :label="t('searchThing', { thing: title || name })"
             dense
@@ -122,7 +123,12 @@ export default defineComponent({
     columns: Array as () => QTableProps['columns'],
     loading: Boolean,
     /** Whether creating new entries is allowed. A respective button is displayed if true. */
-    create: Boolean
+    create: Boolean,
+    /** Whether a search field is enabled */
+    filterable: {
+      type: Boolean,
+      default: true
+    }
   },
   emits: ['row-clicked', 'create-clicked', 'request'],
   setup(props, { emit }) {

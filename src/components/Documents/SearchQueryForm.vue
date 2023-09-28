@@ -10,7 +10,9 @@
       :loading="loading"
       :columns="cols"
       :create="false"
+      :filterable="!querySearch"
       @request="reload"
+      @row-clicked="routeToDocument($event)"
     >
       <template
         v-if="querySearch"
@@ -55,17 +57,12 @@ import TableWithActions from 'components/TableWithActions.vue';
 import {useI18n} from 'vue-i18n';
 import useNotify from 'src/mixins/useNotify';
 import {DocumentApiKey} from 'boot/axios';
-import {DocumentPage, Permission} from '@onto-med/top-api';
-import {event, QTableProps} from 'quasar';
+import {DocumentPage, Permission, Document} from '@onto-med/top-api';
+import {QTableProps} from 'quasar';
 import {storeToRefs} from 'pinia';
 import {useEntity} from 'src/pinia/entity';
 
 export default defineComponent({
-  computed: {
-    event() {
-      return event
-    }
-  },
   components: {
     TableWithActions,
     // PermissionIcon
@@ -94,11 +91,15 @@ export default defineComponent({
     })
     const { isAuthenticated } = storeToRefs(useEntity())
 
+    const routeToDocument = (document: Document) => {
+      console.log(document.id)
+    }
+
     const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!documentApi) return
       loading.value = true
       if (!(props.organisationId && props.repositoryId && props.queryId)) {
-        await documentApi.getDocuments(undefined, undefined, undefined, page)
+        await documentApi.getDocuments(undefined, filter? [filter] : undefined, undefined, page)
           .then( r => { documents.value = r.data } )
           .catch( (e: Error) => { renderError(e) } )
           .finally( () => {
@@ -144,7 +145,8 @@ export default defineComponent({
       isAuthenticated,
       Permission,
       querySearch,
-      queryDisplayName
+      queryDisplayName,
+      routeToDocument
     }
   }
 })
