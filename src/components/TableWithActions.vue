@@ -107,7 +107,7 @@
 import { QTableProps } from 'quasar'
 import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {DocumentPage, OrganisationPage, RepositoryPage} from '@onto-med/top-api'
+import { DocumentPage, OrganisationPage, RepositoryPage } from '@onto-med/top-api'
 
 export default defineComponent({
   props: {

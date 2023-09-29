@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import {Query, QueryPage, QueryResult, QueryState} from '@onto-med/top-api'
+import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { exportFile, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
@@ -211,7 +211,7 @@ export default defineComponent({
 
       onPageSelect (page: number) {
         emit('request', page)
-      },
+      }
     }
   }
 })
