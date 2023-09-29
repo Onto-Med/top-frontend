@@ -38,9 +38,9 @@
 <script lang="ts">
 import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
 import SearchQueryForm from 'components/Documents/SearchQueryForm.vue'
-import {useI18n} from 'vue-i18n'
-import {computed, defineComponent, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { computed, defineComponent, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   components: {
@@ -48,7 +48,7 @@ export default defineComponent({
     SearchQueryForm
   },
   setup() {
-    const {t} = useI18n()
+    const { t } = useI18n()
     const route = useRoute()
     const router = useRouter()
     const queryId = ref<string|undefined>(undefined)
@@ -82,9 +82,11 @@ export default defineComponent({
         return
       }
 
-      if (route.params.hasOwnProperty('organisationId') &&
-        route.params.hasOwnProperty('repositoryId') &&
-        route.params.hasOwnProperty('queryId')) {
+      if (
+        route.params.hasOwnProperty('organisationId')
+        && route.params.hasOwnProperty('repositoryId')
+        && route.params.hasOwnProperty('queryId')
+      ) {
 
         organisationId.value = route.params.organisationId.toString()
         repositoryId.value = route.params.repositoryId.toString()
@@ -97,7 +99,7 @@ export default defineComponent({
       }
     }
 
-    onMounted( () => {
+    onMounted(() => {
       setSearchType(undefined)
     })
 
@@ -116,10 +118,4 @@ export default defineComponent({
     }
   }
 })
-interface QueryData {
-  organisationId: string,
-  repositoryId: string,
-  queryId: string,
-  queryName: string
-}
 </script>

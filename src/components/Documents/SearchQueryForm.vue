@@ -52,20 +52,19 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, inject, ref, onMounted, onUpdated} from 'vue';
-import TableWithActions from 'components/TableWithActions.vue';
-import {useI18n} from 'vue-i18n';
-import useNotify from 'src/mixins/useNotify';
-import {DocumentApiKey} from 'boot/axios';
-import {DocumentPage, Permission, Document} from '@onto-med/top-api';
-import {QTableProps} from 'quasar';
-import {storeToRefs} from 'pinia';
-import {useEntity} from 'src/pinia/entity';
+import { defineComponent, inject, ref, onMounted, onUpdated, computed } from 'vue'
+import TableWithActions from 'components/TableWithActions.vue'
+import { useI18n } from 'vue-i18n'
+import useNotify from 'src/mixins/useNotify'
+import { DocumentApiKey } from 'boot/axios'
+import { DocumentPage, Permission, Document} from '@onto-med/top-api'
+import { QTableProps } from 'quasar'
+import { storeToRefs } from 'pinia'
+import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   components: {
-    TableWithActions,
-    // PermissionIcon
+    TableWithActions
   },
   props: {
     organisationId: String,
@@ -75,13 +74,13 @@ export default defineComponent({
   },
   emits: ['clearQueryResults'],
   setup (props) {
-    const { t }     = useI18n()
+    const { t } = useI18n()
     const { renderError } = useNotify()
-    const loading   = ref(false)
+    const loading = ref(false)
     const querySearch = ref(false)
     const queryDisplayName = ref('')
     const documentApi = inject(DocumentApiKey)
-    const documents   = ref<DocumentPage>({
+    const documents = ref<DocumentPage>({
       content: [],
       number: 1,
       size: 0,
@@ -92,6 +91,7 @@ export default defineComponent({
     const { isAuthenticated } = storeToRefs(useEntity())
 
     const routeToDocument = (document: Document) => {
+      // TODO: implement routing to document
       console.log(document.id)
     }
 
@@ -100,39 +100,37 @@ export default defineComponent({
       loading.value = true
       if (!(props.organisationId && props.repositoryId && props.queryId)) {
         await documentApi.getDocuments(undefined, filter? [filter] : undefined, undefined, page)
-          .then( r => { documents.value = r.data } )
-          .catch( (e: Error) => { renderError(e) } )
-          .finally( () => {
+          .then(r => documents.value = r.data )
+          .catch((e: Error) => renderError(e))
+          .finally(() => {
             loading.value = false
             querySearch.value = false
             queryDisplayName.value = ''
-          } )
+          })
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         await documentApi.getDocumentsForQuery(props.organisationId, props.repositoryId, props.queryId, page)
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
           .then(r => documents.value = r.data)
-          .catch( (e: Error) => { renderError(e) } )
-          .finally( () => {
+          .catch((e: Error) => renderError(e))
+          .finally(() => {
             loading.value = false
             querySearch.value = true
             queryDisplayName.value = props.queryName? props.queryName: ''
-          } )
+          })
       }
     }
 
-    const cols = [
-      { name: 'actions'},
-      { name: 'id', field: 'id', label: 'id', align: 'left' },
+    const cols = computed(() => [
+      { name: 'actions' },
+      { name: 'id', field: 'id', label: t('id'), align: 'left' },
       { name: 'name', field: 'name', label: t('name'), align: 'left' },
-      { name: 'text', field: 'text', label: 'Content', align: 'left' },
-    ] as QTableProps['columns']
+      { name: 'text', field: 'text', label: t('content'), align: 'left' },
+    ] as QTableProps['columns'])
 
     onMounted(async () => {
       await reload()
     })
 
-    onUpdated( async() => {
+    onUpdated(async () => {
       await reload()
     })
 

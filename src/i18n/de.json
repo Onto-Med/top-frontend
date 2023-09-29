@@ -488,5 +488,6 @@
   "moveThing": "{thing} verschieben",
   "move": "Verschieben",
   "thingMoved": "{thing} wurde verschoben",
-  "movingNotPossible": "Für diesen Inhalt ist ein Verschieben nicht möglich."
+  "movingNotPossible": "Für diesen Inhalt ist ein Verschieben nicht möglich.",
+  "content": "Inhalt|Inhalte"
 }

@@ -316,7 +316,7 @@
     "emptyResult": "No result|No results"
   },
   "repositoryType": "Repository type|Repository types",
-  "documentSearch":{
+  "documentSearch": {
     "title": "Document search",
     "description": "Please select the type of the document representation.",
     "short": "Explorative document search",
@@ -488,5 +488,6 @@
   "moveThing": "Move {thing}",
   "move": "Move",
   "thingMoved": "{thing} has been moved",
-  "movingNotPossible": "Moving is not possible for this content."
+  "movingNotPossible": "Moving is not possible for this content.",
+  "content": "Content|Contents"
 }
