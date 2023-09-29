@@ -109,7 +109,7 @@ export default defineComponent({
           } )
       } else {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        await documentApi.getDocumentIdsForQuery(props.organisationId, props.repositoryId, props.queryId, page)
+        await documentApi.getDocumentsForQuery(props.organisationId, props.repositoryId, props.queryId, page)
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
           .then(r => documents.value = r.data)
           .catch( (e: Error) => { renderError(e) } )
