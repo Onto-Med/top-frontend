@@ -65,6 +65,7 @@
           <query-results-table
             class="fit"
             :page="queryPage"
+            :is-concept-query="isConceptQuery"
             @delete="deleteQuery"
             @prefill="prefillQuery"
             @request="loadQueryPage($event)"

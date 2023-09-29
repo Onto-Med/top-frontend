@@ -15,8 +15,10 @@
           <div class="text-h6">
             {{ title || name }}
           </div>
+          <slot name="searchQuery" />
           <q-space />
           <q-input
+            v-if="filterable"
             v-model="filter"
             :label="t('searchThing', { thing: title || name })"
             dense
@@ -105,7 +107,7 @@
 import { QTableProps } from 'quasar'
 import { defineComponent, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { OrganisationPage, RepositoryPage } from '@onto-med/top-api'
+import { DocumentPage, OrganisationPage, RepositoryPage } from '@onto-med/top-api'
 
 export default defineComponent({
   props: {
@@ -115,13 +117,18 @@ export default defineComponent({
     name: String,
     /** The page holding the content if the table. */
     page: {
-      type: Object as () => OrganisationPage|RepositoryPage,
+      type: Object as () => OrganisationPage|RepositoryPage|DocumentPage,
       required: true
     },
     columns: Array as () => QTableProps['columns'],
     loading: Boolean,
     /** Whether creating new entries is allowed. A respective button is displayed if true. */
-    create: Boolean
+    create: Boolean,
+    /** Whether a search field is enabled */
+    filterable: {
+      type: Boolean,
+      default: true
+    }
   },
   emits: ['row-clicked', 'create-clicked', 'request'],
   setup(props, { emit }) {

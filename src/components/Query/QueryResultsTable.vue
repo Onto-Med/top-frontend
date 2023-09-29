@@ -36,6 +36,11 @@
                       {{ t('downloadDataSet') }}
                     </q-item-section>
                   </q-item>
+                  <q-item v-if="isConceptQuery" v-close-popup clickable :disable="!isFinished(props.row)" @click="routeToDocumentView(props.row)">
+                    <q-item-section>
+                      {{ t('showDocumentResults') }}
+                    </q-item-section>
+                  </q-item>
                   <q-item v-close-popup clickable @click="$emit('prefill', props.row)">
                     <q-item-section>
                       {{ t('repeatThing', { thing: t('query') }) }}
@@ -83,6 +88,7 @@ import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   props: {
@@ -90,7 +96,8 @@ export default defineComponent({
       type: Object as () => QueryPage,
       required: true
     },
-    loading: Boolean
+    loading: Boolean,
+    isConceptQuery: Boolean
   },
   emits: ['delete', 'prefill', 'request'],
   setup(props, { emit }) {
@@ -102,6 +109,7 @@ export default defineComponent({
     const results = ref<QueryResult[]>([])
     const interval = ref<number>()
     const skippedQueries = ref<Set<string>>(new Set<string>())
+    const router = useRouter()
 
     const loadResult = async (query: Query) => {
       if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
@@ -123,6 +131,21 @@ export default defineComponent({
       return result.state || QueryState.Running
     }
 
+    const routeToDocumentView = (query: Query) => {
+      if (organisationId.value && repositoryId.value && query.id)
+        void router.push({
+          name: 'documentSearchByQuery',
+          params: {
+            organisationId: organisationId.value,
+            repositoryId: repositoryId.value,
+            queryId: query.id
+          },
+          query: {
+            queryName: query.name
+          }
+        })
+    }
+
     onMounted(() => {
       interval.value = window.setInterval(() => {
         props.page.content.map(async (query) => {
@@ -141,6 +164,7 @@ export default defineComponent({
     })
 
     return {
+      routeToDocumentView,
       t,
 
       rows: computed(() => props.page.content),
@@ -187,7 +211,7 @@ export default defineComponent({
 
       onPageSelect (page: number) {
         emit('request', page)
-      },
+      }
     }
   }
 })

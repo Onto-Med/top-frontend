@@ -316,7 +316,15 @@
     "emptyResult": "No result|No results"
   },
   "repositoryType": "Repository type|Repository types",
-  "documentSearch": "Document search",
+  "documentSearch": {
+    "title": "Document search",
+    "description": "Please select the type of the document representation.",
+    "short": "Explorative document search",
+    "type": {
+      "conceptCluster": "Concept Cluster",
+      "searchQuery": "Search Query"
+    }
+  },
   "phenotype_repository": "Phenotype repository",
   "concept_repository": "Concept repository",
   "exclusive": "Exclusive",
@@ -474,9 +482,15 @@
   },
   "withRestriction": "With restriction|With restrictions",
   "entityImported": "No entities were imported|One entity has been imported|{count} entities have been imported",
+  "showDocumentResults": "Show data set",
+  "clearDocumentQueryResult": "Clear query results",
   "moveTo": "Move to...",
   "moveThing": "Move {thing}",
   "move": "Move",
   "thingMoved": "{thing} has been moved",
-  "movingNotPossible": "Moving is not possible for this content."
+  "movingNotPossible": "Moving is not possible for this content.",
+  "content": "Content|Contents",
+  "importantNodesOnly": "Important nodes only",
+  "yes": "Yes",
+  "no": "No"
 }
