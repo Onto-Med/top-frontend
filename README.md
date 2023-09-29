@@ -2,6 +2,8 @@
 
 A Quasar Framework app
 
+[![Lint](https://github.com/Onto-Med/top-frontend/actions/workflows/lint.yml/badge.svg)](https://github.com/Onto-Med/top-frontend/actions/workflows/lint.yml)
+
 ## Install the dependencies
 The npm package `@onto-med/top-api` is currently located in a private GitHub Packages registry, thus requires authentication.
 
