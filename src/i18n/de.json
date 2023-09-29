@@ -489,5 +489,8 @@
   "move": "Verschieben",
   "thingMoved": "{thing} wurde verschoben",
   "movingNotPossible": "Für diesen Inhalt ist ein Verschieben nicht möglich.",
-  "content": "Inhalt|Inhalte"
+  "content": "Inhalt|Inhalte",
+  "importantNodesOnly": "Nur wichtige Knoten",
+  "yes": "Ja",
+  "no": "Nein"
 }

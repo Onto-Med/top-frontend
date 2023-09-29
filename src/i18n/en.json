@@ -489,5 +489,8 @@
   "move": "Move",
   "thingMoved": "{thing} has been moved",
   "movingNotPossible": "Moving is not possible for this content.",
-  "content": "Content|Contents"
+  "content": "Content|Contents",
+  "importantNodesOnly": "Important nodes only",
+  "yes": "Yes",
+  "no": "No"
 }

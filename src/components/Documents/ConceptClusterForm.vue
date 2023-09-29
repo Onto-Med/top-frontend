@@ -197,12 +197,12 @@ export default defineComponent({
       await conceptApi.getConceptClusters()
         .then((r: { data: { id: string; labels?: string | undefined }[] }) => {
           concepts.value = r.data
-          concepts.value.forEach(function (concept, index) {
+          concepts.value.forEach((_, index) => {
             conceptColors.push({
               'background-color': distinctColors[index],
               'color': distinctColorsFont[index]
             })
-          });
+          })
 
           selectedColors.value = new Array(concepts.value.length)
             .fill({ 'background-color': '', 'color': '' }) as ConceptColor[]
@@ -222,9 +222,7 @@ export default defineComponent({
             selectedConcepts.value.length = 0
             selectedConcepts.value.push(idx)
           } else if (selectedConcepts.value.includes(idx)) {
-            selectedConcepts.value = selectedConcepts.value.filter(function (item) {
-              return item !== idx
-            })
+            selectedConcepts.value = selectedConcepts.value.filter(item => item !== idx)
           } else {
             selectedConcepts.value.push(idx)
           }
@@ -233,20 +231,23 @@ export default defineComponent({
       }
 
       if (selectedConcepts.value.length !== 0) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         await documentApi.getDocumentIdsByConceptClusterIds(
           selectedConcepts.value.map(selConcept => {
             return concepts.value[selConcept].id
           }), conceptMode.value, undefined, mostImportantNodes.value
         )
           .then(r => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
             documents.value = r.data//.map(doc => doc.id).filter(id => id !== undefined) as string[]
           })
           .catch((e: Error) => renderError(e))
-      } else {document_.value = undefined}
-      selectedColors.value.fill({'background-color': '', 'color': ''})
-      selectedConcepts.value.forEach( function (_idx) {selectedColors.value[_idx] = conceptColors[_idx]})
+      } else {
+        document_.value = undefined
+      }
+      selectedColors.value.fill({
+        'background-color': '',
+        'color': ''
+      })
+      selectedConcepts.value.forEach(_idx => selectedColors.value[_idx] = conceptColors[_idx])
     }
 
     onMounted(async () => {
@@ -291,16 +292,13 @@ export default defineComponent({
       mostImportantNodes,
       chooseConcept,
       async chooseDocument (documentId: string) {
-        if (!documentApi) return
-        console.log(documentId)
-        await documentApi.getDocumentById(documentId,
-          selectedConcepts.value.map(selConcept => {
-            return concepts.value[selConcept].id
-          })
+        await documentApi?.getDocumentById(
+          documentId,
+          selectedConcepts.value.map(
+            selConcept => concepts.value[selConcept].id
+          )
         )
-          .then(r => {
-            document_.value = r.data
-          })
+          .then(r => document_.value = r.data)
           .catch((e: Error) => renderError(e))
       },
 
@@ -324,11 +322,11 @@ export default defineComponent({
       mostImportantNodesOptions: computed(() => [
         {
           label: t('yes'),
-          value: true,
+          value: true
         },
         {
           label: t('no'),
-          value: false,
+          value: false
         }
       ])
     }
