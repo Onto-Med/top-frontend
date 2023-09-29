@@ -1,0 +1,43 @@
+name: Lint and test
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - .devcontainer/**
+      - docker-entrypoint.d/**
+      - .dockerignore
+      - Dockerfile
+      - LICENSE
+      - README.md
+      - nginx.conf
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - .devcontainer/**
+      - docker-entrypoint.d/**
+      - .dockerignore
+      - Dockerfile
+      - LICENSE
+      - README.md
+      - nginx.conf
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"  
+      - name: Install dependencies
+        run: yarn
+      - name: Run ESLint
+        run: yarn run eslint . --ext .js,.jsx,.ts,.tsx,.vue
