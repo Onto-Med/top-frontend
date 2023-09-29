@@ -1,0 +1,43 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - .devcontainer/**
+      - docker-entrypoint.d/**
+      - .dockerignore
+      - Dockerfile
+      - LICENSE
+      - README.md
+      - nginx.conf
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - .devcontainer/**
+      - docker-entrypoint.d/**
+      - .dockerignore
+      - Dockerfile
+      - LICENSE
+      - README.md
+      - nginx.conf
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Run ESLint
+        run: eslint . --ext .js,.jsx,.ts,.tsx
