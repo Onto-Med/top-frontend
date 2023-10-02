@@ -1,4 +1,4 @@
-<template #append>
+<template v-slot="append">
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card>
       <q-card-section class="row items-center">

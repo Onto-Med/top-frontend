@@ -77,6 +77,7 @@ module.exports = {
   rules: {
     'prefer-promise-reject-errors': 'off',
     'vue/require-default-prop': 'off',
+    'vue/multi-word-component-names': 'off',
 
     "vue/max-attributes-per-line": ["warn", {
       "singleline": {

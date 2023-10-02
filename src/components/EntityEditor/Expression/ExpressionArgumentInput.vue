@@ -108,14 +108,12 @@
             @update:model-value="handleArgumentUpdate(index, $event)"
             @entity-clicked="$emit('entityClicked', $event)"
           >
-            <template
-              v-if="!infix && (index + 1 < argumentCount || showMoreBtn)"
-              #append
-              :class="{ hover: hover }"
-              @mouseover="hover = true"
-              @mouseleave="hover = false"
-            >
-              <span>,{{ !expand ? '&nbsp;' : '' }}</span>
+            <template v-if="!infix && (index + 1 < argumentCount || showMoreBtn)" #append>
+              <span
+                :class="{ hover: hover }"
+                @mouseover="hover = true"
+                @mouseleave="hover = false"
+              >,{{ !expand ? '&nbsp;' : '' }}</span>
             </template>
           </expression-argument-input>
         </template>
