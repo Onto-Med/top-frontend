@@ -37,8 +37,10 @@
             <span v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.label" />
             <small v-show="scope.opt.code"> [{{ scope.opt.code }}]</small>
           </q-item-label>
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <q-item-label caption v-html="scope.opt.highlightSynonym ? scope.opt.highlightSynonym : scope.opt.name" />
+          <q-item-label caption>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span v-html="scope.opt.highlightSynonym ? scope.opt.highlightSynonym : scope.opt.name" />
+          </q-item-label>
         </q-item-section>
         <q-item-section avatar>
           <q-badge v-if="scope.opt.codeSystem" color="teal">

@@ -1,4 +1,4 @@
-<template #append>
+<template v-slot="append">
   <q-dialog ref="dialog" @hide="onDialogHide">
     <q-card>
       <q-card-section>
@@ -92,7 +92,7 @@
 <script lang="ts">
 import { Organisation, OrganisationMembership, Permission, User } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
-import { QDialog, useQuasar } from 'quasar'
+import { QDialog, QTableColumn, useQuasar } from 'quasar'
 import { OrganisationApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
@@ -177,7 +177,7 @@ export default defineComponent({
           { name: 'user', label: t('user'), align: 'left', sortable: true, required: true },
           { name: 'permission', label: t('permission'), align: 'left', sortable: true, required: true },
           { name: 'actions', align: 'right', sortable: false }
-        ]
+        ] as QTableColumn[]
       }),
 
       isAuthenticated,

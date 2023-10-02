@@ -12,7 +12,7 @@
           :autofocus="autofocus || !modelValue[index].text"
           debounce="200"
           class="col q-pb-none"
-          @update:modelValue="updateEntryByIndex(index, $event, modelValue[index].lang)"
+          @update:model-value="updateEntryByIndex(index, $event, modelValue[index].lang)"
         >
           <template #before>
             <q-select
@@ -22,7 +22,7 @@
               :error="!modelValue[index].lang"
               hide-bottom-space
               class="lang-input"
-              @update:modelValue="updateEntryByIndex(index, modelValue[index].text, $event)"
+              @update:model-value="updateEntryByIndex(index, modelValue[index].text, $event)"
             />
           </template>
           <template #after>

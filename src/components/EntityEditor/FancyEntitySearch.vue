@@ -272,10 +272,11 @@ export default defineComponent({
         nextPage.value = 2
         totalPages.value = 0
         loadOptions()
-          .then(page => {
+          .then(async page => {
             totalPages.value = page.totalPages
             options.value = page.content
-            void nextTick(() => virtualScroll.value?.refresh())
+            await nextTick()
+              .then(() => virtualScroll.value?.refresh())
               .then(() => menu.value?.updatePosition())
           })
           .catch((e: Error) => renderError(e))
@@ -288,12 +289,13 @@ export default defineComponent({
           return
         loading.value = true
         loadOptions(nextPage.value)
-          .then(page => {
+          .then(async page => {
             totalPages.value = page.totalPages
             if (page.content.length > 0) {
               nextPage.value++
               options.value = options.value.concat(page.content)
-              void nextTick(() => details.ref.refresh())
+              await nextTick()
+                .then(() => details.ref.refresh())
                 .then(() => menu.value?.updatePosition())
             }
           })

@@ -1,4 +1,4 @@
-<template #append>
+<template v-slot="append">
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="dialog-content">
       <q-card-section>
@@ -25,7 +25,7 @@
               :entity-id="superEntity ? superEntity.id : undefined"
               :label="t('selectThing', { thing: label }) + '...'"
               removeable
-              @removeClicked="removeSuperEntity(index)"
+              @remove-clicked="removeSuperEntity(index)"
               @entity-set="setSuperEntity(index, $event)"
               @entity-clicked="routeToEntity(superEntity)"
             />
