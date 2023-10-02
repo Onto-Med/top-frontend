@@ -48,12 +48,19 @@
         </tr>
       </template>
     </table-with-actions>
+
+    <document-form
+      v-model="documentView"
+      v-model:show="showForm"
+      @update:show=" showForm = false "
+    />
   </q-card-section>
 </template>
 
 <script lang="ts">
 import { defineComponent, inject, ref, onMounted, onUpdated, computed } from 'vue'
 import TableWithActions from 'components/TableWithActions.vue'
+import DocumentForm from 'components/Documents/DocumentForm.vue';
 import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { DocumentApiKey } from 'boot/axios'
@@ -64,7 +71,7 @@ import { useEntity } from 'src/pinia/entity'
 
 export default defineComponent({
   components: {
-    TableWithActions
+    TableWithActions, DocumentForm
   },
   props: {
     organisationId: String,
@@ -89,10 +96,13 @@ export default defineComponent({
       type: 'document'
     })
     const { isAuthenticated } = storeToRefs(useEntity())
+    const documentView = ref<Document>()
+    const showForm  = ref(false)
 
     const routeToDocument = (document: Document) => {
       // TODO: implement routing to document
-      console.log(document.id)
+      showForm.value = true
+      documentView.value = document
     }
 
     const reload = async (filter: string|undefined = undefined, page = 1) => {
@@ -144,7 +154,10 @@ export default defineComponent({
       Permission,
       querySearch,
       queryDisplayName,
-      routeToDocument
+      routeToDocument,
+      document,
+      documentView,
+      showForm
     }
   }
 })
