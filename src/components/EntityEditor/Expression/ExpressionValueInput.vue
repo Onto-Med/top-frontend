@@ -47,7 +47,7 @@
             round
             class="text-grey"
             size="xs"
-            icon="question_mark"
+            icon="info"
             target="_blank"
             :href="baseDocUrl + constant.id + '.html'"
             :title="t('showThing', { thing: t('documentation') })"

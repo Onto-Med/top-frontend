@@ -41,7 +41,7 @@
                     round
                     class="col-auto text-grey"
                     size="xs"
-                    icon="question_mark"
+                    icon="info"
                     target="_blank"
                     :href="toFunctionUrl(fun)"
                     :title="t('showThing', { thing: t('documentation') })"
