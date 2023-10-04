@@ -107,11 +107,11 @@
   </q-splitter>
   <q-separator />
 
-  <q-card-actions>
+  <q-card-actions class="justify-between">
     <q-btn
       icon="play_arrow"
       color="secondary"
-      :label="t('execute')"
+      :label="t('executeThing', { thing: t('query') })"
       :title="t('queryExecuteDescription')"
       :disable="!configurationComplete"
       @click="onExecute"
@@ -119,7 +119,7 @@
     <q-btn
       icon="save"
       color="primary"
-      :label="t('export')"
+      :label="t('exportThing', { thing: t('query') })"
       :title="t('queryExportDescription')"
       @click="exportQuery"
     />

@@ -281,7 +281,6 @@ export default defineComponent({
       },
 
       routeToEntity (entity: Entity) {
-        console.log(entity)
         if (!entity.repository || !entity.repository.organisation) return
         void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
       },

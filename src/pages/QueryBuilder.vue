@@ -116,6 +116,9 @@ import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
 import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
 import { useRouter } from 'vue-router'
 
+const props = defineProps({
+  queryId: String
+})
 const { t } = useI18n()
 const $q = useQuasar()
 const router = useRouter()
@@ -143,16 +146,18 @@ const drawerWidth = computed(() => {
   return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
 })
 
-function loadQueryPage (page: number) {
+async function loadQueryPage (page: number) {
   if (queryApi && organisation.value && repository.value)
-    queryApi.getQueries(organisation.value.id, repository.value.id, page)
+    await queryApi.getQueries(organisation.value.id, repository.value.id, page)
       .then(r => queryPage.value = r.data)
       .catch((e: Error) => renderError(e))
 }
 
 onMounted(() => {
   if (!organisation.value || !repository.value) return
-  loadQueryPage(1)
+  // TODO: Loading the first page is not sufficient to get a query by ID. There must be an API endpoint to request a query by ID.
+  void loadQueryPage(1)
+    .then(() => prefillQuery(queryPage.value.content.find(q => q.id === props.queryId)))
 })
 
 function reset (repository?: Repository) {
@@ -212,7 +217,12 @@ function deleteQuery (query: PhenotypeQuery) {
     })
 }
 
-function prefillQuery (query: Query) {
+function prefillQuery (query?: Query) {
+  void router.replace({
+    name: 'queryBuilder',
+    params: { organisationId: organisation.value?.id, repositoryId: repository.value?.id, queryId: query?.id }
+  })
+  if (!query) return
   if (isConceptQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     conceptQueryForm.value?.prefillQuery(query as ConceptQuery)
