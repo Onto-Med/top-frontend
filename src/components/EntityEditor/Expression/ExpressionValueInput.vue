@@ -36,7 +36,7 @@
           :key="constant.id"
           v-close-popup
           clickable
-          class="items-center justify-between"
+          class="items-center justify-between text-no-wrap"
           @click="$emit('update:constantId', constant.id)"
         >
           {{ constant.title || constant.id }}
@@ -44,6 +44,8 @@
             v-if="baseDocUrl"
             dense
             flat
+            round
+            class="text-grey"
             size="xs"
             icon="question_mark"
             target="_blank"
@@ -66,11 +68,12 @@
           {{ t('showThing', { thing: t('documentation') }) }}
         </q-item-section>
       </q-item>
-      <q-item v-show="isValueSet" clickable @click="$emit('update:value', undefined)">
-        <q-item-section v-t="'change'" />
-      </q-item>
+      <q-separator v-if="baseDocUrl && defaultConstant" />
       <q-item clickable @click="$emit('enclose')">
         <q-item-section v-t="'encloseWithExpression'" />
+      </q-item>
+      <q-item v-show="isValueSet" clickable @click="$emit('update:value', undefined)">
+        <q-item-section v-t="'change'" />
       </q-item>
       <q-item v-close-popup clickable @click="$emit('remove')">
         <q-item-section v-t="'remove'" />

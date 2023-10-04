@@ -1,6 +1,6 @@
 <template>
-  <q-menu>
-    <div class="scroll">
+  <q-menu ref="menu" anchor="top left" self="bottom left" @hide="showOptions = false">
+    <div v-if="showOptions" class="scroll">
       <q-item dense>
         <q-select
           v-model="filter"
@@ -26,11 +26,28 @@
               :key="fun.id"
               v-close-popup
               clickable
-              class="col-4"
+              class="col-4 q-pa-none"
               @click="$emit('select', fun)"
             >
-              <q-item-section :title="te('functionDescriptions.' + fun.id) ? t('functionDescriptions.' + fun.id) : undefined">
-                {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
+              <q-item-section>
+                <div class="row items-center justify-between">
+                  <div class="col">
+                    {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
+                  </div>
+                  <q-btn
+                    v-if="baseDocUrl"
+                    dense
+                    flat
+                    round
+                    class="col-auto text-grey"
+                    size="xs"
+                    icon="question_mark"
+                    target="_blank"
+                    :href="toFunctionUrl(fun)"
+                    :title="t('showThing', { thing: t('documentation') })"
+                    @click.stop=""
+                  />
+                </div>
               </q-item-section>
             </q-item>
           </q-list>
@@ -39,8 +56,17 @@
     </div>
     <q-separator />
     <q-list dense>
+      <q-item v-if="value" clickable target="_blank" :href="toFunctionUrl(value)">
+        <q-item-section>
+          {{ t('showThing', { thing: t('documentation') }) }}
+        </q-item-section>
+      </q-item>
+      <q-separator v-if="value" />
       <q-item v-if="enclosable" v-close-popup clickable @click="$emit('enclose')">
         <q-item-section v-t="'encloseWithExpression'" />
+      </q-item>
+      <q-item v-if="value && !showOptions" clickable @click="showChangeOptions()">
+        <q-item-section v-t="'change'" />
       </q-item>
       <q-item
         v-if="removable"
@@ -57,12 +83,15 @@
 <script setup lang="ts">
 import { ExpressionFunction } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
+import { QMenu } from 'quasar'
+import { env } from 'src/config'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
+  value: Object as () => ExpressionFunction,
   enclosable: {
     type: Boolean,
     default: true
@@ -82,6 +111,7 @@ const { t, te } = useI18n()
 const entityStore = useEntity()
 const { renderError } = useNotify()
 const { functions } = storeToRefs(entityStore)
+const menu = ref<QMenu>()
 const filter = ref<string[]|undefined>(undefined)
 const functionTypes = computed(() => {
   return functions.value?.map(f => f.type)
@@ -123,6 +153,24 @@ const functionGroups = computed(() =>
     new Map() as Map<string, ExpressionFunction[]>
   ) || new Map()
 )
+
+const showOptions = ref(!props.value)
+
+const baseDocUrl = computed(() => {
+  const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
+  return !baseUrl ? undefined : `${baseUrl}/functions`
+})
+
+function toFunctionUrl(fun: ExpressionFunction) {
+  return baseDocUrl.value
+    ? `${baseDocUrl.value}/${fun.type || ''}/${fun.id}.html`
+    : undefined
+}
+
+function showChangeOptions() {
+  showOptions.value = true
+  void nextTick(() => menu.value?.updatePosition())
+}
 </script>
 
 <style lang="sass" scoped>

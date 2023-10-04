@@ -49,9 +49,10 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b :title="functionTooltip">{{ functionTitle }}</b> (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
+          :value="fun"
           :include-function-types="includeFunctionTypes"
           :exclude-functions="excludeFunctions"
           @enclose="enclose()"
@@ -79,11 +80,12 @@
           >
             <span>
               {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}
-              <b :title="functionTooltip">{{ functionTitle }}</b>
+              <b>{{ functionTitle }}</b>
               {{ !expand ? '&nbsp;' : '' }}
             </span>
             <expression-context-menu
               v-if="!readonly"
+              :value="fun"
               :include-function-types="includeFunctionTypes"
               :exclude-function-types="excludeFunctionTypes"
               :exclude-functions="excludeFunctions"
@@ -137,10 +139,11 @@
           @mouseleave="hover = false"
         >
           {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-          <b :title="functionTooltip">{{ functionTitle }}</b>
+          <b>{{ functionTitle }}</b>
           <slot name="append" />
           <expression-context-menu
             v-if="!readonly"
+            :value="fun"
             :include-function-types="includeFunctionTypes"
             :exclude-function-types="excludeFunctionTypes"
             :exclude-functions="excludeFunctions"
@@ -286,12 +289,6 @@ export default defineComponent({
       functionTitle: computed(() => {
         if (!fun.value) return ''
         return te('functions.' + fun.value.id) ? t('functions.' + fun.value.id) : fun.value.title
-      }),
-
-      functionTooltip: computed(() => {
-         if (!fun.value || !fun.value.id || !te('functionDescriptions.' + fun.value.id))
-          return undefined
-         return t('functionDescriptions.' + fun.value.id)
       }),
 
       prefix: computed(
