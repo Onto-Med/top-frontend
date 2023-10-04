@@ -82,99 +82,91 @@
   </q-popup-edit>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { BooleanValue, Constant, DataType, DateTimeValue, NumberValue, StringValue, Value } from '@onto-med/top-api'
 import { QPopupEdit } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
-import { computed, defineComponent, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { env } from 'src/config'
 
-export default defineComponent({
-  name: 'ConstantInput',
-  props: {
-    value: Object as () => Value|undefined,
-    constantId: String,
-    readonly: Boolean,
-    expand: Boolean,
-    indentLevel: {
-      type: Number,
-      default: 0
-    },
-    indent: {
-      type: Number,
-      default: 2
-    }
+const props = defineProps({
+  value: Object as () => Value|undefined,
+  constantId: String,
+  readonly: Boolean,
+  expand: Boolean,
+  indentLevel: {
+    type: Number,
+    default: 0
   },
-  emits: ['update:value', 'update:constantId', 'enclose', 'remove'],
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const popup = ref(null as unknown as QPopupEdit)
-    const entityStore = useEntity()
-    const constants = ref(undefined as Constant[]|undefined)
-    const dataType = ref(DataType.Number)
-    const isValueSet = computed(() => props.value || defaultConstant.value)
-
-    void entityStore.getConstants()
-      .then(o => constants.value = o)
-
-    onMounted(() => {
-      if (!props.value && !props.constantId)
-        popup.value.show()
-    })
-
-    const defaultConstant = computed(() => constants.value?.find(c => c.id === props.constantId))
-
-    const toValue = (value: string|number|Date|boolean|undefined, dataType: DataType): Value|undefined => {
-      if (dataType === DataType.String)
-        return { value: value, dataType: dataType } as StringValue
-      if (dataType === DataType.Number)
-        return { value: value, dataType: dataType } as NumberValue
-      if (dataType === DataType.DateTime)
-        return { value: value, dataType: dataType } as DateTimeValue
-      if (dataType === DataType.Boolean)
-        return { value: value, dataType: dataType } as BooleanValue
-      return undefined
-    }
-
-    return {
-      t,
-      isValueSet,
-      popup,
-      constants,
-      defaultConstant,
-      dataType,
-      baseDocUrl: computed(() => {
-        const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
-        return !baseUrl ? undefined : `${baseUrl}/constants/`
-      }),
-
-      setValue (value: string|number|Date|boolean|undefined) {
-        emit('update:value', toValue(value, dataType.value))
-      },
-
-      toggleDataType () {
-        if (dataType.value === DataType.Number) dataType.value = DataType.DateTime
-        else if (dataType.value === DataType.DateTime) dataType.value = DataType.String
-        else dataType.value = DataType.Number
-      },
-
-      dataTypeIcon: computed(() => {
-        if (dataType.value === DataType.Number) return 'pin'
-        else if (dataType.value === DataType.DateTime) return 'today'
-        else if (dataType.value === DataType.String) return 'article'
-        return 'question_mark'
-      }),
-
-      isStringValue: computed(() => props.value?.dataType === DataType.String),
-
-      toInputType (dataType: DataType): string {
-        if (dataType === DataType.DateTime) return 'datetime-local'
-        return dataType
-      }
-    }
+  indent: {
+    type: Number,
+    default: 2
   }
 })
+
+const emit = defineEmits(['update:value', 'update:constantId', 'enclose', 'remove'])
+
+const { t } = useI18n()
+const popup = ref(null as unknown as QPopupEdit)
+const entityStore = useEntity()
+const constants = ref(undefined as Constant[]|undefined)
+const dataType = ref(DataType.Number)
+const isValueSet = computed(() => props.value || defaultConstant.value)
+
+void entityStore.getConstants()
+  .then(o => constants.value = o)
+
+onMounted(() => {
+  if (!props.value && !props.constantId)
+    popup.value.show()
+})
+
+const defaultConstant = computed(
+  () => constants.value?.find(c => c.id === props.constantId)
+)
+const isStringValue = computed(
+  () => props.value?.dataType === DataType.String
+)
+
+const baseDocUrl = computed(() => {
+  const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
+  return !baseUrl ? undefined : `${baseUrl}/constants/`
+})
+
+const dataTypeIcon = computed(() => {
+  if (dataType.value === DataType.Number) return 'pin'
+  else if (dataType.value === DataType.DateTime) return 'today'
+  else if (dataType.value === DataType.String) return 'article'
+  return 'question_mark'
+})
+
+function toValue(value: string|number|Date|boolean|undefined, dataType: DataType): Value|undefined {
+  if (dataType === DataType.String)
+    return { value: value, dataType: dataType } as StringValue
+  if (dataType === DataType.Number)
+    return { value: value, dataType: dataType } as NumberValue
+  if (dataType === DataType.DateTime)
+    return { value: value, dataType: dataType } as DateTimeValue
+  if (dataType === DataType.Boolean)
+    return { value: value, dataType: dataType } as BooleanValue
+  return undefined
+}
+
+function setValue (value: string|number|Date|boolean|undefined) {
+  emit('update:value', toValue(value, dataType.value))
+}
+
+function toggleDataType () {
+  if (dataType.value === DataType.Number) dataType.value = DataType.DateTime
+  else if (dataType.value === DataType.DateTime) dataType.value = DataType.String
+  else dataType.value = DataType.Number
+}
+
+function toInputType(dataType: DataType): string {
+  if (dataType === DataType.DateTime) return 'datetime-local'
+  return dataType
+}
 </script>
 
 <style lang="sass" scoped>
