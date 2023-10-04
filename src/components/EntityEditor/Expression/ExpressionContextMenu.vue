@@ -19,7 +19,7 @@
           <q-item-label class="text-bold">
             {{ functionType.label }}
             <q-btn
-              v-if="baseDocUrl && functionType.value !== 'component'"
+              v-if="baseDocUrl && !noDocFunctionTypes.includes(functionType.value)"
               dense
               flat
               round
@@ -48,7 +48,7 @@
                     {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
                   </div>
                   <q-btn
-                    v-if="baseDocUrl && fun.type !== 'component'"
+                    v-if="baseDocUrl && !noDocFunctionTypes.includes(fun.type)"
                     dense
                     flat
                     round
@@ -140,6 +140,11 @@ const functionTypes = computed(() => {
     })
 })
 
+const noDocFunctionTypes = [
+  'component',
+  'textFunction'
+]
+
 onMounted(() => {
   if (!functions.value)
     entityStore.reloadFunctions()
@@ -175,13 +180,13 @@ const baseDocUrl = computed(() => {
 })
 
 function toPackageDocUrl(name: string) {
-  return !baseDocUrl.value || name === 'component'
+  return !baseDocUrl.value || noDocFunctionTypes.includes(name)
     ? undefined
     : `${baseDocUrl.value}/${name}/package-summary.html`
 }
 
 function toFunctionDocUrl(fun: ExpressionFunction) {
-  return !baseDocUrl.value || fun.type === 'component'
+  return !baseDocUrl.value || !fun.type || noDocFunctionTypes.includes(fun.type)
     ? undefined
     : `${baseDocUrl.value}/${fun.type || ''}/${fun.id}.html`
 }
