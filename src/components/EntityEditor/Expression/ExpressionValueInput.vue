@@ -29,8 +29,26 @@
       </template>
     </q-input>
     <q-list v-if="constants" dense>
-      <q-item v-for="constant in constants" :key="constant.id" v-close-popup clickable @click="$emit('update:constantId', constant.id)">
+      <q-item
+        v-for="constant in constants"
+        :key="constant.id"
+        v-close-popup
+        clickable
+        class="items-center justify-between"
+        @click="$emit('update:constantId', constant.id)"
+      >
         {{ constant.title || constant.id }}
+        <q-btn
+          v-if="baseDocUrl"
+          dense
+          flat
+          size="xs"
+          icon="question_mark"
+          target="_blank"
+          :href="baseDocUrl + constant.id + '.html'"
+          :title="t('showThing', { thing: t('documentation') })"
+          @click.stop=""
+        />
       </q-item>
     </q-list>
     <q-separator />
@@ -46,11 +64,12 @@
 </template>
 
 <script lang="ts">
-import { BooleanValue, Constant, DataType, DateTimeValue, NumberValue, StringValue, Value } from '@onto-med/top-api';
-import { QPopupEdit } from 'quasar';
-import { useEntity } from 'src/pinia/entity';
+import { BooleanValue, Constant, DataType, DateTimeValue, NumberValue, StringValue, Value } from '@onto-med/top-api'
+import { QPopupEdit } from 'quasar'
+import { useEntity } from 'src/pinia/entity'
 import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
+import { env } from 'src/config'
 
 export default defineComponent({
   name: 'ConstantInput',
@@ -104,6 +123,10 @@ export default defineComponent({
       constants,
       defaultConstant,
       dataType,
+      baseDocUrl: computed(() => {
+        const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
+        return !baseUrl ? undefined : `${baseUrl}/constants/`
+      }),
 
       setValue (value: string|number|Date|boolean|undefined) {
         emit('update:value', toValue(value, dataType.value))
