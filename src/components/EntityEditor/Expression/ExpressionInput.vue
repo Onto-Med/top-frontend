@@ -79,8 +79,8 @@
   </expandable-card>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import ExpressionArgumentInput from 'src/components/EntityEditor/Expression/ExpressionArgumentInput.vue'
@@ -89,93 +89,83 @@ import Dialog from 'src/components/Dialog.vue'
 import { EntityType, Expression } from '@onto-med/top-api'
 import { useQuasar } from 'quasar'
 
-export default defineComponent({
-  components: {
-    ExpressionArgumentInput,
-    ExpandableCard,
-    SwitchInput
+const props = defineProps({
+  modelValue: {
+    type: Object as () => Expression,
+    default: () => { return {} }
   },
-  props: {
-    modelValue: {
-      type: Object as () => Expression,
-      default: () => { return {} }
-    },
-    label: String,
-    monospace: {
-      type: Boolean,
-      default: true
-    },
-    expanded: Boolean,
-    helpText: String,
-    showHelp: Boolean,
-    organisationId: String,
-    repositoryId: String,
-    readonly: Boolean,
-    entityTypes: {
-      type: Array as () => EntityType[],
-      default: () => []
-    },
-    canBeSwitch: Boolean,
-    includeFunctionTypes: Array as () => string[],
-    excludeFunctionTypes: Array as () => string[],
-    excludeFunctions: Array as () => string[]
+  label: String,
+  monospace: {
+    type: Boolean,
+    default: true
   },
-  emits: ['update:modelValue', 'entityClicked'],
-  setup (props, { emit }) {
-    const { t } = useI18n()
-    const $q = useQuasar()
-    const expandExpression = ref<boolean>($q.localStorage.getItem('expandExpression') || false)
-    const indent = ref<number>($q.localStorage.getItem('expressionIndentSize') || 2)
-
-    watch(
-      expandExpression,
-      (newVal) => $q.localStorage.set('expandExpression', newVal)
-    )
-
-    watch(
-      indent,
-      (newVal) => $q.localStorage.set('expressionIndentSize', newVal)
-    )
-
-    return {
-      t,
-      expandExpression,
-      indent,
-      scores: computed(() => props.canBeSwitch && props.modelValue && props.modelValue.functionId === 'switch'),
-
-      showClearDialog () {
-        $q.dialog({
-          component: Dialog,
-          componentProps: {
-            message: t('confirmClearExpression')
-          }
-        }).onOk(() =>
-          emit('update:modelValue', {})
-        )
-      },
-
-      toggleExpressionType (state: boolean) {
-        if (
-          (props.modelValue.functionId && props.modelValue.functionId !== 'switch')
-          || props.modelValue.arguments
-          || props.modelValue.constantId
-          || props.modelValue.entityId
-        ) {
-          $q.dialog({
-            component: Dialog,
-            componentProps: {
-              message: t('confirmChangeExpressionType')
-            }
-          }).onOk(() =>
-            emit('update:modelValue', { functionId: state ? 'switch' : undefined })
-          )
-        } else {
-          emit('update:modelValue', { functionId: state ? 'switch' : undefined })
-        }
-      }
-    }
-  }
+  expanded: Boolean,
+  helpText: String,
+  showHelp: Boolean,
+  organisationId: String,
+  repositoryId: String,
+  readonly: Boolean,
+  entityTypes: {
+    type: Array as () => EntityType[],
+    default: () => []
+  },
+  canBeSwitch: Boolean,
+  includeFunctionTypes: Array as () => string[],
+  excludeFunctionTypes: Array as () => string[],
+  excludeFunctions: Array as () => string[]
 })
+
+const emit = defineEmits(['update:modelValue', 'entityClicked'])
+
+const { t } = useI18n()
+const $q = useQuasar()
+const expandExpression = ref<boolean>($q.localStorage.getItem('expandExpression') || false)
+const indent = ref<number>($q.localStorage.getItem('expressionIndentSize') || 2)
+
+const scores = computed(
+  () => props.canBeSwitch && props.modelValue && props.modelValue.functionId === 'switch'
+)
+
+watch(
+  expandExpression,
+  (newVal) => $q.localStorage.set('expandExpression', newVal)
+)
+
+watch(
+  indent,
+  (newVal) => $q.localStorage.set('expressionIndentSize', newVal)
+)
+
+function showClearDialog() {
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('confirmClearExpression')
+    }
+  }).onOk(() =>
+    emit('update:modelValue', {})
+  )
+}
+
+function toggleExpressionType(state: boolean) {
+  if (
+    (props.modelValue.functionId && props.modelValue.functionId !== 'switch')
+    || props.modelValue.arguments
+    || props.modelValue.constantId
+    || props.modelValue.entityId
+  ) {
+    $q.dialog({
+      component: Dialog,
+      componentProps: {
+        message: t('confirmChangeExpressionType')
+      }
+    }).onOk(() =>
+      emit('update:modelValue', { functionId: state ? 'switch' : undefined })
+    )
+  } else {
+    emit('update:modelValue', { functionId: state ? 'switch' : undefined })
+  }
+}
 </script>
 
 <style lang="sass" scoped>

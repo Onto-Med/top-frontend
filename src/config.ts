@@ -7,8 +7,14 @@ export const env = {
   GDPR_NOTICE:       process.env.GDPR_NOTICE,
   GDPR_POLICY_URL:   process.env.GDPR_POLICY_URL,
   SYSTEM_NOTICE:     process.env.SYSTEM_NOTICE,
-  DOCUMENTS_ENABLED: process.env.DOCUMENTS_ENABLED
+  DOCUMENTS_ENABLED: process.env.DOCUMENTS_ENABLED,
+  TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL || 'https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner'
 } as NodeJS.ProcessEnv
+
+export const noDocFunctionTypes = [
+  'component',
+  'textFunction'
+]
 
 /**
  * To add new languages please insert respective configurations to the following exports.

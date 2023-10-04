@@ -37,20 +37,6 @@
   "forkEntityToRepository": "Do you want to transfer {entity} to the repository {repository}?",
   "format": "Format|Formats",
   "function": "Function",
-  "functionDescriptions": {
-    "Date": "Determines the date when the argument was observed.",
-    "MinTrue": "Returns true if at least X arguments have the value true. X must be passed as the first argument.",
-    "Filter": "Restricts the values of a phenotype to the selected value range or observation period. The first argument of the function is the phenotype whose values are to be restricted. All further arguments are pairs of comparison operators and values/dates.",
-    "CutFirst": "Returns the phenotype values except for the first one.",
-    "CutLast": "Returns the phenotype values except for the last one.",
-    "If": "If the first argument is true, the second one is returned, otherwise the third.",
-    "Switch": "The switch function receives pairs of values as arguments. If the first value of a pair is true, the second value is returned as the result of the function. The pairs are checked sequentially and only the first pair that evaluates to true is considered. In addition, you have the option to define a default value as the last argument.",
-    "TimeDistance": "This function has 3 or 6 arguments: TimeDistance(phenotype, [count], operator1, timeDistance, [operator2, timeDistance2])\nThe phenotype muss at least have the specified count of values (defaults to 2). The values must have the specified time distance in hours.",
-    "StartsBefore": "This function needs two phenotypes as arguments.\nIt evaluates to true if the time interval of the first phenotype starts before the second one.",
-    "EndsBefore": "This function needs two phenotypes as arguments.\nIt evaluates to true if the time interval of the first phenotype ends before the second one.",
-    "Overlap1": "This function requires at least two arguments. The first two are phenotypes, of which time intervals are overlaping (first phenotype's time interval must start before the second one).\nYou can provide a third argument to set a maximal time distance in hours that might pass between both phenotype time intervals.",
-    "Overlap2": "This function acts like Overlap1 but is bidirectional, i.e., the first phenotype can start before or after the second one.\nYou can provide up to two time distances in hours to specify maximal distance between first and second phenotype and maximal distance between second and first phenotype."
-  },
   "functions": {
     "CutFirst": "CutFirst",
     "CutLast": "CutLast",
@@ -492,5 +478,6 @@
   "content": "Content|Contents",
   "importantNodesOnly": "Important nodes only",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "rightClickShowDoc": "Right click to show documentation."
 }

@@ -49,10 +49,13 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b :title="functionTooltip">{{ functionTitle }}</b> (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
+        --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
+          :value="fun"
           :include-function-types="includeFunctionTypes"
+          :exclude-function-types="excludeFunctionTypes"
           :exclude-functions="excludeFunctions"
           @enclose="enclose()"
           @remove="clear()"
@@ -79,11 +82,12 @@
           >
             <span>
               {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}
-              <b :title="functionTooltip">{{ functionTitle }}</b>
+              <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
               {{ !expand ? '&nbsp;' : '' }}
             </span>
             <expression-context-menu
               v-if="!readonly"
+              :value="fun"
               :include-function-types="includeFunctionTypes"
               :exclude-function-types="excludeFunctionTypes"
               :exclude-functions="excludeFunctions"
@@ -137,10 +141,11 @@
           @mouseleave="hover = false"
         >
           {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-          <b :title="functionTooltip">{{ functionTitle }}</b>
+          <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
           <slot name="append" />
           <expression-context-menu
             v-if="!readonly"
+            :value="fun"
             :include-function-types="includeFunctionTypes"
             :exclude-function-types="excludeFunctionTypes"
             :exclude-functions="excludeFunctions"
@@ -176,9 +181,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed, onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Entity,
   EntityType,
@@ -186,216 +191,205 @@ import {
   ExpressionFunction,
   NotationEnum,
   Value
-} from '@onto-med/top-api';
+} from '@onto-med/top-api'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 import ExpressionValueInput from 'src/components/EntityEditor/Expression/ExpressionValueInput.vue'
-import { useEntity } from 'src/pinia/entity';
-import { storeToRefs } from 'pinia';
-import useNotify from 'src/mixins/useNotify';
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
+import useNotify from 'src/mixins/useNotify'
+import { env, noDocFunctionTypes } from 'src/config'
 
-export default defineComponent({
-  components: {
-    EntityChip,
-    ExpressionContextMenu,
-    ExpressionValueInput
-  },
-  props: {
-    modelValue: {
-      type: Object as () => Expression,
-      default: () => {
-        return {};
-      },
+const props = defineProps({
+  modelValue: {
+    type: Object as () => Expression,
+    default: () => {
+      return {};
     },
-    readonly: Boolean,
-    root: Boolean,
-    expand: Boolean,
-    indent: {
-      type: Number,
-      default: 2
-    },
-    indentLevel: {
-      type: Number,
-      default: 0
-    },
-    organisationId: String,
-    repositoryId: String,
-    entityTypes: Array as () => EntityType[],
-    includeFunctionTypes: Array as () => string[],
-    excludeFunctionTypes: Array as () => string[],
-    excludeFunctions: Array as () => string[]
   },
-  emits: ['update:modelValue', 'entityClicked'],
-  setup(props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, te } = useI18n()
-    const flash = ref(false)
-    const isEntity = ref(false)
-    const isConstant = ref(false)
-    const entityStore = useEntity()
-    const { renderError } = useNotify()
-    const { functions } = storeToRefs(entityStore)
-
-    const fun = computed(() => {
-      if (!props.modelValue || !props.modelValue.functionId || !functions.value) return undefined
-
-      const fun = functions.value
-        .find(f => f.id === props.modelValue?.functionId)
-
-      if (fun) return fun
-      return {
-        id: props.modelValue.functionId,
-        title: t('invalid').toUpperCase(),
-        notation: NotationEnum.Prefix
-      } as ExpressionFunction
-    })
-
-    const blink = () => {
-      flash.value = true
-      setTimeout(() => flash.value = false, 500)
-    }
-
-    const countArguments = (expression: Expression, fun: ExpressionFunction|undefined) => {
-      if (!fun) return 0;
-      const count = Math.max(expression.arguments?.length || 0, fun.minArgumentNumber || 0)
-      if (fun.maxArgumentNumber && fun.maxArgumentNumber < count) return fun.maxArgumentNumber
-      return count
-    }
-
-    const argumentCount = computed(() => countArguments(props.modelValue, fun.value))
-
-    onMounted(() => {
-      if (!functions.value)
-        entityStore.reloadFunctions()
-          .catch((e: Error) => renderError(e))
-    })
-
-    return {
-      t,
-      fun,
-      hover: ref(false),
-      flash,
-      argumentCount,
-      isEntity,
-      isConstant,
-
-      showMoreBtn: computed(() =>
-        !props.readonly && fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
-      ),
-
-      functionTitle: computed(() => {
-        if (!fun.value) return ''
-        return te('functions.' + fun.value.id) ? t('functions.' + fun.value.id) : fun.value.title
-      }),
-
-      functionTooltip: computed(() => {
-         if (!fun.value || !fun.value.id || !te('functionDescriptions.' + fun.value.id))
-          return undefined
-         return t('functionDescriptions.' + fun.value.id)
-      }),
-
-      prefix: computed(
-        () =>
-          fun.value &&
-          fun.value.notation === NotationEnum.Prefix
-      ),
-
-      infix: computed(
-        () =>
-          !fun.value ||
-          fun.value.notation === NotationEnum.Infix
-      ),
-
-      postfix: computed(
-        () =>
-          fun.value &&
-          fun.value.notation === NotationEnum.Postfix
-      ),
-
-      handleArgumentUpdate(index: number, argument: Expression | undefined | null): void {
-        const newModelValue = JSON.parse(
-          JSON.stringify(props.modelValue)
-        ) as Expression
-        if (!newModelValue.arguments) newModelValue.arguments = []
-        if (argument) newModelValue.arguments[index] = argument
-        else newModelValue.arguments.splice(index, 1)
-        emit('update:modelValue', newModelValue)
-      },
-
-      setFunction(fun: ExpressionFunction|undefined) {
-        const newModelValue = (JSON.parse(
-          JSON.stringify(props.modelValue)
-        ) || {}) as Expression
-
-        if (!fun) {
-          isEntity.value = false
-          isConstant.value = false
-          newModelValue.functionId = undefined
-        } else if (fun.id === 'Entity') {
-          isEntity.value = true
-          isConstant.value = false
-          newModelValue.functionId = undefined
-        } else if (fun.id === 'Constant') {
-          isEntity.value = false
-          isConstant.value = true
-          newModelValue.functionId = undefined
-        } else {
-          isEntity.value = false
-          isConstant.value = false
-          newModelValue.functionId = fun.id
-        }
-        if (!newModelValue.arguments) newModelValue.arguments = []
-        const count = countArguments(newModelValue, fun)
-        newModelValue.arguments.splice(count, newModelValue.arguments.length - count)
-        emit('update:modelValue', newModelValue)
-        blink()
-      },
-
-      setEntity (entity: Entity|undefined): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.entityId = entity?.id
-        isEntity.value = true
-        isConstant.value = false
-        emit('update:modelValue', newModelValue)
-      },
-
-      setValue (value: Value|undefined): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.values = []
-        if (value)
-          newModelValue.values.push(value)
-        newModelValue.constantId = undefined
-        isEntity.value = false
-        isConstant.value = true
-        emit('update:modelValue', newModelValue)
-      },
-
-      setConstantId (constantId: string|undefined): void {
-        const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
-        newModelValue.values = undefined
-        newModelValue.constantId = constantId
-        isEntity.value = false
-        isConstant.value = true
-        emit('update:modelValue', newModelValue)
-      },
-
-      enclose (): void {
-        const newModelValue = {
-          arguments: [ JSON.parse(JSON.stringify(props.modelValue)) ]
-        } as Expression
-        isEntity.value = false
-        isConstant.value = false
-        emit('update:modelValue', newModelValue)
-      },
-
-      clear (): void {
-        isEntity.value = false
-        isConstant.value = false
-        emit('update:modelValue', undefined)
-      }
-    };
+  readonly: Boolean,
+  root: Boolean,
+  expand: Boolean,
+  indent: {
+    type: Number,
+    default: 2
   },
-});
+  indentLevel: {
+    type: Number,
+    default: 0
+  },
+  organisationId: String,
+  repositoryId: String,
+  entityTypes: Array as () => EntityType[],
+  includeFunctionTypes: Array as () => string[],
+  excludeFunctionTypes: Array as () => string[],
+  excludeFunctions: Array as () => string[]
+})
+
+const emit = defineEmits(['update:modelValue', 'entityClicked'])
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
+const flash = ref(false)
+const isEntity = ref(false)
+const isConstant = ref(false)
+const entityStore = useEntity()
+const { renderError } = useNotify()
+const { functions } = storeToRefs(entityStore)
+const hover = ref(false)
+
+const fun = computed(() => {
+  if (!props.modelValue || !props.modelValue.functionId || !functions.value) return undefined
+
+  const fun = functions.value
+    .find(f => f.id === props.modelValue?.functionId)
+
+  if (fun) return fun
+  return {
+    id: props.modelValue.functionId,
+    title: t('invalid').toUpperCase(),
+    notation: NotationEnum.Prefix
+  } as ExpressionFunction
+})
+
+const argumentCount = computed(() => countArguments(props.modelValue, fun.value))
+
+const showMoreBtn = computed(() =>
+  !props.readonly && fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
+)
+
+const baseDocUrl = computed(() => {
+  const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
+  return !baseUrl ? undefined : `${baseUrl}/functions`
+})
+
+const functionTitle = computed(() => {
+  if (!fun.value) return ''
+  return te('functions.' + fun.value.id) ? t('functions.' + fun.value.id) : fun.value.title
+})
+
+const functionDocUrl = computed(() => {
+  if (!baseDocUrl.value || !fun.value?.type || noDocFunctionTypes.includes(fun.value.type))
+    return undefined
+  return `${baseDocUrl.value}/${fun.value.type || ''}/${fun.value.id}.html`
+})
+
+const prefix = computed(
+  () => fun.value && fun.value.notation === NotationEnum.Prefix
+)
+
+const infix = computed(
+  () => !fun.value || fun.value.notation === NotationEnum.Infix
+)
+
+const postfix = computed(
+  () => fun.value && fun.value.notation === NotationEnum.Postfix
+)
+
+onMounted(() => {
+  if (!functions.value)
+    entityStore.reloadFunctions()
+      .catch((e: Error) => renderError(e))
+})
+
+function blink() {
+  flash.value = true
+  setTimeout(() => flash.value = false, 500)
+}
+
+function countArguments(expression: Expression, fun: ExpressionFunction|undefined) {
+  if (!fun) return 0;
+  const count = Math.max(expression.arguments?.length || 0, fun.minArgumentNumber || 0)
+  if (fun.maxArgumentNumber && fun.maxArgumentNumber < count) return fun.maxArgumentNumber
+  return count
+}
+
+function handleArgumentUpdate(index: number, argument: Expression | undefined | null): void {
+  const newModelValue = JSON.parse(
+    JSON.stringify(props.modelValue)
+  ) as Expression
+  if (!newModelValue.arguments) newModelValue.arguments = []
+  if (argument) newModelValue.arguments[index] = argument
+  else newModelValue.arguments.splice(index, 1)
+  emit('update:modelValue', newModelValue)
+}
+
+function setFunction(fun: ExpressionFunction|undefined) {
+  const newModelValue = (JSON.parse(
+    JSON.stringify(props.modelValue)
+  ) || {}) as Expression
+
+  if (!fun) {
+    isEntity.value = false
+    isConstant.value = false
+    newModelValue.functionId = undefined
+  } else if (fun.id === 'Entity') {
+    isEntity.value = true
+    isConstant.value = false
+    newModelValue.functionId = undefined
+  } else if (fun.id === 'Constant') {
+    isEntity.value = false
+    isConstant.value = true
+    newModelValue.functionId = undefined
+  } else {
+    isEntity.value = false
+    isConstant.value = false
+    newModelValue.functionId = fun.id
+  }
+  if (!newModelValue.arguments) newModelValue.arguments = []
+  const count = countArguments(newModelValue, fun)
+  newModelValue.arguments.splice(count, newModelValue.arguments.length - count)
+  emit('update:modelValue', newModelValue)
+  blink()
+}
+
+function setEntity(entity: Entity|undefined): void {
+  const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+  newModelValue.entityId = entity?.id
+  isEntity.value = true
+  isConstant.value = false
+  emit('update:modelValue', newModelValue)
+}
+
+function setValue(value: Value|undefined): void {
+  const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+  newModelValue.values = []
+  if (value)
+    newModelValue.values.push(value)
+  newModelValue.constantId = undefined
+  isEntity.value = false
+  isConstant.value = true
+  emit('update:modelValue', newModelValue)
+}
+
+function setConstantId(constantId: string|undefined): void {
+  const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
+  newModelValue.values = undefined
+  newModelValue.constantId = constantId
+  isEntity.value = false
+  isConstant.value = true
+  emit('update:modelValue', newModelValue)
+}
+
+function enclose(): void {
+  const newModelValue = {
+    arguments: [ JSON.parse(JSON.stringify(props.modelValue)) ]
+  } as Expression
+  isEntity.value = false
+  isConstant.value = false
+  emit('update:modelValue', newModelValue)
+}
+
+function clear(): void {
+  isEntity.value = false
+  isConstant.value = false
+  emit('update:modelValue', undefined)
+}
+
+function showFunctionDoc() {
+  if (functionDocUrl.value)
+    window.open(functionDocUrl.value, '_blank')
+}
 </script>
 
 <style lang="sass" scoped>
