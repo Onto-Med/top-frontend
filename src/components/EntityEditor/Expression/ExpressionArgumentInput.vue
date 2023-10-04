@@ -54,6 +54,7 @@
           v-if="!readonly"
           :value="fun"
           :include-function-types="includeFunctionTypes"
+          :exclude-function-types="excludeFunctionTypes"
           :exclude-functions="excludeFunctions"
           @enclose="enclose()"
           @remove="clear()"
