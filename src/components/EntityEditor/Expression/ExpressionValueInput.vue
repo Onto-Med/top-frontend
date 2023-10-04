@@ -72,7 +72,7 @@
       <q-item clickable @click="$emit('enclose')">
         <q-item-section v-t="'encloseWithExpression'" />
       </q-item>
-      <q-item clickable @click="$emit('remove')">
+      <q-item v-close-popup clickable @click="$emit('remove')">
         <q-item-section v-t="'remove'" />
       </q-item>
     </q-list>
