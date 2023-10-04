@@ -56,6 +56,16 @@
       <q-separator />
     </div>
     <q-list dense>
+      <q-item
+        v-if="baseDocUrl && defaultConstant"
+        clickable
+        target="_blank"
+        :href="baseDocUrl + defaultConstant.id + '.html'"
+      >
+        <q-item-section>
+          {{ t('showThing', { thing: t('documentation') }) }}
+        </q-item-section>
+      </q-item>
       <q-item v-show="isValueSet" clickable @click="$emit('update:value', undefined)">
         <q-item-section v-t="'change'" />
       </q-item>
