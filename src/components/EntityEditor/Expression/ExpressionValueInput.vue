@@ -17,42 +17,48 @@
     v-slot="scope"
     :model-value="value?.value"
     :cover="false"
+    class="q-pa-none"
     auto-save
     @update:model-value="setValue($event)"
   >
-    <q-input v-model="scope.value" :type="toInputType(dataType)" dense autofocus @keyup.enter="scope.set">
-      <template #before>
-        <q-btn flat dense :icon="dataTypeIcon" :title="dataType" @click="toggleDataType" />
-      </template>
-      <template #append>
-        <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
-      </template>
-    </q-input>
-    <q-list v-if="constants" dense>
-      <q-item
-        v-for="constant in constants"
-        :key="constant.id"
-        v-close-popup
-        clickable
-        class="items-center justify-between"
-        @click="$emit('update:constantId', constant.id)"
-      >
-        {{ constant.title || constant.id }}
-        <q-btn
-          v-if="baseDocUrl"
-          dense
-          flat
-          size="xs"
-          icon="question_mark"
-          target="_blank"
-          :href="baseDocUrl + constant.id + '.html'"
-          :title="t('showThing', { thing: t('documentation') })"
-          @click.stop=""
-        />
-      </q-item>
-    </q-list>
-    <q-separator />
+    <div v-show="!isValueSet">
+      <q-input v-model="scope.value" :type="toInputType(dataType)" dense autofocus @keyup.enter="scope.set">
+        <template #before>
+          <q-btn flat dense :icon="dataTypeIcon" :title="dataType" @click="toggleDataType" />
+        </template>
+        <template #after>
+          <q-icon v-close-popup clickable name="check" class="cursor-pointer" />
+        </template>
+      </q-input>
+      <q-list v-if="constants" dense>
+        <q-item
+          v-for="constant in constants"
+          :key="constant.id"
+          v-close-popup
+          clickable
+          class="items-center justify-between"
+          @click="$emit('update:constantId', constant.id)"
+        >
+          {{ constant.title || constant.id }}
+          <q-btn
+            v-if="baseDocUrl"
+            dense
+            flat
+            size="xs"
+            icon="question_mark"
+            target="_blank"
+            :href="baseDocUrl + constant.id + '.html'"
+            :title="t('showThing', { thing: t('documentation') })"
+            @click.stop=""
+          />
+        </q-item>
+      </q-list>
+      <q-separator />
+    </div>
     <q-list dense>
+      <q-item v-show="isValueSet" clickable @click="$emit('update:value', undefined)">
+        <q-item-section v-t="'change'" />
+      </q-item>
       <q-item clickable @click="$emit('enclose')">
         <q-item-section v-t="'encloseWithExpression'" />
       </q-item>
@@ -94,6 +100,7 @@ export default defineComponent({
     const entityStore = useEntity()
     const constants = ref(undefined as Constant[]|undefined)
     const dataType = ref(DataType.Number)
+    const isValueSet = computed(() => props.value || defaultConstant.value)
 
     void entityStore.getConstants()
       .then(o => constants.value = o)
@@ -119,6 +126,7 @@ export default defineComponent({
 
     return {
       t,
+      isValueSet,
       popup,
       constants,
       defaultConstant,
