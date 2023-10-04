@@ -18,6 +18,19 @@
         <q-item-section>
           <q-item-label class="text-bold">
             {{ functionType.label }}
+            <q-btn
+              v-if="baseDocUrl && functionType.value !== 'component'"
+              dense
+              flat
+              round
+              class="col-auto text-grey"
+              size="xs"
+              icon="info"
+              target="_blank"
+              :href="toPackageDocUrl(functionType.value)"
+              :title="t('showThing', { thing: t('documentation') })"
+              @click.stop=""
+            />
           </q-item-label>
           <q-separator />
           <q-list dense class="row">
@@ -35,7 +48,7 @@
                     {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
                   </div>
                   <q-btn
-                    v-if="baseDocUrl"
+                    v-if="baseDocUrl && fun.type !== 'component'"
                     dense
                     flat
                     round
@@ -43,7 +56,7 @@
                     size="xs"
                     icon="info"
                     target="_blank"
-                    :href="toFunctionUrl(fun)"
+                    :href="toFunctionDocUrl(fun)"
                     :title="t('showThing', { thing: t('documentation') })"
                     @click.stop=""
                   />
@@ -56,7 +69,7 @@
     </div>
     <q-separator />
     <q-list dense>
-      <q-item v-if="value" clickable target="_blank" :href="toFunctionUrl(value)">
+      <q-item v-if="value" clickable target="_blank" :href="toFunctionDocUrl(value)">
         <q-item-section>
           {{ t('showThing', { thing: t('documentation') }) }}
         </q-item-section>
@@ -161,10 +174,16 @@ const baseDocUrl = computed(() => {
   return !baseUrl ? undefined : `${baseUrl}/functions`
 })
 
-function toFunctionUrl(fun: ExpressionFunction) {
-  return baseDocUrl.value
-    ? `${baseDocUrl.value}/${fun.type || ''}/${fun.id}.html`
-    : undefined
+function toPackageDocUrl(name: string) {
+  return !baseDocUrl.value || name === 'component'
+    ? undefined
+    : `${baseDocUrl.value}/${name}/package-summary.html`
+}
+
+function toFunctionDocUrl(fun: ExpressionFunction) {
+  return !baseDocUrl.value || fun.type === 'component'
+    ? undefined
+    : `${baseDocUrl.value}/${fun.type || ''}/${fun.id}.html`
 }
 
 function showChangeOptions() {
