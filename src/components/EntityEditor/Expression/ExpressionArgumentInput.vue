@@ -49,7 +49,8 @@
         @mouseover="hover = true"
         @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<b>{{ functionTitle }}</b> (
+        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
+        --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b> (
         <expression-context-menu
           v-if="!readonly"
           :value="fun"
@@ -81,7 +82,7 @@
           >
             <span>
               {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}
-              <b>{{ functionTitle }}</b>
+              <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
               {{ !expand ? '&nbsp;' : '' }}
             </span>
             <expression-context-menu
@@ -140,7 +141,7 @@
           @mouseleave="hover = false"
         >
           {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-          <b>{{ functionTitle }}</b>
+          <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
           <slot name="append" />
           <expression-context-menu
             v-if="!readonly"
@@ -181,8 +182,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Entity,
   EntityType,
@@ -190,13 +191,14 @@ import {
   ExpressionFunction,
   NotationEnum,
   Value
-} from '@onto-med/top-api';
+} from '@onto-med/top-api'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 import ExpressionValueInput from 'src/components/EntityEditor/Expression/ExpressionValueInput.vue'
-import { useEntity } from 'src/pinia/entity';
-import { storeToRefs } from 'pinia';
-import useNotify from 'src/mixins/useNotify';
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
+import useNotify from 'src/mixins/useNotify'
+import { env, noDocFunctionTypes } from 'src/config'
 
 const props = defineProps({
   modelValue: {
@@ -256,9 +258,20 @@ const showMoreBtn = computed(() =>
   !props.readonly && fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
 )
 
+const baseDocUrl = computed(() => {
+  const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
+  return !baseUrl ? undefined : `${baseUrl}/functions`
+})
+
 const functionTitle = computed(() => {
   if (!fun.value) return ''
   return te('functions.' + fun.value.id) ? t('functions.' + fun.value.id) : fun.value.title
+})
+
+const functionDocUrl = computed(() => {
+  if (!baseDocUrl.value || !fun.value?.type || noDocFunctionTypes.includes(fun.value.type))
+    return undefined
+  return `${baseDocUrl.value}/${fun.value.type || ''}/${fun.value.id}.html`
 })
 
 const prefix = computed(
@@ -371,6 +384,11 @@ function clear(): void {
   isEntity.value = false
   isConstant.value = false
   emit('update:modelValue', undefined)
+}
+
+function showFunctionDoc() {
+  if (functionDocUrl.value)
+    window.open(functionDocUrl.value, '_blank')
 }
 </script>
 

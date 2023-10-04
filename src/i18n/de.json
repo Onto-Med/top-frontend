@@ -478,5 +478,6 @@
   "content": "Inhalt|Inhalte",
   "importantNodesOnly": "Nur wichtige Knoten",
   "yes": "Ja",
-  "no": "Nein"
+  "no": "Nein",
+  "rightClickShowDoc": "Klicken Sie mit der rechten Maustaste, um die Dokumentation anzuzeigen."
 }

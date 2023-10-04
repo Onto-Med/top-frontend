@@ -1,7 +1,11 @@
 <template>
   <div class="clickable">
     <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel) * indent) }}</span>
-    <span v-if="defaultConstant">
+    <span
+      v-if="defaultConstant"
+      :title="t('rightClickShowDoc')"
+      @click.right="showConstantDoc(defaultConstant)"
+    >
       {{ defaultConstant.title || defaultConstant.id }}
     </span>
     <span v-else-if="value">
@@ -39,20 +43,12 @@
           class="items-center justify-between text-no-wrap"
           @click="$emit('update:constantId', constant.id)"
         >
-          {{ constant.title || constant.id }}
-          <q-btn
-            v-if="baseDocUrl"
-            dense
-            flat
-            round
-            class="text-grey"
-            size="xs"
-            icon="info"
-            target="_blank"
-            :href="baseDocUrl + constant.id + '.html'"
-            :title="t('showThing', { thing: t('documentation') })"
-            @click.stop=""
-          />
+          <q-item-section
+            :title="t('rightClickShowDoc')"
+            @click.right="showConstantDoc(constant)"
+          >
+            {{ constant.title || constant.id }}
+          </q-item-section>
         </q-item>
       </q-list>
       <q-separator />
@@ -131,7 +127,7 @@ const isStringValue = computed(
 
 const baseDocUrl = computed(() => {
   const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
-  return !baseUrl ? undefined : `${baseUrl}/constants/`
+  return !baseUrl ? undefined : `${baseUrl}/constants`
 })
 
 const dataTypeIcon = computed(() => {
@@ -166,6 +162,11 @@ function toggleDataType () {
 function toInputType(dataType: DataType): string {
   if (dataType === DataType.DateTime) return 'datetime-local'
   return dataType
+}
+
+function showConstantDoc(constant: Constant) {
+  if (baseDocUrl.value)
+    window.open(`${baseDocUrl.value}/${constant.id}.html`, '_blank')
 }
 </script>
 

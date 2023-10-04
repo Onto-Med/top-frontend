@@ -478,5 +478,6 @@
   "content": "Content|Contents",
   "importantNodesOnly": "Important nodes only",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "rightClickShowDoc": "Right click to show documentation."
 }

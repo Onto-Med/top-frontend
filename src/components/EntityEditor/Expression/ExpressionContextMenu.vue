@@ -42,25 +42,15 @@
               class="col-4 q-pa-none"
               @click="$emit('select', fun)"
             >
-              <q-item-section>
-                <div class="row items-center justify-between">
-                  <div class="col">
-                    {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
-                  </div>
-                  <q-btn
-                    v-if="baseDocUrl && !noDocFunctionTypes.includes(fun.type)"
-                    dense
-                    flat
-                    round
-                    class="col-auto text-grey"
-                    size="xs"
-                    icon="info"
-                    target="_blank"
-                    :href="toFunctionDocUrl(fun)"
-                    :title="t('showThing', { thing: t('documentation') })"
-                    @click.stop=""
-                  />
-                </div>
+              <q-item-section
+                v-if="baseDocUrl && !noDocFunctionTypes.includes(fun.type)"
+                :title="t('rightClickShowDoc')"
+                @click.right="showFunctionDoc(fun)"
+              >
+                {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
+              </q-item-section>
+              <q-item-section v-else>
+                {{ te('functions.' + fun.id) ? t('functions.' + fun.id) : fun.title }}
               </q-item-section>
             </q-item>
           </q-list>
@@ -97,7 +87,7 @@
 import { ExpressionFunction } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { QMenu } from 'quasar'
-import { env } from 'src/config'
+import { env, noDocFunctionTypes } from 'src/config'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import { computed, nextTick, onMounted, ref } from 'vue'
@@ -139,11 +129,6 @@ const functionTypes = computed(() => {
       }
     })
 })
-
-const noDocFunctionTypes = [
-  'component',
-  'textFunction'
-]
 
 onMounted(() => {
   if (!functions.value)
@@ -194,6 +179,11 @@ function toFunctionDocUrl(fun: ExpressionFunction) {
 function showChangeOptions() {
   showOptions.value = true
   void nextTick(() => menu.value?.updatePosition())
+}
+
+function showFunctionDoc(fun: ExpressionFunction) {
+  if (baseDocUrl.value && fun.type && !noDocFunctionTypes.includes(fun.type))
+    window.open(toFunctionDocUrl(fun), '_blank')
 }
 </script>
 

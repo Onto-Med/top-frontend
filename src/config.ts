@@ -11,6 +11,11 @@ export const env = {
   TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL || 'https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner'
 } as NodeJS.ProcessEnv
 
+export const noDocFunctionTypes = [
+  'component',
+  'textFunction'
+]
+
 /**
  * To add new languages please insert respective configurations to the following exports.
  */
