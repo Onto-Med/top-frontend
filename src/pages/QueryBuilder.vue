@@ -8,7 +8,7 @@
             <span v-if="repository">
               {{ t('for') }}:
               <q-breadcrumbs class="inline-block">
-                <q-breadcrumbs-el :label="repository.organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
+                <q-breadcrumbs-el :label="organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
                 <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
               </q-breadcrumbs>
             </span>
@@ -154,10 +154,11 @@ async function loadQueryPage (page: number) {
 }
 
 onMounted(() => {
-  if (!organisation.value || !repository.value) return
-  // TODO: Loading the first page is not sufficient to get a query by ID. There must be an API endpoint to request a query by ID.
+  if (props.queryId && organisation.value && repository.value)
+    queryApi?.getQueryById(organisation.value.id, repository.value.id, props.queryId)
+      .then(r => prefillQuery(r.data))
+      .catch((e: Error) => renderError(e))
   void loadQueryPage(1)
-    .then(() => prefillQuery(queryPage.value.content.find(q => q.id === props.queryId)))
 })
 
 function reset (repository?: Repository) {
