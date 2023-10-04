@@ -68,7 +68,8 @@ module.exports = configure(function (ctx) {
         GDPR_NOTICE:       process.env.GDPR_NOTICE == 'true',
         GDPR_POLICY_URL:   process.env.GDPR_POLICY_URL,
         SYSTEM_NOTICE:     process.env.SYSTEM_NOTICE,
-        DOCUMENTS_ENABLED: process.env.DOCUMENTS_ENABLED == 'true'
+        DOCUMENTS_ENABLED: process.env.DOCUMENTS_ENABLED == 'true',
+        TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
       },
 
       // transpile: false,
