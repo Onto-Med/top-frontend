@@ -72,7 +72,11 @@
           />
         </q-scroll-area>
 
-        <div v-show="minifyResults" class="q-mt-xl rotate-90 q-table__title text-no-wrap">
+        <div
+          v-show="minifyResults"
+          class="q-mt-xl rotate-90 q-table__title text-no-wrap cursor-pointer"
+          @click="minifyResults = !minifyResults"
+        >
           {{ t('queryResult', 2) }}
         </div>
         <div class="absolute drawer-icon">
