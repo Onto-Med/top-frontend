@@ -205,7 +205,7 @@ import { exportFile, useQuasar } from 'quasar'
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
 const $q = useQuasar()
-const { isCategory, isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
+const { getTitle, isCategory, isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
 const entityStore = useEntity()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
@@ -312,6 +312,19 @@ function importQuery () {
 }
 
 function onExecute () {
+  if (!query.value.name) {
+    if (query.value.criteria?.length) {
+      query.value.name
+        = t('filterBy') + ': '
+        + "'" + getTitle(entityStore.getEntity(query.value.criteria[0].subjectId)) + "'"
+        + (query.value.criteria.length > 1 ? ' ' + t('andMore', query.value.criteria.length - 1) : '')
+    } else if (query.value.projection?.length) {
+      query.value.name
+        = t('projection') + ': '
+        + "'" + getTitle(entityStore.getEntity(query.value.projection[0].subjectId)) + "'"
+        + (query.value.projection.length > 1 ? ' ' + t('andMore', query.value.projection.length - 1) : '')
+    }
+  }
   emit('execute', JSON.parse(JSON.stringify(query.value)) as PhenotypeQuery)
 }
 

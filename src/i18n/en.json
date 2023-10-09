@@ -482,5 +482,6 @@
   "importantNodesOnly": "Important nodes only",
   "yes": "Yes",
   "no": "No",
-  "rightClickShowDoc": "Right click to show documentation."
+  "rightClickShowDoc": "Right click to show documentation.",
+  "andMore": "and nothing more|and one more|and {n} more"
 }

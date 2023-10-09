@@ -482,5 +482,6 @@
   "importantNodesOnly": "Nur wichtige Knoten",
   "yes": "Ja",
   "no": "Nein",
-  "rightClickShowDoc": "Klicken Sie mit der rechten Maustaste, um die Dokumentation anzuzeigen."
+  "rightClickShowDoc": "Klicken Sie mit der rechten Maustaste, um die Dokumentation anzuzeigen.",
+  "andMore": "und nichts weiteres|und ein weiteres|und {n} weitere"
 }
