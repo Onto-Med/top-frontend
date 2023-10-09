@@ -468,6 +468,9 @@
   },
   "withRestriction": "With restriction|With restrictions",
   "entityImported": "No entities were imported|One entity has been imported|{count} entities have been imported",
+  "exportThing": "Export {thing}",
+  "configuration": "Configuration|Configurations",
+  "executeThing": "Execute {thing}",
   "showDocumentResults": "Show data set",
   "clearDocumentQueryResult": "Clear query results",
   "moveTo": "Move to...",
@@ -479,5 +482,6 @@
   "importantNodesOnly": "Important nodes only",
   "yes": "Yes",
   "no": "No",
-  "rightClickShowDoc": "Right click to show documentation."
+  "rightClickShowDoc": "Right click to show documentation.",
+  "andMore": "and nothing more|and one more|and {n} more"
 }

@@ -8,7 +8,7 @@
             <span v-if="repository">
               {{ t('for') }}:
               <q-breadcrumbs class="inline-block">
-                <q-breadcrumbs-el :label="repository.organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
+                <q-breadcrumbs-el :label="organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
                 <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
               </q-breadcrumbs>
             </span>
@@ -72,7 +72,11 @@
           />
         </q-scroll-area>
 
-        <div v-show="minifyResults" class="q-mt-xl rotate-90 q-table__title text-no-wrap">
+        <div
+          v-show="minifyResults"
+          class="q-mt-xl rotate-90 q-table__title text-no-wrap cursor-pointer"
+          @click="minifyResults = !minifyResults"
+        >
           {{ t('queryResult', 2) }}
         </div>
         <div class="absolute drawer-icon">
@@ -116,6 +120,9 @@ import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
 import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
 import { useRouter } from 'vue-router'
 
+const props = defineProps({
+  queryId: String
+})
 const { t } = useI18n()
 const $q = useQuasar()
 const router = useRouter()
@@ -143,16 +150,19 @@ const drawerWidth = computed(() => {
   return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
 })
 
-function loadQueryPage (page: number) {
+async function loadQueryPage (page: number) {
   if (queryApi && organisation.value && repository.value)
-    queryApi.getQueries(organisation.value.id, repository.value.id, page)
+    await queryApi.getQueries(organisation.value.id, repository.value.id, page)
       .then(r => queryPage.value = r.data)
       .catch((e: Error) => renderError(e))
 }
 
 onMounted(() => {
-  if (!organisation.value || !repository.value) return
-  loadQueryPage(1)
+  if (props.queryId && organisation.value && repository.value)
+    queryApi?.getQueryById(organisation.value.id, repository.value.id, props.queryId)
+      .then(r => prefillQuery(r.data))
+      .catch((e: Error) => renderError(e))
+  void loadQueryPage(1)
 })
 
 function reset (repository?: Repository) {
@@ -195,6 +205,16 @@ function execute (query: Query) {
       resultsScrollArea.value?.setScrollPosition('vertical', 0)
       minifyResults.value = false
     })
+    .then(
+      () => router.replace({
+        name: 'queryBuilder',
+        params: {
+          organisationId: entityStore.organisationId,
+          repositoryId: entityStore.repository?.id,
+          queryId: query.id
+        }
+      })
+    )
     .catch((e: Error) => renderError(e))
 }
 
@@ -212,7 +232,12 @@ function deleteQuery (query: PhenotypeQuery) {
     })
 }
 
-function prefillQuery (query: Query) {
+function prefillQuery (query?: Query) {
+  void router.replace({
+    name: 'queryBuilder',
+    params: { organisationId: organisation.value?.id, repositoryId: repository.value?.id, queryId: query?.id }
+  })
+  if (!query) return
   if (isConceptQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     conceptQueryForm.value?.prefillQuery(query as ConceptQuery)

@@ -107,11 +107,11 @@
   </q-splitter>
   <q-separator />
 
-  <q-card-actions>
+  <q-card-actions class="justify-between">
     <q-btn
       icon="play_arrow"
       color="secondary"
-      :label="t('execute')"
+      :label="t('executeThing', { thing: t('query') })"
       :title="t('queryExecuteDescription')"
       :disable="!configurationComplete"
       @click="onExecute"
@@ -119,7 +119,7 @@
     <q-btn
       icon="save"
       color="primary"
-      :label="t('export')"
+      :label="t('exportThing', { thing: t('query') })"
       :title="t('queryExportDescription')"
       @click="exportQuery"
     />
@@ -138,6 +138,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { exportFile, useQuasar } from 'quasar'
 import EntityDisplay from '../EntityEditor/EntityDisplay.vue'
 import { languages } from 'src/config'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
@@ -145,6 +146,7 @@ const $q = useQuasar()
 const entityStore = useEntity()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
+const { getTitle } = useEntityFormatter()
 
 const name = ref<string>()
 const dataSource = ref<string>()
@@ -225,6 +227,10 @@ function importQuery () {
 }
 
 function onExecute () {
+  if (!name.value && entity.value) {
+    name.value = getTitle(entity.value)
+  }
+
   emit('execute', JSON.parse(
     JSON.stringify(
       query.value,

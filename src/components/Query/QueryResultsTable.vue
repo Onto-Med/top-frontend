@@ -114,11 +114,12 @@ export default defineComponent({
     const loadResult = async (query: Query) => {
       if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
         return new Promise<void>(resolve => resolve())
-      return queryApi.getQueryResult(organisationId.value, repositoryId.value, query.id)
+      return queryApi.getQueryById(organisationId.value, repositoryId.value, query.id)
         .then(r => {
+          if (!r.data.result) return
           const index = results.value.findIndex(result => result.id === query.id)
           if (index !== -1) results.value.splice(index, 1)
-          results.value.push(r.data)
+          results.value.push(r.data.result)
         })
     }
 
