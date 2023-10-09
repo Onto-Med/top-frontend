@@ -201,6 +201,16 @@ function execute (query: Query) {
       resultsScrollArea.value?.setScrollPosition('vertical', 0)
       minifyResults.value = false
     })
+    .then(
+      () => router.replace({
+        name: 'queryBuilder',
+        params: {
+          organisationId: entityStore.organisationId,
+          repositoryId: entityStore.repository?.id,
+          queryId: query.id
+        }
+      })
+    )
     .catch((e: Error) => renderError(e))
 }
 
