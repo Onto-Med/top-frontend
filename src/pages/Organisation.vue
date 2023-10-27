@@ -129,7 +129,8 @@ export default defineComponent({
     const saving = ref(false)
     const organisationApi = inject(OrganisationApiKey)
     const repositoryApi = inject(RepositoryApiKey)
-    const { organisation } = storeToRefs(useEntity())
+    const entityStore = useEntity()
+    const { organisation } = storeToRefs(entityStore)
     const repositories = ref<RepositoryPage>({
       content: [],
       number: 1,
@@ -142,7 +143,8 @@ export default defineComponent({
       return { id: (uuidv4 as () => string)(), primary: false } as Repository
     }
     const repository = ref(newRepository())
-    const { isAuthenticated } = storeToRefs(useEntity())
+    const { isAuthenticated, isAdmin } = storeToRefs(entityStore)
+    void entityStore.loadUser()
 
     const reload = async (filter: string|undefined = undefined, page = 1) => {
       if (!repositoryApi || !organisation.value) return
@@ -191,13 +193,12 @@ export default defineComponent({
       reload,
       newRepository,
       isAuthenticated,
+      isAdmin,
       routeToEditor,
 
       canRead: computed(() => isAuthenticated.value && canRead(organisation.value)),
       canWrite: computed(() => isAuthenticated.value && canWrite(organisation.value)),
       canManage: computed(() => isAuthenticated.value && canManage(organisation.value)),
-      // TODO: get value from backend
-      isAdmin: true,
 
       async saveRepository (repository: Repository) {
         if (!repositoryApi || !organisation.value) return
