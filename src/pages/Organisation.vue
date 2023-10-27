@@ -196,6 +196,7 @@ export default defineComponent({
       canRead: computed(() => isAuthenticated.value && canRead(organisation.value)),
       canWrite: computed(() => isAuthenticated.value && canWrite(organisation.value)),
       canManage: computed(() => isAuthenticated.value && canManage(organisation.value)),
+      // TODO: get value from backend
       isAdmin: true,
 
       async saveRepository (repository: Repository) {
