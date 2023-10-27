@@ -483,5 +483,8 @@
   "yes": "Ja",
   "no": "Nein",
   "rightClickShowDoc": "Klicken Sie mit der rechten Maustaste, um die Dokumentation anzuzeigen.",
-  "andMore": "und nichts weiteres|und ein weiteres|und {n} weitere"
+  "andMore": "und nichts weiteres|und ein weiteres|und {n} weitere",
+  "thingAdded": "{thing} wurde hinzugefügt",
+  "confirmDeleteDataSource": "Möchten Sie diese Datenquelle wirklich löschen?",
+  "thingRemoved": "{thing} wurde entfernt"
 }

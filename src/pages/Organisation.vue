@@ -13,12 +13,21 @@
             </small>
           </div>
           <div v-if="canManage" class="col-auto">
-            <q-btn
-              color="primary"
-              icon="settings"
-              :label="$q.screen.gt.xs ? t('manageThing', { thing: t('permission', 2) }) : ''"
-              @click="showMembershipDialog()"
-            />
+            <q-btn-group>
+              <q-btn
+                color="primary"
+                icon="settings"
+                :label="$q.screen.gt.xs ? t('manageThing', { thing: t('permission', 2) }) : ''"
+                @click="showMembershipDialog()"
+              />
+              <q-btn
+                v-if="isAdmin"
+                color="secondary"
+                icon="lan"
+                :label="$q.screen.gt.xs ? t('manageThing', { thing: t('dataSource', 2) }) : ''"
+                @click="showDataSourceDialog()"
+              />
+            </q-btn-group>
           </div>
         </div>
       </q-card-section>
@@ -96,6 +105,7 @@ import { Repository, RepositoryPage } from '@onto-med/top-api'
 import TableWithActions from 'src/components/TableWithActions.vue'
 import RepositoryForm from 'src/components/Repository/RepositoryForm.vue'
 import MembershipDialog from 'src/components/Organisation/MembershipDialog.vue'
+import DataSourceDialog from 'src/components/Organisation/DataSourceDialog.vue'
 import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -186,6 +196,7 @@ export default defineComponent({
       canRead: computed(() => isAuthenticated.value && canRead(organisation.value)),
       canWrite: computed(() => isAuthenticated.value && canWrite(organisation.value)),
       canManage: computed(() => isAuthenticated.value && canManage(organisation.value)),
+      isAdmin: true,
 
       async saveRepository (repository: Repository) {
         if (!repositoryApi || !organisation.value) return
@@ -231,6 +242,15 @@ export default defineComponent({
       showMembershipDialog () {
         $q.dialog({
           component: MembershipDialog,
+          componentProps: {
+            organisation: organisation.value
+          }
+        })
+      },
+
+      showDataSourceDialog() {
+        $q.dialog({
+          component: DataSourceDialog,
           componentProps: {
             organisation: organisation.value
           }

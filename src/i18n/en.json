@@ -483,5 +483,8 @@
   "yes": "Yes",
   "no": "No",
   "rightClickShowDoc": "Right click to show documentation.",
-  "andMore": "and nothing more|and one more|and {n} more"
+  "andMore": "and nothing more|and one more|and {n} more",
+  "thingAdded": "{thing} has been added",
+  "confirmDeleteDataSource": "Do you really want to delete this data source?",
+  "thingRemoved": "{thing} has been removed"
 }
