@@ -2,7 +2,7 @@
   <q-card-section class="row q-pa-none">
     <div class="col-12 col-sm-6 col-md-7 q-pa-md">
       <q-input v-model="query.name" :label="t('queryName')" type="text" />
-          
+
       <q-select
         v-model="query.dataSource"
         :options="dataSources"
@@ -197,10 +197,11 @@ import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { onMounted, ref, computed, watch } from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { exportFile, useQuasar } from 'quasar'
+import { QueryApiKey } from 'src/boot/axios'
 
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
@@ -209,6 +210,7 @@ const { getTitle, isCategory, isPhenotype, isRestricted, requiresAggregationFunc
 const entityStore = useEntity()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
+const queryApi = inject(QueryApiKey)
 
 const emptyQuery = () => {
   return {
@@ -226,6 +228,7 @@ const importFile = ref<File>()
 const fileReader = new FileReader()
 
 const splitterModel = ref<number>($q.localStorage.getItem('phenotypeQuerySplitterWidth') || 25)
+const dataSources = ref([] as DataSource[])
 
 const prefillQuery = (oldQuery: PhenotypeQuery) => {
   query.value = JSON.parse(JSON.stringify(oldQuery)) as PhenotypeQuery
@@ -246,14 +249,10 @@ entityStore.getFunction('aggregate', 'Last', 'First')
   .then(r => aggregationFunctionOptions.value = r)
   .catch((e: Error) => renderError(e))
 
-const dataSources = ref([] as DataSource[])
-entityStore.getDataSources(QueryType.Phenotype)
-  .then(r => dataSources.value = r)
-  .catch((e: Error) => renderError(e))
-
 onMounted(() => {
   if (!organisation.value || !repository.value) return
   reloadEntities().catch((e: Error) => renderError(e))
+  reloadDataSources().catch((e: Error) => renderError(e))
 })
 
 watch(
@@ -269,6 +268,12 @@ const querySubjectPresent = computed(() =>
   query.value.criteria && query.value.criteria.length > 0
   || query.value.projection && query.value.projection.length > 0
 )
+
+async function reloadDataSources() {
+  if (!organisation.value) return
+  await queryApi?.getOrganisationDataSources(organisation.value.id, QueryType.Phenotype)
+    .then(r => dataSources.value = r.data)
+}
 
 function addCriterion (subject: Phenotype) {
   if (!subject || subject.dataType !== DataType.Boolean && !isRestricted(subject)) return

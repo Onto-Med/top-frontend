@@ -132,13 +132,14 @@ import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { computed, onMounted, ref, watch} from 'vue'
+import { computed, inject, onMounted, ref, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { exportFile, useQuasar } from 'quasar'
 import EntityDisplay from '../EntityEditor/EntityDisplay.vue'
 import { languages } from 'src/config'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { QueryApiKey } from 'src/boot/axios'
 
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
@@ -147,6 +148,7 @@ const entityStore = useEntity()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
 const { getTitle } = useEntityFormatter()
+const queryApi = inject(QueryApiKey)
 
 const name = ref<string>()
 const dataSource = ref<string>()
@@ -163,6 +165,7 @@ const importFile = ref(undefined as File|undefined)
 const fileReader = new FileReader()
 
 const splitterModel = ref<number>($q.localStorage.getItem('conceptQuerySplitterWidth') || 35)
+const dataSources = ref([] as DataSource[])
 
 function prefillQuery (query: ConceptQuery) {
   entity.value = entityStore.getEntity(query.entityId)
@@ -182,14 +185,10 @@ async function reloadEntities () {
     .finally(() => treeLoading.value = false)
 }
 
-const dataSources = ref([] as DataSource[])
-entityStore.getDataSources(QueryType.Concept)
-  .then(r => dataSources.value = r)
-  .catch((e: Error) => renderError(e))
-
 onMounted(() => {
   if (!organisation.value || !repository.value) return
   reloadEntities().catch((e: Error) => renderError(e))
+  reloadDataSources().catch((e: Error) => renderError(e))
 })
 
 watch(
@@ -213,6 +212,12 @@ const query = computed(() => {
     type: QueryType.Concept
   } as ConceptQuery
 })
+
+async function reloadDataSources() {
+  if (!organisation.value) return
+  await queryApi?.getOrganisationDataSources(organisation.value.id, QueryType.Concept)
+    .then(r => dataSources.value = r.data)
+}
 
 function exportQuery () {
   exportFile(
