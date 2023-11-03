@@ -3,39 +3,47 @@
     <q-card>
       <q-card-section>
         <div class="text-h6">
-          {{ t('dataSource', 2) }}
+          {{ t('manageThing', { thing: t('dataSource', 2) }) }}
         </div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section>
+        <p v-t="'manageDataSourceDescription'" />
         <q-select
           v-model="dataSource"
           :options="availableDataSources"
           :label="t('dataSource')"
           option-value="id"
-          option-label="id"
           map-options
-        />
-        <div>
-          <q-btn
-            type="submit"
-            icon="add"
-            color="primary"
-            :disabled="loading"
-            :label="t('add')"
-            @click="addDataSource()"
-          />
-          <q-btn
-            flat
-            type="reset"
-            color="primary"
-            :disabled="loading"
-            :label="t('reset')"
-            @click="resetDataSource()"
-          />
-        </div>
+        >
+          <template #selected>
+            <span v-if="dataSource">
+              {{ dataSource.title || dataSource.id }}
+            </span>
+          </template>
+          <template #option="scope">
+            <q-item v-bind="scope.itemProps" :title="t(scope.opt.queryType)">
+              <q-item-section>
+                <div class="items-center">
+                  <q-icon :name="queryIcon(scope.opt.queryType)" size="xs" />
+                  {{ scope.opt.title || scope.opt.id }}
+                </div>
+              </q-item-section>
+            </q-item>
+          </template>
+          <template #after>
+            <q-btn
+              type="submit"
+              icon="add"
+              color="primary"
+              :disabled="loading"
+              :label="t('add')"
+              @click="addDataSource()"
+            />
+          </template>
+        </q-select>
       </q-card-section>
 
       <q-separator size="3px" />
@@ -49,6 +57,8 @@
           :no-data-label="t('noDataPresent')"
           :pagination="initialPagination"
           :filter="filter"
+          :rows-per-page-label="t('recordsPerPage')"
+          :pagination-label="paginationLabel"
         >
           <template #top>
             <q-input v-model="filter" dense debounce="300" color="primary">
@@ -67,8 +77,8 @@
           </template>
           <template #body="rowProps">
             <q-tr :props="rowProps">
-              <q-td>{{ rowProps.row.id }}</q-td>
-              
+              <q-td>{{ rowProps.row.title || rowProps.row.id }}</q-td>
+              <q-td>{{ t(rowProps.row.queryType) }}</q-td>
               <q-td auto-width>
                 <q-btn
                   v-if="isAuthenticated"
@@ -103,6 +113,7 @@ import { useEntity } from 'src/pinia/entity'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dialog from 'src/components/Dialog.vue'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 const props = defineProps({
   organisation: {
@@ -122,6 +133,7 @@ const availableDataSources = ref<DataSource[]>([])
 const loading = ref(false)
 const queryApi = inject(QueryApiKey)
 const { isAuthenticated } = storeToRefs(useEntity())
+const { queryIcon, paginationLabel } = useEntityFormatter()
 const filter = ref('')
 const initialPagination = {
   sortBy: 'id',
@@ -132,7 +144,8 @@ const initialPagination = {
 
 const columns = computed(() => {
   return [
-    { name: 'id', label: t('id'), align: 'left', sortable: true, required: true },
+    { name: 'id', label: t('dataSource'), align: 'left', sortable: true, required: true },
+    { name: 'queryType', label: t('suitableFor'), align: 'left', sortable: true, required: true },
     { name: 'actions', align: 'right', sortable: false }
   ] as QTableColumn[]
 })

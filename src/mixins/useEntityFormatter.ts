@@ -10,6 +10,8 @@ import {
   Organisation,
   Permission,
   Phenotype,
+  Query,
+  QueryType,
   Repository,
   RepositoryType,
   RestrictionOperator
@@ -245,6 +247,13 @@ export default function (this: void) {
       return 'tab'
     },
 
+    queryIcon: (query: Query | QueryType) => {
+      const type = query.hasOwnProperty('id') ? (query as Query).type : query as QueryType
+      if (type === QueryType.Concept) return 'article'
+      if (type === QueryType.Phenotype) return 'category'
+      return 'question_mark'
+    },
+
     requiresAggregationFunction: (entity: Entity) => {
       return [EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(entity.entityType)
     },
@@ -268,6 +277,10 @@ export default function (this: void) {
 
     canManage: (organisation?: Organisation) => {
       return Permission.Manage === organisation?.permission
+    },
+
+    paginationLabel: (firstRowIndex: number, endRowIndex: number, totalRowNumber: number) => {
+      return `${firstRowIndex}-${endRowIndex} ${t('of')} ${totalRowNumber}`
     }
   }
 }
