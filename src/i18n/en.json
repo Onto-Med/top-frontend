@@ -483,5 +483,14 @@
   "yes": "Yes",
   "no": "No",
   "rightClickShowDoc": "Right click to show documentation.",
-  "andMore": "and nothing more|and one more|and {n} more"
+  "andMore": "and nothing more|and one more|and {n} more",
+  "thingAdded": "{thing} has been added",
+  "confirmDeleteDataSource": "Do you really want to delete this data source?",
+  "thingRemoved": "{thing} has been removed",
+  "suitableFor": "Suitable for",
+  "manageDataSourceDescription": "Select a data source that you want to make available to this organisation. All users with write permission will be able to query this source.",
+  "recordsPerPage": "Records per page:",
+  "of": "of",
+  "manage": "Manage",
+  "edit": "Edit"
 }

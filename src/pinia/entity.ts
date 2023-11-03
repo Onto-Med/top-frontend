@@ -26,8 +26,11 @@ import {
   QueryType,
   Repository,
   RepositoryApi,
+  Role,
   SingleConcept,
-  StringRestriction
+  StringRestriction,
+  User,
+  UserApi
 } from '@onto-med/top-api'
 import { AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
@@ -51,13 +54,38 @@ export const useEntity = defineStore('entity', {
       repositoryApi: undefined as RepositoryApi | undefined,
       defaultApi: undefined as DefaultApi | undefined,
       queryApi: undefined as QueryApi | undefined,
-      codeApi: undefined as CodeApi | undefined
+      codeApi: undefined as CodeApi | undefined,
+      userApi: undefined as UserApi | undefined,
+      user: undefined as User | undefined
     }
   },
   getters: {
-    isAuthenticated: (state) => !state.keycloak || state.keycloak.authenticated
+    isAuthenticated(state) {
+      return !state.keycloak || state.keycloak.authenticated
+    },
+
+    isAdmin(state) {
+      return state.user?.role === Role.Admin
+    }
   },
   actions: {
+    async loadUser() {
+      if (!this.user?.id) {
+        if (this.keycloak) {
+          if (this.keycloak.authenticated && this.keycloak.subject) {
+            await this.userApi?.getUserById(this.keycloak.subject)
+              .then(r => this.user = r.data)
+              .catch(() => {})
+          } else {
+            this.user = { role: Role.User } as User
+          }
+        } else {
+          this.user = { role: Role.Admin } as User
+        }
+      }
+      
+    },
+
     async reloadEntities() {
       if (!this.organisationId || !this.repositoryId)
         throw {
