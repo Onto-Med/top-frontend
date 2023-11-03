@@ -4,15 +4,6 @@
       <q-card-section>
         <div v-if="state.createdAt" class="text-h6">
           {{ t('editThing', { thing: t('organisation') }) }}
-          <q-btn
-            v-show="state.createdAt"
-            dense
-            color="red"
-            icon="delete"
-            class="float-right"
-            :title="t('deleteThing', { thing: t('organisation') })"
-            @click="showDeleteDialog"
-          />
         </div>
         <div v-else class="text-h6">
           {{ t('createThing', { thing: t('organisation') }) }}
@@ -64,8 +55,6 @@ import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
 import OrganisationSelectInput from 'src/components/Organisation/OrganisationSelectInput.vue'
-import Dialog from 'src/components/Dialog.vue'
-import { useQuasar } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -80,14 +69,13 @@ export default defineComponent({
     loading: Boolean
   },
   emits: ['update:show', 'update:model-value', 'delete-clicked'],
-  setup(props, { emit }) {
+  setup(props) {
     const { t } = useI18n()
     const copy = (value: unknown) => {
       return JSON.parse(JSON.stringify(value)) as Organisation
     }
     const state = ref(copy(props.modelValue))
     const isNew = computed(() => !state.value.createdAt)
-    const $q = useQuasar()
 
     watch(() => props.modelValue, (value) => {
       state.value = copy(value)
@@ -97,16 +85,6 @@ export default defineComponent({
       t,
       state,
       isNew,
-      showDeleteDialog () {
-        $q.dialog({
-          component: Dialog,
-          componentProps: {
-            message: t('organisationPage.confirmDelete')
-          }
-        }).onOk(() => {
-          emit('delete-clicked', props.modelValue)
-        })
-      },
 
       setId (id: string|number|null) {
         if (!isNew.value) return

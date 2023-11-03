@@ -3,7 +3,7 @@
     <q-card>
       <q-card-section>
         <div class="text-h6">
-          {{ t('organisationMembership', 2) }}
+          {{ t('manageThing', { thing: t('permission', 2) }) }}
         </div>
       </q-card-section>
 
@@ -43,6 +43,8 @@
           :no-data-label="t('noDataPresent')"
           :pagination="initialPagination"
           :filter="filter"
+          :rows-per-page-label="t('recordsPerPage')"
+          :pagination-label="paginationLabel"
         >
           <template #top>
             <q-input v-model="filter" dense debounce="300" color="primary">
@@ -119,7 +121,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, te } = useI18n()
     const { notify, renderError } = useNotify()
-    const { permissionTitle } = useEntityFormatter()
+    const { paginationLabel, permissionTitle } = useEntityFormatter()
     const $q = useQuasar()
     const dialog = ref<QDialog|undefined>(undefined)
     const show = () => {
@@ -170,6 +172,7 @@ export default defineComponent({
       permission,
       reloadMemberships,
       resetMembership,
+      paginationLabel,
       permissionTitle,
 
       columns: computed(() => {

@@ -490,5 +490,7 @@
   "suitableFor": "Verwendbar für",
   "manageDataSourceDescription": "Wählen Sie eine Datenquelle aus, die Sie dieser Organisation zur Verfügung stellen möchten. Alle Nutzer mit Schreibberechtigung können diese Quelle abfragen.",
   "recordsPerPage": "Einträge pro Seite:",
-  "of": "von"
+  "of": "von",
+  "manage": "Verwalten",
+  "edit": "Bearbeiten"
 }
