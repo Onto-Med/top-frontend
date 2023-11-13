@@ -22,7 +22,7 @@
       @request="reload"
     >
       <template v-if="isAuthenticated" #actions="{ row }">
-        <permission-icon :permission="row.permission" class="q-ml-sm gt-xs" size="sm" />
+        <permission-icon :permission="row.permission" class="q-ml-sm gt-xs" />
       </template>
     </table-with-actions>
 
