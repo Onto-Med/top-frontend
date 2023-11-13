@@ -50,49 +50,35 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue'
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Organisation } from '@onto-med/top-api'
 import OrganisationSelectInput from 'src/components/Organisation/OrganisationSelectInput.vue'
+import useDefaultHelpers from 'src/mixins/useDefaultHelpers'
+import { QDialog } from 'quasar'
 
-export default defineComponent({
-  components: {
-    OrganisationSelectInput
-  },
-  props: {
-    modelValue: {
-      type: Object as () => Organisation,
-      required: true
-    },
-    show: Boolean,
-    loading: Boolean
-  },
-  emits: ['update:show', 'update:model-value', 'delete-clicked'],
-  setup(props) {
-    const { t } = useI18n()
-    const copy = (value: unknown) => {
-      return JSON.parse(JSON.stringify(value)) as Organisation
-    }
-    const state = ref(copy(props.modelValue))
-    const isNew = computed(() => !state.value.createdAt)
+const props = defineProps<{
+  modelValue: Organisation
+  loading?: boolean
+  show?: boolean
+}>()
 
-    watch(() => props.modelValue, (value) => {
-      state.value = copy(value)
-    })
+defineEmits(['update:show', 'update:model-value', 'delete-clicked'])
 
-    return {
-      t,
-      state,
-      isNew,
+const { t } = useI18n()
+const { copy, toValidId } = useDefaultHelpers()
+const state = ref(copy(props.modelValue))
+const isNew = computed(() => !state.value.createdAt)
+const isValid = computed(() => state.value.name && state.value.id)
 
-      setId (id: string|number|null) {
-        if (!isNew.value) return
-        state.value.id = id ? (id as string).replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
-      },
+watch(
+  () => props.modelValue,
+  (value) => state.value = copy(value)
+)
 
-      isValid: computed(() => state.value.name && state.value.id)
-    }
-  }
-})
+function setId(id: string|number|null) {
+  if (!isNew.value) return
+  state.value.id = toValidId(id)
+}
 </script>

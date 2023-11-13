@@ -73,64 +73,48 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue'
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Repository, RepositoryType } from '@onto-med/top-api'
 import EnumSelect from 'src/components/EnumSelect.vue'
 import Dialog from 'src/components/Dialog.vue'
 import { useQuasar } from 'quasar'
+import useDefaultHelpers from 'src/mixins/useDefaultHelpers'
 
-export default defineComponent({
-  components: {
-    EnumSelect
-  },
-  props: {
-    modelValue: {
-      type: Object as () => Repository,
-      required: true
-    },
-    show: Boolean,
-    loading: Boolean
-  },
-  emits: ['update:show', 'update:model-value', 'delete-clicked'],
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const copy = (value: unknown) => {
-      return JSON.parse(JSON.stringify(value)) as Repository
+const props = defineProps<{
+  modelValue: Repository
+  loading?: boolean
+  show?: boolean
+}>()
+
+const emit = defineEmits(['update:show', 'update:model-value', 'delete-clicked'])
+
+const { t } = useI18n()
+const $q = useQuasar()
+const { copy, toValidId } = useDefaultHelpers()
+const state = ref(copy(props.modelValue))
+const isNew = computed(() => !state.value.createdAt)
+const isValid = computed(() => state.value.id && state.value.name && state.value.repositoryType)
+
+watch(
+  () => props.modelValue,
+  (value) => state.value = copy(value)
+)
+
+function setId(id: string|number|null) {
+  if (!isNew.value) return
+  state.value.id = toValidId(id)
+}
+
+function showDeleteDialog() {
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('repositoryPage.confirmDelete')
     }
-    const state = ref(copy(props.modelValue))
-    const isNew = computed(() => !state.value.createdAt)
-    const $q = useQuasar()
-
-    watch(() => props.modelValue, (value) => {
-      state.value = copy(value)
-    })
-
-    return {
-      t,
-      state,
-      isNew,
-      RepositoryType,
-
-      showDeleteDialog () {
-        $q.dialog({
-          component: Dialog,
-          componentProps: {
-            message: t('repositoryPage.confirmDelete')
-          }
-        }).onOk(() => {
-          emit('delete-clicked', props.modelValue)
-        })
-      },
-
-      setId (id: string|number|null) {
-        if (!isNew.value) return
-        state.value.id = id ? (id as string).replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
-      },
-
-      isValid: computed(() => state.value.id && state.value.name && state.value.repositoryType)
-    }
-  }
-})
+  }).onOk(() => {
+    emit('delete-clicked', props.modelValue)
+  })
+}
 </script>
