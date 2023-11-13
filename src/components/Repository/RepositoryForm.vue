@@ -53,7 +53,7 @@
           </q-item-section>
         </q-item>
 
-        <repository-type-select v-model="state.repositoryType" :readonly="!isNew" />
+        <enum-select v-model:selected="state.repositoryType" i18n-prefix="repositoryType" :enum="RepositoryType" :readonly="!isNew" />
 
         <q-input v-model="state.description" type="textarea" :label="t('description')" />
       </q-card-section>
@@ -76,14 +76,14 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Repository } from '@onto-med/top-api'
-import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
+import { Repository, RepositoryType } from '@onto-med/top-api'
+import EnumSelect from 'src/components/EnumSelect.vue'
 import Dialog from 'src/components/Dialog.vue'
 import { useQuasar } from 'quasar'
 
 export default defineComponent({
   components: {
-    RepositoryTypeSelect
+    EnumSelect
   },
   props: {
     modelValue: {
@@ -111,6 +111,8 @@ export default defineComponent({
       t,
       state,
       isNew,
+      RepositoryType,
+
       showDeleteDialog () {
         $q.dialog({
           component: Dialog,

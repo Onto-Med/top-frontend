@@ -24,13 +24,13 @@
         <q-menu class="filter-menu">
           <q-list dense>
             <q-item>
-              <entity-type-select v-model="filterEntityType" :options="entityTypeOptions" class="fit" dense />
+              <enum-select v-model:selected="filterEntityType" i18n-prefix="entityType" :options="entityTypeOptions" class="fit" dense />
             </q-item>
             <q-item v-if="!isConceptRepository">
-              <item-type-select v-model="filterItemType" class="fit" dense />
+              <enum-select v-model:selected="filterItemType" i18n-prefix="itemType" :enum="ItemType" class="fit" dense />
             </q-item>
             <q-item v-if="!isConceptRepository">
-              <data-type-select v-model="filterDataType" class="fit" dense />
+              <enum-select v-model:selected="filterDataType" i18n-prefix="dataType" :enum="DataType" class="fit" dense />
             </q-item>
           </q-list>
         </q-menu>
@@ -105,10 +105,8 @@ import {computed, defineComponent, nextTick, ref, watch} from 'vue'
 import {useI18n} from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
-import EntityTypeSelect from 'src/components/EntityEditor/EntityTypeSelect.vue'
+import EnumSelect from 'src/components/EnumSelect.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
-import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
-import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
 import {Category, Concept, DataType, Entity, EntityType, ItemType, SingleConcept} from '@onto-med/top-api'
 import {useEntity} from 'src/pinia/entity'
 import {storeToRefs} from 'pinia'
@@ -118,11 +116,9 @@ import {QTree} from 'quasar'
 export default defineComponent({
   name: 'EntityTree',
   components: {
-    DataTypeSelect,
-    ItemTypeSelect,
     EntitySearchInput,
     EntityTreeContextMenu,
-    EntityTypeSelect
+    EnumSelect
   },
   props: {
     nodes: Array as () => Entity[],
@@ -309,6 +305,9 @@ export default defineComponent({
       getTitle,
       getDescriptions,
       isRestricted,
+
+      ItemType,
+      DataType,
 
       treeNodes: computed((): TreeNode[] => {
         return toTree(visibleNodes.value, props.excludeTypeIfEmpty)

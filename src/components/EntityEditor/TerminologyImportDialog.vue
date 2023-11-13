@@ -29,8 +29,8 @@
               class="col"
             />
             <div v-if="isPhenotype(entity)" class="col-4">
-              <item-type-select v-model:model-value="itemType" dense required />
-              <data-type-select v-model:model-value="dataType" dense required />
+              <enum-select v-model:selected="itemType" i18n-prefix="itemType" :enum="ItemType" dense required />
+              <enum-select v-model:selected="dataType" i18n-prefix="dataType" :enum="DataType" dense required />
               <unit-input v-if="dataType === DataType.Number" v-model:model-value="unit" dense show-label />
             </div>
           </div>
@@ -85,13 +85,12 @@ import { useI18n } from 'vue-i18n'
 import CodeInput from 'src/components/CodeInput.vue'
 import EntityDisplay from './EntityDisplay.vue'
 import RangeInput from './RangeInput.vue'
-import ItemTypeSelect from './ItemTypeSelect.vue'
-import DataTypeSelect from './DataTypeSelect.vue'
 import UnitInput from '../UnitInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { v4 as uuidv4 } from 'uuid'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
+import EnumSelect from '../EnumSelect.vue'
 
 const props = defineProps({
   repositoryType: {

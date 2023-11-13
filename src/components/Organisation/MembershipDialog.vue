@@ -11,7 +11,7 @@
 
       <q-card-section v-if="isAuthenticated">
         <user-select v-model="user" required />
-        <permission-select v-model="permission" required />
+        <enum-select v-model:selected="permission" :enum="Permission" i18n-prefix="permission" required />
         <div>
           <q-btn
             type="submit"
@@ -100,14 +100,14 @@ import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import { computed, defineComponent, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import PermissionSelect from 'src/components/Organisation/PermissionSelect.vue'
+import EnumSelect from 'src/components/EnumSelect.vue'
 import UserSelect from 'src/components/Organisation/UserSelect.vue'
 import Dialog from 'src/components/Dialog.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 export default defineComponent({
   components: {
-    PermissionSelect,
+    EnumSelect,
     UserSelect
   },
   props: {
@@ -170,6 +170,7 @@ export default defineComponent({
       initialPagination: { sortBy: 'name', descenting: false, page: 1, rowsPerPage: 10 },
       user,
       permission,
+      Permission,
       reloadMemberships,
       resetMembership,
       paginationLabel,

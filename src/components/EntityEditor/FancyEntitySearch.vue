@@ -39,14 +39,18 @@
           class="inline col"
           @update:model-value="filterFn"
         />
-        <item-type-select
-          v-model="filterItemType"
+        <enum-select
+          v-model:selected="filterItemType"
+          i18n-prefix="itemType"
+          :enum="ItemType"
           dense
           class="inline col"
-          @update:model-value="filterFn"
+          @update:selected="filterFn"
         />
-        <data-type-select
-          v-model="filterDataType"
+        <enum-select
+          v-model:selected="filterDataType"
+          i18n-prefix="dataType"
+          :enum="DataType"
           dense
           class="inline col"
           @update:model-value="filterFn"
@@ -134,9 +138,8 @@ import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
 import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDialog.vue'
-import ItemTypeSelect from './ItemTypeSelect.vue'
-import DataTypeSelect from './DataTypeSelect.vue'
 import { QMenu, QVirtualScroll } from 'quasar'
+import EnumSelect from 'src/components/EnumSelect.vue'
 
 /**
  * This component can be used as a more user-friendly search field for entities.
@@ -149,9 +152,8 @@ export default defineComponent({
   components: {
     RepositorySelectField,
     ForkCreateDialog,
-    ItemTypeSelect,
-    DataTypeSelect
-  },
+    EnumSelect
+},
   props: {
     /** Placeholder to be displayed if the field is empty, default is 'Search Entity...' (gets localised). */
     placeholder: String,
@@ -266,6 +268,8 @@ export default defineComponent({
       filterDataType,
       options,
       loading,
+      DataType,
+      ItemType,
 
       filterFn () {
         loading.value = true

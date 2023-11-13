@@ -18,27 +18,32 @@
         <div v-show="isRestricted(entityType) || hasDataType(entityType)" class="col-12 col-md-4">
           <q-card>
             <q-card-section>
-              <item-type-select
+              <enum-select
                 v-if="hasItemType(entityType)"
-                :model-value="itemType"
+                i18n-prefix="itemType"
+                :selected="itemType"
                 :readonly="readonly"
+                :enum="ItemType"
                 required
-                description
-                tooltip
-                @update:model-value="$emit('update:itemType', $event)"
+                show-description
+                show-tooltip
+                @update:selected="$emit('update:itemType', $event)"
               />
 
-              <data-type-select
+              <enum-select
                 v-if="hasDataType(entityType)"
-                :model-value="dataType"
+                :selected="dataType"
                 :readonly="readonly || version !== undefined"
+                :enum="DataType"
+                i18n-prefix="dataType"
                 required
-                @update:model-value="$emit('update:dataType', $event)"
+                @update:selected="$emit('update:dataType', $event)"
               />
 
-              <data-type-select
+              <enum-select
                 v-else
-                :model-value="DataType.Boolean"
+                :selected="DataType.Boolean"
+                i18n-prefix="dataType"
                 readonly
               />
 
@@ -153,8 +158,7 @@ import {
   Restriction
 } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
-import DataTypeSelect from 'src/components/EntityEditor/DataTypeSelect.vue'
-import ItemTypeSelect from 'src/components/EntityEditor/ItemTypeSelect.vue'
+import EnumSelect from 'src/components/EnumSelect.vue'
 import RestrictionInput from 'src/components/EntityEditor/RestrictionInput.vue'
 import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionInput.vue'
 import UnitInput from 'src/components/UnitInput.vue'
@@ -166,8 +170,7 @@ import {useRouter} from 'vue-router'
 export default defineComponent({
   components: {
     LocalizedTextInput,
-    DataTypeSelect,
-    ItemTypeSelect,
+    EnumSelect,
     RestrictionInput,
     ExpressionInput,
     UnitInput,
@@ -260,6 +263,7 @@ export default defineComponent({
 
       EntityType,
       DataType,
+      ItemType,
       showSuperCategoryInput,
       superPhenotype,
 
