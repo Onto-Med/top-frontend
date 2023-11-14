@@ -7,7 +7,7 @@ A Quasar Framework app
 ## Install the dependencies
 The npm package `@onto-med/top-api` is currently located in a private GitHub Packages registry, thus requires authentication.
 
-You can authenticate at GitHub via `npm login --scope=@onto-med --registry=https://npm.pkg.github.com` (if you use npm version 9 or higher, you must add the argument `--auth-type=legacy`).
+You can authenticate at GitHub via `npm login --scope=@onto-med --auth-type=legacy --registry=https://npm.pkg.github.com` (if you use npm version 8 or lower, remove the argument `--auth-type=legacy`).
 You will be prompted for your username and password (personal access token).
 
 ```bash
