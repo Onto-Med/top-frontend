@@ -5,6 +5,9 @@ A Quasar Framework app
 [![Lint](https://github.com/Onto-Med/top-frontend/actions/workflows/lint.yml/badge.svg)](https://github.com/Onto-Med/top-frontend/actions/workflows/lint.yml)
 
 ## Install the dependencies
+
+Install npm, Yarn and Quasar CLI. 
+
 The npm package `@onto-med/top-api` is currently located in a private GitHub Packages registry, thus requires authentication.
 
 You can authenticate at GitHub via `npm login --scope=@onto-med --auth-type=legacy --registry=https://npm.pkg.github.com` (if you use npm version 8 or lower, remove the argument `--auth-type=legacy`).
