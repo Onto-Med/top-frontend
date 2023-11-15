@@ -1,4 +1,5 @@
-import { RouteRecordRaw } from 'vue-router';
+import { RouteRecordRaw } from 'vue-router'
+import { env } from 'src/config'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -53,7 +54,7 @@ const routes: RouteRecordRaw[] = [
         path: '/document/query/:organisationId/:repositoryId/:queryId',
         component: () => import('pages/DocumentSearch.vue'),
         meta: {
-          disabled: !process.env.DOCUMENTS_ENABLED
+          disabled: !env.DOCUMENTS_ENABLED
         },
         props: true
       },
@@ -62,7 +63,7 @@ const routes: RouteRecordRaw[] = [
         path: '/document',
         component: () => import('pages/DocumentSearch.vue'),
         meta: {
-          disabled: !process.env.DOCUMENTS_ENABLED
+          disabled: !env.DOCUMENTS_ENABLED
         }
       }
     ],
@@ -77,6 +78,6 @@ const routes: RouteRecordRaw[] = [
       allowAnonymous: true
     }
   },
-];
+]
 
-export default routes;
+export default routes

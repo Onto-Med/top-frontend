@@ -40,7 +40,7 @@ fi
 
 if [[ ! -z "${DOCUMENTS_ENABLED}" ]]
 then
-    sed -i "s|DOCUMENTS_ENABLED\\:!1|DOCUMENTS_ENABLED:'${DOCUMENTS_ENABLED}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|DOCUMENTS_ENABLED\\:!1|DOCUMENTS_ENABLED:${DOCUMENTS_ENABLED}|g" /usr/share/nginx/html/js/app.*.js
 fi
 
 if [[ ! -z "${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}" ]]
