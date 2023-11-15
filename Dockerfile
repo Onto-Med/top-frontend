@@ -1,12 +1,11 @@
-FROM node:alpine as develop-stage
+FROM node:alpine as build-stage
 WORKDIR /app
 RUN yarn global add @quasar/cli
-COPY . .
-
-FROM develop-stage as build-stage
 ARG NPM_AUTH_TOKEN
 ENV NPM_AUTH_TOKEN=$NPM_AUTH_TOKEN
+COPY package.json yarn.lock .npmrc ./
 RUN yarn
+COPY . .
 RUN quasar build
 
 FROM nginx:alpine as production-stage
