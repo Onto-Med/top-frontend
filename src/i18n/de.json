@@ -172,8 +172,8 @@
   "enumeration": "Aufzählung|Aufzählungen",
   "valueRange": "Wertebereich|Wertebereiche",
   "pleaseWait": "Bitte warten",
-  "primary": "Primär",
-  "primaryRepositoryDescription": "Primäre Repositorien sind öffentlich. Ihr Inhalt kann in private Repositorien geforkt werden und sie unterstützen Pull-Requests.",
+  "primary": "Öffentlich",
+  "primaryRepositoryDescription": "Öffentliche Repositorien sind für jedermann lesbar. Ihr Inhalt kann in private Repositorien geforkt werden und sie unterstützen Pull-Requests.",
   "reload": "Neu laden",
   "dismiss": "Verwerfen",
   "notFound": "Nicht gefunden",
@@ -397,14 +397,14 @@
   "updatedAt": "Aktualisiert am {date}",
   "goToThing": "Gehe zu {thing}",
   "downloadDataSet": "Gesamten Datensatz herunterladen",
-  "includePrimaryRepositories": "Primäre Repositorien einschließen",
-  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in primären Repositorien zu erweitern.",
+  "includePrimaryRepositories": "Öffentliche Repositorien einschließen",
+  "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in öffentlichen Repositorien zu erweitern.",
   "forkCouldNotBeCreated": "Es konnte kein Fork erstellt werden, da möglicherweise bereits ein aktueller Fork in diesem Repositorium vorhanden ist.",
   "previousQuery": "Vorherige Abfrage|Vorherige Abfragen",
   "result": "Ergebnis",
   "queued": "In Warteschlange",
   "notAuthorised": {
-    "onlyPrimaryVisible": "Sie verfügen nicht über die erforderlichen Berechtigungen, daher sind nur primäre Repositorien für Sie sichtbar."
+    "onlyPrimaryVisible": "Sie verfügen nicht über die erforderlichen Berechtigungen, daher sind nur öffentliche Repositorien für Sie sichtbar."
   },
   "boolean": "Boolean",
   "codeInput": {
