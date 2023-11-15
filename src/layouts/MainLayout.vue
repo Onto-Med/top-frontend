@@ -206,6 +206,7 @@ import { Entity } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
 import { storeToRefs } from 'pinia'
+import { env } from 'src/config'
 
 export default defineComponent({
   components: {
@@ -233,7 +234,7 @@ export default defineComponent({
           isHidden: keycloak.value && !keycloak.value.authenticated
         }
       ]
-      if (process.env.DOCUMENTS_ENABLED) {
+      if (env.DOCUMENTS_ENABLED) {
         links.push({
           title: t('document', 2),
           icon: 'article',
