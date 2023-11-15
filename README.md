@@ -4,15 +4,22 @@ A Quasar Framework app
 
 [![Lint](https://github.com/Onto-Med/top-frontend/actions/workflows/lint.yml/badge.svg)](https://github.com/Onto-Med/top-frontend/actions/workflows/lint.yml)
 
-## Install the dependencies
-The npm package `@onto-med/top-api` is currently located in a private GitHub Packages registry, thus requires authentication.
+## Development
 
-You can authenticate at GitHub via `npm login --scope=@onto-med --auth-type=legacy --registry=https://npm.pkg.github.com` (if you use npm version 8 or lower, remove the argument `--auth-type=legacy`).
-You will be prompted for your username and password (personal access token).
+### Install the dependencies
 
-```bash
-yarn
-```
+1. Install [npm](https://www.npmjs.com/package/npm), [Yarn](https://classic.yarnpkg.com/lang/en/docs/install) and [Quasar CLI](https://quasar.dev/start/quasar-cli/),
+or use the `.devcontainer/devcontainer.json` configuration to build a [Development Container](https://containers.dev/).
+
+2. The npm package `@onto-med/top-api` is hosted in the GitHub Packages registry, thus requires authentication.
+
+    * You can authenticate at GitHub via `npm login --scope=@onto-med --auth-type=legacy --registry=https://npm.pkg.github.com`
+      (if you use npm version 8 or lower, remove the argument `--auth-type=legacy`).
+      You will be prompted for your username and password (personal access token).
+
+    * For the devcontainer setup, you need to create a `.devcontainer/.env` file containing your GitHub personal access token (see `.devcontainer/.env.dist`)
+
+3. Run `yarn` (skip this step in the devcontainer setup)
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
