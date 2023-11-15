@@ -170,8 +170,8 @@
   "enumeration": "Enumeration|Enumerations",
   "valueRange": "Value range|Value ranges",
   "pleaseWait": "Please wait",
-  "primary": "Primary",
-  "primaryRepositoryDescription": "Primary repositories are public. Their content can be forked into private repositories and they support pull requests.",
+  "primary": "Public",
+  "primaryRepositoryDescription": "Public repositories are readable by everyone. Their content can be forked into private repositories and they support pull requests.",
   "reload": "Reload",
   "dismiss": "Dismiss",
   "notFound": "Not found",
@@ -397,14 +397,14 @@
   "updatedAt": "Updated at {date}",
   "goToThing": "Go to {thing}",
   "downloadDataSet": "Download whole data set",
-  "includePrimaryRepositories": "Include primary repositories",
-  "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in primary repositories.",
+  "includePrimaryRepositories": "Include public repositories",
+  "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in public repositories.",
   "forkCouldNotBeCreated": "A fork could not be created because there may already be an up-to-date fork in this repository.",
   "previousQuery": "Previous query|Previous queries",
   "result": "Result",
   "queued": "Queued",
   "notAuthorised": {
-    "onlyPrimaryVisible": "You do not have required permissions, so only primary repositories are visible to you."
+    "onlyPrimaryVisible": "You do not have required permissions, so only public repositories are visible to you."
   },
   "boolean": "Boolean",
   "codeInput": {
