@@ -90,35 +90,26 @@
   </q-page>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Statistic } from '@onto-med/top-api'
 import { DefaultApiKey } from 'src/boot/axios'
-import { defineComponent, inject, onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import packageInfo from '../../package.json'
 import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  setup () {
-    const { t } = useI18n()
-    const router = useRouter()
-    const defaultApi = inject(DefaultApiKey)
-    const statistic = ref(undefined as Statistic|undefined)
+const { t } = useI18n()
+const router = useRouter()
+const defaultApi = inject(DefaultApiKey)
+const statistic = ref(undefined as Statistic|undefined)
+const productName = packageInfo.productName
+const version = packageInfo.version
 
-    onMounted(() => defaultApi?.getStatistics().then(r => statistic.value = r.data))
+onMounted(() => defaultApi?.getStatistics().then(r => statistic.value = r.data))
 
-    return {
-      t,
-      statistic,
-      productName: packageInfo.productName,
-      version: packageInfo.version,
-
-      routeTo (name: string) {
-        void router.push({ name })
-      }
-    }
-  }
-})
+function routeTo(name: string) {
+  void router.push({ name })
+}
 </script>
 
 <style lang="sass" scope>

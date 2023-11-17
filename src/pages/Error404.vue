@@ -6,7 +6,7 @@
       </div>
 
       <div class="text-h2" style="opacity:.4">
-        Oops. Nothing here...
+        {{ t('404Description') }}
       </div>
 
       <q-btn
@@ -15,17 +15,15 @@
         text-color="blue"
         unelevated
         to="/"
-        label="Go Home"
+        :label="t('goToThing', { thing: t('home') })"
         no-caps
       />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  name: 'Error404'
-})
+const { t } = useI18n()
 </script>
