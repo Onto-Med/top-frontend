@@ -16,8 +16,8 @@ import {
   RepositoryType,
   RestrictionOperator
 } from '@onto-med/top-api'
-import {useEntity} from 'src/pinia/entity'
-import {useI18n} from 'vue-i18n'
+import { useEntity } from 'src/pinia/entity'
+import { useI18n } from 'vue-i18n'
 
 export default function (this: void) {
   // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -109,7 +109,7 @@ export default function (this: void) {
     return superPhenotypePrefix + title
   }
 
-  const rotateOperator = (operator: RestrictionOperator): RestrictionOperator => {
+  const invertOperator = (operator: RestrictionOperator): RestrictionOperator => {
     switch (operator) {
       case RestrictionOperator.GreaterThan: return RestrictionOperator.LessThan
       case RestrictionOperator.GreaterThanOrEqualTo: return RestrictionOperator.LessThanOrEqualTo
@@ -210,13 +210,13 @@ export default function (this: void) {
       ]
     },
 
-    restrictionToString(this: void, restriction?: NumberRestriction|DateTimeRestriction): string {
+    restrictionToString(this: void, restriction?: NumberRestriction | DateTimeRestriction): string {
       let result = ''
       if (restriction?.values?.length !== 0) {
-        const values = restriction?.values as (number|Date|string)[]
+        const values = restriction?.values as (number | Date | string)[]
         if (restriction?.minOperator || restriction?.maxOperator) {
           if (restriction?.minOperator && values[0]) {
-            result += `${values[0].toString()} ${rotateOperator(restriction.minOperator)} x`
+            result += `${values[0].toString()} ${invertOperator(restriction.minOperator)} x`
           }
           if (restriction?.maxOperator && values[1]) {
             if (result === '') result += 'x'

@@ -1,3 +1,11 @@
+/**
+ * This object is a workaround to make the TOP frontend configurable in a Docker
+ * setup using environment variables.
+ * In a Docker container, only the final built JavaScript code is available, with
+ * calls to `process.env` being completely replaced with the actual values. The
+ * field names listed here are preserved after built and can be accessed and
+ * replaced with custom values provided via environment variables.
+ */
 export const env = {
   OAUTH2_ENABLED:    process.env.OAUTH2_ENABLED,
   OAUTH2_URL:        process.env.OAUTH2_URL || 'http://127.0.0.1:8081',
@@ -11,6 +19,9 @@ export const env = {
   TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL || 'https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner'
 } as NodeJS.ProcessEnv
 
+/**
+ * List of function types for which no documentation reference should be displayed.
+ */
 export const noDocFunctionTypes = [
   'component',
   'textFunction'

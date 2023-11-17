@@ -16,8 +16,10 @@
           <span class="q-pt-md">{{ t('queryBuilder.description') }}</span>
 
           <div class="row q-gutter-md">
-            <repository-type-select
-              v-model="repositoryTypeFilter"
+            <enum-select
+              v-model:selected="repositoryTypeFilter"
+              i18n-prefix="repositoryType"
+              :enum="RepositoryType"
               :required="false"
               hide-bottom-space
               class="col-lg-2 col-4"
@@ -117,7 +119,7 @@ import RepositorySelectField from 'src/components/Repository/RepositorySelectFie
 import Dialog from 'src/components/Dialog.vue'
 import ConceptQueryForm from 'src/components/Query/ConceptQueryForm.vue'
 import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
-import RepositoryTypeSelect from 'src/components/EntityEditor/RepositoryTypeSelect.vue'
+import EnumSelect from 'src/components/EnumSelect.vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({

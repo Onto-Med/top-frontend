@@ -193,7 +193,7 @@
   </q-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
@@ -201,97 +201,81 @@ import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import FancyEntitySearch from 'src/components/EntityEditor/FancyEntitySearch.vue'
 import packageInfo from '../../package.json'
-import { defineComponent, ref, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Entity } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
 import { storeToRefs } from 'pinia'
-import { env } from 'src/config'
+import { env} from 'src/config'
 
-export default defineComponent({
-  components: {
-    NavbarLink,
-    LanguageSwitch,
-    FancyEntitySearch
-  },
+const { t } = useI18n()
+const router = useRouter()
+const entityStore = useEntity()
+const $q = useQuasar()
+const leftDrawerOpen = ref<boolean>(!($q.localStorage.getItem('minimiseDrawer') as boolean))
+const { keycloak, organisation } = storeToRefs(entityStore)
+const drawer = ref(undefined as QMenu|undefined)
 
-  setup () {
-    const { t } = useI18n()
-    const router = useRouter()
-    const entityStore = useEntity()
-    const $q = useQuasar()
-    const leftDrawerOpen = ref<boolean>(!($q.localStorage.getItem('minimiseDrawer') as boolean))
-    const { keycloak, organisation } = storeToRefs(entityStore)
-    const drawer = ref(undefined as QMenu|undefined)
-
-    const linksList = computed(() => {
-      const links = [
-        {
-          title: t('query', 2),
-          icon: 'person_search',
-          caption: t('navbar.query.caption'),
-          routeName: 'queryBuilder',
-          isHidden: keycloak.value && !keycloak.value.authenticated
-        }
-      ]
-      if (env.DOCUMENTS_ENABLED) {
-        links.push({
-          title: t('document', 2),
-          icon: 'article',
-          caption: t('documentSearch.short'),
-          routeName: 'documentSearch',
-          isHidden: keycloak.value && !keycloak.value.authenticated
-        })
-      }
-      return links
-    })
-
-    watch(
-      leftDrawerOpen,
-      (newVal) => $q.localStorage.set('minimiseDrawer', !newVal)
-    )
-
-    return {
-      t,
-      drawer,
-      productName: packageInfo.productName,
-      documentationUrl: packageInfo.homepage,
-      repositoryUrl: packageInfo.repository ? (packageInfo.repository as Record<string, unknown>).url as string : undefined,
-      links: linksList,
-      leftDrawerOpen,
-      fabGithub,
-      fasBook,
-      keycloak,
-      organisation,
-      smallScreen: computed(() => $q.screen.lt.md),
-      username: computed(() => (keycloak.value?.tokenParsed?.name || keycloak.value?.tokenParsed?.preferred_username) as string | undefined),
-
-      editAccountUrl: keycloak.value?.createAccountUrl(),
-
-      repositoryId: computed(() => {
-        const route = router.currentRoute.value
-        if (!route || route.name !== 'editor') return undefined
-        return route.params.repositoryId as string|undefined
-      }),
-
-      toggleLeftDrawer () {
-        if (($q.platform.is.mobile || $q.screen.lt.md) && drawer.value)
-          drawer.value.show()
-        else
-          leftDrawerOpen.value = !leftDrawerOpen.value
-      },
-
-      routeToEntity (entity: Entity) {
-        if (!entity.repository || !entity.repository.organisation) return
-        void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
-      },
-
-      toggleDarkMode: $q.dark.toggle,
-
-      isDarkModeActive: computed(() => $q.dark.isActive)
+const links = computed(() => {
+  const links = [
+    {
+      title: t('query', 2),
+      icon: 'person_search',
+      caption: t('navbar.query.caption'),
+      routeName: 'queryBuilder',
+      isHidden: keycloak.value && !keycloak.value.authenticated
     }
+  ]
+  if (env.DOCUMENTS_ENABLED) {
+    links.push({
+      title: t('document', 2),
+      icon: 'article',
+      caption: t('documentSearch.short'),
+      routeName: 'documentSearch',
+      isHidden: keycloak.value && !keycloak.value.authenticated
+    })
   }
+  return links
 })
+
+const toggleDarkMode = $q.dark.toggle
+const isDarkModeActive = computed(() => $q.dark.isActive)
+
+const productName = packageInfo.productName
+const documentationUrl = packageInfo.homepage
+const repositoryUrl = packageInfo.repository
+  ? (packageInfo.repository as Record<string, unknown>).url as string
+  : undefined
+const editAccountUrl = computed(() => keycloak.value?.createAccountUrl())
+
+
+const smallScreen = computed(() => $q.screen.lt.md)
+const username = computed(() =>
+  (keycloak.value?.tokenParsed?.name || keycloak.value?.tokenParsed?.preferred_username) as string | undefined
+)
+
+const repositoryId = computed(() => {
+  const route = router.currentRoute.value
+  if (!route || route.name !== 'editor') return undefined
+  return route.params.repositoryId as string|undefined
+})
+
+watch(
+  leftDrawerOpen,
+  (newVal) => $q.localStorage.set('minimiseDrawer', !newVal)
+)
+
+function toggleLeftDrawer() {
+  if (($q.platform.is.mobile || $q.screen.lt.md) && drawer.value)
+    drawer.value.show()
+  else
+    leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+function routeToEntity(entity: Entity) {
+  if (!entity.repository || !entity.repository.organisation) return
+  void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
+}
 </script>
 
 <style lang="sass" scoped>
