@@ -5,14 +5,15 @@ import { AxiosInstance } from 'axios'
 
 export default boot(({ app }) => {
   const pinia = createPinia()
+  const axios = app.config.globalProperties.$axios as AxiosInstance | undefined
   pinia.use(() => ({
-    entityApi: new EntityApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
-    organisationApi: new OrganisationApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
-    repositoryApi: new RepositoryApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
-    defaultApi: new DefaultApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
-    queryApi: new QueryApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
-    codeApi: new CodeApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined),
-    userApi: new UserApi(undefined, '', app.config.globalProperties.$axios as AxiosInstance|undefined)
+    entityApi: new EntityApi(undefined, '', axios),
+    organisationApi: new OrganisationApi(undefined, '', axios),
+    repositoryApi: new RepositoryApi(undefined, '', axios),
+    defaultApi: new DefaultApi(undefined, '', axios),
+    queryApi: new QueryApi(undefined, '', axios),
+    codeApi: new CodeApi(undefined, '', axios),
+    userApi: new UserApi(undefined, '', axios)
   }))
   app.use(pinia)
 })
