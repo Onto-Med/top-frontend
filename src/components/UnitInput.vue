@@ -4,7 +4,8 @@
       :dense="dense"
       emit-value
       use-input
-      input-debounce="200"
+      input-debounce="0"
+      clearable
       :class="{ 'ucum-select-field': fixedWidth }"
       :label="showLabel ? t('unit') : undefined"
       :readonly="readonly"
@@ -34,67 +35,67 @@
   </div>
 </template>
 
-<script lang="ts">
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-import { defineComponent, ref, computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
 import * as ucumLhc from '@lhncbc/ucum-lhc'
 import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  name: 'UcumInput',
-  props: {
-    modelValue: String,
-    readonly: Boolean,
-    showLabel: Boolean,
-    fixedWidth: Boolean,
-    dense: Boolean
-  },
-  emits: ['update:modelValue'],
-  setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n()
-    const utils = ucumLhc.UcumLhcUtils.getInstance()
-    const options = ref(null as unknown as Array<Record<string, string>>)
+interface TypedUcumLhcUtils {
+  validateUnitString(string?: string, bool?: boolean): Record<string, unknown>
+}
 
-    const validation = computed(() =>
-      utils.validateUnitString(props.modelValue) as Record<string, unknown>
-    )
-    const displayValue = computed(() => {
-      if (validation.value && validation.value.status === 'valid') {
-        const unit = validation.value.unit as Record<string, string>
-        return `${unit.code} (${unit.name})`
-      }
-      return ''
-    })
+const props = defineProps<{
+  modelValue?: string,
+  readonly?: boolean,
+  showLabel?: boolean,
+  fixedWidth?: boolean,
+  dense?: boolean
+}>()
 
-    return {
-      t, options, validation, displayValue,
+defineEmits(['update:modelValue'])
 
-      filterFn (val: string, update: (arg0: () => void) => void, abort: () => void) {
-        if (!val || val.length === 0) {
-          abort()
-          return
-        }
+const { t } = useI18n()
 
-        const result: Record<string, unknown> = utils.validateUnitString(val, true)
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+const utils = ucumLhc.UcumLhcUtils.getInstance() as TypedUcumLhcUtils
+const options = ref(null as unknown as Array<Record<string, string>>)
 
-        if (result.suggestions) {
-          update(() =>
-            options.value = (result.suggestions as Array<Record<string, unknown>>)
-              .flatMap(s => s.units as Array<string[]>).map((u: string[]) => {
-                return { value: u[0], label: u[1] }
-              })
-          )
-        } else if (result.unit) {
-          const unit = result.unit as Record<string, string>
-          update(() => options.value = [{ value: unit.code, label: unit.name }])
-        } else {
-          abort()
-        }
-      }
-    }
+const validation = computed(() =>
+  utils.validateUnitString(props.modelValue)
+)
+
+const displayValue = computed(() => {
+  if (validation.value && validation.value.status === 'valid') {
+    const unit = validation.value.unit as Record<string, string>
+    return `${unit.code} (${unit.name})`
   }
+  return ''
 })
+
+
+function filterFn(val: string, update: (arg0: () => void) => void, abort: () => void) {
+  console.log('test')
+  if (!val || val.length === 0) {
+    abort()
+    return
+  }
+
+  const result: Record<string, unknown> = utils.validateUnitString(val, true)
+
+  if (result.suggestions) {
+    update(() =>
+      options.value = (result.suggestions as Array<Record<string, unknown>>)
+        .flatMap(s => s.units as Array<string[]>).map((u: string[]) => {
+          return { value: u[0], label: u[1] }
+        })
+    )
+  } else if (result.unit) {
+    const unit = result.unit as Record<string, string>
+    update(() => options.value = [{ value: unit.code, label: unit.name }])
+  } else {
+    abort()
+  }
+}
 </script>
 
 <style lang="sass" scoped>
