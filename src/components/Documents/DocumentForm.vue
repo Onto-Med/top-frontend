@@ -21,27 +21,18 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue'
-import {Document} from '@onto-med/top-api';
-import {useI18n} from 'vue-i18n';
+<script setup lang="ts">
+import { Document } from '@onto-med/top-api'
+import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  props: {
-    modelValue: {
-      type: Object as () => Document,
-      required: true
-    },
-    show: Boolean
-  },
-  emits: ['update:show'],
-  setup() {
-    const { t } = useI18n()
-    return {
-      t,
-    }
-  }
-})
+defineProps<{
+  modelValue: Document,
+  show: boolean
+}>()
+
+defineEmits(['update:show'])
+
+const { t } = useI18n()
 </script>
 
 <style scoped lang="sass">
