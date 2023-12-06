@@ -35,17 +35,12 @@
         </q-btn>
       </template>
       <template #row-cells="props">
-        <tr>
-          <q-td>
-            {{ props.row.id }}
-          </q-td>
-          <q-td>
-            {{ props.row.name }}
-          </q-td>
-          <q-td>
-            {{ props.row.text }}
-          </q-td>
-        </tr>
+        <q-td :title="props.row.id">
+          {{ props.row.name }}
+        </q-td>
+        <q-td>
+          {{ props.row.text }}
+        </q-td>
       </template>
     </table-with-actions>
 
@@ -131,7 +126,6 @@ export default defineComponent({
 
     const cols = computed(() => [
       { name: 'actions' },
-      { name: 'id', field: 'id', label: t('id'), align: 'left' },
       { name: 'name', field: 'name', label: t('name'), align: 'left' },
       { name: 'text', field: 'text', label: t('content'), align: 'left' },
     ] as QTableProps['columns'])
