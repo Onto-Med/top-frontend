@@ -1,24 +1,24 @@
 <template>
-  <q-layout>
-    <q-page class="q-pa-md q-gutter-md">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">
-            {{ t('documentSearch.title') }}
-          </div>
-          <span class="q-pt-md">{{ t('documentSearch.description') }}</span>
-          <div class="row q-gutter-md">
-            <q-btn-toggle
-              v-model="searchType"
-              :options="searchTypeOptions"
-              no-caps
-              rounded
-            />
-          </div>
-        </q-card-section>
+  <q-page class="q-pa-md q-gutter-md">
+    <q-card>
+      <q-card-section>
+        <div class="text-h6">
+          {{ t('documentSearch.title') }}
+        </div>
+        <span class="q-pt-md">{{ t('documentSearch.description') }}</span>
+        <div class="row q-gutter-md">
+          <q-btn-toggle
+            v-model="searchType"
+            :options="searchTypeOptions"
+            no-caps
+            rounded
+          />
+        </div>
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
+      <q-card-section class="q-pa-none">
         <concept-cluster-form
           v-if="searchType === 'conceptCluster'"
         />
@@ -30,9 +30,9 @@
           :query-name="queryName"
           @clear-query-results="clearQueryResults"
         />
-      </q-card>
-    </q-page>
-  </q-layout>
+      </q-card-section>
+    </q-card>
+  </q-page>
 </template>
 
 <script lang="ts">

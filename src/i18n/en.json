@@ -493,5 +493,6 @@
   "of": "of",
   "manage": "Manage",
   "edit": "Edit",
-  "404Description": "The requested page does not exist."
+  "404Description": "The requested page does not exist.",
+  "clickThingToShowContent": "Click on a {thing} to show its content."
 }

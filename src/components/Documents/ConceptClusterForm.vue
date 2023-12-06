@@ -1,68 +1,72 @@
 <template>
-  <q-card-section class="row q-pa-none">
-    <q-splitter v-model="splitterModel" style="min-height: inherit; height: 100px">
-      <template #before>
-        <div class="column fit">
-          <q-card class="col">
-            <q-card-section>
-              <div class="text-subtitle2">
-                {{ t('concept', 2) }}
-              </div>
-            </q-card-section>
-            <q-card-section class="row">
-              <div class="col-10">
-                <q-select
-                  v-model="conceptMode"
-                  :options="conceptModeOptions"
-                  :label="t('selectionMode')"
-                  emit-value
-                  map-options
-                >
-                  <template #option="scope">
-                    <q-item v-bind="scope.itemProps">
-                      <q-item-section avatar>
-                        <q-icon :name="scope.opt.icon" />
-                      </q-item-section>
-                      <q-item-section>
-                        <q-item-label>
-                          {{ scope.opt.label }}
-                        </q-item-label>
-                        <q-item-label caption>
-                          {{ scope.opt.description }}
-                        </q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                </q-select>
-              </div>
-              <div class="col-10">
-                <q-select
-                  v-model="mostImportantNodes"
-                  :options="mostImportantNodesOptions"
-                  :label="t('importantNodesOnly')"
-                  emit-value
-                  map-options
-                >
-                  <template #option="scope">
-                    <q-item v-bind="scope.itemProps">
-                      <q-item-section>
-                        <q-item-label>
-                          {{ scope.opt.label }}
-                        </q-item-label>
-                        <q-item-label caption>
-                          {{ scope.opt.description }}
-                        </q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                </q-select>
-              </div>
-            </q-card-section>
-            <q-card-section class="row">
+  <q-splitter v-model="splitterModel" class="fit">
+    <template #before>
+      <q-card>
+        <q-card-section class="bg-grey-1">
+          <div class="text-subtitle2">
+            {{ t('concept', 2) }}
+          </div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section>
+          <q-select
+            v-model="conceptMode"
+            :options="conceptModeOptions"
+            :label="t('selectionMode')"
+            dense
+            emit-value
+            map-options
+          >
+            <template #option="scope">
+              <q-item v-bind="scope.itemProps">
+                <q-item-section avatar>
+                  <q-icon :name="scope.opt.icon" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>
+                    {{ scope.opt.label }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ scope.opt.description }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+          <q-select
+            v-model="mostImportantNodes"
+            :options="mostImportantNodesOptions"
+            :label="t('importantNodesOnly')"
+            dense
+            emit-value
+            map-options
+          >
+            <template #option="scope">
+              <q-item v-bind="scope.itemProps">
+                <q-item-section>
+                  <q-item-label>
+                    {{ scope.opt.label }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ scope.opt.description }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="q-pa-none">
+          <q-scroll-area style="height: 60vh">
+            <div class="column">
               <q-chip
                 v-for="(concept, index) in concepts"
                 :key="concept.id"
-                class="col-10 cursor-pointer relative-position"
+                class="cursor-pointer"
                 :style="selectedColors[index]"
                 clickable
                 @click="chooseConcept(index, false)"
@@ -74,76 +78,84 @@
                   {{ concept.labels }}
                 </q-tooltip>
               </q-chip>
-            </q-card-section>
-          </q-card>
-        </div>
-      </template>
+            </div>
+          </q-scroll-area>
+        </q-card-section>
+      </q-card>
+    </template>
 
-      <template #after>
-        <div class="column fit">
-          <div class="row col no-wrap justify-between">
-            <q-card class="col">
-              <q-card-section>
-                <div class="text-subtitle2">
-                  {{ t('document', 2) }} <a v-if="documents.length > 0">
-                    ({{ t('resultCount', documents.length) }})
-                  </a>
-                </div>
-              </q-card-section>
-              <!--  TODO: need to find a better solution for style height -->
-              <q-virtual-scroll
-                v-slot="{ item }"
-                style="height: 94%"
-                :items="documents"
-                separator
-              >
-                <q-item
-                  :key="item.id"
-                  class="cursor-pointer relative-position"
-                  clickable
-                  @click="chooseDocument(item.id)"
+    <template #after>
+      <div class="row">
+        <div class="col">
+          <q-card-section class="bg-grey-1">
+            <div class="text-subtitle2">
+              {{ t('document', 2) }} <a v-if="documents.length > 0">
+                ({{ t('resultCount', documents.length) }})
+              </a>
+            </div>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-virtual-scroll
+            v-slot="{ item }"
+            style="height: 72vh"
+            :items="documents"
+            separator
+          >
+            <q-item
+              :key="item.id"
+              class="cursor-pointer relative-position"
+              clickable
+              @click="chooseDocument(item.id)"
+            >
+              <q-item-section>
+                <q-item-label
+                  :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
                 >
-                  <q-item-section>
-                    <q-item-label
-                      :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
-                    >
-                      {{ item.name }}
-                    </q-item-label>
-                    <q-item-label
-                      caption
-                      lines="2"
-                      :style="{'font-size': '14px'}"
-                    >
-                      First line of doc or some such thing
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-virtual-scroll>
-            </q-card>
+                  {{ item.name }}
+                </q-item-label>
+                <q-item-label
+                  caption
+                  lines="2"
+                  :style="{'font-size': '14px'}"
+                >
+                  First line of doc or some such thing
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-virtual-scroll>
+        </div>
 
-            <q-card class="col">
-              <q-card-section>
-                <div class="text-subtitle2">
-                  {{ t('details', 2) }}
-                </div>
-              </q-card-section>
-              <q-scroll-area v-if="document_" style="height: 94%">
-                <q-card-section>
-                  <div class="text-h6">
-                    {{ document_.name }}
-                  </div>
-                </q-card-section>
-                <q-card-section>
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <div style="line-height: 1.6" v-html="document_.highlightedText" />
-                </q-card-section>
-              </q-scroll-area>
-            </q-card>
+        <q-separator vertical />
+
+        <div class="col">
+          <q-card-section class="bg-grey-1">
+            <div class="text-subtitle2">
+              {{ t('details', 2) }}
+            </div>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-scroll-area v-if="document_" style="height: 72vh">
+            <q-card-section>
+              <div class="text-h6">
+                {{ document_.name }}
+              </div>
+            </q-card-section>
+            <q-card-section>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div style="line-height: 1.6" v-html="document_.highlightedText" />
+            </q-card-section>
+          </q-scroll-area>
+          <div v-else class="text-grey q-pa-md">
+            <small>{{ t('clickThingToShowContent', { thing: t('document') }) }}</small>
           </div>
         </div>
-      </template>
-    </q-splitter>
-  </q-card-section>
+      </div>
+    </template>
+  </q-splitter>
 </template>
 
 <script lang="ts">

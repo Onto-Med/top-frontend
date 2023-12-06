@@ -35,7 +35,7 @@ export default defineComponent({
     show: Boolean
   },
   emits: ['update:show'],
-  setup(props, { emit }) {
+  setup() {
     const { t } = useI18n()
     return {
       t,

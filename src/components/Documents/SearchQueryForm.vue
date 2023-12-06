@@ -1,5 +1,5 @@
 <template>
-  <q-card-section class="q-pa-none">
+  <div>
     <table-with-actions
       flat
       wrap-cells
@@ -49,11 +49,11 @@
       v-model:show="showForm"
       @update:show=" showForm = false "
     />
-  </q-card-section>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref, onMounted, onUpdated, computed } from 'vue'
+import { defineComponent, inject, ref, onMounted, computed } from 'vue'
 import TableWithActions from 'components/TableWithActions.vue'
 import DocumentForm from 'components/Documents/DocumentForm.vue';
 import { useI18n } from 'vue-i18n'
@@ -131,10 +131,6 @@ export default defineComponent({
     ] as QTableProps['columns'])
 
     onMounted(async () => {
-      await reload()
-    })
-
-    onUpdated(async () => {
       await reload()
     })
 
