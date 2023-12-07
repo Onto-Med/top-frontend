@@ -1,16 +1,22 @@
 <template>
   <q-dialog :model-value="show" persistent>
-    <q-card>
+    <q-card style="width: 60vw; max-width: 60vw;">
       <q-card-section>
         <div class="text-h6">
           {{ modelValue.name }}
         </div>
       </q-card-section>
-      <q-card-section>
+
+      <q-separator />
+
+      <q-card-section style="max-height: 70vh" class="scroll">
         <div class="q-pa-lg">
           {{ modelValue.highlightedText }}
         </div>
       </q-card-section>
+
+      <q-separator />
+
       <q-btn
         class="q-ma-sm"
         @click="$emit('update:show', $event)"
