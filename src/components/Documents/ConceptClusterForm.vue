@@ -81,6 +81,7 @@
             </div>
           </q-scroll-area>
         </q-card-section>
+        <q-inner-loading :showing="loading" />
       </q-card>
     </template>
 
@@ -110,48 +111,15 @@
               @click="chooseDocument(item.id)"
             >
               <q-item-section>
-                <q-item-label
-                  :style="{'font-size': '18px', 'color': '#696969', 'font-weight': 'bold'}"
-                >
-                  {{ item.name }}
+                <q-item-label class="document-item">
+                  {{ item.name || item.id }}
                 </q-item-label>
-                <q-item-label
-                  caption
-                  lines="2"
-                  :style="{'font-size': '14px'}"
-                >
-                  First line of doc or some such thing
+                <q-item-label caption lines="2">
+                  {{ item.text }}
                 </q-item-label>
               </q-item-section>
             </q-item>
           </q-virtual-scroll>
-        </div>
-
-        <q-separator vertical />
-
-        <div class="col">
-          <q-card-section class="bg-grey-1">
-            <div class="text-subtitle2">
-              {{ t('details', 2) }}
-            </div>
-          </q-card-section>
-
-          <q-separator />
-
-          <q-scroll-area v-if="document_" style="height: 72vh">
-            <q-card-section>
-              <div class="text-h6">
-                {{ document_.name }}
-              </div>
-            </q-card-section>
-            <q-card-section>
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <div style="line-height: 1.6" v-html="document_.highlightedText" />
-            </q-card-section>
-          </q-scroll-area>
-          <div v-else class="text-grey q-pa-md">
-            <small>{{ t('clickThingToShowContent', { thing: t('document') }) }}</small>
-          </div>
         </div>
       </div>
     </template>
@@ -164,6 +132,8 @@ import { useI18n } from 'vue-i18n'
 import { DocumentApiKey, ConceptClusterApiKey } from 'src/boot/axios'
 import { Document, ConceptCluster } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
+import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
+import { useQuasar } from 'quasar'
 
 interface ConceptColor {
   'background-color': string,
@@ -171,6 +141,7 @@ interface ConceptColor {
 }
 
 const { t } = useI18n()
+const $q = useQuasar()
 const { renderError }  = useNotify()
 const documentApi      = inject(DocumentApiKey)
 const conceptApi       = inject(ConceptClusterApiKey)
@@ -261,7 +232,7 @@ watch(
 )
 
 async function reload() {
-  if (!conceptApi || !documentApi) return
+  if (!conceptApi || !documentApi || loading.value) return
   loading.value = true
   await conceptApi.getConceptClusters()
     .then((r: { data: { id: string; labels?: string | undefined }[] }) => {
@@ -323,7 +294,21 @@ async function chooseDocument(documentId: string) {
       selConcept => concepts.value[selConcept].id
     )
   )
-    .then(r => document_.value = r.data)
+    .then(r => {
+      $q.dialog({
+        component: DocumentDetailsDialog,
+        componentProps: {
+          document: r.data
+        }
+      })
+    })
     .catch((e: Error) => renderError(e))
 }
 </script>
+
+<style lang="sass">
+.document-item
+  font-size: 18px
+  color: #696969
+  font-weight: bold
+</style>

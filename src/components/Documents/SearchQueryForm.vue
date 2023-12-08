@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { inject, ref, onMounted, computed } from 'vue'
 import TableWithActions from 'components/TableWithActions.vue'
-import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue';
+import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
 import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { DocumentApiKey } from 'boot/axios'

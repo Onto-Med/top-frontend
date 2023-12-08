@@ -490,7 +490,6 @@
   "manage": "Manage",
   "edit": "Edit",
   "404Description": "The requested page does not exist.",
-  "clickThingToShowContent": "Click on a {thing} to show its content.",
   "concept_cluster": "Concept cluster",
   "search_query": "Search query|Search queries"
 }

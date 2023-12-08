@@ -12,7 +12,8 @@
 
       <q-card-section class="scroll q-pa-none">
         <q-scroll-area class="highlighted-text">
-          <pre class="q-pa-sm q-ma-none">{{ document.highlightedText }}</pre>
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <pre class="q-pa-sm q-ma-none" v-html="document.highlightedText" />
         </q-scroll-area>
       </q-card-section>
 
