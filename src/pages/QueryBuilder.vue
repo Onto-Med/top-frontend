@@ -262,8 +262,12 @@ function setRepository (repo?: Repository) {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .drawer-icon
   top: 30px
   left: -17px
+</style>
+<style lang="sass">
+.q-drawer.q-drawer--right
+  top: 0px !important
 </style>
