@@ -43,25 +43,18 @@
         </q-td>
       </template>
     </table-with-actions>
-
-    <document-form
-      v-if="documentView"
-      v-model="documentView"
-      v-model:show="showForm"
-      @update:show="showForm = false"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { inject, ref, onMounted, computed } from 'vue'
 import TableWithActions from 'components/TableWithActions.vue'
-import DocumentForm from 'components/Documents/DocumentForm.vue';
+import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue';
 import { useI18n } from 'vue-i18n'
 import useNotify from 'src/mixins/useNotify'
 import { DocumentApiKey } from 'boot/axios'
 import { DocumentPage, Document} from '@onto-med/top-api'
-import { QTableProps } from 'quasar'
+import { QTableProps, useQuasar } from 'quasar'
 
 const props = defineProps<{
   organisationId?: string,
@@ -73,6 +66,7 @@ const props = defineProps<{
 defineEmits(['clearQueryResults'])
 
 const { t } = useI18n()
+const $q = useQuasar()
 const { renderError } = useNotify()
 const loading = ref(false)
 const querySearch = ref(false)
@@ -86,13 +80,14 @@ const documents = ref<DocumentPage>({
   totalPages: 0,
   type: 'document'
 })
-const documentView = ref<Document>()
-const showForm  = ref(false)
 
-const routeToDocument = (document: Document) => {
-  // TODO: implement routing to document
-  showForm.value = true
-  documentView.value = document
+function routeToDocument(document: Document) {
+  $q.dialog({
+    component: DocumentDetailsDialog,
+    componentProps: {
+      document
+    }
+  })
 }
 
 const cols = computed(() => [
