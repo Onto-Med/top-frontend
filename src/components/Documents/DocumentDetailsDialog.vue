@@ -10,9 +10,9 @@
 
       <q-separator />
 
-      <q-card-section style="max-height: 70vh" class="scroll">
+      <q-card-section class="scroll q-pa-none">
         <q-scroll-area class="highlighted-text">
-          {{ document.highlightedText }}
+          <pre class="q-pa-sm q-ma-none">{{ document.highlightedText }}</pre>
         </q-scroll-area>
       </q-card-section>
 
@@ -46,4 +46,7 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
 .highlighted-text
   height: 60vh
   width: 100%
+  pre
+    font-family: inherit
+    text-wrap: wrap
 </style>
