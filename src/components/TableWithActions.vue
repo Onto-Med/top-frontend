@@ -7,6 +7,7 @@
         :loading="loading"
         :no-data-label="t('noDataPresent')"
         :rows-per-page-options="[0]"
+        :wrap-cells="wrapCells"
         flat
         hide-pagination
         row-key="id"
@@ -128,7 +129,9 @@ export default defineComponent({
     filterable: {
       type: Boolean,
       default: true
-    }
+    },
+    /** Wrap text within table cells. */
+    wrapCells: Boolean
   },
   emits: ['row-clicked', 'create-clicked', 'request'],
   setup(props, { emit }) {
