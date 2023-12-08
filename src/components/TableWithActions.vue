@@ -8,6 +8,7 @@
         :no-data-label="t('noDataPresent')"
         :rows-per-page-options="[0]"
         :wrap-cells="wrapCells"
+        class="sticky-header-table"
         flat
         hide-pagination
         row-key="id"
@@ -56,6 +57,7 @@
               v-for="col in props.cols"
               :key="col.name"
               :props="props"
+              class="bg-grey-1"
             >
               {{ col.label }}
             </q-th>
@@ -171,3 +173,17 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="sass">
+.sticky-header-table
+  max-height: 72vh
+
+  thead tr th
+    position: sticky
+    z-index: 1
+    border-top-width: 1px !important
+  thead tr:first-child th
+    top: 0
+  &.q-table--loading thead tr:last-child th
+    top: 48px
+</style>

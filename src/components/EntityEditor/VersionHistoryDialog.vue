@@ -11,12 +11,15 @@
       >
         <template #header="props">
           <q-tr :props="props">
-            <q-th auto-width />
-            <q-th>#</q-th>
+            <q-th class="bg-grey-1" auto-width />
+            <q-th class="bg-grey-1">
+              #
+            </q-th>
             <q-th
               v-for="col in props.cols"
               :key="col.name"
               :props="props"
+              class="bg-grey-1"
             >
               {{ col.label }}
             </q-th>
@@ -165,6 +168,7 @@ export default defineComponent({
   thead tr th
     position: sticky
     z-index: 1
+    border-top-width: 1px !important
   thead tr:first-child th
     top: 0
   &.q-table--loading thead tr:last-child th
