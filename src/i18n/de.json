@@ -305,11 +305,7 @@
   "documentSearch": {
     "title": "Dokumentensuche",
     "description": "Bitte wählen sie die Art der Dokumentrepräsentation aus.",
-    "short": "Explorative Dokumentensuche",
-    "type": {
-      "conceptCluster": "Konzept-Cluster",
-      "searchQuery": "Such-Abfrage"
-    }
+    "short": "Explorative Dokumentensuche"
   },
   "concept_repository": "Konzept Repositorium",
   "phenotype_repository": "Phänotyp Repositorium",
@@ -494,5 +490,7 @@
   "manage": "Verwalten",
   "edit": "Bearbeiten",
   "404Description": "Die angeforderte Seite existiert nicht.",
-  "clickThingToShowContent": "Klicken Sie auf ein {thing}, um den Inhalt anzuzeigen."
+  "clickThingToShowContent": "Klicken Sie auf ein {thing}, um den Inhalt anzuzeigen.",
+  "concept_cluster": "Konzept-Cluster",
+  "search_query": "Such-Abfrage|Such-Abfragen"
 }
