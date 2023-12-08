@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialogRef">
     <q-card class="full-width">
       <q-card-section>
         <div class="text-h6">
@@ -39,7 +39,7 @@ defineProps<{
 }>()
 
 const { t } = useI18n()
-const { dialogRef, onDialogHide } = useDialogPluginComponent()
+const { dialogRef } = useDialogPluginComponent()
 </script>
 
 <style scoped lang="sass">
