@@ -1,11 +1,13 @@
 <template>
-  <q-dialog ref="dialogRef" full-height>
-    <q-card style="width: 750px; max-width: 80vw;">
-      <q-card-section>
+  <q-dialog ref="dialogRef">
+    <q-card class="content">
+      <q-card-section class="row items-center">
         <div class="text-h6">
           <q-icon name="article" />
           {{ document.name }}
         </div>
+        <q-space />
+        <q-btn v-close-popup icon="close" flat round dense />
       </q-card-section>
 
       <q-separator />
@@ -22,7 +24,7 @@
 
 <script setup lang="ts">
 import { Document } from '@onto-med/top-api'
-import { useDialogPluginComponent } from 'quasar';
+import { useDialogPluginComponent } from 'quasar'
 
 defineProps<{
   document: Document
@@ -32,16 +34,18 @@ const { dialogRef } = useDialogPluginComponent()
 </script>
 
 <style scoped lang="sass">
+.content
+  width: 750px
+  max-width: 80vw
 .highlighted-text
   height: 85vh
   width: 100%
   pre
     font-family: inherit
     text-wrap: wrap
-    overflow-x: auto
-    white-space: pre-wrap
-    white-space: -moz-pre-wrap
-    white-space: -pre-wrap
-    white-space: -o-pre-wrap
     word-wrap: break-word
+</style>
+<style lang="sass">
+.highlighted-text .q-scrollarea__content
+  width: 100% !important
 </style>
