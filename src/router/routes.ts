@@ -56,7 +56,10 @@ const routes: RouteRecordRaw[] = [
         meta: {
           disabled: !env.DOCUMENTS_ENABLED
         },
-        props: true
+        props: route => {
+          const params = route.params
+          return { params, initialSearchType: route.query.searchType }
+        }
       },
       {
         name: 'documentSearch',
