@@ -58,7 +58,12 @@ const routes: RouteRecordRaw[] = [
         },
         props: route => {
           const params = route.params
-          return { params, initialSearchType: route.query.searchType }
+          return {
+            organisationId: params.organisationId,
+            repositoryId: params.repositoryId,
+            queryId: params.queryId,
+            initialSearchType: route.query.searchType
+          }
         }
       },
       {
