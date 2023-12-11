@@ -44,6 +44,10 @@ const { dialogRef } = useDialogPluginComponent()
     font-family: inherit
     text-wrap: wrap
     word-wrap: break-word
+    white-space: pre-wrap
+    white-space: -moz-pre-wrap
+    white-space: -pre-wrap
+    white-space: -o-pre-wrap
 </style>
 <style lang="sass">
 .highlighted-text .q-scrollarea__content
