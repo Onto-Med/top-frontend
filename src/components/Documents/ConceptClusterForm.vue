@@ -1,5 +1,5 @@
 <template>
-  <q-splitter v-model="splitterModel" class="fit">
+  <q-splitter v-model="splitterModel" :limits="[25, 75]" class="fit">
     <template #before>
       <q-card>
         <q-card-section class="bg-grey-1">
@@ -143,7 +143,7 @@ const selectedConcepts = ref<number[]>([])
 const selectedColors = ref<ConceptColor[]>([])
 const conceptMode = ref('exclusive')
 const mostImportantNodes = ref(true)
-const splitterModel = ref(20)
+const splitterModel = ref(40)
 
 const conceptModeOptions = computed(() => [
   {
