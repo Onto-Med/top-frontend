@@ -15,6 +15,7 @@
             :model-value="conceptMode"
             :options="conceptModeOptions"
             :label="t('selectionMode')"
+            :readonly="loading"
             dense
             emit-value
             map-options
@@ -40,6 +41,7 @@
             v-model="mostImportantNodes"
             :options="mostImportantNodesOptions"
             :label="t('importantNodesOnly')"
+            :readonly="loading"
             dense
             emit-value
             map-options
@@ -59,6 +61,7 @@
                 :val="index"
                 :label="concept.labels"
                 :title="concept.labels"
+                :disable="loading"
                 class="ellipsis"
                 dense
                 @update:model-value="prepareSelectedConcepts()"
@@ -66,7 +69,7 @@
             </div>
           </q-scroll-area>
         </q-card-section>
-        <q-inner-loading :showing="loading" />
+        <q-inner-loading :showing="conceptsLoading" />
       </q-card>
     </template>
 
@@ -105,6 +108,7 @@
               </q-item-section>
             </q-item>
           </q-virtual-scroll>
+          <q-inner-loading :showing="documentsLoading" />
         </div>
       </div>
     </template>
@@ -127,15 +131,16 @@ interface ConceptColor {
 
 const { t } = useI18n()
 const $q = useQuasar()
-const { renderError }  = useNotify()
-const documentApi      = inject(DocumentApiKey)
-const conceptApi       = inject(ConceptClusterApiKey)
-const documents        = ref<Document[]>([])
-const document_        = ref<Document>()
-const concepts         = ref<ConceptCluster[]>([])
-const loading          = ref(false)
+const { renderError } = useNotify()
+const documentApi = inject(DocumentApiKey)
+const conceptApi = inject(ConceptClusterApiKey)
+const documents = ref<Document[]>([])
+const document_ = ref<Document>()
+const concepts = ref<ConceptCluster[]>([])
+const conceptsLoading = ref(false)
+const documentsLoading = ref(false)
 const selectedConcepts = ref<number[]>([])
-const distinctColors   = [
+const distinctColors = [
   '#556b2f', '#228b22',
   '#7f0000', '#483d8b', '#008b8b', '#cd853f',
   '#4682b4', '#000080', '#8fbc8f', '#800080',
@@ -184,6 +189,8 @@ const mostImportantNodesOptions = computed(() => [
   { label: t('no'), value: false }
 ])
 
+const loading = computed(() => conceptsLoading.value || documentsLoading.value)
+
 onMounted(async () => await reloadConcepts())
 
 watch(
@@ -192,8 +199,8 @@ watch(
 )
 
 async function reloadConcepts() {
-  if (!conceptApi || !documentApi || loading.value) return
-  loading.value = true
+  if (!conceptApi || !documentApi || conceptsLoading.value) return
+  conceptsLoading.value = true
   await conceptApi.getConceptClusters()
     .then(r => {
       concepts.value = r.data
@@ -207,22 +214,24 @@ async function reloadConcepts() {
         .fill({ 'background-color': '', 'color': '' }) as ConceptColor[]
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => conceptsLoading.value = false)
 }
 
 async function reloadDocuments() {
-  if (!documentApi) return
+  if (!documentApi || documentsLoading.value) return
+  documentsLoading.value = true
   documents.value = []
   document_.value = undefined
   if (selectedConcepts.value.length !== 0) {
     await documentApi.getDocumentIdsByConceptClusterIds(
-      selectedConcepts.value.map(selConcept => concepts.value[selConcept].id),
+      selectedConcepts.value.map(selConcept => concepts.value[selConcept]?.id),
       conceptMode.value,
       undefined,
       mostImportantNodes.value
     )
       .then(r => documents.value = r.data)
       .catch((e: Error) => renderError(e))
+      .finally(() => documentsLoading.value = false)
   }
 }
 
