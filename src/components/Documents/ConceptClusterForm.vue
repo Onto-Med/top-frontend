@@ -219,12 +219,13 @@ async function reloadConcepts() {
 
 async function reloadDocuments() {
   if (!documentApi || documentsLoading.value) return
-  documentsLoading.value = true
   documents.value = []
   document_.value = undefined
-  if (selectedConcepts.value.length !== 0) {
+  const conceptClusterIds = selectedConcepts.value.map(c => concepts.value[c]?.id).filter(id => !!id)
+  if (conceptClusterIds.length > 0) {
+    documentsLoading.value = true
     await documentApi.getDocumentIdsByConceptClusterIds(
-      selectedConcepts.value.map(selConcept => concepts.value[selConcept]?.id),
+      conceptClusterIds,
       conceptMode.value,
       undefined,
       mostImportantNodes.value
