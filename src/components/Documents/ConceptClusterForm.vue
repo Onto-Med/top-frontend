@@ -12,12 +12,13 @@
 
         <q-card-section>
           <q-select
-            v-model="conceptMode"
+            :model-value="conceptMode"
             :options="conceptModeOptions"
             :label="t('selectionMode')"
             dense
             emit-value
             map-options
+            @update:model-value="setConceptMode($event)"
           >
             <template #option="scope">
               <q-item v-bind="scope.itemProps">
@@ -50,21 +51,18 @@
         <q-card-section class="q-pa-none">
           <q-scroll-area style="height: 60vh">
             <div class="column">
-              <q-chip
+              <q-checkbox
                 v-for="(concept, index) in concepts"
                 :key="concept.id"
-                class="cursor-pointer"
+                v-model="selectedConcepts"
                 :style="selectedColors[index]"
-                clickable
-                @click="chooseConcept(index, false)"
-              >
-                <div class="ellipsis">
-                  {{ concept.labels }}
-                </div>
-                <q-tooltip :delay="500" anchor="center right" self="center left" :offset="[10, 10]">
-                  {{ concept.labels }}
-                </q-tooltip>
-              </q-chip>
+                :val="index"
+                :label="concept.labels"
+                :title="concept.labels"
+                class="ellipsis"
+                dense
+                @update:model-value="prepareSelectedConcepts()"
+              />
             </div>
           </q-scroll-area>
         </q-card-section>
@@ -157,13 +155,11 @@ const distinctColorsFont = [
   '#000000', '#000000', '#000000', '#000000',
   '#000000', '#000000', '#ffffff', '#000000'
 ]
-const conceptColors: ConceptColor[] = [] //ToDo: const? or ref?
-const selectedColors                = ref<ConceptColor[]>([])
-const conceptMode                   = ref('exclusive')
-const mostImportantNodes            = ref(true)
+const conceptColors: ConceptColor[] = []
+const selectedColors = ref<ConceptColor[]>([])
+const conceptMode = ref('exclusive')
+const mostImportantNodes = ref(true)
 const splitterModel = ref(20)
-
-let lastSelectedConcept = -1
 
 const conceptModeOptions = computed(() => [
   {
@@ -184,45 +180,22 @@ const conceptModeOptions = computed(() => [
 ])
 
 const mostImportantNodesOptions = computed(() => [
-  {
-    label: t('yes'),
-    value: true
-  },
-  {
-    label: t('no'),
-    value: false
-  }
+  { label: t('yes'), value: true },
+  { label: t('no'), value: false }
 ])
 
-onMounted(async () => await reload())
+onMounted(async () => await reloadConcepts())
 
 watch(
-  () => conceptMode.value,
-  (value, oldValue) => {
-    if (value === oldValue || selectedConcepts.value.length <= 1) return
-    if (conceptMode.value === 'exclusive') {
-      chooseConcept(lastSelectedConcept, false)
-        .catch((e: Error) => renderError(e))
-    } else {
-      chooseConcept(lastSelectedConcept, true)
-        .catch((e: Error) => renderError(e))
-    }
-  }
+  [ mostImportantNodes, conceptMode, selectedConcepts ],
+  () => reloadDocuments().catch((e: Error) => renderError(e))
 )
 
-watch(
-  () => mostImportantNodes.value,
-  () => {
-    chooseConcept(undefined, undefined)
-      .catch((e: Error) => renderError(e))
-  }
-)
-
-async function reload() {
+async function reloadConcepts() {
   if (!conceptApi || !documentApi || loading.value) return
   loading.value = true
   await conceptApi.getConceptClusters()
-    .then((r: { data: { id: string; labels?: string | undefined }[] }) => {
+    .then(r => {
       concepts.value = r.data
       concepts.value.forEach((_, index) => {
         conceptColors.push({
@@ -237,49 +210,44 @@ async function reload() {
     .finally(() => loading.value = false)
 }
 
-async function chooseConcept(idx: number | undefined, changedConceptMode: boolean | undefined) {
+async function reloadDocuments() {
   if (!documentApi) return
-  if (idx !== undefined) {
-    documents.value.length = 0;
-    if (changedConceptMode !== true) {
-      if (conceptMode.value === 'exclusive') {
-        selectedConcepts.value.length = 0
-        selectedConcepts.value.push(idx)
-      } else if (selectedConcepts.value.includes(idx)) {
-        selectedConcepts.value = selectedConcepts.value.filter(item => item !== idx)
-      } else {
-        selectedConcepts.value.push(idx)
-      }
-      lastSelectedConcept = idx
-    }
-  }
-
+  documents.value = []
+  document_.value = undefined
   if (selectedConcepts.value.length !== 0) {
     await documentApi.getDocumentIdsByConceptClusterIds(
-      selectedConcepts.value.map(selConcept => {
-        return concepts.value[selConcept].id
-      }), conceptMode.value, undefined, mostImportantNodes.value
+      selectedConcepts.value.map(selConcept => concepts.value[selConcept].id),
+      conceptMode.value,
+      undefined,
+      mostImportantNodes.value
     )
-      .then(r => {
-        documents.value = r.data//.map(doc => doc.id).filter(id => id !== undefined) as string[]
-      })
+      .then(r => documents.value = r.data)
       .catch((e: Error) => renderError(e))
-  } else {
-    document_.value = undefined
+  }
+}
+
+function setConceptMode(newMode = 'exclusive') {
+  if (newMode === conceptMode.value) return
+  conceptMode.value = newMode
+  if (selectedConcepts.value.length > 1 && newMode === 'exclusive')
+    prepareSelectedConcepts()
+}
+
+function prepareSelectedConcepts() {
+  if (conceptMode.value === 'exclusive') {
+    selectedConcepts.value = [selectedConcepts.value.at(-1) as number]
   }
   selectedColors.value.fill({
     'background-color': '',
     'color': ''
   })
-  selectedConcepts.value.forEach(_idx => selectedColors.value[_idx] = conceptColors[_idx])
+  selectedConcepts.value.forEach(idx => selectedColors.value[idx] = conceptColors[idx])
 }
 
 async function chooseDocument(documentId: string) {
   await documentApi?.getDocumentById(
     documentId,
-    selectedConcepts.value.map(
-      selConcept => concepts.value[selConcept].id
-    )
+    selectedConcepts.value.map(idx => concepts.value[idx].id)
   )
     .then(r => {
       $q.dialog({
