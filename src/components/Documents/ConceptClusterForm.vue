@@ -125,8 +125,8 @@ import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vu
 import { useQuasar } from 'quasar'
 
 interface ConceptColor {
-  'background-color': string,
-  color: string
+  'background-color'?: string,
+  color?: string
 }
 
 const { t } = useI18n()
@@ -140,27 +140,6 @@ const concepts = ref<ConceptCluster[]>([])
 const conceptsLoading = ref(false)
 const documentsLoading = ref(false)
 const selectedConcepts = ref<number[]>([])
-const distinctColors = [
-  '#556b2f', '#228b22',
-  '#7f0000', '#483d8b', '#008b8b', '#cd853f',
-  '#4682b4', '#000080', '#8fbc8f', '#800080',
-  '#b03060', '#ff0000', '#ffa500', '#00ff00',
-  '#dc143c', '#00ffff', '#0000ff', '#f08080',
-  '#adff2f', '#ff00ff', '#1e90ff', '#f0e68c',
-  '#ffff54', '#dda0dd', '#90ee90', '#7b68ee',
-  '#00ff7f', '#ff1493', '#696969', '#d3d3d3'
-]
-const distinctColorsFont = [
-  '#ffffff', '#ffffff',
-  '#ffffff', '#ffffff', '#000000', '#000000',
-  '#000000', '#ffffff', '#000000', '#ffffff',
-  '#000000', '#000000', '#000000', '#000000',
-  '#000000', '#000000', '#ffffff', '#000000',
-  '#000000', '#000000', '#000000', '#000000',
-  '#000000', '#000000', '#000000', '#000000',
-  '#000000', '#000000', '#ffffff', '#000000'
-]
-const conceptColors: ConceptColor[] = []
 const selectedColors = ref<ConceptColor[]>([])
 const conceptMode = ref('exclusive')
 const mostImportantNodes = ref(true)
@@ -202,17 +181,7 @@ async function reloadConcepts() {
   if (!conceptApi || !documentApi || conceptsLoading.value) return
   conceptsLoading.value = true
   await conceptApi.getConceptClusters()
-    .then(r => {
-      concepts.value = r.data
-      concepts.value.forEach((_, index) => {
-        conceptColors.push({
-          'background-color': distinctColors[index],
-          'color': distinctColorsFont[index]
-        })
-      })
-      selectedColors.value = new Array(concepts.value.length)
-        .fill({ 'background-color': '', 'color': '' }) as ConceptColor[]
-    })
+    .then(r => concepts.value = r.data)
     .catch((e: Error) => renderError(e))
     .finally(() => conceptsLoading.value = false)
 }
@@ -251,7 +220,9 @@ function prepareSelectedConcepts() {
     'background-color': '',
     'color': ''
   })
-  selectedConcepts.value.forEach(idx => selectedColors.value[idx] = conceptColors[idx])
+  selectedConcepts.value.forEach(
+    (selection, idx) => selectedColors.value[selection] = distinctConceptColor(idx)
+  )
 }
 
 async function chooseDocument(documentId: string) {
@@ -268,6 +239,15 @@ async function chooseDocument(documentId: string) {
       })
     })
     .catch((e: Error) => renderError(e))
+}
+
+function distinctConceptColor(index = 0) {
+  const n = selectedConcepts.value.length
+  const hsl = (index + 1) * (360 / n) % 360
+  return {
+    'background-color': `hsl(${hsl}, 100%, 50%)`,
+    color: hsl > 200 ? 'white' : undefined
+  }
 }
 </script>
 
