@@ -56,13 +56,13 @@ const routes: RouteRecordRaw[] = [
         meta: {
           disabled: !env.DOCUMENTS_ENABLED
         },
-        props: route => {
-          const params = route.params
+        props: ({ params, query }) => {
           return {
             organisationId: params.organisationId,
             repositoryId: params.repositoryId,
             queryId: params.queryId,
-            initialSearchType: route.query.searchType
+            queryName: query.queryName,
+            initialSearchType: query.searchType
           }
         }
       },

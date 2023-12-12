@@ -84,6 +84,7 @@ import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { exportFile, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
+import { SearchTypesEnum } from 'src/config'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue'
@@ -142,7 +143,8 @@ export default defineComponent({
             queryId: query.id
           },
           query: {
-            queryName: query.name
+            queryName: query.name,
+            searchType: SearchTypesEnum.SEARCH_QUERY
           }
         })
     }
