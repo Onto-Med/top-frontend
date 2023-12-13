@@ -38,28 +38,38 @@
 <script setup lang="ts">
 import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
 import SearchQueryForm from 'components/Documents/SearchQueryForm.vue'
-import { useI18n } from 'vue-i18n'
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { SearchTypesEnum } from 'src/config'
-import { watch } from 'vue'
+import {useI18n} from 'vue-i18n'
+import {computed, ref, watch} from 'vue'
+import {useRouter} from 'vue-router'
+import {SearchTypesEnum} from 'src/config'
 
 const props = defineProps({
   initialSearchType: {
     type: String as () => SearchTypesEnum,
     default: SearchTypesEnum.CONCEPT_CLUSTER
-  }
+  },
+  organisationId: {
+    type: String,
+    default: undefined
+  },
+  repositoryId: {
+    type: String,
+    default: undefined
+  },
+  queryId: {
+    type: String,
+    default: undefined
+  },
+  queryName: {
+    type: String,
+    default: undefined
+  },
 })
 
 const { t } = useI18n()
-const route = useRoute()
 const router = useRouter()
-const queryId = ref<string|undefined>(undefined)
-const organisationId = ref<string|undefined>(undefined)
-const repositoryId = ref<string|undefined>(undefined)
-const queryName = ref<string|undefined>(undefined)
 const searchType = ref(props.initialSearchType)
-const searchTypeOptions = computed(() => 
+const searchTypeOptions = computed(() =>
   Object.values(SearchTypesEnum)
     .map(st => ({ label: t(st), value: st }))
 )
@@ -75,33 +85,11 @@ async function setSearchTypeInRouteQuery(searchType: SearchTypesEnum) {
   await router.replace({ name: 'documentSearch', query: { searchType } })
 }
 
-function setSearchType(set?: SearchTypesEnum) {
-  organisationId.value = undefined
-  repositoryId.value = undefined
-  queryId.value = undefined
-  queryName.value = undefined
-
-  if (set) {
-    searchType.value = set
-    return
-  }
-
-  if (
-    route.params.hasOwnProperty('organisationId')
-    && route.params.hasOwnProperty('repositoryId')
-    && route.params.hasOwnProperty('queryId')
-  ) {
-    organisationId.value = route.params.organisationId.toString()
-    repositoryId.value = route.params.repositoryId.toString()
-    queryId.value = route.params.queryId.toString()
-    queryName.value = route.query.queryName ? route.query.queryName.toString() : 'Query'
-    searchType.value = SearchTypesEnum.SEARCH_QUERY
-  } else {
-    searchType.value = SearchTypesEnum.CONCEPT_CLUSTER
-  }
-}
-
-function clearQueryResults() {
-  setSearchType(SearchTypesEnum.SEARCH_QUERY)
+async function clearQueryResults() {
+  await router.replace(
+    {
+      name: 'documentSearch',
+      query: { searchType: SearchTypesEnum.SEARCH_QUERY },
+    })
 }
 </script>

@@ -111,13 +111,13 @@ async function reload(filter: string|undefined = undefined, page = 1) {
         queryDisplayName.value = ''
       })
   } else {
+    queryDisplayName.value = props.queryName? props.queryName: ''
     await documentApi.getDocumentsForQuery(props.organisationId, props.repositoryId, props.queryId, page)
       .then(r => documents.value = r.data)
       .catch((e: Error) => renderError(e))
       .finally(() => {
         loading.value = false
         querySearch.value = true
-        queryDisplayName.value = props.queryName? props.queryName: ''
       })
   }
 }
