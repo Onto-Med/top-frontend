@@ -96,29 +96,26 @@ const cols = computed(() => [
   { name: 'text', field: 'text', label: t('content'), align: 'left' },
 ] as QTableProps['columns'])
 
-onMounted(async () => await reload())
+onMounted(() => reload())
 
-async function reload(filter: string|undefined = undefined, page = 1) {
+function reload(filter: string|undefined = undefined, page = 1) {
   if (!documentApi) return
   loading.value = true
-  if (!(props.organisationId && props.repositoryId && props.queryId)) {
-    await documentApi.getDocuments(undefined, filter? [filter] : undefined, undefined, page)
-      .then(r => documents.value = r.data )
-      .catch((e: Error) => renderError(e))
-      .finally(() => {
-        loading.value = false
-        querySearch.value = false
-        queryDisplayName.value = ''
-      })
+  const searchByQuery = !!(props.organisationId && props.repositoryId && props.queryId)
+
+  var promise = undefined
+  if (searchByQuery) {
+    queryDisplayName.value = props.queryName || ''
+    promise = documentApi.getDocumentsForQuery(props.organisationId, props.repositoryId, props.queryId, page)
   } else {
-    queryDisplayName.value = props.queryName? props.queryName: ''
-    await documentApi.getDocumentsForQuery(props.organisationId, props.repositoryId, props.queryId, page)
-      .then(r => documents.value = r.data)
-      .catch((e: Error) => renderError(e))
-      .finally(() => {
-        loading.value = false
-        querySearch.value = true
-      })
+    promise = documentApi.getDocuments(undefined, filter ? [filter] : undefined, undefined, page)
   }
+
+  promise.then(r => documents.value = r.data)
+    .catch((e: Error) => renderError(e))
+    .finally(() => {
+      loading.value = false
+      querySearch.value = searchByQuery
+    })
 }
 </script>
