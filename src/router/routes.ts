@@ -51,7 +51,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         name: 'documentSearchByQuery',
-        path: '/document/query/:organisationId/:repositoryId/:queryId/:queryName',
+        path: '/document/query/:organisationId/:repositoryId/:queryId',
         component: () => import('pages/DocumentSearch.vue'),
         meta: {
           disabled: !env.DOCUMENTS_ENABLED
@@ -61,7 +61,7 @@ const routes: RouteRecordRaw[] = [
             organisationId: params.organisationId,
             repositoryId: params.repositoryId,
             queryId: params.queryId,
-            queryName: params.queryName,
+            queryName: query.queryName,
             initialSearchType: query.searchType
           }
         }

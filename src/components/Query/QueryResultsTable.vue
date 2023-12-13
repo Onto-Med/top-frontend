@@ -140,10 +140,10 @@ export default defineComponent({
           params: {
             organisationId: organisationId.value,
             repositoryId: repositoryId.value,
-            queryId: query.id,
-            queryName: query.name,
+            queryId: query.id
           },
           query: {
+            queryName: query.name,
             searchType: SearchTypesEnum.SEARCH_QUERY
           }
         })
