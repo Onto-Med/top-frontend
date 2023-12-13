@@ -14,26 +14,13 @@
       @request="reload"
       @row-clicked="routeToDocument($event)"
     >
-      <template
-        v-if="querySearch"
-        #searchQuery
-      >
-        <q-space />
-        <q-btn
-          color="primary"
-          no-caps
-          :label="$q.screen.gt.xs ? (queryDisplayName) : ''"
-        >
-          <q-menu>
-            <q-list dense>
-              <q-item v-close-popup clickable @click="clearQueryResults">
-                <q-item-section>
-                  {{ t('clearDocumentQueryResult') }}
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
+      <template v-if="querySearch" #title>
+        <div v-show="$q.screen.gt.xs" class="text-h6">
+          {{ t('documentsOfQuery') }}: {{ queryDisplayName }}
+        </div>
+      </template>
+      <template v-if="querySearch" #action-buttons>
+        <q-btn icon="clear" :label="t('clear')" :title="t('clearDocumentQueryResult')" @click="clearQueryResults" />
       </template>
       <template #row-cells="rowCellProps">
         <q-td :title="rowCellProps.row.id">

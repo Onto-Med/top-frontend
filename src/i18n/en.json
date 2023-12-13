@@ -491,5 +491,7 @@
   "edit": "Edit",
   "404Description": "The requested page does not exist.",
   "concept_cluster": "Concept cluster",
-  "search_query": "Search query|Search queries"
+  "search_query": "Search query|Search queries",
+  "clear": "Clear",
+  "documentsOfQuery": "Documents of query"
 }

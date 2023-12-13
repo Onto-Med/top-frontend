@@ -14,10 +14,11 @@
         row-key="id"
       >
         <template #top>
-          <div class="text-h6">
-            {{ title || name }}
-          </div>
-          <slot name="searchQuery" />
+          <slot name="title">
+            <div class="text-h6">
+              {{ title || name }}
+            </div>
+          </slot>
           <q-space />
           <q-input
             v-if="filterable"
@@ -34,6 +35,7 @@
             </template>
           </q-input>
           <q-btn-group>
+            <slot name="action-buttons" />
             <q-btn
               v-if="create"
               color="primary"

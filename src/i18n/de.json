@@ -468,7 +468,7 @@
   "configuration": "Konfiguration|Konfigurationen",
   "executeThing": "{thing} ausführen",
   "showDocumentResults": "Datensatz anzeigen",
-  "clearDocumentQueryResult": "Suchergebnisse löschen",
+  "clearDocumentQueryResult": "Suchergebnisse leeren",
   "moveTo": "Verschieben nach...",
   "moveThing": "{thing} verschieben",
   "move": "Verschieben",
@@ -491,5 +491,7 @@
   "edit": "Bearbeiten",
   "404Description": "Die angeforderte Seite existiert nicht.",
   "concept_cluster": "Konzept-Cluster",
-  "search_query": "Such-Abfrage|Such-Abfragen"
+  "search_query": "Such-Abfrage|Such-Abfragen",
+  "clear": "Leeren",
+  "documentsOfQuery": "Dokumente der Abfrage"
 }
