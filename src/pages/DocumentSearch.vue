@@ -48,22 +48,10 @@ const props = defineProps({
     type: String as () => SearchTypesEnum,
     default: SearchTypesEnum.CONCEPT_CLUSTER
   },
-  organisationId: {
-    type: String,
-    default: undefined
-  },
-  repositoryId: {
-    type: String,
-    default: undefined
-  },
-  queryId: {
-    type: String,
-    default: undefined
-  },
-  queryName: {
-    type: String,
-    default: undefined
-  },
+  organisationId: String,
+  repositoryId: String,
+  queryId: String,
+  queryName: String
 })
 
 const { t } = useI18n()
