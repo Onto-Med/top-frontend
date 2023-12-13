@@ -69,7 +69,7 @@ watch(
 )
 
 async function setSearchTypeInRouteQuery(searchType: SearchTypesEnum) {
-  if (props.organisationId && props.repositoryId && props.queryId) {
+  if (searchType == SearchTypesEnum.SEARCH_QUERY && props.organisationId && props.repositoryId && props.queryId) {
     await router.replace({
       name: 'documentSearchByQuery',
       params: props,
