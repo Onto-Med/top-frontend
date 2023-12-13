@@ -21,11 +21,12 @@
         <q-space />
         <q-btn
           color="primary"
+          no-caps
           :label="$q.screen.gt.xs ? (queryDisplayName) : ''"
         >
           <q-menu>
             <q-list dense>
-              <q-item v-close-popup clickable @click="$emit('clearQueryResults')">
+              <q-item v-close-popup clickable @click="clearQueryResults">
                 <q-item-section>
                   {{ t('clearDocumentQueryResult') }}
                 </q-item-section>
@@ -55,6 +56,8 @@ import useNotify from 'src/mixins/useNotify'
 import { DocumentApiKey } from 'boot/axios'
 import { DocumentPage, Document} from '@onto-med/top-api'
 import { QTableProps, useQuasar } from 'quasar'
+import { SearchTypesEnum } from 'src/config'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   organisationId?: string,
@@ -67,6 +70,7 @@ defineEmits(['clearQueryResults'])
 
 const { t } = useI18n()
 const $q = useQuasar()
+const router = useRouter()
 const { renderError } = useNotify()
 const loading = ref(false)
 const querySearch = ref(false)
@@ -117,5 +121,12 @@ function reload(filter: string|undefined = undefined, page = 1) {
       loading.value = false
       querySearch.value = searchByQuery
     })
+}
+
+function clearQueryResults() {
+  void router.replace({
+    name: 'documentSearch',
+    query: { searchType: SearchTypesEnum.SEARCH_QUERY },
+  }).then(() => reload())
 }
 </script>

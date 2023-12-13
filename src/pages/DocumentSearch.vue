@@ -28,7 +28,6 @@
           :repository-id="repositoryId"
           :query-id="queryId"
           :query-name="queryName"
-          @clear-query-results="clearQueryResults"
         />
       </q-card-section>
     </q-card>
@@ -71,13 +70,5 @@ watch(
 
 async function setSearchTypeInRouteQuery(searchType: SearchTypesEnum) {
   await router.replace({ name: 'documentSearch', query: { searchType } })
-}
-
-async function clearQueryResults() {
-  await router.replace(
-    {
-      name: 'documentSearch',
-      query: { searchType: SearchTypesEnum.SEARCH_QUERY },
-    })
 }
 </script>
