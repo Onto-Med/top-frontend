@@ -56,32 +56,16 @@
 
       <q-card-section class="q-pb-lg">
         <div class="row">
-          <div class="col-sm-3 col-6">
+          <div
+            v-for="entry in overviewContent"
+            :key="entry.key"
+            class="col-6"
+            :class="{ 'col-sm-4': !env.DOCUMENTS_ENABLED, 'col-sm-3': env.DOCUMENTS_ENABLED }"
+          >
             <q-avatar icon="groups" size="8rem" />
             <div class="text-h6">
-              {{ t('organisation', 2) }}
-              <q-badge v-if="statistic" :label="statistic.organisations" />
-            </div>
-          </div>
-          <div class="col-sm-3 col-6">
-            <q-avatar icon="tab" size="8rem" />
-            <div class="text-h6">
-              {{ t('repository', 2) }}
-              <q-badge v-if="statistic" :label="statistic.repositories" />
-            </div>
-          </div>
-          <div class="col-sm-3 col-6">
-            <q-avatar icon="category" size="8rem" />
-            <div class="text-h6">
-              {{ t('phenotype', 2) }}
-              <q-badge v-if="statistic" :label="statistic.phenotypes" />
-            </div>
-          </div>
-          <div class="col-sm-3 col-6">
-            <q-avatar icon="article" size="8rem" />
-            <div class="text-h6">
-              {{ t('document', 2) }}
-              <q-badge v-if="statistic" :label="statistic.documents" />
+              {{ entry.label }}
+              <q-badge v-if="statistic" :label="statistic[entry.key as statisticKey]" />
             </div>
           </div>
         </div>
@@ -93,10 +77,11 @@
 <script setup lang="ts">
 import { Statistic } from '@onto-med/top-api'
 import { DefaultApiKey } from 'src/boot/axios'
-import { inject, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import packageInfo from '../../package.json'
 import { useRouter } from 'vue-router'
+import { env } from 'src/config'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -104,6 +89,18 @@ const defaultApi = inject(DefaultApiKey)
 const statistic = ref(undefined as Statistic|undefined)
 const productName = packageInfo.productName
 const version = packageInfo.version
+
+type statisticKey = keyof Statistic
+
+const overviewContent = computed(() => {
+  const entries = [
+    { key: 'organisations', label: t('organisation', 2), icon: 'groups' },
+    { key: 'repositories', label: t('repository', 2), icon: 'tab' },
+    { key: 'phenotypes', label: t('phenotype', 2), icon: 'category' }
+  ]
+  if (env.DOCUMENTS_ENABLED) entries.push({ key: 'documents', label: t('document', 2), icon: 'article' })
+  return entries
+})
 
 onMounted(() => defaultApi?.getStatistics().then(r => statistic.value = r.data))
 

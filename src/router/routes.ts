@@ -56,11 +56,22 @@ const routes: RouteRecordRaw[] = [
         meta: {
           disabled: !env.DOCUMENTS_ENABLED
         },
-        props: true
+        props: ({ params, query }) => {
+          return {
+            organisationId: params.organisationId,
+            repositoryId: params.repositoryId,
+            queryId: params.queryId,
+            queryName: query.queryName,
+            initialSearchType: query.searchType
+          }
+        }
       },
       {
         name: 'documentSearch',
         path: '/document',
+        props: route => {
+          return { initialSearchType: route.query.searchType }
+        },
         component: () => import('pages/DocumentSearch.vue'),
         meta: {
           disabled: !env.DOCUMENTS_ENABLED

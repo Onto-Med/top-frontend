@@ -305,11 +305,7 @@
   "documentSearch": {
     "title": "Dokumentensuche",
     "description": "Bitte wählen sie die Art der Dokumentrepräsentation aus.",
-    "short": "Explorative Dokumentensuche",
-    "type": {
-      "conceptCluster": "Konzept-Cluster",
-      "searchQuery": "Such-Abfrage"
-    }
+    "short": "Explorative Dokumentensuche"
   },
   "concept_repository": "Konzept Repositorium",
   "phenotype_repository": "Phänotyp Repositorium",
@@ -472,7 +468,7 @@
   "configuration": "Konfiguration|Konfigurationen",
   "executeThing": "{thing} ausführen",
   "showDocumentResults": "Datensatz anzeigen",
-  "clearDocumentQueryResult": "Suchergebnisse löschen",
+  "clearDocumentQueryResult": "Suchergebnisse leeren",
   "moveTo": "Verschieben nach...",
   "moveThing": "{thing} verschieben",
   "move": "Verschieben",
@@ -493,5 +489,9 @@
   "of": "von",
   "manage": "Verwalten",
   "edit": "Bearbeiten",
-  "404Description": "Die angeforderte Seite existiert nicht."
+  "404Description": "Die angeforderte Seite existiert nicht.",
+  "concept_cluster": "Konzept-Cluster",
+  "search_query": "Such-Abfrage|Such-Abfragen",
+  "clear": "Leeren",
+  "documentsOfQuery": "Dokumente der Abfrage"
 }

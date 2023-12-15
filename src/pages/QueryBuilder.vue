@@ -1,99 +1,97 @@
 <template>
-  <q-layout>
-    <q-page class="q-pa-md q-gutter-md q-mr-xl">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">
-            {{ t('home_.runQuery.header') }}
-            <span v-if="repository">
-              {{ t('for') }}:
-              <q-breadcrumbs class="inline-block">
-                <q-breadcrumbs-el :label="organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
-                <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
-              </q-breadcrumbs>
-            </span>
-          </div>
-          <span class="q-pt-md">{{ t('queryBuilder.description') }}</span>
+  <q-page class="q-pa-md q-gutter-md q-mr-xl">
+    <q-card>
+      <q-card-section>
+        <div class="text-h6">
+          {{ t('home_.runQuery.header') }}
+          <span v-if="repository">
+            {{ t('for') }}:
+            <q-breadcrumbs class="inline-block">
+              <q-breadcrumbs-el :label="organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
+              <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
+            </q-breadcrumbs>
+          </span>
+        </div>
+        <span class="q-pt-md">{{ t('queryBuilder.description') }}</span>
 
-          <div class="row q-gutter-md">
-            <enum-select
-              v-model:selected="repositoryTypeFilter"
-              i18n-prefix="repositoryType"
-              :enum="RepositoryType"
-              :required="false"
-              hide-bottom-space
-              class="col-lg-2 col-4"
-            />
-            <repository-select-field
-              :model-value="repository"
-              :repository-type="repositoryTypeFilter"
-              :label="t('repositoryContainingModel')"
-              :permissions="[Permission.Write, Permission.Manage]"
-              required
-              class="col-4 col"
-              @update:model-value="setRepository"
-            />
-          </div>
-        </q-card-section>
+        <div class="row q-gutter-md">
+          <enum-select
+            v-model:selected="repositoryTypeFilter"
+            i18n-prefix="repositoryType"
+            :enum="RepositoryType"
+            :required="false"
+            hide-bottom-space
+            class="col-lg-2 col-4"
+          />
+          <repository-select-field
+            :model-value="repository"
+            :repository-type="repositoryTypeFilter"
+            :label="t('repositoryContainingModel')"
+            :permissions="[Permission.Write, Permission.Manage]"
+            required
+            class="col-4 col"
+            @update:model-value="setRepository"
+          />
+        </div>
+      </q-card-section>
 
-        <q-separator />
+      <q-separator />
 
-        <concept-query-form
-          v-if="isConceptQuery"
-          ref="conceptQueryForm"
-          @execute="execute"
+      <concept-query-form
+        v-if="isConceptQuery"
+        ref="conceptQueryForm"
+        @execute="execute"
+      />
+      <phenotype-query-form
+        v-if="isPhenotypeQuery"
+        ref="phenotypeQueryForm"
+        @execute="execute"
+      />
+    </q-card>
+
+    <q-drawer
+      v-if="repository"
+      :model-value="resultsDrawer"
+      :mini="minifyResults"
+      :width="drawerWidth"
+      :class="{ 'bg-grey-2': !isDarkModeActive }"
+      :breakpoint="0"
+      bordered
+      elevated
+      overlay
+      side="right"
+      @update:model-value="resultsDrawer = true"
+    >
+      <q-scroll-area v-show="!minifyResults" ref="resultsScrollArea" class="fit">
+        <query-results-table
+          class="fit"
+          :page="queryPage"
+          :is-concept-query="isConceptQuery"
+          @delete="deleteQuery"
+          @prefill="prefillQuery"
+          @request="loadQueryPage($event)"
         />
-        <phenotype-query-form
-          v-if="isPhenotypeQuery"
-          ref="phenotypeQueryForm"
-          @execute="execute"
-        />
-      </q-card>
+      </q-scroll-area>
 
-      <q-drawer
-        v-if="repository"
-        :model-value="resultsDrawer"
-        :mini="minifyResults"
-        :width="drawerWidth"
-        :class="{ 'bg-grey-2': !isDarkModeActive }"
-        :breakpoint="0"
-        bordered
-        elevated
-        overlay
-        side="right"
-        @update:model-value="resultsDrawer = true"
+      <div
+        v-show="minifyResults"
+        class="q-mt-xl rotate-90 q-table__title text-no-wrap cursor-pointer"
+        @click="minifyResults = !minifyResults"
       >
-        <q-scroll-area v-show="!minifyResults" ref="resultsScrollArea" class="fit">
-          <query-results-table
-            class="fit"
-            :page="queryPage"
-            :is-concept-query="isConceptQuery"
-            @delete="deleteQuery"
-            @prefill="prefillQuery"
-            @request="loadQueryPage($event)"
-          />
-        </q-scroll-area>
-
-        <div
-          v-show="minifyResults"
-          class="q-mt-xl rotate-90 q-table__title text-no-wrap cursor-pointer"
+        {{ t('queryResult', 2) }}
+      </div>
+      <div class="absolute drawer-icon">
+        <q-btn
+          dense
+          round
+          unelevated
+          color="primary"
+          :icon="minifyResults ? 'chevron_left' : 'chevron_right'"
           @click="minifyResults = !minifyResults"
-        >
-          {{ t('queryResult', 2) }}
-        </div>
-        <div class="absolute drawer-icon">
-          <q-btn
-            dense
-            round
-            unelevated
-            color="primary"
-            :icon="minifyResults ? 'chevron_left' : 'chevron_right'"
-            @click="minifyResults = !minifyResults"
-          />
-        </div>
-      </q-drawer>
-    </q-page>
-  </q-layout>
+        />
+      </div>
+    </q-drawer>
+  </q-page>
 </template>
 
 <script setup lang="ts">
@@ -264,8 +262,12 @@ function setRepository (repo?: Repository) {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .drawer-icon
   top: 30px
   left: -17px
+</style>
+<style lang="sass">
+.q-drawer.q-drawer--right
+  top: 0px !important
 </style>

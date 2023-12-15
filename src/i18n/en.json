@@ -305,11 +305,7 @@
   "documentSearch": {
     "title": "Document search",
     "description": "Please select the type of the document representation.",
-    "short": "Explorative document search",
-    "type": {
-      "conceptCluster": "Concept Cluster",
-      "searchQuery": "Search Query"
-    }
+    "short": "Explorative document search"
   },
   "phenotype_repository": "Phenotype repository",
   "concept_repository": "Concept repository",
@@ -493,5 +489,9 @@
   "of": "of",
   "manage": "Manage",
   "edit": "Edit",
-  "404Description": "The requested page does not exist."
+  "404Description": "The requested page does not exist.",
+  "concept_cluster": "Concept cluster",
+  "search_query": "Search query|Search queries",
+  "clear": "Clear",
+  "documentsOfQuery": "Documents of query"
 }
