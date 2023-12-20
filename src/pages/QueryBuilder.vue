@@ -95,30 +95,22 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ConceptQuery,
-  Permission,
-  PhenotypeQuery,
-  Query,
-  QueryPage,
-  Repository,
-  RepositoryType
-} from '@onto-med/top-api'
-import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import {ConceptQuery, Permission, PhenotypeQuery, Query, QueryPage, Repository, RepositoryType} from '@onto-med/top-api'
+import {storeToRefs} from 'pinia'
+import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { onMounted, ref, computed, inject } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { v4 as uuidv4 } from 'uuid'
-import { QueryApiKey } from 'src/boot/axios'
-import { QScrollArea, useQuasar } from 'quasar'
+import {computed, inject, onMounted, ref} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {v4 as uuidv4} from 'uuid'
+import {QueryApiKey} from 'src/boot/axios'
+import {QScrollArea, useQuasar} from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import Dialog from 'src/components/Dialog.vue'
 import ConceptQueryForm from 'src/components/Query/ConceptQueryForm.vue'
 import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
 import EnumSelect from 'src/components/EnumSelect.vue'
-import { useRouter } from 'vue-router'
+import {useRouter} from 'vue-router'
 
 const props = defineProps({
   queryId: String
