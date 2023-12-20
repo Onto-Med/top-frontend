@@ -1,21 +1,29 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <q-card>
-      <q-card-section>
-        <div class="text-h6">
-          {{ t('documentSearch.title') }}
+      <q-card-section class="row no-wrap justify-between">
+        <div>
+          <div class="text-h6">
+            {{ t('documentSearch.title') }}
+          </div>
+          <span class="q-pt-md">{{ t('documentSearch.description') }}</span>
+          <div class="row q-gutter-md">
+            <q-btn-toggle
+              v-model="searchType"
+              :options="searchTypeOptions"
+              no-caps
+              rounded
+            />
+          </div>
         </div>
-        <span class="q-pt-md">{{ t('documentSearch.description') }}</span>
-        <div class="row q-gutter-md">
-          <q-btn-toggle
-            v-model="searchType"
-            :options="searchTypeOptions"
-            no-caps
-            rounded
+        <div v-if="!props.queryId && searchType===SearchTypesEnum.SEARCH_QUERY" class="self-center">
+          <q-btn
+            color="primary"
+            label="Run Search Query on Documents"
+            :to="{ name: 'queryBuilder', params: { organisationId: organisationId } }"
           />
         </div>
       </q-card-section>
-
       <q-separator />
 
       <q-card-section class="q-pa-none">
