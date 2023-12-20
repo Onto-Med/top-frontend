@@ -27,7 +27,6 @@
 
             <export-dialog v-model:show="showExportDialog" :repository="repository" @import="reloadEntities()" />
           </div>
-
           <entity-tree
             v-model:selected="selected"
             :nodes="entities"
@@ -41,6 +40,9 @@
             @duplicate-entity="handleEntityDuplication"
             @dblclick="preserve()"
           />
+          <q-expansion-item :label="t('concept_cluster')">
+            content
+          </q-expansion-item>
         </div>
       </template>
 

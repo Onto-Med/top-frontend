@@ -163,7 +163,7 @@ const distinctColorsFont = [
 const conceptColors: ConceptColor[] = []
 const selectedColors = ref<ConceptColor[]>([])
 const conceptMode = ref('exclusive')
-const mostImportantNodes = ref(true)
+const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
 
 const conceptModeOptions = computed(() => [
@@ -201,7 +201,7 @@ watch(
 async function reloadConcepts() {
   if (!conceptApi || !documentApi || conceptsLoading.value) return
   conceptsLoading.value = true
-  await conceptApi.getConceptClusters()
+  await conceptApi.getConceptClusters(undefined, false)
     .then(r => {
       concepts.value = r.data
       concepts.value.forEach((_, index) => {
