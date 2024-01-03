@@ -493,5 +493,7 @@
   "concept_cluster": "Konzept-Cluster",
   "search_query": "Such-Abfrage|Such-Abfragen",
   "clear": "Leeren",
-  "documentsOfQuery": "Dokumente der Abfrage"
+  "documentsOfQuery": "Dokumente der Abfrage",
+  "codeMissing": "Code fehlt|Codes fehlen",
+  "codeMissingDescription": "Es wird empfohlen, mindestens einen Code bereitzustellen, um die Wiederverwendbarkeit dieses Modells sicherzustellen."
 }
