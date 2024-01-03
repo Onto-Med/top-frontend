@@ -64,7 +64,15 @@
       </q-item-label>
     </q-item-section>
     <q-item-section side>
-      <q-btn-group flat>
+      <q-btn-group flat class="items-center">
+        <div
+          v-show="hasItemType(subject) && (!subject.codes || !subject.codes.length)"
+          class="text-subtitle2 text-warning"
+          :title="t('codeMissingDescription')"
+        >
+          <q-icon name="warning" />
+          <span class="gt-md">{{ t('codeMissing') }}</span>
+        </div>
         <query-subject-configuration
           :date-time-restriction="dateTimeRestriction"
           :default-aggregation-function-id="defaultAggregationFunctionId"
@@ -121,7 +129,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { t, d, te } = useI18n()
     const entityStore = useEntity()
-    const { getSynonyms, isRestricted, getIcon, getIconTooltip, getTitle, requiresAggregationFunction } = useEntityFormatter()
+    const { getSynonyms, hasItemType, isRestricted, getIcon, getIconTooltip, getTitle, requiresAggregationFunction } = useEntityFormatter()
     const subject = ref<Entity>()
 
     const loadEntity = (subjectId: string) => entityStore.loadEntity(subjectId).then(e => subject.value = e)
@@ -142,6 +150,7 @@ export default defineComponent({
       getIcon,
       getIconTooltip,
       getTitle,
+      hasItemType,
 
       requiresAggregationFunction: computed(() => subject.value ? requiresAggregationFunction(subject.value) : false),
 

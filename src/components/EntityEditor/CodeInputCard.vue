@@ -12,6 +12,14 @@
             size="sm"
           />
         </span>
+        <span
+          v-show="warningIfEmpty && !modelValue.length"
+          class="text-subtitle2 q-ml-md text-warning"
+          :title="t('codeMissingDescription')"
+        >
+          <q-icon name="warning" />
+          {{ t('codeMissing') }}
+        </span>
       </q-toolbar-title>
     </template>
 
@@ -71,7 +79,9 @@ const props = defineProps({
   },
   expanded: Boolean,
   showHelp: Boolean,
-  readonly: Boolean
+  readonly: Boolean,
+  /** Display a warning if modelValue Array is empty. */
+  warningIfEmpty: Boolean
 })
 
 const emit = defineEmits(['update:modelValue'])

@@ -136,6 +136,7 @@
         :model-value="codes"
         :readonly="readonly"
         :expanded="codes && codes.length > 0"
+        :warning-if-empty="hasItemType(entityType)"
         @update:model-value="$emit('update:codes', $event)"
       />
     </div>
