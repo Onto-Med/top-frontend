@@ -1,5 +1,5 @@
 <template>
-  <q-menu ref="menu" anchor="top left" self="bottom left" @hide="showOptions = false">
+  <q-menu ref="menu" anchor="top left" self="bottom left" @hide="onHide">
     <div v-if="showOptions" class="scroll">
       <q-item dense>
         <q-select
@@ -184,6 +184,11 @@ function showChangeOptions() {
 function showFunctionDoc(fun: ExpressionFunction) {
   if (baseDocUrl.value && fun.type && !noDocFunctionTypes.includes(fun.type))
     window.open(toFunctionDocUrl(fun), '_blank')
+}
+
+function onHide() {
+  if (props.value)
+    showOptions.value = false
 }
 </script>
 
