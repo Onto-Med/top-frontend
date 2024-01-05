@@ -1,6 +1,6 @@
 <template>
   <q-menu ref="menu" anchor="top left" self="bottom left" @hide="onHide">
-    <div v-if="showOptions" class="scroll">
+    <div v-if="changing || !value" class="scroll">
       <q-item dense>
         <q-select
           v-model="filter"
@@ -29,7 +29,7 @@
               target="_blank"
               :href="toPackageDocUrl(functionType.value)"
               :title="t('showThing', { thing: t('documentation') })"
-              @click.stop=""
+              @click.stop
             />
           </q-item-label>
           <q-separator />
@@ -37,10 +37,9 @@
             <q-item
               v-for="fun in functionGroups?.get(functionType.value)"
               :key="fun.id"
-              v-close-popup
               clickable
               class="col-4 q-pa-none"
-              @click="$emit('select', fun)"
+              @click="onSelect(fun)"
             >
               <q-item-section
                 v-if="baseDocUrl && !noDocFunctionTypes.includes(fun.type)"
@@ -65,17 +64,16 @@
         </q-item-section>
       </q-item>
       <q-separator v-if="value" />
-      <q-item v-if="enclosable" v-close-popup clickable @click="$emit('enclose')">
+      <q-item v-if="enclosable" clickable @click="onEnclose">
         <q-item-section v-t="'encloseWithExpression'" />
       </q-item>
-      <q-item v-if="value && !showOptions" clickable @click="showChangeOptions()">
+      <q-item v-if="value && !changing" clickable @click="showChangeOptions()">
         <q-item-section v-t="'change'" />
       </q-item>
       <q-item
         v-if="removable"
-        v-close-popup
         clickable
-        @click="$emit('remove', undefined)"
+        @click="onRemove"
       >
         <q-item-section v-t="'remove'" />
       </q-item>
@@ -107,7 +105,7 @@ const props = defineProps({
   excludeFunctionTypes: Array as () => string[],
   excludeFunctions: Array as () => string[]
 })
-defineEmits(['enclose', 'remove', 'select'])
+const emit = defineEmits(['enclose', 'remove', 'select'])
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
@@ -157,7 +155,7 @@ const functionGroups = computed(() =>
   ) || new Map()
 )
 
-const showOptions = ref(!props.value)
+const changing = ref(false)
 
 const baseDocUrl = computed(() => {
   const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
@@ -177,7 +175,7 @@ function toFunctionDocUrl(fun: ExpressionFunction) {
 }
 
 function showChangeOptions() {
-  showOptions.value = true
+  changing.value = true
   void nextTick(() => menu.value?.updatePosition())
 }
 
@@ -186,9 +184,24 @@ function showFunctionDoc(fun: ExpressionFunction) {
     window.open(toFunctionDocUrl(fun), '_blank')
 }
 
+function onEnclose() {
+  emit('enclose')
+  void nextTick(() => menu.value?.updatePosition())
+}
+
 function onHide() {
   if (props.value)
-    showOptions.value = false
+    changing.value = false
+}
+
+function onRemove() {
+  menu.value?.hide()
+  emit('remove')
+}
+
+function onSelect(fun: ExpressionFunction) {
+  menu.value?.hide()
+  emit('select', fun)
 }
 </script>
 
