@@ -495,5 +495,14 @@
   "clear": "Clear",
   "documentsOfQuery": "Documents of query",
   "codeMissing": "Code is missing|Codes are missing",
-  "codeMissingDescription": "It is recommended to provide at least one code to ensure the reusability of this model."
+  "codeMissingDescription": "It is recommended to provide at least one code to ensure the reusability of this model.",
+  "codeScope": {
+    "title": "Scope",
+    "description": "The scope of this code."
+  },
+  "codeScopes": {
+    "self": "Self",
+    "leaves": "Leaves",
+    "subtree": "Subtree"
+  }
 }

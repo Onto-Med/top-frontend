@@ -495,5 +495,14 @@
   "clear": "Leeren",
   "documentsOfQuery": "Dokumente der Abfrage",
   "codeMissing": "Code fehlt|Codes fehlen",
-  "codeMissingDescription": "Es wird empfohlen, mindestens einen Code bereitzustellen, um die Wiederverwendbarkeit dieses Modells sicherzustellen."
+  "codeMissingDescription": "Es wird empfohlen, mindestens einen Code bereitzustellen, um die Wiederverwendbarkeit dieses Modells sicherzustellen.",
+  "codeScope": {
+    "title": "Geldungsbereich",
+    "description": "Der Geltungsbereich dieses Codes."
+  },
+  "codeScopes": {
+    "leaves": "Blätter",
+    "subtree": "Teilbaum",
+    "self": "Selbst"
+  }
 }

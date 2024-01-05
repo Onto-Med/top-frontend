@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-v-html -->
 <template>
   <expandable-card :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
     <template #title>
@@ -47,6 +46,12 @@
                   {{ entry.code }}
                 </span>
               </a>
+              <q-space />
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption>
+                {{ te('codeScopes.' + entry.scope) ? t('codeScopes.' + entry.scope) : entry.scope }}
+              </q-item-label>
             </q-item-section>
             <q-item-section avatar>
               <q-btn
@@ -70,7 +75,7 @@ import { Code } from '@onto-med/top-api'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
-import CodeInput from '../CodeInput.vue'
+import CodeInput from './CodeInput.vue'
 
 const props = defineProps({
   modelValue: {
@@ -86,16 +91,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const { t } = useI18n()
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
 const showManualForm = ref(false)
 
-function addEntry (entry?: Code) {
+function addEntry(entry?: Code) {
   const newModelValue = props.modelValue.slice()
   newModelValue.push(entry as Code)
   emit('update:modelValue', newModelValue)
 }
 
-function removeEntryByIndex (index: number) {
+function removeEntryByIndex(index: number) {
   let newModelValue = props.modelValue.slice()
   newModelValue.splice(index, 1)
   emit('update:modelValue', newModelValue)
