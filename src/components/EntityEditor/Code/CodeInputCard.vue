@@ -25,7 +25,7 @@
     <template #default>
       <code-input
         v-if="!readonly"
-        :disabled-codes="modelValue"
+        :disabled-codes="disabledCodes"
         :manual-entry="showManualForm"
         @select="addEntry"
       />
@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { Code } from '@onto-med/top-api'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import CodeInput from './CodeInput.vue'
@@ -95,10 +95,26 @@ const emit = defineEmits(['update:modelValue'])
 const { t, te } = useI18n()
 const showManualForm = ref(false)
 
+const disabledCodes = computed(() => {
+  // It is allowed to have the same codes twice, one with scope 'self' and one with 'leaves'.
+  // For simplicity, we just check if a code is already duplicated.
+  return props.modelValue.filter((c1, i1) => props.modelValue.some((c2, i2) => codeEquals(c1, c2) && i1 != i2))
+})
+
+function codeEquals(code1?: Code, code2?: Code, includeScope = false) {
+  if (!code1 || !code2) return false
+  return code1.codeSystem.uri == code2.codeSystem.uri
+    && code1.code == code2.code
+    && (!includeScope || code1.scope == code2.scope)
+}
+
 function addEntry(entry?: Code) {
   const newModelValue = props.modelValue.slice()
+  if (newModelValue.some(c => codeEquals(c, entry, true)))
+    return false
   newModelValue.push(entry as Code)
   emit('update:modelValue', newModelValue)
+  return true
 }
 
 function removeEntryByIndex(index: number) {
