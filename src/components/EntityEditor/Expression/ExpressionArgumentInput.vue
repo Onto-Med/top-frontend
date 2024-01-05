@@ -41,29 +41,26 @@
       />
       <slot name="append" />
     </div>
-    <template v-else-if="fun">
+    <template v-else>
       <div
         v-if="prefix"
-        :class="{ hover: hover }"
-        class="clickable"
-        @mouseover="hover = true"
-        @mouseleave="hover = false"
       >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
-        --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b> (
-        <expression-context-menu
-          v-if="!readonly"
-          :value="fun"
-          :include-function-types="includeFunctionTypes"
-          :exclude-function-types="excludeFunctionTypes"
-          :exclude-functions="excludeFunctions"
-          @enclose="enclose()"
-          @remove="clear()"
-          @select="setFunction($event)"
-        />
+        <span
+          :class="{ hover: hover }"
+          class="clickable"
+          @mouseover="hover = true"
+          @mouseleave="hover = false"
+        >
+          {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
+          --><b v-if="fun" :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
+          <span v-else>[{{ t('selectThing', { thing: t('function') }) }}]</span>
+          <span v-show="argumentCount">(</span>
+        </span>
+        <slot v-if="!argumentCount" name="append" />
       </div>
       <div
         v-else
+        class="clickable"
         :class="{ hover: hover }"
         @mouseover="hover = true"
         @mouseleave="hover = false"
@@ -73,7 +70,7 @@
 
       <div :class="expand ? '' : 'col row items-center'">
         <template v-for="(n, index) in argumentCount" :key="index">
-          <div
+          <span
             v-if="index != 0 && infix"
             :class="{ hover: hover }"
             class="clickable"
@@ -81,21 +78,11 @@
             @mouseleave="hover = false"
           >
             <span>
-              {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}
-              <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
-              {{ !expand ? '&nbsp;' : '' }}
+              {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<!--
+              --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b><!--
+              -->{{ !expand ? '&nbsp;' : '' }}
             </span>
-            <expression-context-menu
-              v-if="!readonly"
-              :value="fun"
-              :include-function-types="includeFunctionTypes"
-              :exclude-function-types="excludeFunctionTypes"
-              :exclude-functions="excludeFunctions"
-              @enclose="enclose()"
-              @remove="clear()"
-              @select="setFunction($event)"
-            />
-          </div>
+          </span>
           <expression-argument-input
             v-if="modelValue.arguments"
             :model-value="modelValue.arguments[index]"
@@ -117,67 +104,52 @@
                 :class="{ hover: hover }"
                 @mouseover="hover = true"
                 @mouseleave="hover = false"
+                @click.stop
               >,{{ !expand ? '&nbsp;' : '' }}</span>
             </template>
           </expression-argument-input>
         </template>
 
         <template v-if="fun && showMoreBtn">
-          <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
-          <q-icon
-            name="add"
-            class="clickable"
-            :title="t('addMoreArguments')"
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-            @click="handleArgumentUpdate(argumentCount, { })"
-          />
+          <div>
+            <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel + 1) * indent) }}</span>
+            <q-icon
+              name="add"
+              class="clickable"
+              :title="t('addMoreArguments')"
+              @mouseover="hover = true"
+              @mouseleave="hover = false"
+              @click.stop="handleArgumentUpdate(argumentCount, { })"
+            />
+          </div>
         </template>
 
         <div
-          v-if="postfix"
-          :class="{ hover: hover }"
-          @mouseover="hover = true"
-          @mouseleave="hover = false"
-        >
-          {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})
-          <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
-          <slot name="append" />
-          <expression-context-menu
-            v-if="!readonly"
-            :value="fun"
-            :include-function-types="includeFunctionTypes"
-            :exclude-function-types="excludeFunctionTypes"
-            :exclude-functions="excludeFunctions"
-            @enclose="enclose()"
-            @remove="clear()"
-            @select="setFunction($event)"
-          />
-        </div>
-        <div
-          v-else
+          v-if="postfix || argumentCount"
+          class="clickable"
           :class="{ hover: hover }"
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
           <span>{{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})</span>
-          <slot name="append" />
+          <template v-if="postfix">
+            <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
+          </template>
         </div>
+        <slot v-if="postfix || argumentCount" name="append" />
       </div>
-    </template>
-    <div v-else class="clickable">
-      <span>{{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}[{{ modelValue?.arguments ? '...' : t('selectThing', { thing: t('function') }) }}]</span>
       <expression-context-menu
         v-if="!readonly"
-        :enclosable="false"
+        :value="fun"
+        :enclosable="!!fun"
         :include-function-types="includeFunctionTypes"
         :exclude-function-types="excludeFunctionTypes"
         :exclude-functions="excludeFunctions"
-        @select="setFunction($event)"
+        @enclose="enclose()"
         @remove="clear()"
+        @select="setFunction($event)"
       />
-      <slot name="append" />
-    </div>
+    </template>
   </div>
 </template>
 
@@ -203,9 +175,7 @@ import { env, noDocFunctionTypes } from 'src/config'
 const props = defineProps({
   modelValue: {
     type: Object as () => Expression,
-    default: () => {
-      return {};
-    },
+    default: () => ({}),
   },
   readonly: Boolean,
   root: Boolean,
@@ -275,11 +245,11 @@ const functionDocUrl = computed(() => {
 })
 
 const prefix = computed(
-  () => fun.value && fun.value.notation === NotationEnum.Prefix
+  () => !fun.value || fun.value.notation === NotationEnum.Prefix
 )
 
 const infix = computed(
-  () => !fun.value || fun.value.notation === NotationEnum.Infix
+  () => fun.value && fun.value.notation === NotationEnum.Infix
 )
 
 const postfix = computed(
@@ -297,10 +267,9 @@ function blink() {
   setTimeout(() => flash.value = false, 500)
 }
 
-function countArguments(expression: Expression, fun: ExpressionFunction|undefined) {
-  if (!fun) return 0;
-  const count = Math.max(expression.arguments?.length || 0, fun.minArgumentNumber || 0)
-  if (fun.maxArgumentNumber && fun.maxArgumentNumber < count) return fun.maxArgumentNumber
+function countArguments(expression?: Expression, fun?: ExpressionFunction) {
+  const count = Math.max(expression?.arguments?.length || 0, fun?.minArgumentNumber || 0)
+  if (fun?.maxArgumentNumber && fun?.maxArgumentNumber < count) return fun?.maxArgumentNumber
   return count
 }
 
@@ -357,6 +326,7 @@ function setValue(value: Value|undefined): void {
   if (value)
     newModelValue.values.push(value)
   newModelValue.constantId = undefined
+  newModelValue.arguments = undefined
   isEntity.value = false
   isConstant.value = true
   emit('update:modelValue', newModelValue)
@@ -366,6 +336,7 @@ function setConstantId(constantId: string|undefined): void {
   const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
   newModelValue.values = undefined
   newModelValue.constantId = constantId
+  newModelValue.arguments = undefined
   isEntity.value = false
   isConstant.value = true
   emit('update:modelValue', newModelValue)
