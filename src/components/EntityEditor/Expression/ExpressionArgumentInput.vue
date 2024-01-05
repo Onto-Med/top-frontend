@@ -326,6 +326,7 @@ function setValue(value: Value|undefined): void {
   if (value)
     newModelValue.values.push(value)
   newModelValue.constantId = undefined
+  newModelValue.arguments = undefined
   isEntity.value = false
   isConstant.value = true
   emit('update:modelValue', newModelValue)
@@ -335,6 +336,7 @@ function setConstantId(constantId: string|undefined): void {
   const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
   newModelValue.values = undefined
   newModelValue.constantId = constantId
+  newModelValue.arguments = undefined
   isEntity.value = false
   isConstant.value = true
   emit('update:modelValue', newModelValue)
