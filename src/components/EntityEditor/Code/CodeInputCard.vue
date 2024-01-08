@@ -19,6 +19,16 @@
           <q-icon name="warning" />
           {{ t('codeMissing') }}
         </span>
+        <q-space />
+        <q-btn
+          dense
+          flat
+          class="text-caption"
+          icon="upload_file"
+          :label="t('import')"
+          :title="t('codeInput.importCsvDescription')"
+          @click.stop="showImportDialog"
+        />
       </q-toolbar-title>
     </template>
 
@@ -27,7 +37,7 @@
         v-if="!readonly"
         :disabled-codes="disabledCodes"
         :manual-entry="showManualForm"
-        @select="addEntry"
+        @select="addEntries([$event])"
       />
     </template>
 
@@ -76,6 +86,9 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import CodeInput from './CodeInput.vue'
+import { useQuasar } from 'quasar'
+import useNotify from 'src/mixins/useNotify'
+import CodeImportDialog from './CodeImportDialog.vue'
 
 const props = defineProps({
   modelValue: {
@@ -93,6 +106,8 @@ const emit = defineEmits(['update:modelValue'])
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
+const $q = useQuasar()
+const { notify } = useNotify()
 const showManualForm = ref(false)
 
 const disabledCodes = computed(() => {
@@ -108,19 +123,35 @@ function codeEquals(code1?: Code, code2?: Code, includeScope = false) {
     && (!includeScope || code1.scope == code2.scope)
 }
 
-function addEntry(entry?: Code) {
+function addEntries(entries?: Code[]) {
+  if (!entries) return [false]
   const newModelValue = props.modelValue.slice()
-  if (newModelValue.some(c => codeEquals(c, entry, true)))
-    return false
-  newModelValue.push(entry as Code)
+  const results = entries.map(e => {
+    if (newModelValue.some(c => codeEquals(c, e, true)))
+      return false
+    newModelValue.push(e)
+    return true
+  })
   emit('update:modelValue', newModelValue)
-  return true
+  return results
 }
 
 function removeEntryByIndex(index: number) {
   let newModelValue = props.modelValue.slice()
   newModelValue.splice(index, 1)
   emit('update:modelValue', newModelValue)
+}
+
+function showImportDialog() {
+  $q.dialog({
+    component: CodeImportDialog
+  }).onOk(
+    (codes: Code[]) => {
+      const accepted = addEntries(codes).filter(e => !!e).length
+      notify(t('codeImport.imported', accepted), 'positive')
+      // TODO: expand card
+    }
+  )
 }
 </script>
 
