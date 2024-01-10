@@ -61,6 +61,23 @@
             <q-item-section side>
               <q-item-label caption>
                 {{ te('codeScopes.' + entry.scope) ? t('codeScopes.' + entry.scope) : entry.scope }}
+                <q-popup-edit
+                  v-slot="scope"
+                  :model-value="entry.scope"
+                  buttons
+                  :label-cancel="t('cancel')"
+                  :label-set="t('set')"
+                  @update:model-value="updateScopeByIndex(index, $event)"
+                >
+                  <enum-select
+                    v-model:selected="scope.value"
+                    i18n-prefix="codeScope"
+                    :enum="CodeScope"
+                    dense
+                    autofocus
+                    required
+                  />
+                </q-popup-edit>
               </q-item-label>
             </q-item-section>
             <q-item-section avatar>
@@ -81,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { Code } from '@onto-med/top-api'
+import { Code, CodeScope } from '@onto-med/top-api'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
@@ -89,6 +106,7 @@ import CodeInput from './CodeInput.vue'
 import { useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 import CodeImportDialog from './CodeImportDialog.vue'
+import EnumSelect from 'src/components/EnumSelect.vue'
 
 const props = defineProps({
   modelValue: {
@@ -134,6 +152,12 @@ function addEntries(entries?: Code[]) {
   })
   emit('update:modelValue', newModelValue)
   return results
+}
+
+function updateScopeByIndex(index: number, scope: CodeScope) {
+  let newModelValue = props.modelValue.slice()
+  newModelValue[index].scope = scope
+  emit('update:modelValue', newModelValue)
 }
 
 function removeEntryByIndex(index: number) {
