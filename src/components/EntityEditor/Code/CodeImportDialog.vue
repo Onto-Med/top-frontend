@@ -172,12 +172,18 @@ function loadCodes() {
         {
           code: row[0],
           codeSystem: { uri: row[1] },
-          scope: row[2] as CodeScope|undefined || CodeScope.Self,
+          scope: CodeScope[toCapital(row[2]) as keyof typeof CodeScope] || CodeScope.Self,
         }
       ))
     })
     .catch((e: Error) => renderError(e))
     .finally(() => loading.value = false)
+}
+
+function toCapital(string: string) {
+  const str = string.trim()
+  if (str.length === 0) return str
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
 function onHasHeaderChanged(value?: boolean) {
