@@ -500,7 +500,8 @@
   "codeImport": {
     "title": "Code-Import aus CSV",
     "imported": "Ein Code übernommen|{count} Codes übernommen",
-    "fileDescription": "Wählen Sie eine CSV-Datei mit Codes aus. Die Datei sollte zwei Spalten haben, eine für Code und eine für Codesystem-URI.",
+    "fileDescription": "Wählen Sie eine CSV-Datei mit Codes aus. Die Datei sollte zwei oder drei Spalten haben, eine für die Codesystem-URI, eine für den Code und optional eine for den Geltungsbereich.",
+    "selectCodesToImport": "Wählen Sie in der unten stehenden Tabelle die Codes aus, die Sie aus der CSV-Datei übernehmen möchten. Sie können die Tabelleneinträge nach Bedarf ändern, indem Sie auf eine Zeile klicken.",
     "selectFile": "CSV-Datei auswählen",
     "hasHeader": "Hat eine Kopfzeile"
   },
@@ -513,7 +514,7 @@
     "subtree": "Teilbaum",
     "self": "Selbst"
   },
-  "selectCodesToImport": "Wählen Sie in der folgenden Tabelle die Codes aus, die Sie aus der CSV-Datei importieren möchten.",
-  "recordSelected": "Keine Datensätze ausgewählt|Ein Datensatz ausgewählt|{count} Datensätze ausgewählt",
-  "delimiter": "Trennzeichen|Trennzeichen"
+  "recordSelected": "Keine Datensätze ausgewählt.|Ein Datensatz ausgewählt.|{count} Datensätze ausgewählt.",
+  "delimiter": "Trennzeichen|Trennzeichen",
+  "set": "Setzen"
 }

@@ -23,7 +23,7 @@
         <q-btn
           dense
           flat
-          class="text-caption"
+          class="text-caption q-item__label--caption"
           icon="upload_file"
           :label="t('import')"
           :title="t('codeInput.importCsvDescription')"

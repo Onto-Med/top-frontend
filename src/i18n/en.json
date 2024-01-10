@@ -500,7 +500,8 @@
   "codeImport": {
     "title": "Code import from CSV",
     "imported": "One Code accepted|{count} codes accepted",
-    "fileDescription": "Select a CSV file containing codes. The file should have two columns, one for code and one for code system URI.",
+    "fileDescription": "Select a CSV file containing codes. The file should have two or three columns, one for the code system URI, one for the code and optionally one for the scope.",
+    "selectCodesToImport": "In the table below, select the codes you wish to transfer from the CSV file. You can modify the table entries as required by clicking on a row.",
     "selectFile": "Select CSV file",
     "hasHeader": "Has header row"
   },
@@ -513,7 +514,7 @@
     "leaves": "Leaves",
     "subtree": "Subtree"
   },
-  "selectCodesToImport": "Select the codes you want to import from the CSV file in the table below.",
-  "recordSelected": "No records selected|One record selected|{count} records selected",
-  "delimiter": "Delimiter|Delimiters"
+  "recordSelected": "No records selected.|One record selected.|{count} records selected.",
+  "delimiter": "Delimiter|Delimiters",
+  "set": "Set"
 }

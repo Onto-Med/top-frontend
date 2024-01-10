@@ -12,11 +12,22 @@
         <q-file
           v-model="csvFile"
           :label="t('codeImport.selectFile') + '...'"
+          :loading="loading"
           accept=".csv"
+          clearable
           @update:model-value="loadCodes"
         >
           <template #prepend>
             <q-icon name="attach_file" />
+          </template>
+          <template #after>
+            <div class="text-caption">
+              <q-checkbox
+                v-model="hasHeader"
+                :label="t('codeImport.hasHeader')"
+                @update:model-value="onHasHeaderChanged($event)"
+              />
+            </div>
           </template>
         </q-file>
       </q-card-section>
@@ -24,39 +35,57 @@
       <q-separator v-show="codes.length > 0" />
 
       <q-card-section v-show="codes.length > 0" class="q-pa-none">
-        <p v-t="'selectCodesToImport'" class="q-px-md q-pt-sm q-mb-none" />
+        <p v-t="'codeImport.selectCodesToImport'" class="q-px-md q-pt-sm q-mb-none" />
         <q-table
           v-model:selected="selection"
           flat
           dense
           hide-pagination
           virtual-scroll
+          hide-selected-banner
           :title="t('code', 2)"
-          :rows="codes"
+          :rows="tableRows"
           :columns="columns"
           :row-key="codeKey"
-          :selected-rows-label="count => t('recordSelected', count)"
           :no-data-label="t('noDataPresent')"
           :rows-per-page-options="[0]"
           :virtual-scroll-sticky-size-start="48"
           selection="multiple"
           class="codes-table"
         >
-          <template #body-cell-code="props">
-            <q-td key="code" :props="props">
-              {{ props.row.code }}
-              <q-popup-edit v-slot="scope" v-model="props.row.code" buttons>
+          <template #body-cell-codeSystem="props">
+            <q-td key="codeSystem" :props="props">
+              {{ props.row.codeSystem.uri }}
+              <q-popup-edit v-slot="scope" v-model="props.row.codeSystem.uri" buttons :label-cancel="t('cancel')" :label-set="t('set')">
                 <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
               </q-popup-edit>
             </q-td>
           </template>
-          <template #body-cell-codeSystem="props">
-            <q-td key="codeSystem" :props="props">
-              {{ props.row.codeSystem.uri }}
-              <q-popup-edit v-slot="scope" v-model="props.row.codeSystem.uri" buttons>
+          <template #body-cell-code="props">
+            <q-td key="code" :props="props">
+              {{ props.row.code }}
+              <q-popup-edit v-slot="scope" v-model="props.row.code" buttons :label-cancel="t('cancel')" :label-set="t('set')">
                 <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
               </q-popup-edit>
             </q-td>
+          </template>
+          <template #body-cell-scope="props">
+            <q-td key="code" :props="props">
+              {{ te('codeScopes.' + props.row.scope) ? t('codeScopes.' + props.row.scope) : props.row.scope }}
+              <q-popup-edit v-slot="scope" v-model="props.row.scope" buttons :label-cancel="t('cancel')" :label-set="t('set')">
+                <enum-select
+                  v-model:selected="scope.value"
+                  i18n-prefix="codeScope"
+                  :enum="CodeScope"
+                  dense
+                  autofocus
+                  required
+                />
+              </q-popup-edit>
+            </q-td>
+          </template>
+          <template #bottom>
+            {{ t('recordSelected', selection.length) }}
           </template>
         </q-table>
       </q-card-section>
@@ -72,27 +101,37 @@
 </template>
 
 <script setup lang="ts">
-import { Code } from '@onto-med/top-api'
+import { Code, CodeScope } from '@onto-med/top-api'
 import { useDialogPluginComponent } from 'quasar'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { parse } from 'papaparse'
 import useNotify from 'src/mixins/useNotify'
+import EnumSelect from 'src/components/EnumSelect.vue'
 
 const emit = defineEmits(['hide', 'ok'])
 
-const { t } = useI18n()
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
 const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const onCancelClick = onDialogCancel
 const codes = ref<Code[]>([])
 const selection = ref<Code[]>([])
-
+const hasHeader = ref(false)
+const loading = ref(false)
 const csvFile = ref<File>()
 
 const isValid = computed(() => selection.value.length > 0)
 
 const columns = computed(() => [
+  {
+    name: 'codeSystem',
+    required: true,
+    label: t('codeSystem'),
+    field: (row: Code) => row.codeSystem.uri,
+    sortable: true,
+  },
   {
     name: 'code',
     required: true,
@@ -101,30 +140,50 @@ const columns = computed(() => [
     sortable: true,
   },
   {
-    name: 'codeSystem',
-    required: true,
-    label: t('codeSystem'),
-    field: (row: Code) => row.codeSystem.uri,
+    name: 'scope',
+    required: false,
+    label: t('codeScope.title'),
+    field: (row: Code) => row.scope,
     sortable: true,
   }
 ])
+
+const tableRows = computed(
+  () => codes.value.filter((_row, index) => !hasHeader.value || index !== 0)
+)
 
 function codeKey(code: Code) {
   return `${code.codeSystem.uri}#${code.code}`
 }
 
 function loadCodes() {
-  if (!csvFile.value) return
+  if (loading.value) return
+  if (!csvFile.value) {
+    codes.value = []
+    return
+  }
+  loading.value = true
   csvFile.value.text()
     .then(content => {
       const data = parse(content, {
         skipEmptyLines: true,
       }).data as Array<Array<string>>
       codes.value = data.map(row => (
-        { code: row[0], codeSystem: { uri: row[1] } }
+        {
+          code: row[0],
+          codeSystem: { uri: row[1] },
+          scope: row[2] as CodeScope|undefined || CodeScope.Self,
+        }
       ))
     })
     .catch((e: Error) => renderError(e))
+    .finally(() => loading.value = false)
+}
+
+function onHasHeaderChanged(value?: boolean) {
+  if (!value || codes.value.length == 0) return
+  const key = codeKey(codes.value[0])
+  selection.value = selection.value.filter(s => codeKey(s) !== key)
 }
 
 function onOkClick() {
