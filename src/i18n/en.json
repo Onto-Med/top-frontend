@@ -404,7 +404,8 @@
   },
   "boolean": "Boolean",
   "codeInput": {
-    "allCodeSystems": "all"
+    "allCodeSystems": "all",
+    "importCsvDescription": "Import codes from a CSV file."
   },
   "codeSystem": "Code system|Code systems",
   "unknownCodeSystem": "Unknown code system|Unknown code systems",
@@ -495,5 +496,25 @@
   "clear": "Clear",
   "documentsOfQuery": "Documents of query",
   "codeMissing": "Code is missing|Codes are missing",
-  "codeMissingDescription": "It is recommended to provide at least one code to ensure the reusability of this model."
+  "codeMissingDescription": "It is recommended to provide at least one code to ensure the reusability of this model.",
+  "codeImport": {
+    "title": "Code import from CSV",
+    "imported": "One Code accepted|{count} codes accepted",
+    "fileDescription": "Select a CSV file containing codes. The file should have two or three columns, one for the code system URI, one for the code and optionally one for the scope.",
+    "selectCodesToImport": "In the table below, select the codes you wish to transfer from the CSV file. You can modify the table entries as required by clicking on a row.",
+    "selectFile": "Select CSV file",
+    "hasHeader": "Has header row"
+  },
+  "codeScope": {
+    "title": "Scope",
+    "description": "The scope of this code."
+  },
+  "codeScopes": {
+    "self": "Self",
+    "leaves": "Leaves",
+    "subtree": "Subtree"
+  },
+  "recordSelected": "No records selected.|One record selected.|{count} records selected.",
+  "delimiter": "Delimiter|Delimiters",
+  "set": "Set"
 }

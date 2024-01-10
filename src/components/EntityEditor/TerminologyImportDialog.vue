@@ -82,7 +82,7 @@ import { Code, DataType, Entity, EntityType, ItemType, NumberRestriction, Phenot
 import { useDialogPluginComponent } from 'quasar'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import CodeInput from 'src/components/CodeInput.vue'
+import CodeInput from 'src/components/EntityEditor/Code/CodeInput.vue'
 import EntityDisplay from './EntityDisplay.vue'
 import RangeInput from './RangeInput.vue'
 import UnitInput from '../UnitInput.vue'

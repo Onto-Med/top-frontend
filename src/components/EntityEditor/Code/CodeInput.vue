@@ -70,8 +70,15 @@
         class="system-input"
       />
     </template>
-    <template v-if="!noBtn" #after>
+    <template #after>
+      <enum-select
+        v-if="selection"
+        v-model:selected="selection.scope"
+        :enum="CodeScope"
+        i18n-prefix="codeScope"
+      />
       <q-btn
+        v-if="!noBtn"
         color="primary"
         :icon="btnIconName"
         :label="$q.screen.gt.sm ? btnLabel || t('addThing', { thing: t('code') }) : ''"
@@ -108,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { Code, CodePage, CodeSystem } from '@onto-med/top-api'
+import { Code, CodePage, CodeScope, CodeSystem } from '@onto-med/top-api'
 import { computed, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeSystemInput from 'src/components/CodeSystemInput.vue'
@@ -116,6 +123,7 @@ import { CodeApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import { QInput, QSelect } from 'quasar'
+import EnumSelect from 'src/components/EnumSelect.vue'
 
 const props = defineProps({
   autofocus: Boolean,
@@ -155,7 +163,11 @@ const codeApi = inject(CodeApiKey)
 const codeSystemFilter = ref<CodeSystem>()
 
 const selection = ref<Code>()
-const manualCode = ref<Code>({ code: '', codeSystem: { uri: '' } })
+const manualCode = ref<Code>({
+  code: '',
+  codeSystem: { uri: '' },
+  scope: CodeScope.Self
+})
 
 const autoSuggestOptions = ref<Code[]>([])
 const loading = ref(false)
@@ -193,7 +205,8 @@ function select (entry?: Code, manual = false) {
     if (entry)
       manualCode.value = {
         code: entry.code,
-        codeSystem: JSON.parse(JSON.stringify(entry.codeSystem)) as CodeSystem
+        codeSystem: JSON.parse(JSON.stringify(entry.codeSystem)) as CodeSystem,
+        scope: CodeScope.Self
       }
     manualCodeInput.value?.select()
   } else {
