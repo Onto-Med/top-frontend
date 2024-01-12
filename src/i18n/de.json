@@ -516,5 +516,6 @@
   },
   "recordSelected": "Keine Datensätze ausgewählt.|Ein Datensatz ausgewählt.|{count} Datensätze ausgewählt.",
   "delimiter": "Trennzeichen|Trennzeichen",
-  "set": "Setzen"
+  "set": "Setzen",
+  "confirmUnsavedChanges": "Es gibt nicht gespeicherte Änderungen, die verloren gehen, wenn Sie diese Seite verlassen. Dennoch fortfahre?"
 }
