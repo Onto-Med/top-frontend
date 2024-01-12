@@ -516,5 +516,6 @@
   },
   "recordSelected": "No records selected.|One record selected.|{count} records selected.",
   "delimiter": "Delimiter|Delimiters",
-  "set": "Set"
+  "set": "Set",
+  "confirmUnsavedChanges": "There are unsaved changes that will be lost when you leave this page. Proceed anyway?"
 }

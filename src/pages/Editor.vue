@@ -129,7 +129,7 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
 import { useI18n } from 'vue-i18n'
@@ -142,6 +142,7 @@ import {
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useQuasar } from 'quasar'
+import Dialog from 'src/components/Dialog.vue'
 
 interface EditorTab {
   state: Entity,
@@ -199,6 +200,8 @@ const isConceptRepository = computed(() =>
   repository.value && repository.value.repositoryType === RepositoryType.ConceptRepository
 )
 
+const hasUnsavedTabs = computed(() => tabs.value.some(t => t.dirty || !t.selectedVersion))
+
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
   reloadEntities()
@@ -225,6 +228,10 @@ onMounted(() => {
     })
 })
 
+onBeforeRouteLeave(
+  async () => await confirmCloseUnsavedTabs().then(() => true).catch(() => false)
+)
+
 watch(
   repository,
   newVal => {
@@ -240,7 +247,7 @@ watch(
       .filter(t => !t.preserve && t.state.id !== entity?.id)
       .forEach(t => closeTab(t.state))
     if (entity) {
-      let tab = tabs.value.find(t => t.state.id === entity.id)
+      let tab = getTab(entity)
       if (!tab) {
         tabs.value.push({ selectedVersion: entity.version, state: clone(entity), dirty: false })
         tab = tabs.value[tabs.value.length - 1]
@@ -374,11 +381,11 @@ function saveEntity(entity: Entity) {
   entityStore.saveEntity(entity)
     .then((r) => {
       notify(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
-      const index = tabs.value.findIndex(t => t.state.id === r.id)
-      if (index != -1) {
-        tabs.value[index].state = clone(r)
-        tabs.value[index].dirty = false
-        tabs.value[index].selectedVersion = r.version
+      const tab = getTab(r)
+      if (tab) {
+        tab.state = clone(r)
+        tab.dirty = false
+        tab.selectedVersion = r.version
       }
       void router.push({
         name: 'editor',
@@ -416,7 +423,7 @@ function closeOtherTabs(tab: EditorTab) {
 }
 
 function closeSavedTabs() {
-  tabs.value.filter(t => !t.dirty).forEach(t => closeTab(t.state))
+  tabs.value.filter(t => !t.dirty && !!t.selectedVersion).forEach(t => closeTab(t.state))
 }
 
 function preserve() {
@@ -426,6 +433,10 @@ function preserve() {
       if (tab) tab.preserve = true
     }
   })
+}
+
+function getTab(entity?: Entity) {
+  return tabs.value.find(t => t.state.id === entity?.id)
 }
 
 function reset(tab: EditorTab) {
@@ -448,6 +459,26 @@ function reset(tab: EditorTab) {
 
 function getTabTitle(tab: EditorTab) {
   return getTitle(entityStore.getEntity(tab.state.id), true)
+}
+
+/**
+ * Shows a confirmation dialog if the provided tab is unsaved.
+ * @param {EntityTab|undefined} tab - The tab to check for unsaved changes, if undefined all tabs are checked.
+ */
+async function confirmCloseUnsavedTabs(tab?: EditorTab) {
+  return new Promise<void>((resolve, reject) => {
+    if (tab && !tab.dirty && !!tab.selectedVersion || !hasUnsavedTabs.value)
+      return resolve()
+    $q.dialog({
+      component: Dialog,
+      componentProps: {
+        message: t('confirmUnsavedChanges')
+      }
+    })
+    .onOk(() => resolve())
+    .onCancel(() => reject())
+    .onDismiss(() => reject())
+  })
 }
 </script>
 
