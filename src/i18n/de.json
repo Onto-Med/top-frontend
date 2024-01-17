@@ -99,8 +99,8 @@
   "nothingSelectedYet": "Es wurde noch nichts ausgewählt.",
   "performThing": "{thing} ausführen",
   "pleaseModifySettings": "Bitte passen Sie die Einstellungen an",
-  "projection": "Projektion|Projektionen",
-  "projectionSelection": "Rechtsklicken Sie auf Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.",
+  "output": "Ausgabe|Ausgaben",
+  "outputSelection": "Rechtsklicken Sie auf Phänotypen im linken Baum, um sie der Ausgabe hinzuzufügen.",
   "query": "Abfrage|Abfragen",
   "queryExecuteDescription": "Führen Sie die Abfrage jetzt aus und lassen Sie sich die Ergebnismenge anzeigen.",
   "queryExportDescription": "Speichern Sie diese Abfrage, um sie später erneut verwenden zu können.",
@@ -286,7 +286,7 @@
   "copy": "Kopieren",
   "restrictionOf": "Restriktion von",
   "inUnit": "in {unit}",
-  "projectionEntry": "Projektionseintrag|Projektionseinträge",
+  "outputEntry": "Ausgabe-Eintrag|Ausgabe-Einträge",
   "addAsThing": "Als {thing} hinzufügen",
   "incomplete": "Unvollständig",
   "failed": "Fehlgeschlagen",
@@ -445,7 +445,7 @@
   "for": "für",
   "repositoryContainingModel": "Modell enthaltendes Repositorium",
   "queryBuilder": {
-    "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um Auswahlkriterien und Projektion festzulegen."
+    "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um die Auswahlkriterien und Ausgabe festzulegen."
   },
   "confirmClearQuery": "Wenn Sie zu einem anderen Repositorium wechseln, geht Ihre aktuelle Abfrage verloren. Sind Sie sicher?",
   "repeatThing": "{thing} wiederholen",
@@ -517,5 +517,6 @@
   "set": "Setzen",
   "confirmUnsavedChanges": "Es gibt nicht gespeicherte Änderungen, die verloren gehen, wenn Sie diese Seite verlassen. Dennoch fortfahre?",
   "queryDataSourceIsRequired": "Bitte geben Sie eine Datenquelle an, um diese Abfrage auszuführen!",
-  "noQueryProjectionSet": "Standardmäßig werden alle zur Berechnung des Abfrageergebnisses erforderlichen Phänotypen automatisch in die Projektion einbezogen. Sie können hier zusätzliche Phänotypen angeben, die einbezogen werden sollen."
+  "querySubjectIsRequired": "Bitte geben Sie mindestens ein Auswahlkriterium oder einen Ausgabe-Eintrag an!",
+  "emptyQueryOutput": "Standardmäßig werden alle zur Berechnung des Abfrageergebnisses erforderlichen Phänotypen automatisch in die Ausgabe einbezogen. Sie können hier zusätzliche Phänotypen angeben, die einbezogen werden sollen."
 }

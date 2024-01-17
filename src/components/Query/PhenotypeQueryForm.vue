@@ -60,7 +60,7 @@
           <template #entity-context-menu="props">
             <q-list v-show="!isCategory(props.entity)" dense>
               <q-item v-close-popup clickable @click="addSelection(props.entity)">
-                <q-item-section>{{ t('addAsThing', { thing: t('projectionEntry') }) }}</q-item-section>
+                <q-item-section>{{ t('addAsThing', { thing: t('outputEntry') }) }}</q-item-section>
               </q-item>
               <q-item v-close-popup clickable :disable="isPhenotype(props.entity) && props.entity.dataType !== DataType.Boolean" @click="addCriterion(props.entity)">
                 <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
@@ -117,11 +117,11 @@
           <q-item class="col-auto">
             <q-item-section>
               <q-item-label class="text-h6" :class="{ 'text-grey': !query.projection?.length }">
-                {{ t('projection') }}
+                {{ t('output') }}
                 <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
               </q-item-label>
               <q-item-label caption class="gt-sm">
-                {{ t('projectionSelection') }}
+                {{ t('outputSelection') }}
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -145,7 +145,7 @@
                 />
               </q-list>
               <div v-else class="q-pa-sm text-grey">
-                {{ t('noQueryProjectionSet') }}
+                {{ t('emptyQueryOutput') }}
               </div>
             </q-scroll-area>
           </q-card-section>
@@ -325,7 +325,7 @@ function onExecute () {
         + (query.value.criteria.length > 1 ? ' ' + t('andMore', query.value.criteria.length - 1) : '')
     } else if (query.value.projection?.length) {
       query.value.name
-        = t('projection') + ': '
+        = t('output') + ': '
         + "'" + getTitle(entityStore.getEntity(query.value.projection[0].subjectId)) + "'"
         + (query.value.projection.length > 1 ? ' ' + t('andMore', query.value.projection.length - 1) : '')
     }
