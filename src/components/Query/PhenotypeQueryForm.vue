@@ -77,47 +77,6 @@
           <q-item class="col-auto">
             <q-item-section>
               <q-item-label class="text-h6">
-                {{ t('projection') }}
-                <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
-              </q-item-label>
-              <q-item-label caption class="gt-sm">
-                {{ t('projectionSelection') }}
-              </q-item-label>
-              <q-item-label caption class="gt-sm">
-                {{ t('emptyProjectionBehaviour') }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-separator />
-          <q-card-section class="col fit q-pa-none">
-            <q-scroll-area class="fit q-px-sm">
-              <q-list v-if="query.projection && query.projection.length" dense separator>
-                <query-subject
-                  v-for="(entry, index) in query.projection"
-                  :key="index"
-                  v-model:default-aggregation-function-id="entry.defaultAggregationFunctionId"
-                  v-model:date-time-restriction="entry.dateTimeRestriction"
-                  :aggregation-function-options="aggregationFunctionOptions"
-                  :down-disabled="index == query.projection.length - 1"
-                  :subject-id="entry.subjectId"
-                  :up-disabled="index == 0"
-                  sortable
-                  @move-up="moveSelectEntry(index, index - 1)"
-                  @move-down="moveSelectEntry(index, index + 1)"
-                  @remove="query.projection?.splice(index, 1)"
-                />
-              </q-list>
-              <div v-else class="q-pa-sm">
-                {{ t('nothingSelectedYet') }}
-              </div>
-            </q-scroll-area>
-          </q-card-section>
-        </q-card>
-
-        <q-card class="col-12 col-md column">
-          <q-item class="col-auto">
-            <q-item-section>
-              <q-item-label class="text-h6">
                 {{ t('eligibilityCriterion', 2) }}
                 <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
               </q-item-label>
@@ -149,6 +108,47 @@
                     <q-separator class="col" />
                   </div>
                 </template>
+              </q-list>
+              <div v-else class="q-pa-sm">
+                {{ t('nothingSelectedYet') }}
+              </div>
+            </q-scroll-area>
+          </q-card-section>
+        </q-card>
+
+        <q-card class="col-12 col-md column">
+          <q-item class="col-auto">
+            <q-item-section>
+              <q-item-label class="text-h6">
+                {{ t('projection') }}
+                <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+              </q-item-label>
+              <q-item-label caption class="gt-sm">
+                {{ t('projectionSelection') }}
+              </q-item-label>
+              <q-item-label caption class="gt-sm">
+                {{ t('emptyProjectionBehaviour') }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator />
+          <q-card-section class="col fit q-pa-none">
+            <q-scroll-area class="fit q-px-sm">
+              <q-list v-if="query.projection && query.projection.length" dense separator>
+                <query-subject
+                  v-for="(entry, index) in query.projection"
+                  :key="index"
+                  v-model:default-aggregation-function-id="entry.defaultAggregationFunctionId"
+                  v-model:date-time-restriction="entry.dateTimeRestriction"
+                  :aggregation-function-options="aggregationFunctionOptions"
+                  :down-disabled="index == query.projection.length - 1"
+                  :subject-id="entry.subjectId"
+                  :up-disabled="index == 0"
+                  sortable
+                  @move-up="moveSelectEntry(index, index - 1)"
+                  @move-down="moveSelectEntry(index, index + 1)"
+                  @remove="query.projection?.splice(index, 1)"
+                />
               </q-list>
               <div v-else class="q-pa-sm">
                 {{ t('nothingSelectedYet') }}
