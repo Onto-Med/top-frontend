@@ -19,7 +19,7 @@
   "thingCreatedOrUpdated": "{thing} erzeugt oder aktualisiert.",
   "ctrl": "STRG",
   "dataSource": "Datenquelle|Datenquellen",
-  "dataSourceDescription": "Wählen Sie mindestens eine Datenquelle aus, auf der die Abfrage ausgeführt werden soll.",
+  "dataSourceDescription": "Wählen Sie eine Datenquelle aus, auf der die Abfrage ausgeführt werden soll.",
   "dateTimeRestriction": "Zeitbegrenzung|Zeitbegrenzungen",
   "dateTimeRestrictionDescription": "Begrenzen Sie den Zeitraum, in dem dieser Phänotyp beobachtet werden musste.",
   "defaultValue": "Standardwert|Standartwerte",
@@ -388,8 +388,6 @@
   "editAccount": "Konto bearbeiten",
   "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse",
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
-  "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
-  "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
   "updatedAt": "Aktualisiert am {date}",
   "goToThing": "Gehe zu {thing}",
   "downloadDataSet": "Gesamten Datensatz herunterladen",
@@ -517,5 +515,6 @@
   "recordSelected": "Keine Datensätze ausgewählt.|Ein Datensatz ausgewählt.|{count} Datensätze ausgewählt.",
   "delimiter": "Trennzeichen|Trennzeichen",
   "set": "Setzen",
-  "confirmUnsavedChanges": "Es gibt nicht gespeicherte Änderungen, die verloren gehen, wenn Sie diese Seite verlassen. Dennoch fortfahre?"
+  "confirmUnsavedChanges": "Es gibt nicht gespeicherte Änderungen, die verloren gehen, wenn Sie diese Seite verlassen. Dennoch fortfahre?",
+  "queryDataSourceIsRequired": "Bitte geben Sie eine Datenquelle an, um diese Abfrage auszuführen!"
 }

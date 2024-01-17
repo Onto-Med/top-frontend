@@ -6,7 +6,7 @@
       <q-select
         v-model="query.dataSource"
         :options="dataSources"
-        :label="t('dataSource', 2)"
+        :label="t('dataSource')"
         :error-message="t('dataSourceDescription')"
         :error="!query.dataSource"
         option-value="id"
@@ -83,9 +83,6 @@
               <q-item-label caption class="gt-sm">
                 {{ t('eligibilityCriterionSelection') }}
               </q-item-label>
-              <q-item-label caption class="gt-sm">
-                {{ t('emptyCriteriaBehaviour') }}
-              </q-item-label>
             </q-item-section>
           </q-item>
           <q-separator />
@@ -126,9 +123,6 @@
               <q-item-label caption class="gt-sm">
                 {{ t('projectionSelection') }}
               </q-item-label>
-              <q-item-label caption class="gt-sm">
-                {{ t('emptyProjectionBehaviour') }}
-              </q-item-label>
             </q-item-section>
           </q-item>
           <q-separator />
@@ -162,7 +156,7 @@
 
   <q-separator />
 
-  <q-card-actions class="justify-between">
+  <q-card-actions class="q-gutter-md">
     <q-btn
       icon="play_arrow"
       color="secondary"
@@ -171,6 +165,12 @@
       :disable="!(configurationComplete && querySubjectPresent)"
       @click="onExecute"
     />
+    <div v-if="!(configurationComplete && querySubjectPresent)" class="text-warning text-subtitle2">
+      <q-icon name="warning" />
+      <span v-if="!configurationComplete" v-t="'queryDataSourceIsRequired'" />
+      <span v-else-if="!querySubjectPresent" v-t="'querySubjectIsRequired'" />
+    </div>
+    <q-space />
     <q-btn
       icon="save"
       color="primary"

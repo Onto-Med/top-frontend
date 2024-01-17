@@ -19,7 +19,7 @@
   "thingCreatedOrUpdated": "{thing} created or updated.",
   "ctrl": "CTRL",
   "dataSource": "Data source|Data sources",
-  "dataSourceDescription": "Select at least one data source on which the query shall be executed.",
+  "dataSourceDescription": "Select a data source on which the query shall be executed.",
   "dateTimeRestriction": "Time restriction|Time restrictions",
   "dateTimeRestrictionDescription": "Restrict the time range, when this phenotype must have been observed.",
   "defaultValue": "Default value|Default values",
@@ -388,8 +388,6 @@
   "editAccount": "Edit account",
   "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
   "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based document search.",
-  "emptyProjectionBehaviour": "A projection is mandatory, if no criteria are defined.",
-  "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
   "updatedAt": "Updated at {date}",
   "goToThing": "Go to {thing}",
   "downloadDataSet": "Download whole data set",
@@ -517,5 +515,7 @@
   "recordSelected": "No records selected.|One record selected.|{count} records selected.",
   "delimiter": "Delimiter|Delimiters",
   "set": "Set",
-  "confirmUnsavedChanges": "There are unsaved changes that will be lost when you leave this page. Proceed anyway?"
+  "confirmUnsavedChanges": "There are unsaved changes that will be lost when you leave this page. Proceed anyway?",
+  "queryDataSourceIsRequired": "Please specify a data source in order to run this query!",
+  "querySubjectIsRequired": "Please provide at least one eligibility criterion or projection entry!"
 }
