@@ -55,7 +55,7 @@
           :duplicatable="false"
           class="col column full-width"
           @refresh-clicked="reloadEntities"
-          @update:selected="addCriterion($event); addSelection($event)"
+          @update:selected="addCriterion"
         >
           <template #entity-context-menu="props">
             <q-list v-show="!isCategory(props.entity)" dense>

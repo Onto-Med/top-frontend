@@ -100,7 +100,7 @@
   "performThing": "Perform {thing}",
   "pleaseModifySettings": "Please modify the settings",
   "projection": "Projection|Projections",
-  "projectionSelection": "Click on phenotypes in the left tree to add them to the projection.",
+  "projectionSelection": "Right-click on phenotypes in the left tree to add them to the projection.",
   "query": "Query|Queries",
   "queryExecuteDescription": "Execute this query now and show the result set.",
   "queryExportDescription": "Save this query to be able to use it again later.",

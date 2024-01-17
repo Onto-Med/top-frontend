@@ -100,7 +100,7 @@
   "performThing": "{thing} ausführen",
   "pleaseModifySettings": "Bitte passen Sie die Einstellungen an",
   "projection": "Projektion|Projektionen",
-  "projectionSelection": "Klicken Sie auf Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.",
+  "projectionSelection": "Rechtsklicken Sie auf Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.",
   "query": "Abfrage|Abfragen",
   "queryExecuteDescription": "Führen Sie die Abfrage jetzt aus und lassen Sie sich die Ergebnismenge anzeigen.",
   "queryExportDescription": "Speichern Sie diese Abfrage, um sie später erneut verwenden zu können.",
