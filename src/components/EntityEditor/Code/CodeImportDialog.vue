@@ -153,7 +153,7 @@ const tableRows = computed(
 )
 
 function codeKey(code: Code) {
-  return `${code.codeSystem.uri}#${code.code}`
+  return `${code.codeSystem.uri}#${code.code} - ${code.scope}`
 }
 
 function loadCodes() {
@@ -170,8 +170,8 @@ function loadCodes() {
       }).data as Array<Array<string>>
       codes.value = data.map(row => (
         {
-          code: row[0],
-          codeSystem: { uri: row[1] },
+          codeSystem: { uri: row[0] },
+          code: row[1],
           scope: CodeScope[toCapital(row[2]) as keyof typeof CodeScope] || CodeScope.Self,
         }
       ))
