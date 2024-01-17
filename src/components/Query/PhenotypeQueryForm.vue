@@ -116,7 +116,7 @@
         <q-card class="col-12 col-md column">
           <q-item class="col-auto">
             <q-item-section>
-              <q-item-label class="text-h6">
+              <q-item-label class="text-h6" :class="{ 'text-grey': !query.projection?.length }">
                 {{ t('projection') }}
                 <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
               </q-item-label>
@@ -144,8 +144,8 @@
                   @remove="query.projection?.splice(index, 1)"
                 />
               </q-list>
-              <div v-else class="q-pa-sm">
-                {{ t('nothingSelectedYet') }}
+              <div v-else class="q-pa-sm text-grey">
+                {{ t('noQueryProjectionSet') }}
               </div>
             </q-scroll-area>
           </q-card-section>

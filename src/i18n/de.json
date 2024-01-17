@@ -516,5 +516,6 @@
   "delimiter": "Trennzeichen|Trennzeichen",
   "set": "Setzen",
   "confirmUnsavedChanges": "Es gibt nicht gespeicherte Änderungen, die verloren gehen, wenn Sie diese Seite verlassen. Dennoch fortfahre?",
-  "queryDataSourceIsRequired": "Bitte geben Sie eine Datenquelle an, um diese Abfrage auszuführen!"
+  "queryDataSourceIsRequired": "Bitte geben Sie eine Datenquelle an, um diese Abfrage auszuführen!",
+  "noQueryProjectionSet": "Standardmäßig werden alle zur Berechnung des Abfrageergebnisses erforderlichen Phänotypen automatisch in die Projektion einbezogen. Sie können hier zusätzliche Phänotypen angeben, die einbezogen werden sollen."
 }

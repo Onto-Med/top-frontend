@@ -517,5 +517,6 @@
   "set": "Set",
   "confirmUnsavedChanges": "There are unsaved changes that will be lost when you leave this page. Proceed anyway?",
   "queryDataSourceIsRequired": "Please specify a data source in order to run this query!",
-  "querySubjectIsRequired": "Please provide at least one eligibility criterion or projection entry!"
+  "querySubjectIsRequired": "Please provide at least one eligibility criterion or projection entry!",
+  "noQueryProjectionSet": "By default, all phenotypes required to calculate the query result are automatically included in the projection. You can specify additional phenotypes to be included here."
 }
