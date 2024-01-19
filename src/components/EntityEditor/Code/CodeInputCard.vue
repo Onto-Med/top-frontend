@@ -1,5 +1,10 @@
 <template>
-  <expandable-card :help-text="t('entityEditor.codesHelp')" :expanded="expanded" :show-help="showHelp">
+  <expandable-card
+    v-model:show-help="showHelp"
+    :help-text="t('entityEditor.codesHelp')"
+    :expanded="expanded"
+    @update:expanded="$emit('update:expanded', $event)"
+  >
     <template #title>
       <q-toolbar-title class="row items-center">
         {{ t('code', 2) }}
@@ -114,19 +119,19 @@ const props = defineProps({
     default: () => []
   },
   expanded: Boolean,
-  showHelp: Boolean,
   readonly: Boolean,
   /** Display a warning if modelValue Array is empty. */
   warningIfEmpty: Boolean
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'update:expanded'])
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
 const $q = useQuasar()
 const { notify } = useNotify()
 const showManualForm = ref(false)
+const showHelp = ref(false)
 
 const disabledCodes = computed(() => {
   // It is allowed to have the same codes twice, one with scope 'self' and one with 'leaves'.
@@ -173,7 +178,7 @@ function showImportDialog() {
     (codes: Code[]) => {
       const accepted = addEntries(codes).filter(e => !!e).length
       notify(t('codeImport.imported', accepted), 'positive')
-      // TODO: expand card
+      emit('update:expanded', true)
     }
   )
 }

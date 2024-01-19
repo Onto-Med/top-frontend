@@ -1,8 +1,8 @@
 <template>
   <q-card>
-    <q-card-section class="q-pa-sm cursor-pointer" @click="isExpanded = !isExpanded">
+    <q-card-section class="q-pa-sm cursor-pointer" @click="$emit('update:expanded', !expanded)">
       <q-toolbar>
-        <q-btn color="grey" round flat dense :icon="isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+        <q-btn color="grey" round flat dense :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
         <slot name="title">
           <q-toolbar-title class="row items-center">
             <span v-if="title">{{ title }}</span>
@@ -19,13 +19,13 @@
           dense
           icon="info"
           :title="t('showThing', { thing: t('help') })"
-          @click.stop="isHelpVisible = !(isHelpVisible && isExpanded); isExpanded = isHelpVisible || isExpanded"
+          @click.stop="toggleHelp"
         />
       </q-toolbar>
     </q-card-section>
 
     <q-slide-transition>
-      <div v-show="isExpanded">
+      <div v-show="expanded">
         <q-separator />
 
         <q-card-section class="row q-pa-none">
@@ -33,9 +33,9 @@
             <slot />
           </div>
 
-          <q-separator v-show="$q.screen.gt.sm && isHelpVisible" vertical />
+          <q-separator v-show="$q.screen.gt.sm && showHelp" vertical />
 
-          <div v-show="$q.screen.gt.sm && isHelpVisible" class="col-6 q-pa-md">
+          <div v-show="$q.screen.gt.sm && showHelp" class="col-6 q-pa-md">
             <div class="text-subtitle1">
               {{ t('help') }}:
             </div>
@@ -51,29 +51,24 @@
   </q-card>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  name: 'ExpandableCard',
-  props: {
-    title: String,
-    helpText: String,
-    expanded: Boolean,
-    showHelp: Boolean,
-    error: Boolean
-  },
-  setup (props) {
-    const { t } = useI18n()
-    const isExpanded    = ref(props.expanded)
-    const isHelpVisible = ref(props.showHelp)
+const props = defineProps<{
+  title?: string
+  helpText?: string
+  expanded?: boolean
+  showHelp?: boolean
+  error?: boolean
+}>()
 
-    return {
-      t,
-      isExpanded,
-      isHelpVisible
-    }
-  },
-})
+const emit = defineEmits(['update:expanded', 'update:showHelp'])
+
+const { t } = useI18n()
+
+function toggleHelp() {
+  if (!props.showHelp && !props.expanded)
+    emit('update:expanded', true)
+  emit('update:showHelp', !props.showHelp)
+}
 </script>
