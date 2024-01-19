@@ -1,5 +1,12 @@
 <template>
-  <expandable-card :title="label" :error="hasError" :help-text="helpText" :expanded="expanded" :show-help="showHelp">
+  <expandable-card
+    v-model:show-help="showHelp"
+    :title="label"
+    :error="hasError"
+    :help-text="helpText"
+    :expanded="expanded"
+    @update:expanded="$emit('update:expanded', $event)"
+  >
     <template #default>
       <div v-for="(entry, index) in modelValue" :key="index" class="row">
         <q-input
@@ -58,88 +65,76 @@
   </expandable-card>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import { LocalisableText } from '@onto-med/top-api'
 
-export default defineComponent({
-  name: 'LocalizedTextInput',
-  components: {
-    ExpandableCard
+const props = defineProps({
+  modelValue: {
+    type: Array as () => Array<LocalisableText>,
+    default: () => []
   },
-  props: {
-    modelValue: {
-      type: Array as () => Array<LocalisableText>,
-      default: () => []
-    },
-    helpText: String,
-    unique: Boolean,
-    textArea: Boolean,
-    rows: [Number, String],
-    cols: [Number, String],
-    name: String,
-    label: String,
-    supportedLangs: {
-      type: Array as () => string[],
-      default: () => ['de', 'en']
-    },
-    expanded: Boolean,
-    showHelp: Boolean,
-    readonly: Boolean,
-    required: Boolean,
-    autofocus: Boolean
+  helpText: String,
+  unique: Boolean,
+  textArea: Boolean,
+  rows: [Number, String],
+  cols: [Number, String],
+  name: String,
+  label: String,
+  supportedLangs: {
+    type: Array as () => string[],
+    default: () => ['de', 'en']
   },
-  emits: ['update:modelValue'],
-  setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t } = useI18n()
-
-    const duplicatedLangs = computed((): (string|undefined)[] => {
-      return props.modelValue
-        .map(x => x.lang)
-        .filter((l: string|undefined, i: number, a: Array<string|undefined>) => a.indexOf(l) !== i)
-    })
-
-    const unusedSupportedLangs = computed((): (string|undefined)[] => {
-      return props.supportedLangs.filter(l => !props.modelValue.map(x => x.lang).includes(l))
-    })
-
-    const empty = computed(() => !props.modelValue || props.modelValue.length < 1)
-
-    return {
-      t,
-      duplicatedLangs,
-      empty,
-
-      hasError: computed(() =>
-        (props.required && empty.value)
-        || props.unique && duplicatedLangs.value.length > 0
-        || (props.modelValue && props.modelValue?.findIndex(x => !x.lang || !x.text) !== -1)
-      ),
-
-      removeEntryByIndex (index: number) {
-        let newModelValue = props.modelValue.slice()
-        newModelValue.splice(index, 1)
-        emit('update:modelValue', newModelValue)
-      },
-
-      updateEntryByIndex (index: number, text?: string|number|null, lang?: string) {
-        let newModelValue = props.modelValue.slice()
-        newModelValue[index].text = text as string
-        newModelValue[index].lang = lang as string
-        emit('update:modelValue', newModelValue)
-      },
-
-      addEntry () {
-        let newModelValue = props.modelValue.slice()
-        newModelValue.push({ lang: unusedSupportedLangs.value[0] as string } as LocalisableText)
-        emit('update:modelValue', newModelValue)
-      }
-    }
-  }
+  expanded: Boolean,
+  readonly: Boolean,
+  required: Boolean,
+  autofocus: Boolean
 })
+
+const emit = defineEmits(['update:modelValue', 'update:expanded', 'update:showHelp'])
+
+const { t } = useI18n()
+
+const showHelp = ref(false)
+
+const duplicatedLangs = computed((): (string|undefined)[] => {
+  return props.modelValue
+    .map(x => x.lang)
+    .filter((l: string|undefined, i: number, a: Array<string|undefined>) => a.indexOf(l) !== i)
+})
+
+const unusedSupportedLangs = computed((): (string|undefined)[] => {
+  return props.supportedLangs.filter(l => !props.modelValue.map(x => x.lang).includes(l))
+})
+
+const empty = computed(() => !props.modelValue || props.modelValue.length < 1)
+
+const hasError = computed(() =>
+  (props.required && empty.value)
+  || props.unique && duplicatedLangs.value.length > 0
+  || (props.modelValue && props.modelValue?.findIndex(x => !x.lang || !x.text) !== -1)
+)
+
+function removeEntryByIndex(index: number) {
+  let newModelValue = props.modelValue.slice()
+  newModelValue.splice(index, 1)
+  emit('update:modelValue', newModelValue)
+}
+
+function updateEntryByIndex(index: number, text?: string|number|null, lang?: string) {
+  let newModelValue = props.modelValue.slice()
+  newModelValue[index].text = text as string
+  newModelValue[index].lang = lang as string
+  emit('update:modelValue', newModelValue)
+}
+
+function addEntry() {
+  let newModelValue = props.modelValue.slice()
+  newModelValue.push({ lang: unusedSupportedLangs.value[0] as string } as LocalisableText)
+  emit('update:modelValue', newModelValue)
+}
 </script>
 
 <style lang="sass" scoped>

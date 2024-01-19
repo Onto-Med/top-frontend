@@ -1,9 +1,10 @@
 <template>
   <expandable-card
+    v-model:show-help="showHelp"
     :error="!modelValue || !modelValue.functionId"
     :help-text="helpText"
     :expanded="expanded"
-    :show-help="showHelp"
+    @update:expanded="$emit('update:expanded', $event)"
   >
     <template #title>
       <q-toolbar-title class="row items-center">
@@ -101,7 +102,6 @@ const props = defineProps({
   },
   expanded: Boolean,
   helpText: String,
-  showHelp: Boolean,
   organisationId: String,
   repositoryId: String,
   readonly: Boolean,
@@ -115,12 +115,13 @@ const props = defineProps({
   excludeFunctions: Array as () => string[]
 })
 
-const emit = defineEmits(['update:modelValue', 'entityClicked'])
+const emit = defineEmits(['update:modelValue', 'entityClicked', 'update:expanded'])
 
 const { t } = useI18n()
 const $q = useQuasar()
 const expandExpression = ref<boolean>($q.localStorage.getItem('expandExpression') || false)
 const indent = ref<number>($q.localStorage.getItem('expressionIndentSize') || 2)
+const showHelp = ref(false)
 
 const scores = computed(
   () => props.canBeSwitch && props.modelValue && props.modelValue.functionId === 'switch'

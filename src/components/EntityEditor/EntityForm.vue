@@ -4,9 +4,9 @@
       <div class="row q-col-gutter-md q-ma-none">
         <div class="col-12 col-md">
           <localized-text-input
+            v-model:expanded="showTitle"
             :model-value="titles"
             unique
-            expanded
             :readonly="readonly"
             :required="true"
             :label="t('title', 2)"
@@ -73,9 +73,9 @@
 
       <expression-input
         v-if="EntityType.CompositePhenotype === entityType"
+        v-model:expanded="showExpression"
         :model-value="expression"
         can-be-switch
-        expanded
         :readonly="readonly"
         :label="t('formula')"
         :help-text="t('entityEditor.formulaHelp')"
@@ -89,8 +89,8 @@
 
       <expression-input
         v-if="EntityType.CompositeConcept === entityType"
+        v-model:expanded="showExpression"
         :model-value="expression"
-        expanded
         :readonly="readonly"
         :label="t('formula')"
         :help-text="t('entityEditor.textFormulaHelp')"
@@ -106,36 +106,37 @@
       <restriction-input
         v-if="[EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entityType) && superPhenotype"
         :key="restrictionKey"
+        v-model:expanded="showExpression"
         :model-value="restriction"
         :unit="superPhenotype.unit"
-        expanded
         :readonly="readonly"
         @update:model-value="$emit('update:restriction', $event)"
       />
 
       <localized-text-input
+        v-model:expanded="showSynonyms"
         :model-value="synonyms"
         :readonly="readonly"
         :label="t('synonym', 2)"
         :help-text="t('entityEditor.synonymsHelp')"
-        :expanded="synonyms && synonyms.length > 0"
         @update:model-value="$emit('update:synonyms', $event)"
       />
+
       <localized-text-input
+        v-model:expanded="showDescriptions"
         :model-value="descriptions"
         text-area
         rows="3"
         :readonly="readonly"
         :label="t('description', 2)"
         :help-text="t('entityEditor.descriptionsHelp')"
-        :expanded="descriptions && descriptions.length > 0"
         @update:model-value="$emit('update:descriptions', $event)"
       />
 
       <code-input-card
+        v-model:expanded="showCodes"
         :model-value="codes"
         :readonly="readonly"
-        :expanded="codes && codes.length > 0"
         :warning-if-empty="hasItemType(entityType)"
         @update:model-value="$emit('update:codes', $event)"
       />
@@ -143,9 +144,9 @@
   </q-scroll-area>
 </template>
 
-<script lang="ts">
-import {defineComponent, onMounted, PropType, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
+<script setup lang="ts">
+import { onMounted, PropType, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Code,
   Concept,
@@ -165,114 +166,89 @@ import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionIn
 import UnitInput from 'src/components/UnitInput.vue'
 import CodeInputCard from 'src/components/EntityEditor/Code/CodeInputCard.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import {useEntity} from 'src/pinia/entity'
-import {useRouter} from 'vue-router'
+import { useEntity } from 'src/pinia/entity'
+import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  components: {
-    LocalizedTextInput,
-    EnumSelect,
-    RestrictionInput,
-    ExpressionInput,
-    UnitInput,
-    CodeInputCard
+const props = defineProps({
+  version: Number,
+  entityId: {
+    type: String,
+    required: true
   },
-  props: {
-    version: Number,
-    entityId: {
-      type: String,
-      required: true
-    },
-    repositoryId: {
-      type: String,
-      required: true
-    },
-    organisationId: {
-      type: String,
-      required: true
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    entityType: {
-      type: String as PropType<EntityType>
-    },
-    dataType: {
-      type: String as PropType<DataType>
-    },
-    itemType: {
-      type: String as PropType<ItemType>
-    },
-    unit: {
-      type: String
-    },
-    titles: {
-      type: Array as () => LocalisableText[],
-      default: () => []
-    },
-    synonyms: {
-      type: Array as () => LocalisableText[],
-      default: () => []
-    },
-    descriptions: {
-      type: Array as () => LocalisableText[],
-      default: () => []
-    },
-    codes: {
-      type: Array as () => Code[],
-      default: () => []
-    },
-    expression: {
-      type: Object as () => Expression
-    },
-    restriction: {
-      type: Object as () => Restriction
-    },
-    superConcepts: {
-      type: Array as () => Concept[],
-      default: () => []
-    },
-    restrictionKey: Number
+  repositoryId: {
+    type: String,
+    required: true
   },
-  emits: [
-    'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression', 'update:restriction',
-    'update:dataType', 'update:titles', 'update:itemType'
-  ],
-  setup (props) {
-    const { t } = useI18n()
-    const router = useRouter()
-    const { isRestricted, hasDataType, hasItemType, restrictionEntityTypes, getTitle } = useEntityFormatter()
-    const entityStore = useEntity()
-    const showSuperCategoryInput = ref(false)
-    const superPhenotype = ref(undefined as Phenotype|undefined)
-
-    onMounted(async () => {
-      await entityStore
-        .loadSuperPhenotype(props.entityId)
-        .then(e => superPhenotype.value = e)
-        .catch((e: Error) => console.log(e))
-    })
-
-    return {
-      t,
-      isRestricted,
-      hasDataType,
-      hasItemType,
-      restrictionEntityTypes,
-      getTitle,
-
-      EntityType,
-      DataType,
-      ItemType,
-      showSuperCategoryInput,
-      superPhenotype,
-
-      routeToEntity (entity: Entity|undefined) {
-        if (!entity || !entity.repository || !entity.repository.organisation) return
-        void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
-      }
-    }
-  }
+  organisationId: {
+    type: String,
+    required: true
+  },
+  readonly: {
+    type: Boolean,
+    default: false
+  },
+  entityType: String as PropType<EntityType>,
+  dataType: String as PropType<DataType>,
+  itemType: String as PropType<ItemType>,
+  unit: String,
+  titles: {
+    type: Array as () => LocalisableText[],
+    default: () => []
+  },
+  synonyms: {
+    type: Array as () => LocalisableText[],
+    default: () => []
+  },
+  descriptions: {
+    type: Array as () => LocalisableText[],
+    default: () => []
+  },
+  codes: {
+    type: Array as () => Code[],
+    default: () => []
+  },
+  expression: Object as () => Expression,
+  restriction: Object as () => Restriction,
+  superConcepts: {
+    type: Array as () => Concept[],
+    default: () => []
+  },
+  restrictionKey: Number
 })
+
+defineEmits([
+  'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression',
+  'update:restriction', 'update:dataType', 'update:titles', 'update:itemType'
+])
+
+const { t } = useI18n()
+const router = useRouter()
+const { isRestricted, hasDataType, hasItemType, getTitle } = useEntityFormatter()
+const entityStore = useEntity()
+const superPhenotype = ref(undefined as Phenotype|undefined)
+
+onMounted(async () => {
+  await entityStore
+    .loadSuperPhenotype(props.entityId)
+    .then(e => superPhenotype.value = e)
+    .catch((e: Error) => console.log(e))
+})
+
+const showTitle = ref(true)
+const showExpression = ref(true)
+const showDescriptions = ref(props.descriptions && props.descriptions.length > 0)
+const showSynonyms = ref(props.synonyms && props.synonyms.length > 0)
+const showCodes = ref(props.codes && props.codes.length > 0)
+
+function routeToEntity(entity: Entity|undefined) {
+  if (!entity || !entity.repository || !entity.repository.organisation) return
+  void router.push({
+    name: 'editor',
+    params: {
+      organisationId: entity.repository.organisation.id,
+      repositoryId: entity.repository.id,
+      entityId: entity.id
+    }
+  })
+}
 </script>
