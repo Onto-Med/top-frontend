@@ -44,7 +44,7 @@ module.exports = {
 
     // https://github.com/prettier/eslint-config-prettier#installation
     // usage with Prettier, provided by 'eslint-config-prettier'.
-    // 'prettier'
+    'prettier',
   ],
 
   plugins: [
@@ -81,7 +81,7 @@ module.exports = {
 
     "vue/max-attributes-per-line": ["warn", {
       "singleline": {
-        "max": 5
+        "max": 20
       },
       "multiline": {
         "max": 1
