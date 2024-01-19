@@ -19,7 +19,7 @@
   "thingCreatedOrUpdated": "{thing} created or updated.",
   "ctrl": "CTRL",
   "dataSource": "Data source|Data sources",
-  "dataSourceDescription": "Select at least one data source on which the query shall be executed.",
+  "dataSourceDescription": "Select a data source on which the query shall be executed.",
   "dateTimeRestriction": "Time restriction|Time restrictions",
   "dateTimeRestrictionDescription": "Restrict the time range, when this phenotype must have been observed.",
   "defaultValue": "Default value|Default values",
@@ -99,8 +99,8 @@
   "nothingSelectedYet": "Nothing has been selected yet.",
   "performThing": "Perform {thing}",
   "pleaseModifySettings": "Please modify the settings",
-  "projection": "Projection|Projections",
-  "projectionSelection": "Click on phenotypes in the left tree to add them to the projection.",
+  "output": "Output|Outputs",
+  "outputSelection": "Right-click on phenotypes in the left tree to add them to the output.",
   "query": "Query|Queries",
   "queryExecuteDescription": "Execute this query now and show the result set.",
   "queryExportDescription": "Save this query to be able to use it again later.",
@@ -286,7 +286,7 @@
   "copy": "Copy",
   "restrictionOf": "Restriction of",
   "inUnit": "in {unit}",
-  "projectionEntry": "Projection entry|Projection entries",
+  "outputEntry": "Output entry|Output entries",
   "addAsThing": "Add as {thing}",
   "incomplete": "Incomplete",
   "failed": "Failed",
@@ -388,8 +388,6 @@
   "editAccount": "Edit account",
   "resultCountWithTotal": "No results|{count} of {total} result|{count} of {total} results",
   "appDescription": "This framework supports the modelling and application of phenotypes. It also enables ontology-based document search.",
-  "emptyProjectionBehaviour": "A projection is mandatory, if no criteria are defined.",
-  "emptyCriteriaBehaviour": "If there is no projection in a query, the criteria serve as projection.",
   "updatedAt": "Updated at {date}",
   "goToThing": "Go to {thing}",
   "downloadDataSet": "Download whole data set",
@@ -446,7 +444,7 @@
   },
   "for": "for",
   "queryBuilder": {
-    "description": "You first need to select the phenotype model that you want to use and a data source to perform the query on. You can then use the model content to specify query criteria and projection."
+    "description": "You first need to select the phenotype model that you want to use and a data source to perform the query on. You can then use the model content to specify the query criteria and output."
   },
   "repositoryContainingModel": "Repository containing the model",
   "confirmClearQuery": "If you switch to another repository, your current query will be lost. Are you sure?",
@@ -517,5 +515,8 @@
   "recordSelected": "No records selected.|One record selected.|{count} records selected.",
   "delimiter": "Delimiter|Delimiters",
   "set": "Set",
-  "confirmUnsavedChanges": "There are unsaved changes that will be lost when you leave this page. Proceed anyway?"
+  "confirmUnsavedChanges": "There are unsaved changes that will be lost when you leave this page. Proceed anyway?",
+  "queryDataSourceIsRequired": "Please specify a data source in order to run this query!",
+  "querySubjectIsRequired": "Please provide at least one eligibility criterion or output entry!",
+  "emptyQueryOutput": "By default, all phenotypes required to calculate the query result are automatically included in the output. You can specify additional phenotypes to be included here."
 }

@@ -19,7 +19,7 @@
   "thingCreatedOrUpdated": "{thing} erzeugt oder aktualisiert.",
   "ctrl": "STRG",
   "dataSource": "Datenquelle|Datenquellen",
-  "dataSourceDescription": "Wählen Sie mindestens eine Datenquelle aus, auf der die Abfrage ausgeführt werden soll.",
+  "dataSourceDescription": "Wählen Sie eine Datenquelle aus, auf der die Abfrage ausgeführt werden soll.",
   "dateTimeRestriction": "Zeitbegrenzung|Zeitbegrenzungen",
   "dateTimeRestrictionDescription": "Begrenzen Sie den Zeitraum, in dem dieser Phänotyp beobachtet werden musste.",
   "defaultValue": "Standardwert|Standartwerte",
@@ -99,8 +99,8 @@
   "nothingSelectedYet": "Es wurde noch nichts ausgewählt.",
   "performThing": "{thing} ausführen",
   "pleaseModifySettings": "Bitte passen Sie die Einstellungen an",
-  "projection": "Projektion|Projektionen",
-  "projectionSelection": "Klicken Sie auf Phänotypen im linken Baum, um sie der Projektion hinzuzufügen.",
+  "output": "Ausgabe|Ausgaben",
+  "outputSelection": "Rechtsklicken Sie auf Phänotypen im linken Baum, um sie der Ausgabe hinzuzufügen.",
   "query": "Abfrage|Abfragen",
   "queryExecuteDescription": "Führen Sie die Abfrage jetzt aus und lassen Sie sich die Ergebnismenge anzeigen.",
   "queryExportDescription": "Speichern Sie diese Abfrage, um sie später erneut verwenden zu können.",
@@ -286,7 +286,7 @@
   "copy": "Kopieren",
   "restrictionOf": "Restriktion von",
   "inUnit": "in {unit}",
-  "projectionEntry": "Projektionseintrag|Projektionseinträge",
+  "outputEntry": "Ausgabe-Eintrag|Ausgabe-Einträge",
   "addAsThing": "Als {thing} hinzufügen",
   "incomplete": "Unvollständig",
   "failed": "Fehlgeschlagen",
@@ -388,8 +388,6 @@
   "editAccount": "Konto bearbeiten",
   "resultCountWithTotal": "Keine Ergebnisse|{count} von {total} Ergebnis|{count} von {total} Ergebnisse",
   "appDescription": "Dieses Framework unterstützt bei der Modellierung und Anwendung von Phänotypen. Es ermöglicht auch eine ontologiebasierte Textsuche.",
-  "emptyProjectionBehaviour": "Eine Projektion ist erforderlich, falls keine Auswahlkriterien definiert sind.",
-  "emptyCriteriaBehaviour": "Wenn in einer Abfrage keine Projektion vorhanden ist, dienen die Kriterien als Projektion.",
   "updatedAt": "Aktualisiert am {date}",
   "goToThing": "Gehe zu {thing}",
   "downloadDataSet": "Gesamten Datensatz herunterladen",
@@ -447,7 +445,7 @@
   "for": "für",
   "repositoryContainingModel": "Modell enthaltendes Repositorium",
   "queryBuilder": {
-    "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um Auswahlkriterien und Projektion festzulegen."
+    "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um die Auswahlkriterien und Ausgabe festzulegen."
   },
   "confirmClearQuery": "Wenn Sie zu einem anderen Repositorium wechseln, geht Ihre aktuelle Abfrage verloren. Sind Sie sicher?",
   "repeatThing": "{thing} wiederholen",
@@ -517,5 +515,8 @@
   "recordSelected": "Keine Datensätze ausgewählt.|Ein Datensatz ausgewählt.|{count} Datensätze ausgewählt.",
   "delimiter": "Trennzeichen|Trennzeichen",
   "set": "Setzen",
-  "confirmUnsavedChanges": "Es gibt nicht gespeicherte Änderungen, die verloren gehen, wenn Sie diese Seite verlassen. Dennoch fortfahre?"
+  "confirmUnsavedChanges": "Es gibt nicht gespeicherte Änderungen, die verloren gehen, wenn Sie diese Seite verlassen. Dennoch fortfahre?",
+  "queryDataSourceIsRequired": "Bitte geben Sie eine Datenquelle an, um diese Abfrage auszuführen!",
+  "querySubjectIsRequired": "Bitte geben Sie mindestens ein Auswahlkriterium oder einen Ausgabe-Eintrag an!",
+  "emptyQueryOutput": "Standardmäßig werden alle zur Berechnung des Abfrageergebnisses erforderlichen Phänotypen automatisch in die Ausgabe einbezogen. Sie können hier zusätzliche Phänotypen angeben, die einbezogen werden sollen."
 }

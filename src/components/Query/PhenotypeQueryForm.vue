@@ -6,7 +6,7 @@
       <q-select
         v-model="query.dataSource"
         :options="dataSources"
-        :label="t('dataSource', 2)"
+        :label="t('dataSource')"
         :error-message="t('dataSourceDescription')"
         :error="!query.dataSource"
         option-value="id"
@@ -55,12 +55,12 @@
           :duplicatable="false"
           class="col column full-width"
           @refresh-clicked="reloadEntities"
-          @update:selected="addCriterion($event); addSelection($event)"
+          @update:selected="addCriterion"
         >
           <template #entity-context-menu="props">
             <q-list v-show="!isCategory(props.entity)" dense>
               <q-item v-close-popup clickable @click="addSelection(props.entity)">
-                <q-item-section>{{ t('addAsThing', { thing: t('projectionEntry') }) }}</q-item-section>
+                <q-item-section>{{ t('addAsThing', { thing: t('outputEntry') }) }}</q-item-section>
               </q-item>
               <q-item v-close-popup clickable :disable="isPhenotype(props.entity) && props.entity.dataType !== DataType.Boolean" @click="addCriterion(props.entity)">
                 <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
@@ -77,55 +77,11 @@
           <q-item class="col-auto">
             <q-item-section>
               <q-item-label class="text-h6">
-                {{ t('projection') }}
-                <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
-              </q-item-label>
-              <q-item-label caption class="gt-sm">
-                {{ t('projectionSelection') }}
-              </q-item-label>
-              <q-item-label caption class="gt-sm">
-                {{ t('emptyProjectionBehaviour') }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-separator />
-          <q-card-section class="col fit q-pa-none">
-            <q-scroll-area class="fit q-px-sm">
-              <q-list v-if="query.projection && query.projection.length" dense separator>
-                <query-subject
-                  v-for="(entry, index) in query.projection"
-                  :key="index"
-                  v-model:default-aggregation-function-id="entry.defaultAggregationFunctionId"
-                  v-model:date-time-restriction="entry.dateTimeRestriction"
-                  :aggregation-function-options="aggregationFunctionOptions"
-                  :down-disabled="index == query.projection.length - 1"
-                  :subject-id="entry.subjectId"
-                  :up-disabled="index == 0"
-                  sortable
-                  @move-up="moveSelectEntry(index, index - 1)"
-                  @move-down="moveSelectEntry(index, index + 1)"
-                  @remove="query.projection?.splice(index, 1)"
-                />
-              </q-list>
-              <div v-else class="q-pa-sm">
-                {{ t('nothingSelectedYet') }}
-              </div>
-            </q-scroll-area>
-          </q-card-section>
-        </q-card>
-
-        <q-card class="col-12 col-md column">
-          <q-item class="col-auto">
-            <q-item-section>
-              <q-item-label class="text-h6">
                 {{ t('eligibilityCriterion', 2) }}
                 <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
               </q-item-label>
               <q-item-label caption class="gt-sm">
                 {{ t('eligibilityCriterionSelection') }}
-              </q-item-label>
-              <q-item-label caption class="gt-sm">
-                {{ t('emptyCriteriaBehaviour') }}
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -156,13 +112,51 @@
             </q-scroll-area>
           </q-card-section>
         </q-card>
+
+        <q-card class="col-12 col-md column">
+          <q-item class="col-auto">
+            <q-item-section>
+              <q-item-label class="text-h6" :class="{ 'text-grey': !query.projection?.length }">
+                {{ t('output') }}
+                <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+              </q-item-label>
+              <q-item-label caption class="gt-sm">
+                {{ t('outputSelection') }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator />
+          <q-card-section class="col fit q-pa-none">
+            <q-scroll-area class="fit q-px-sm">
+              <q-list v-if="query.projection && query.projection.length" dense separator>
+                <query-subject
+                  v-for="(entry, index) in query.projection"
+                  :key="index"
+                  v-model:default-aggregation-function-id="entry.defaultAggregationFunctionId"
+                  v-model:date-time-restriction="entry.dateTimeRestriction"
+                  :aggregation-function-options="aggregationFunctionOptions"
+                  :down-disabled="index == query.projection.length - 1"
+                  :subject-id="entry.subjectId"
+                  :up-disabled="index == 0"
+                  sortable
+                  @move-up="moveSelectEntry(index, index - 1)"
+                  @move-down="moveSelectEntry(index, index + 1)"
+                  @remove="query.projection?.splice(index, 1)"
+                />
+              </q-list>
+              <div v-else class="q-pa-sm text-grey">
+                {{ t('emptyQueryOutput') }}
+              </div>
+            </q-scroll-area>
+          </q-card-section>
+        </q-card>
       </div>
     </template>
   </q-splitter>
 
   <q-separator />
 
-  <q-card-actions class="justify-between">
+  <q-card-actions class="q-gutter-md">
     <q-btn
       icon="play_arrow"
       color="secondary"
@@ -171,6 +165,12 @@
       :disable="!(configurationComplete && querySubjectPresent)"
       @click="onExecute"
     />
+    <div v-if="!(configurationComplete && querySubjectPresent)" class="text-warning text-subtitle2">
+      <q-icon name="warning" />
+      <span v-if="!configurationComplete" v-t="'queryDataSourceIsRequired'" />
+      <span v-else-if="!querySubjectPresent" v-t="'querySubjectIsRequired'" />
+    </div>
+    <q-space />
     <q-btn
       icon="save"
       color="primary"
@@ -325,7 +325,7 @@ function onExecute () {
         + (query.value.criteria.length > 1 ? ' ' + t('andMore', query.value.criteria.length - 1) : '')
     } else if (query.value.projection?.length) {
       query.value.name
-        = t('projection') + ': '
+        = t('output') + ': '
         + "'" + getTitle(entityStore.getEntity(query.value.projection[0].subjectId)) + "'"
         + (query.value.projection.length > 1 ? ' ' + t('andMore', query.value.projection.length - 1) : '')
     }
