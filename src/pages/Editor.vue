@@ -40,7 +40,7 @@
             @duplicate-entity="handleEntityDuplication"
             @dblclick="preserve()"
           />
-          <q-expansion-item :label="t('concept_cluster')">
+          <q-expansion-item v-if="isConceptRepository" :label="t('concept_cluster')">
             content
           </q-expansion-item>
         </div>
