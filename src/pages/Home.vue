@@ -1,11 +1,7 @@
 <template>
   <q-page class="q-pa-md q-gutter-y-lg">
     <div class="row justify-center">
-      <q-img src="/images/framework_overview.svg" fit="cover" height="300px" class="mood-img">
-        <span class="absolute-bottom-right text-h6 text-grey-4 q-pr-sm">
-          v{{ version }}
-        </span>
-      </q-img>
+      <q-img src="/images/framework_overview.svg" fit="cover" height="300px" class="mood-img" />
     </div>
 
     <div class="text-center">
@@ -88,7 +84,6 @@ const router = useRouter()
 const defaultApi = inject(DefaultApiKey)
 const statistic = ref(undefined as Statistic|undefined)
 const productName = packageInfo.productName
-const version = packageInfo.version
 
 type statisticKey = keyof Statistic
 

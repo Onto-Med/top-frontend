@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh Lpr fFf" :class="{ 'bg-grey-1': !isDarkModeActive }">
+  <q-layout view="hHh Lpr fFf" :class="{ 'bg-grey-1': !isDarkModeActive }" aria-disabled="true">
     <q-header elevated :class="{ 'bg-white text-grey-8': !isDarkModeActive, 'bg-dark text-grey-2': isDarkModeActive }" class="q-py-xs" height-hint="58">
       <q-toolbar>
         <q-btn
@@ -22,7 +22,7 @@
 
         <q-space />
 
-        <div class="toolbar-input-container row no-wrap gt-sm">
+        <div v-if="backendDetails" class="toolbar-input-container row no-wrap gt-sm">
           <fancy-entity-search fork @entity-selected="routeToEntity" />
         </div>
 
@@ -110,7 +110,7 @@
       :width="240"
     >
       <q-scroll-area class="fit">
-        <q-list padding>
+        <q-list padding class="q-mb-sm">
           <NavbarLink v-bind="{ title: t('home'), icon: 'house', routeName: 'home', exact: true }" />
 
           <q-expansion-item
@@ -177,12 +177,24 @@
             </div>
           </div>
         </q-list>
+
+        <div v-show="leftDrawerOpen" class="version-box q-px-md text-caption text-grey">
+          {{ t('frontend') }}: v{{ version }}<br>
+          {{ t('backend') }}: {{ backendDetails ? 'v' + backendDetails.version : t('unavailable') }}
+        </div>
       </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
       <q-scroll-area class="main-content">
-        <router-view :key="repositoryId" />
+        <router-view v-if="backendDetails" :key="repositoryId" />
+        <div v-else-if="!loading" class="q-mt-xl q-px-xl q-gutter-lg text-center items-center">
+          <div class="text-h5">
+            {{ t('backendUnavailable') }}
+          </div>
+          <q-btn icon="refresh" :label="t('tryAgain')" @click="performPing()" />
+        </div>
+        <q-inner-loading :showing="loading"/>
       </q-scroll-area>
     </q-page-container>
 
@@ -202,11 +214,14 @@ import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import FancyEntitySearch from 'src/components/EntityEditor/FancyEntitySearch.vue'
 import packageInfo from '../../package.json'
 import { ref, computed, watch } from 'vue'
-import { Entity } from '@onto-med/top-api'
+import { AppDescription, Entity } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
 import { storeToRefs } from 'pinia'
 import { env} from 'src/config'
+import { inject } from 'vue'
+import { DefaultApiKey } from 'src/boot/axios'
+import { onMounted } from 'vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -215,6 +230,10 @@ const $q = useQuasar()
 const leftDrawerOpen = ref<boolean>(!($q.localStorage.getItem('minimiseDrawer') as boolean))
 const { keycloak, organisation } = storeToRefs(entityStore)
 const drawer = ref(undefined as QMenu|undefined)
+const version = packageInfo.version
+const defaultApi = inject(DefaultApiKey)
+const loading = ref(false)
+const backendDetails = ref<AppDescription>()
 
 const links = computed(() => {
   const links = [
@@ -260,10 +279,21 @@ const repositoryId = computed(() => {
   return route.params.repositoryId as string|undefined
 })
 
+onMounted(() => performPing())
+
 watch(
   leftDrawerOpen,
   (newVal) => $q.localStorage.set('minimiseDrawer', !newVal)
 )
+
+function performPing() {
+  if (loading.value) return
+  loading.value = true
+  defaultApi?.ping()
+    .then(r => backendDetails.value = r.data)
+    .catch(() => {})
+    .finally(() => loading.value = false)
+}
 
 function toggleLeftDrawer() {
   if (($q.platform.is.mobile || $q.screen.lt.md) && drawer.value)
@@ -287,6 +317,10 @@ function routeToEntity(entity: Entity) {
   color: inherit
 .main-content
   height: calc(100vh - 58px)
+
+.version-box
+  position: absolute
+  bottom: 0
 </style>
 
 <style lang="sass">
