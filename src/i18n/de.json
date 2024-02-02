@@ -527,5 +527,9 @@
   "tryAgain": "Erneut versuchen",
   "dataOfQuery": "Daten der Abfrage \"{thing}\"",
   "fileToDisplay": "Anzuzeigende Datei|Anzuzeigende Dateien",
-  "definition": "Definition|Definitionen"
+  "definition": "Definition|Definitionen",
+  "conceptCluster": {
+    "noConceptsAvailable": "Derzeit liegen keine Konzepte vor. Möglicherweise müssen sie zunächst aus einem Textkorpus generiert werden. Bitte nutzen Sie die Schaltfläche oben, um den Generierungsprozess zu starten.",
+    "selectConceptsDescription": "Bitte geben Sie auf der rechten Seite die Konzepte an, nach denen Sie suchen möchten."
+  }
 }
