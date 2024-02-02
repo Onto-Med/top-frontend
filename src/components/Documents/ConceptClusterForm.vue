@@ -187,6 +187,7 @@ const selectedColors = ref<ConceptColor[]>([])
 const conceptMode = ref('exclusive')
 const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
+const processId = 'top-framework'
 
 const conceptModeOptions = computed(() => [
   {
@@ -223,7 +224,8 @@ watch(
 async function reloadConcepts() {
   if (!conceptApi || !documentApi || conceptsLoading.value) return
   conceptsLoading.value = true
-  await conceptApi.getConceptClusters(undefined, false)
+  await checkPipeline()
+    .then(() => conceptApi.getConceptClusters(undefined, false))
     .then(r => {
       concepts.value = r.data
       concepts.value.forEach((_, index) => {
@@ -276,6 +278,15 @@ function prepareSelectedConcepts() {
   selectedConcepts.value.forEach(idx => selectedColors.value[idx] = conceptColors[idx])
 }
 
+async function checkPipeline() {
+  return await conceptGraphsApi?.getStoredProcesses()
+    .then(r =>
+      r.data
+        .filter((p) => p.name === processId && p.finished_steps?.some((s) => s.name === 'graph'))
+        .length > 0
+    ).then(r => !r ? Promise.reject() : true)
+}
+
 async function chooseDocument(documentId: string) {
   await documentApi?.getDocumentById(
     documentId,
@@ -299,7 +310,6 @@ function confirmRegenerate() {
       message: t('conceptCluster.confirmRegenerate')
     }
   }).onOk(() => {
-    const processId = 'top-framework'
     conceptGraphsApi?.startConceptGraphPipelineWithoutUpload(processId)
       .then(r => {
         if (r.data.status == PipelineResponseStatus.Successful) {
