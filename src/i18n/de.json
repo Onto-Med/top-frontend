@@ -523,5 +523,9 @@
   "backendUnavailable": "Der Backend-Server ist derzeit nicht verfügbar. Bitte versuchen Sie es später noch einmal.",
   "backend": "Backend|Backends",
   "unavailable": "nicht verfügbar",
-  "tryAgain": "Erneut versuchen"
+  "tryAgain": "Erneut versuchen",
+  "conceptCluster": {
+    "noConceptsAvailable": "Derzeit liegen keine Konzepte vor. Möglicherweise müssen sie zunächst aus einem Textkorpus generiert werden. Bitte nutzen Sie die Schaltfläche oben, um den Generierungsprozess zu starten.",
+    "selectConceptsDescription": "Bitte geben Sie auf der rechten Seite die Konzepte an, nach denen Sie suchen möchten."
+  }
 }

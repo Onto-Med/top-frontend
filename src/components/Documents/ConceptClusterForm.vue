@@ -66,6 +66,12 @@
                 dense
                 @update:model-value="prepareSelectedConcepts()"
               />
+              <div v-if="!concepts.length && !conceptsLoading" class="q-pa-md text-grey">
+                <div class="q-gutter-md text-center">
+                  <div>{{ t('conceptCluster.noConceptsAvailable') }}</div>
+                  <q-btn icon="refresh" dense :label="t('reload')" @click="reloadConcepts" />
+                </div>
+              </div>
             </div>
           </q-scroll-area>
         </q-card-section>
@@ -78,15 +84,17 @@
         <div class="col">
           <q-card-section class="bg-grey-1">
             <div class="text-subtitle2">
-              {{ t('document', 2) }} <a v-if="documents.length > 0">
+              {{ t('document', 2) }}
+              <span v-if="selectedConcepts.length">
                 ({{ t('resultCount', documents.length) }})
-              </a>
+              </span>
             </div>
           </q-card-section>
 
           <q-separator />
 
           <q-virtual-scroll
+            v-if="selectedConcepts.length"
             v-slot="{ item }"
             style="height: 72vh"
             :items="documents"
@@ -108,6 +116,12 @@
               </q-item-section>
             </q-item>
           </q-virtual-scroll>
+
+          <div v-else class="row q-pa-md text-grey items-center">
+            <q-icon name="arrow_back_ios" size="xl" class="col-auto" />
+            <div class="col">{{ t('conceptCluster.selectConceptsDescription') }}</div>
+          </div>
+
           <q-inner-loading :showing="documentsLoading" />
         </div>
       </div>
