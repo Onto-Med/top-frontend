@@ -2,10 +2,16 @@
   <q-splitter v-model="splitterModel" :limits="[25, 75]" class="fit">
     <template #before>
       <q-card>
-        <q-card-section class="bg-grey-1">
-          <div class="text-subtitle2">
+        <q-card-section class="row q-pl-md q-pa-none bg-grey-1">
+          <div class="text-subtitle2 q-py-md">
             {{ t('concept', 2) }}
           </div>
+          <q-space />
+          <q-separator vertical />
+          <q-btn dense flat no-caps class="q-py-none" @click="confirmRegenerate">
+            <q-icon name="update" />
+            <div class="q-pl-sm gt-xs">{{ t('conceptCluster.regenerate') }}</div>
+          </q-btn>
         </q-card-section>
 
         <q-separator />
@@ -132,11 +138,12 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DocumentApiKey, ConceptClusterApiKey } from 'src/boot/axios'
-import { Document, ConceptCluster } from '@onto-med/top-api'
+import { DocumentApiKey, ConceptClusterApiKey, ConceptgraphsApiKey } from 'src/boot/axios'
+import { Document, ConceptCluster, PipelineResponseStatus } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
 import { useQuasar } from 'quasar'
+import Dialog from 'src/components/Dialog.vue'
 
 interface ConceptColor {
   'background-color': string,
@@ -145,9 +152,10 @@ interface ConceptColor {
 
 const { t } = useI18n()
 const $q = useQuasar()
-const { renderError } = useNotify()
+const { renderError, notify } = useNotify()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
+const conceptGraphsApi = inject(ConceptgraphsApiKey)
 const documents = ref<Document[]>([])
 const document_ = ref<Document>()
 const concepts = ref<ConceptCluster[]>([])
@@ -282,6 +290,28 @@ async function chooseDocument(documentId: string) {
       })
     })
     .catch((e: Error) => renderError(e))
+}
+
+function confirmRegenerate() {
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('conceptCluster.confirmRegenerate')
+    }
+  }).onOk(() => {
+    const processId = 'top-framework'
+    conceptGraphsApi?.startConceptGraphPipelineWithoutUpload(processId)
+      .then(r => {
+        if (r.data.status == PipelineResponseStatus.Successful) {
+          concepts.value = []
+          selectedColors.value = []
+          notify(t('conceptCluster.pipelineStarted'), 'positive')
+        } else {
+          notify(r.data.response || t('conceptCluster.pipelineFailed'), 'negative')
+        }
+      })
+      .catch((e: Error) => renderError(e))
+  })
 }
 </script>
 
