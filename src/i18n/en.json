@@ -530,6 +530,10 @@
   "definition": "Definition|Definitions",
   "conceptCluster": {
     "noConceptsAvailable": "No concepts are currently available. They may need to be generated from a text corpus first. Please use the button above to start the generation process.",
-    "selectConceptsDescription": "On the right-hand side of the page, please specify the concepts you would like to use to search for documents."
+    "selectConceptsDescription": "On the right-hand side of the page, please specify the concepts you would like to use to search for documents.",
+    "regenerate": "Regenerate",
+    "confirmRegenerate": "Do you really want to regenerate the concept clusters? The process will take a few minutes, depending on the size of the corpus, and previous clusters will be dropped.",
+    "pipelineStarted": "The generation pipeline has been started. In a few minutes, new clusters should be available.",
+    "pipelineFailed": "The generation pipeline has failed. Please try again."
   }
 }

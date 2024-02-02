@@ -530,6 +530,10 @@
   "definition": "Definition|Definitionen",
   "conceptCluster": {
     "noConceptsAvailable": "Derzeit liegen keine Konzepte vor. Möglicherweise müssen sie zunächst aus einem Textkorpus generiert werden. Bitte nutzen Sie die Schaltfläche oben, um den Generierungsprozess zu starten.",
-    "selectConceptsDescription": "Bitte geben Sie auf der rechten Seite die Konzepte an, nach denen Sie suchen möchten."
+    "selectConceptsDescription": "Bitte geben Sie auf der rechten Seite die Konzepte an, nach denen Sie suchen möchten.",
+    "regenerate": "Regenerieren",
+    "confirmRegenerate": "Möchten Sie die Konzeptcluster wirklich neu generieren? Der Vorgang dauert je nach Korpusgröße einige Minuten und vorherige Cluster werden verworfen.",
+    "pipelineStarted": "Die Generierungspipeline wurde gestartet. In wenigen Minuten sollten neue Cluster verfügbar sein.",
+    "pipelineFailed": "Die Generierungspipeline ist fehlgeschlagen. Bitte versuche es erneut."
   }
 }
