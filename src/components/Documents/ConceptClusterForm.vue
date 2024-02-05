@@ -7,8 +7,8 @@
             {{ t('concept', 2) }}
           </div>
           <q-space />
-          <q-separator vertical />
-          <q-btn dense flat no-caps class="q-py-none" @click="confirmRegenerate">
+          <q-separator v-if="isAdmin" vertical />
+          <q-btn v-if="isAdmin" dense flat no-caps class="q-py-none" @click="confirmRegenerate">
             <q-icon name="update" />
             <div class="q-pl-sm gt-xs">{{ t('conceptCluster.regenerate') }}</div>
           </q-btn>
@@ -144,6 +144,8 @@ import useNotify from 'src/mixins/useNotify'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
 import { useQuasar } from 'quasar'
 import Dialog from 'src/components/Dialog.vue'
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
 
 interface ConceptColor {
   'background-color': string,
@@ -156,6 +158,8 @@ const { renderError, notify } = useNotify()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
 const conceptGraphsApi = inject(ConceptgraphsApiKey)
+const entityStore = useEntity()
+const { isAdmin } = storeToRefs(entityStore)
 const documents = ref<Document[]>([])
 const document_ = ref<Document>()
 const concepts = ref<ConceptCluster[]>([])
@@ -214,7 +218,10 @@ const mostImportantNodesOptions = computed(() => [
 
 const loading = computed(() => conceptsLoading.value || documentsLoading.value)
 
-onMounted(async () => await reloadConcepts())
+onMounted(async () =>
+  await entityStore.loadUser()
+    .then(() => reloadConcepts())
+)
 
 watch(
   [ mostImportantNodes, conceptMode, selectedConcepts ],
@@ -304,6 +311,7 @@ async function chooseDocument(documentId: string) {
 }
 
 function confirmRegenerate() {
+  if (!isAdmin.value) return
   $q.dialog({
     component: Dialog,
     componentProps: {
