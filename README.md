@@ -13,11 +13,12 @@ or use the `.devcontainer/devcontainer.json` configuration to build a [Developme
 
 2. The npm package `@onto-med/top-api` is hosted in the GitHub Packages registry, thus requires authentication.
 
-    * You can authenticate at GitHub via `npm login --scope=@onto-med --auth-type=legacy --registry=https://npm.pkg.github.com`
-      (if you use npm version 8 or lower, remove the argument `--auth-type=legacy`).
-      You will be prompted for your username and password (personal access token).
-
-    * For the devcontainer setup, you need to create a `.devcontainer/.env` file containing your GitHub personal access token (see `.devcontainer/.env.dist`)
+    1. Create a [personal access token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) at <https://github.com/settings/tokens> and give it access to `read:packages`.
+    2. Optionally, export your token to the environment variable `NPM_AUTH_TOKEN`.
+    3. Alternatively to the step above, you can authenticate at GitHub via `npm login --scope=@onto-med --auth-type=legacy --registry=https://npm.pkg.github.com`
+       (if you use npm version 8 or lower, remove the argument `--auth-type=legacy`).
+       You will now be prompted for your username and "password" (enter your personal access token, *not* your GitHub account password).
+    4. For the devcontainer setup, you need to create a `.devcontainer/.env` file containing your GitHub personal access token (see `.devcontainer/.env.dist`)
 
 3. Run `yarn` (skip this step in the devcontainer setup)
 
