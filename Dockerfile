@@ -15,4 +15,5 @@ COPY docker-entrypoint.d/* /docker-entrypoint.d/
 RUN chmod u+x /docker-entrypoint.d/*.sh
 
 EXPOSE 80
+ENV NGINX_ENTRYPOINT_QUIET_LOGS=1
 CMD ["nginx", "-g", "daemon off;"]
