@@ -13,27 +13,27 @@
         :no-data-label="t('noDataPresent')"
         row-key="id"
       >
-        <template #body="props">
-          <q-tr :props="props" class="cursor-pointer">
-            <slot name="row-cells" :row="props.row">
+        <template #body="trProps">
+          <q-tr :props="trProps" class="cursor-pointer">
+            <slot name="row-cells" :row="trProps.row">
               <q-td auto-width>
-                <q-spinner v-if="isRunning(props.row)" :title="t('running')" size="sm" />
+                <q-spinner v-if="isRunning(trProps.row)" :title="t('running')" size="sm" />
                 <q-icon
-                  v-else-if="isFinished(props.row)"
+                  v-else-if="isFinished(trProps.row)"
                   :title="t('finished')"
                   name="done"
                   size="sm"
                   color="positive"
                 />
-                <q-icon v-else-if="isFailed(props.row)" :title="t('failed')" name="bolt" size="sm" color="negative" />
+                <q-icon v-else-if="isFailed(trProps.row)" :title="t('failed')" name="bolt" size="sm" color="negative" />
                 <q-icon v-else :title="t('queued')" name="pause" size="sm" color="grey" />
               </q-td>
-              <q-td>{{ props.row.name || t('unnamedQuery') }}</q-td>
+              <q-td>{{ trProps.row.name || t('unnamedQuery') }}</q-td>
               <q-td>
-                {{ getResult(props.row) }}
+                {{ getResult(trProps.row) }}
               </q-td>
               <q-td auto-width class="col-auto text-grey text-right" :title="t('elapsedTime')">
-                <span class="gt-sm">{{ getEllapsedTime(props.row) }}</span>
+                <span class="gt-sm">{{ getEllapsedTime(trProps.row) }}</span>
               </q-td>
               <q-menu>
                 <q-list dense>
@@ -41,30 +41,41 @@
                     v-if="isConceptQuery"
                     v-close-popup
                     clickable
-                    :disable="!isFinished(props.row)"
-                    @click="routeToDocumentView(props.row)"
+                    :disable="!isFinished(trProps.row)"
+                    @click="routeToDocumentView(trProps.row)"
                   >
                     <q-item-section>
                       {{ t('showDocumentResults') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-else v-close-popup clickable :disable="!isFinished(props.row)" @click="showGrid(props.row)">
+                  <q-item
+                    v-else
+                    v-close-popup
+                    clickable
+                    :disable="!isFinished(trProps.row)"
+                    @click="showGrid(trProps.row)"
+                  >
                     <q-item-section>
                       {{ t('showGrid') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="exportToFile(props.row)">
+                  <q-item
+                    v-close-popup
+                    clickable
+                    :disable="!isFinished(trProps.row)"
+                    @click="exportToFile(trProps.row)"
+                  >
                     <q-item-section>
                       {{ t('downloadDataSet') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-close-popup clickable @click="$emit('prefill', props.row)">
+                  <q-item v-close-popup clickable @click="$emit('prefill', trProps.row)">
                     <q-item-section>
                       {{ t('repeatThing', { thing: t('query') }) }}
                     </q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item v-close-popup clickable @click="$emit('delete', props.row)">
+                  <q-item v-close-popup clickable @click="$emit('delete', trProps.row)">
                     <q-item-section>
                       {{ t('removeThing', { thing: t('queryResult') }) }}
                     </q-item-section>
@@ -96,7 +107,7 @@
   </q-card>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
 import GridDialog from './GridDialog.vue'
 import { storeToRefs } from 'pinia'
@@ -105,170 +116,159 @@ import { QueryApiKey } from 'src/boot/axios'
 import { SearchTypesEnum } from 'src/config'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
-import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import * as zip from '@zip.js/zip.js'
 
-export default defineComponent({
-  props: {
-    page: {
-      type: Object as () => QueryPage,
-      required: true
-    },
-    loading: Boolean,
-    isConceptQuery: Boolean
+const props = defineProps({
+  page: {
+    type: Object as () => QueryPage,
+    required: true
   },
-  emits: ['delete', 'prefill', 'request'],
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const queryApi = inject(QueryApiKey)
-    const entityStore = useEntity()
-    const { renderError } = useNotify()
-    const { organisationId, repositoryId } = storeToRefs(entityStore)
-    const results = ref<QueryResult[]>([])
-    const interval = ref<number>()
-    const skippedQueries = ref<Set<string>>(new Set<string>())
-    const router = useRouter()
-    const $q = useQuasar()
-
-    const loadResult = async (query: Query) => {
-      if (
-        props.loading ||
-        !queryApi ||
-        !organisationId.value ||
-        !repositoryId.value ||
-        getQueryResult(query)?.finishedAt
-      )
-        return new Promise<void>((resolve) => resolve())
-      return queryApi.getQueryById(organisationId.value, repositoryId.value, query.id).then((r) => {
-        if (!r.data.result) return
-        const index = results.value.findIndex((result) => result.id === query.id)
-        if (index !== -1) results.value.splice(index, 1)
-        results.value.push(r.data.result)
-      })
-    }
-
-    const getQueryResult = (query: Query) => results.value.find((r) => r.id === query.id)
-
-    const getState = (query: Query): QueryState => {
-      const result = getQueryResult(query)
-      if (!result) return QueryState.Queued
-      if (!result.finishedAt) return QueryState.Running
-      return result.state || QueryState.Running
-    }
-
-    const routeToDocumentView = (query: Query) => {
-      if (organisationId.value && repositoryId.value && query.id)
-        void router.push({
-          name: 'documentSearchByQuery',
-          params: {
-            organisationId: organisationId.value,
-            repositoryId: repositoryId.value,
-            queryId: query.id
-          },
-          query: {
-            queryName: query.name,
-            searchType: SearchTypesEnum.SEARCH_QUERY
-          }
-        })
-    }
-
-    onMounted(() => {
-      interval.value = window.setInterval(() => {
-        props.page.content.map(async (query) => {
-          if (getQueryResult(query)?.finishedAt || skippedQueries.value.has(query.id)) return
-          await loadResult(query).catch((e: Error) => {
-            skippedQueries.value.add(query.id)
-            renderError(e)
-          })
-        })
-      }, 5000)
-    })
-
-    onUnmounted(() => {
-      window.clearInterval(interval.value)
-    })
-
-    const download = async (query: Query) => {
-      if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return Promise.reject()
-      return queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, { responseType: 'blob' })
-    }
-
-    return {
-      routeToDocumentView,
-      t,
-
-      rows: computed(() => props.page.content),
-      cols: computed(
-        () =>
-          [
-            { name: 'state' },
-            { name: 'name', field: 'name', label: t('name'), align: 'left' },
-            { name: 'result', field: 'result', label: t('result'), align: 'left' },
-            { name: 'elappsedTime', align: 'right' }
-          ] as QTableProps['columns']
-      ),
-
-      isRunning(query: Query): boolean {
-        return getState(query) === QueryState.Running
-      },
-
-      isFinished(query: Query): boolean {
-        return getState(query) === QueryState.Finished
-      },
-
-      isFailed(query: Query): boolean {
-        return getState(query) === QueryState.Failed
-      },
-
-      getEllapsedTime(query: Query): string | undefined {
-        const result = getQueryResult(query)
-        if (!result) return undefined
-        const finishedAt = result.finishedAt ? new Date(result.finishedAt).getTime() : new Date().getTime()
-        return new Date(finishedAt - new Date(result.createdAt).getTime()).toISOString().slice(11, 19)
-      },
-
-      getResult(query: Query): number | string | undefined {
-        const result = getQueryResult(query)
-        if (!result) return undefined
-        return result.message || result.count
-      },
-
-      exportToFile(query: Query) {
-        download(query).then(
-          (r) => exportFile(query.id + '.zip', r.data as Blob),
-          () => {}
-        )
-      },
-
-      showGrid(query: Query) {
-        download(query)
-          .then((r) => {
-            const zipBlob = r.data as Blob
-            const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
-            return zipReader.getEntries()
-          })
-          .then((entries) => {
-            const subjectEntry = entries[2] // 0 is actual metadata, 1 is metadata.csv, 2 is data_subjects.csv
-            const subjectWriter = new zip.TextWriter()
-            return subjectEntry.getData!(subjectWriter)
-          })
-          .then((subjectCsv) =>
-            $q.dialog({
-              component: GridDialog,
-              componentProps: {
-                csv: subjectCsv
-              }
-            })
-          )
-          .catch((e: Error) => renderError(e))
-      },
-
-      onPageSelect(page: number) {
-        emit('request', page)
-      }
-    }
-  }
+  loading: Boolean,
+  isConceptQuery: Boolean
 })
+
+const emit = defineEmits(['delete', 'prefill', 'request'])
+
+const { t } = useI18n()
+const queryApi = inject(QueryApiKey)
+const entityStore = useEntity()
+const { renderError } = useNotify()
+const { organisationId, repositoryId } = storeToRefs(entityStore)
+const results = ref<QueryResult[]>([])
+const interval = ref<number>()
+const skippedQueries = ref<Set<string>>(new Set<string>())
+const router = useRouter()
+const $q = useQuasar()
+
+const rows = computed(() => props.page.content)
+const cols = computed(
+  () =>
+    [
+      { name: 'state' },
+      { name: 'name', field: 'name', label: t('name'), align: 'left' },
+      { name: 'result', field: 'result', label: t('result'), align: 'left' },
+      { name: 'elappsedTime', align: 'right' }
+    ] as QTableProps['columns']
+)
+
+onMounted(() => {
+  interval.value = window.setInterval(() => {
+    props.page.content.map(async (query) => {
+      if (getQueryResult(query)?.finishedAt || skippedQueries.value.has(query.id)) return
+      await loadResult(query).catch((e: Error) => {
+        skippedQueries.value.add(query.id)
+        renderError(e)
+      })
+    })
+  }, 5000)
+})
+
+onUnmounted(() => {
+  window.clearInterval(interval.value)
+})
+
+async function loadResult(query: Query) {
+  if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
+    return new Promise<void>((resolve) => resolve())
+  return queryApi.getQueryById(organisationId.value, repositoryId.value, query.id).then((r) => {
+    if (!r.data.result) return
+    const index = results.value.findIndex((result) => result.id === query.id)
+    if (index !== -1) results.value.splice(index, 1)
+    results.value.push(r.data.result)
+  })
+}
+
+function getQueryResult(query: Query) {
+  return results.value.find((r) => r.id === query.id)
+}
+
+function getState(query: Query): QueryState {
+  const result = getQueryResult(query)
+  if (!result) return QueryState.Queued
+  if (!result.finishedAt) return QueryState.Running
+  return result.state || QueryState.Running
+}
+
+function routeToDocumentView(query: Query) {
+  if (organisationId.value && repositoryId.value && query.id)
+    void router.push({
+      name: 'documentSearchByQuery',
+      params: {
+        organisationId: organisationId.value,
+        repositoryId: repositoryId.value,
+        queryId: query.id
+      },
+      query: {
+        queryName: query.name,
+        searchType: SearchTypesEnum.SEARCH_QUERY
+      }
+    })
+}
+
+async function download(query: Query) {
+  if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return Promise.reject()
+  return queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, { responseType: 'blob' })
+}
+
+function isRunning(query: Query): boolean {
+  return getState(query) === QueryState.Running
+}
+
+function isFinished(query: Query): boolean {
+  return getState(query) === QueryState.Finished
+}
+
+function isFailed(query: Query): boolean {
+  return getState(query) === QueryState.Failed
+}
+
+function getEllapsedTime(query: Query): string | undefined {
+  const result = getQueryResult(query)
+  if (!result) return undefined
+  const finishedAt = result.finishedAt ? new Date(result.finishedAt).getTime() : new Date().getTime()
+  return new Date(finishedAt - new Date(result.createdAt).getTime()).toISOString().slice(11, 19)
+}
+
+function getResult(query: Query): number | string | undefined {
+  const result = getQueryResult(query)
+  if (!result) return undefined
+  return result.message || result.count
+}
+
+function exportToFile(query: Query) {
+  download(query).then(
+    (r) => exportFile(query.id + '.zip', r.data as Blob),
+    () => {}
+  )
+}
+
+function showGrid(query: Query) {
+  download(query)
+    .then((r) => {
+      const zipBlob = r.data as Blob
+      const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
+      return zipReader.getEntries()
+    })
+    .then((entries) => {
+      const subjectEntry = entries[2] // 0 is actual metadata, 1 is metadata.csv, 2 is data_subjects.csv
+      const subjectWriter = new zip.TextWriter()
+      return subjectEntry.getData!(subjectWriter)
+    })
+    .then((subjectCsv) =>
+      $q.dialog({
+        component: GridDialog,
+        componentProps: {
+          csv: subjectCsv
+        }
+      })
+    )
+    .catch((e: Error) => renderError(e))
+}
+
+function onPageSelect(page: number) {
+  emit('request', page)
+}
 </script>
