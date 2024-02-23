@@ -261,7 +261,8 @@ function showGrid(query: Query) {
       $q.dialog({
         component: GridDialog,
         componentProps: {
-          csv: subjectCsv
+          csv: subjectCsv,
+          query
         }
       })
     )

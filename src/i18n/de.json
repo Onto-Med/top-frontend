@@ -524,5 +524,6 @@
   "backend": "Backend|Backends",
   "showGrid": "Ergebnisse in Tabelle anzeigen",
   "unavailable": "nicht verfügbar",
-  "tryAgain": "Erneut versuchen"
+  "tryAgain": "Erneut versuchen",
+  "dataOfQuery": "Daten der Abfrage \"{thing}\""
 }

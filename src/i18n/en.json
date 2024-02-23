@@ -524,5 +524,6 @@
   "backend": "Backend|Backends",
   "showGrid": "Show data table",
   "unavailable": "unavailable",
-  "tryAgain": "Try again"
+  "tryAgain": "Try again",
+  "dataOfQuery": "Data of query '{thing}'"
 }
