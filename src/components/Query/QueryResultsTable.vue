@@ -53,7 +53,7 @@
                       {{ t('showGrid') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="download(props.row)">
+                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="exportToFile(props.row)">
                     <q-item-section>
                       {{ t('downloadDataSet') }}
                     </q-item-section>
@@ -190,6 +190,11 @@ export default defineComponent({
       window.clearInterval(interval.value)
     })
 
+    const download = async (query: Query) => {
+      if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return Promise.reject()
+      return queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, { responseType: 'blob' })
+    }
+
     return {
       routeToDocumentView,
       t,
@@ -230,36 +235,34 @@ export default defineComponent({
         return result.message || result.count
       },
 
-      async download(query: Query) {
-        if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return
-        await queryApi
-          .downloadQueryResult(organisationId.value, repositoryId.value, query.id, { responseType: 'blob' })
-          .then((r) => exportFile(query.id + '.zip', r.data as Blob))
+      exportToFile(query: Query) {
+        download(query).then(
+          (r) => exportFile(query.id + '.zip', r.data as Blob),
+          () => {}
+        )
       },
 
-      async showGrid(query: Query) {
-        if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return
-        const zipBlob = (
-          await queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, {
-            responseType: 'blob'
+      showGrid(query: Query) {
+        download(query)
+          .then((r) => {
+            const zipBlob = r.data as Blob
+            const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
+            return zipReader.getEntries()
           })
-        ).data as Blob
-        const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
-        const entries = await zipReader.getEntries()
-        const subjectEntry = entries[2] // 0 is actual metadata, 1 is metadata.csv, 2 is data_subjects.csv
-        const subjectWriter = new zip.TextWriter()
-        const subjectCsv = await subjectEntry.getData!(subjectWriter)
-        //console.log(subjectCsv)
-
-        $q.dialog({
-          component: GridDialog,
-
-          // props forwarded to your custom component
-          componentProps: {
-            csv: subjectCsv
-            // ...more..props...
-          }
-        })
+          .then((entries) => {
+            const subjectEntry = entries[2] // 0 is actual metadata, 1 is metadata.csv, 2 is data_subjects.csv
+            const subjectWriter = new zip.TextWriter()
+            return subjectEntry.getData!(subjectWriter)
+          })
+          .then((subjectCsv) =>
+            $q.dialog({
+              component: GridDialog,
+              componentProps: {
+                csv: subjectCsv
+              }
+            })
+          )
+          .catch((e: Error) => renderError(e))
       },
 
       onPageSelect(page: number) {
