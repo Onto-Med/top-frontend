@@ -37,11 +37,6 @@
               </q-td>
               <q-menu>
                 <q-list dense>
-                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="download(props.row)">
-                    <q-item-section>
-                      {{ t('downloadDataSet') }}
-                    </q-item-section>
-                  </q-item>
                   <q-item
                     v-if="isConceptQuery"
                     v-close-popup
@@ -53,6 +48,16 @@
                       {{ t('showDocumentResults') }}
                     </q-item-section>
                   </q-item>
+                  <q-item v-else v-close-popup clickable :disable="!isFinished(props.row)" @click="showGrid(props.row)">
+                    <q-item-section>
+                      {{ t('showGrid') }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="download(props.row)">
+                    <q-item-section>
+                      {{ t('downloadDataSet') }}
+                    </q-item-section>
+                  </q-item>
                   <q-item v-close-popup clickable @click="$emit('prefill', props.row)">
                     <q-item-section>
                       {{ t('repeatThing', { thing: t('query') }) }}
@@ -62,11 +67,6 @@
                   <q-item v-close-popup clickable @click="$emit('delete', props.row)">
                     <q-item-section>
                       {{ t('removeThing', { thing: t('queryResult') }) }}
-                    </q-item-section>
-                  </q-item>
-                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="showGrid(props.row)">
-                    <q-item-section>
-                      {{ t('showGrid') }}
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -97,9 +97,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call*/
-/* eslint-disable @typescript-eslint/no-unsafe-member-access*/
 import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
 import GridDialog from './GridDialog.vue'
 import { storeToRefs } from 'pinia'
