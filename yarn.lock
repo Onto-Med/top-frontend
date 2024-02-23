@@ -2315,6 +2315,11 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
+"@zip.js/zip.js@^2.7.34":
+  version "2.7.34"
+  resolved "https://registry.yarnpkg.com/@zip.js/zip.js/-/zip.js-2.7.34.tgz#2d5c84cffa4b6b27a94e8eb1bbb3682de6598bdf"
+  integrity sha512-SWAK+hLYKRHswhakNUirPYrdsflSFOxykUckfbWDcPvP8tjLuV5EWyd3GHV0hVaJLDps40jJnv8yQVDbWnQDfg==
+
 abab@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.6.tgz#41b80f2c871d19686216b82309231cfd3cb3d291"
@@ -2355,6 +2360,18 @@ acorn@^8.0.4, acorn@^8.1.0, acorn@^8.7.1, acorn@^8.8.1, acorn@^8.8.2, acorn@^8.9
   version "8.11.2"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.11.2.tgz#ca0d78b51895be5390a5903c5b3bdcdaf78ae40b"
   integrity sha512-nc0Axzp/0FILLEVsm4fNwLCwMttvhEI263QtVPQcbpfZZ3ts0hLsZGOpE6czNlid7CJ9MlyH8reXkpsf3YUY4w==
+
+ag-grid-community@31.1.1:
+  version "31.1.1"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-31.1.1.tgz#212fc3e358d4be1865bc4618f6d0d865faaed385"
+  integrity sha512-tiQZ7VQ07yJScTMIQpaYoUMPgiyXMwYDcwTxe4riRrcYGTg0e258XEihoPUZFejR60P1fYWMxdJaR2JUnyhGrg==
+
+ag-grid-vue3@^31.0.3:
+  version "31.1.1"
+  resolved "https://registry.yarnpkg.com/ag-grid-vue3/-/ag-grid-vue3-31.1.1.tgz#0382632cf521138c532b48c9b985c3951d69e788"
+  integrity sha512-GjR4/6JUWQ0VsdmcxSN5ks1vH+wB7lLjX1CbskPqNfD69/fb9l7Eg2oGAgqNJo8b87W87jzhg9RguOx5bDpsZQ==
+  dependencies:
+    ag-grid-community "31.1.1"
 
 agent-base@6:
   version "6.0.2"
