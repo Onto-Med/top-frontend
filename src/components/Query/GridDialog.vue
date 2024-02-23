@@ -40,13 +40,13 @@ const props = defineProps<{
   query: Query
 }>()
 
-defineEmits([
-  ...useDialogPluginComponent.emits
-])
+defineEmits([...useDialogPluginComponent.emits])
 
 const { t } = useI18n()
 const { dialogRef, onDialogHide } = useDialogPluginComponent()
-const rows = computed(() => Papa.parse(props.csv, { header: true, delimiter: ';' }).data as Array<Array<string>>)
+const rows = computed(
+  () => Papa.parse(props.csv, { header: true, delimiter: ';', skipEmptyLines: true }).data as Array<Array<string>>
+)
 const colDefs = computed(() => {
   const keys = Object.keys(rows.value[0])
   return keys.map((key) => colDef(key))
