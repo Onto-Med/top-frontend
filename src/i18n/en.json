@@ -525,5 +525,6 @@
   "showGrid": "Show data table",
   "unavailable": "unavailable",
   "tryAgain": "Try again",
-  "dataOfQuery": "Data of query '{thing}'"
+  "dataOfQuery": "Data of query '{thing}'",
+  "fileToDisplay": "File to display|Files to display"
 }

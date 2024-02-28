@@ -252,16 +252,11 @@ function showGrid(query: Query) {
       const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
       return zipReader.getEntries()
     })
-    .then((entries) => {
-      const subjectEntry = entries[2] // 0 is actual metadata, 1 is metadata.csv, 2 is data_subjects.csv
-      const subjectWriter = new zip.TextWriter()
-      return subjectEntry.getData!(subjectWriter)
-    })
-    .then((subjectCsv) =>
+    .then((entries) =>
       $q.dialog({
         component: GridDialog,
         componentProps: {
-          csv: subjectCsv,
+          entries: entries,
           query
         }
       })
