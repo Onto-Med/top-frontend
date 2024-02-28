@@ -83,6 +83,8 @@ const colDefs = computed(() => {
 onMounted(() => {
   if (props.entries.find(e => e.filename == subjectsFileName))
     entry.value = subjectsFileName
+  else
+    entry.value = props.entries[0]?.filename
   loadEntry()
 })
 
