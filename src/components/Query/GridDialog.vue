@@ -47,7 +47,11 @@ const { dialogRef, onDialogHide } = useDialogPluginComponent()
 const rows = computed(
   () => Papa.parse(props.csv, { header: true, delimiter: ';', skipEmptyLines: true }).data as Array<Array<string>>
 )
+const isEmpty = computed(
+  () => rows.value.length == 0
+)
 const colDefs = computed(() => {
+  if (isEmpty.value) return []
   const keys = Object.keys(rows.value[0])
   return keys.map((key) => colDef(key))
 })
