@@ -525,5 +525,6 @@
   "showGrid": "Ergebnisse in Tabelle anzeigen",
   "unavailable": "nicht verfügbar",
   "tryAgain": "Erneut versuchen",
-  "dataOfQuery": "Daten der Abfrage \"{thing}\""
+  "dataOfQuery": "Daten der Abfrage \"{thing}\"",
+  "fileToDisplay": "Anzuzeigende Datei|Anzuzeigende Dateien"
 }
