@@ -56,7 +56,13 @@
           <template #body-cell-codeSystem="props">
             <q-td key="codeSystem" :props="props">
               {{ props.row.codeSystem.uri }}
-              <q-popup-edit v-slot="scope" v-model="props.row.codeSystem.uri" buttons :label-cancel="t('cancel')" :label-set="t('set')">
+              <q-popup-edit
+                v-slot="scope"
+                v-model="props.row.codeSystem.uri"
+                buttons
+                :label-cancel="t('cancel')"
+                :label-set="t('set')"
+              >
                 <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
               </q-popup-edit>
             </q-td>
@@ -64,7 +70,13 @@
           <template #body-cell-code="props">
             <q-td key="code" :props="props">
               {{ props.row.code }}
-              <q-popup-edit v-slot="scope" v-model="props.row.code" buttons :label-cancel="t('cancel')" :label-set="t('set')">
+              <q-popup-edit
+                v-slot="scope"
+                v-model="props.row.code"
+                buttons
+                :label-cancel="t('cancel')"
+                :label-set="t('set')"
+              >
                 <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
               </q-popup-edit>
             </q-td>
@@ -72,7 +84,13 @@
           <template #body-cell-scope="props">
             <q-td key="code" :props="props">
               {{ te('codeScopes.' + props.row.scope) ? t('codeScopes.' + props.row.scope) : props.row.scope }}
-              <q-popup-edit v-slot="scope" v-model="props.row.scope" buttons :label-cancel="t('cancel')" :label-set="t('set')">
+              <q-popup-edit
+                v-slot="scope"
+                v-model="props.row.scope"
+                buttons
+                :label-cancel="t('cancel')"
+                :label-set="t('set')"
+              >
                 <enum-select
                   v-model:selected="scope.value"
                   i18n-prefix="codeScope"
@@ -130,27 +148,25 @@ const columns = computed(() => [
     required: true,
     label: t('codeSystem'),
     field: (row: Code) => row.codeSystem.uri,
-    sortable: true,
+    sortable: true
   },
   {
     name: 'code',
     required: true,
     label: t('code'),
     field: (row: Code) => row.code,
-    sortable: true,
+    sortable: true
   },
   {
     name: 'scope',
     required: false,
     label: t('codeScope.title'),
     field: (row: Code) => row.scope,
-    sortable: true,
+    sortable: true
   }
 ])
 
-const tableRows = computed(
-  () => codes.value.filter((_row, index) => !hasHeader.value || index !== 0)
-)
+const tableRows = computed(() => codes.value.filter((_row, index) => !hasHeader.value || index !== 0))
 
 function codeKey(code: Code) {
   return `${code.codeSystem.uri}#${code.code} - ${code.scope}`
@@ -163,21 +179,20 @@ function loadCodes() {
     return
   }
   loading.value = true
-  csvFile.value.text()
-    .then(content => {
+  csvFile.value
+    .text()
+    .then((content) => {
       const data = parse(content, {
-        skipEmptyLines: true,
+        skipEmptyLines: true
       }).data as Array<Array<string>>
-      codes.value = data.map(row => (
-        {
-          codeSystem: { uri: row[0] },
-          code: row[1],
-          scope: CodeScope[toCapital(row[2]) as keyof typeof CodeScope] || CodeScope.Self,
-        }
-      ))
+      codes.value = data.map((row) => ({
+        codeSystem: { uri: row[0] },
+        code: row[1],
+        scope: CodeScope[toCapital(row[2]) as keyof typeof CodeScope] || CodeScope.Self
+      }))
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 
 function toCapital(string: string) {
@@ -189,7 +204,7 @@ function toCapital(string: string) {
 function onHasHeaderChanged(value?: boolean) {
   if (!value || codes.value.length == 0) return
   const key = codeKey(codes.value[0])
-  selection.value = selection.value.filter(s => codeKey(s) !== key)
+  selection.value = selection.value.filter((s) => codeKey(s) !== key)
 }
 
 function onOkClick() {

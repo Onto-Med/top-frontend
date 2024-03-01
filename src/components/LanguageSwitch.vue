@@ -21,8 +21,5 @@ import { languages } from 'src/config'
 const $q = useQuasar()
 const { locale } = useI18n()
 
-watch(
-  locale,
-  (newVal) => $q.localStorage.set('language', newVal)
-)
+watch(locale, (newVal) => $q.localStorage.set('language', newVal))
 </script>

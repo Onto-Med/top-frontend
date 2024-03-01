@@ -9,35 +9,28 @@
         :no-data-label="t('noDataPresent')"
         row-key="versionId"
       >
-        <template #header="props">
-          <q-tr :props="props">
+        <template #header="headerProps">
+          <q-tr :props="headerProps">
             <q-th class="bg-grey-1" auto-width />
-            <q-th class="bg-grey-1">
-              #
-            </q-th>
-            <q-th
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-              class="bg-grey-1"
-            >
+            <q-th class="bg-grey-1"> # </q-th>
+            <q-th v-for="col in headerProps.cols" :key="col.name" :props="headerProps" class="bg-grey-1">
               {{ col.label }}
             </q-th>
           </q-tr>
         </template>
 
-        <template #body="props">
+        <template #body="bodyProps">
           <q-tr
             v-close-popup
-            :props="props"
+            :props="bodyProps"
             :title="t('showThing', { thing: t('version') })"
             class="cursor-pointer"
-            :class="{ 'bg-secondary': props.row.version === selectedVersion }"
-            @click="$emit('prefill', props.row)"
+            :class="{ 'bg-secondary': bodyProps.row.version === selectedVersion }"
+            @click="$emit('prefill', bodyProps.row)"
           >
             <q-td auto-width>
               <q-btn
-                v-if="!readonly && currentVersion && props.row.version !== currentVersion"
+                v-if="!readonly && currentVersion && bodyProps.row.version !== currentVersion"
                 size="sm"
                 color="red"
                 round
@@ -45,16 +38,14 @@
                 flat
                 icon="delete"
                 :title="t('deleteThing', { thing: t('version') })"
-                @click.stop="deleteVersion(props.row)"
+                @click.stop="deleteVersion(bodyProps.row)"
               />
-              <b v-else-if="currentVersion && props.row.version === currentVersion">
-                {{ t('current') }}:
-              </b>
+              <b v-else-if="currentVersion && bodyProps.row.version === currentVersion"> {{ t('current') }}: </b>
             </q-td>
-            <q-td>{{ props.row.version }}</q-td>
-            <q-td>{{ getTitle(props.row) }}</q-td>
-            <q-td>{{ props.row.author }}</q-td>
-            <q-td>{{ props.row.createdAt ? d(props.row.createdAt, 'long') : '' }}</q-td>
+            <q-td>{{ bodyProps.row.version }}</q-td>
+            <q-td>{{ getTitle(bodyProps.row) }}</q-td>
+            <q-td>{{ bodyProps.row.author }}</q-td>
+            <q-td>{{ bodyProps.row.createdAt ? d(bodyProps.row.createdAt, 'long') : '' }}</q-td>
           </q-tr>
         </template>
       </q-table>
@@ -65,16 +56,13 @@
         <q-btn flat :label="t('reload')" color="primary" @click="reload" />
         <q-btn v-close-popup flat :label="t('close')" color="primary" />
       </q-card-actions>
-      <q-inner-loading
-        :showing="loading"
-        :label="t('pleaseWait') + '...'"
-      />
+      <q-inner-loading :showing="loading" :label="t('pleaseWait') + '...'" />
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, watch, inject, computed } from 'vue'
+<script setup lang="ts">
+import { ref, watch, inject, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityApiKey } from 'src/boot/axios'
 import { Entity } from '@onto-med/top-api'
@@ -83,83 +71,64 @@ import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import { QTableProps } from 'quasar'
 
-export default defineComponent({
-  name: 'VersionHistoryDialog',
-  props: {
-    show: {
-      type: Boolean,
-      required: true
-    },
-    entityId: {
-      type: String,
-      required: true
-    },
-    organisationId: {
-      type: String,
-      required: true
-    },
-    repositoryId: {
-      type: String,
-      required: true
-    },
-    currentVersion: Number,
-    selectedVersion: Number,
-    readonly: Boolean
-  },
-  emits: ['restore', 'update:show', 'prefill', 'deleted'],
-  setup (props, { emit }) {
-    const { t, d }     = useI18n()
-    const entityApi    = inject(EntityApiKey)
-    const entityStore  = useEntity()
-    const { getTitle } = useEntityFormatter()
-    const { notify, renderError } = useNotify()
-    const versions     = ref<Entity[]>([])
-    const loading      = ref(false)
+const props = defineProps<{
+  show: boolean
+  entityId: string
+  organisationId: string
+  repositoryId: string
+  currentVersion?: number
+  selectedVersion?: number
+  readonly?: boolean
+}>()
 
-    const reload = async () => {
-      if (!entityApi || !props.entityId) return
-      loading.value = true
+const emit = defineEmits(['restore', 'update:show', 'prefill', 'deleted'])
 
-      await entityApi.getEntityVersionsById(props.organisationId, props.repositoryId, props.entityId)
-        .then(r => versions.value = r.data)
-        .catch((e: Error) => renderError(e))
-        .finally(() => loading.value = false)
-    }
+const { t, d } = useI18n()
+const entityApi = inject(EntityApiKey)
+const entityStore = useEntity()
+const { getTitle } = useEntityFormatter()
+const { notify, renderError } = useNotify()
+const versions = ref<Entity[]>([])
+const loading = ref(false)
 
-    watch(
-      () => props.show,
-      (newShow: boolean) => {
-        if (newShow && !versions.value.length) void reload()
-      }
-    )
+const columns = computed(
+  () =>
+    [
+      { name: 'title', label: t('title'), align: 'left' },
+      { name: 'userAccount', label: t('author'), align: 'left' },
+      { name: 'timestamp', label: t('timestamp') }
+    ] as QTableProps['columns']
+)
 
-    return {
-      t,
-      d,
-      getTitle,
-      columns: computed(() => [
-        { name: 'title', label: t('title'), align: 'left' },
-        { name: 'userAccount', label: t('author'), align: 'left' },
-        { name: 'timestamp', label: t('timestamp') }
-      ] as QTableProps['columns']),
-      versions,
-      loading,
-      reload,
-
-      deleteVersion (version: Entity) {
-        entityStore.deleteVersion(version)
-          .then(() => {
-            notify(t('thingDeleted', { thing: t('version') }), 'positive')
-          })
-          .then(() => emit('deleted'))
-          .then(() => reload())
-          .catch((e: Error) => renderError(e))
-      }
-    }
+watch(
+  () => props.show,
+  (newShow: boolean) => {
+    if (newShow && !versions.value.length) void reload()
   }
-})
-</script>
+)
 
+async function reload() {
+  if (!entityApi || !props.entityId) return
+  loading.value = true
+
+  await entityApi
+    .getEntityVersionsById(props.organisationId, props.repositoryId, props.entityId)
+    .then((r) => (versions.value = r.data))
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+}
+
+function deleteVersion(version: Entity) {
+  entityStore
+    .deleteVersion(version)
+    .then(() => {
+      notify(t('thingDeleted', { thing: t('version') }), 'positive')
+    })
+    .then(() => emit('deleted'))
+    .then(() => reload())
+    .catch((e: Error) => renderError(e))
+}
+</script>
 
 <style lang="sass" scoped>
 .sticky-header-table

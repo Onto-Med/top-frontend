@@ -25,7 +25,11 @@
             @update:model-value="$emit('update:defaultAggregationFunctionId', $event)"
           >
             <template #selected>
-              {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
+              {{
+                te('functions.' + defaultAggregationFunctionId)
+                  ? t('functions.' + defaultAggregationFunctionId)
+                  : defaultAggregationFunctionId
+              }}
             </template>
             <template #option="scope">
               <q-item v-bind="scope.itemProps">
@@ -68,101 +72,93 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DateTimeRestriction, DataType, ExpressionFunction } from '@onto-med/top-api'
 import RangeInput from '../EntityEditor/RangeInput.vue'
 
-export default defineComponent({
-  components: { RangeInput },
-  props: {
-    dateTimeRestriction: {
-      type: Object as () => DateTimeRestriction,
-      default: () => {
-        return { type: DataType.DateTime, values: [] }
-      }
-    },
-    defaultAggregationFunctionId: {
-      type: String,
-      require: true
-    },
-    aggregationFunctionOptions: {
-      type: Array as () => ExpressionFunction[],
-      default: () => []
-    },
-    showAggregationFunction: {
-      type: Boolean,
-      default: false
+const props = defineProps({
+  dateTimeRestriction: {
+    type: Object as () => DateTimeRestriction,
+    default: () => {
+      return { type: DataType.DateTime, values: [] }
     }
   },
-  emits: ['update:dateTimeRestriction', 'update:defaultAggregationFunctionId'],
-  setup (props, { emit }) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, te } = useI18n()
-
-    const clone = (restriction: DateTimeRestriction) => (
-      {
-        type: DataType.DateTime,
-        minOperator: restriction.minOperator,
-        maxOperator: restriction.maxOperator,
-        values: restriction.values?.slice()
-      } as DateTimeRestriction)
-
-    return {
-      t,
-      te,
-      DataType,
-      showDialog: ref(false),
-
-      clearDateTimeRestriction () {
-        let newModelValue = JSON.parse(JSON.stringify(props.dateTimeRestriction)) as DateTimeRestriction
-        newModelValue.values = []
-        emit('update:dateTimeRestriction', newModelValue)
-      },
-
-      minimum: computed({
-        get: () => props.dateTimeRestriction.values ? props.dateTimeRestriction.values[0] : undefined,
-        set: (val) => {
-          let newModelValue = clone(props.dateTimeRestriction)
-          if (!newModelValue.values) newModelValue.values = []
-          newModelValue.values[0] = val as Date
-          newModelValue.values[1] = newModelValue.values[1]
-          emit('update:dateTimeRestriction', newModelValue)
-        }
-      }),
-
-      maximum: computed({
-        get: () => props.dateTimeRestriction.values ? props.dateTimeRestriction.values[1] : undefined,
-        set: (val) => {
-          let newModelValue = clone(props.dateTimeRestriction)
-          if (!newModelValue.values) newModelValue.values = []
-          newModelValue.values[1] = val as Date
-          newModelValue.values[0] = newModelValue.values[0]
-          emit('update:dateTimeRestriction', newModelValue)
-        }
-      }),
-
-      minOperator: computed({
-        get: () => props.dateTimeRestriction.minOperator,
-        set: (val) => {
-          let newModelValue = clone(props.dateTimeRestriction)
-          newModelValue.minOperator = val
-          emit('update:dateTimeRestriction', newModelValue)
-        }
-      }),
-
-      maxOperator: computed({
-        get: () => props.dateTimeRestriction.maxOperator,
-        set: (val) => {
-          let newModelValue = clone(props.dateTimeRestriction)
-          newModelValue.maxOperator = val
-          emit('update:dateTimeRestriction', newModelValue)
-        }
-      })
-    }
+  defaultAggregationFunctionId: {
+    type: String,
+    require: true
+  },
+  aggregationFunctionOptions: {
+    type: Array as () => ExpressionFunction[],
+    default: () => []
+  },
+  showAggregationFunction: {
+    type: Boolean,
+    default: false
   }
 })
+
+const emit = defineEmits(['update:dateTimeRestriction', 'update:defaultAggregationFunctionId'])
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
+const showDialog = ref(false)
+
+const minimum = computed({
+  get: () => (props.dateTimeRestriction.values ? props.dateTimeRestriction.values[0] : undefined),
+  set: (val) => {
+    let newModelValue = clone(props.dateTimeRestriction)
+    if (!newModelValue.values) newModelValue.values = []
+    newModelValue.values[0] = val as Date
+    newModelValue.values[1] = newModelValue.values[1]
+    emit('update:dateTimeRestriction', newModelValue)
+  }
+})
+
+const maximum = computed({
+  get: () => (props.dateTimeRestriction.values ? props.dateTimeRestriction.values[1] : undefined),
+  set: (val) => {
+    let newModelValue = clone(props.dateTimeRestriction)
+    if (!newModelValue.values) newModelValue.values = []
+    newModelValue.values[1] = val as Date
+    newModelValue.values[0] = newModelValue.values[0]
+    emit('update:dateTimeRestriction', newModelValue)
+  }
+})
+
+const minOperator = computed({
+  get: () => props.dateTimeRestriction.minOperator,
+  set: (val) => {
+    let newModelValue = clone(props.dateTimeRestriction)
+    newModelValue.minOperator = val
+    emit('update:dateTimeRestriction', newModelValue)
+  }
+})
+
+const maxOperator = computed({
+  get: () => props.dateTimeRestriction.maxOperator,
+  set: (val) => {
+    let newModelValue = clone(props.dateTimeRestriction)
+    newModelValue.maxOperator = val
+    emit('update:dateTimeRestriction', newModelValue)
+  }
+})
+
+function clone(restriction: DateTimeRestriction) {
+  return {
+    type: DataType.DateTime,
+    minOperator: restriction.minOperator,
+    maxOperator: restriction.maxOperator,
+    values: restriction.values?.slice()
+  } as DateTimeRestriction
+}
+
+function clearDateTimeRestriction() {
+  let newModelValue = JSON.parse(JSON.stringify(props.dateTimeRestriction)) as DateTimeRestriction
+  newModelValue.values = []
+  emit('update:dateTimeRestriction', newModelValue)
+}
 </script>
 
 <style lang="sass" scoped>

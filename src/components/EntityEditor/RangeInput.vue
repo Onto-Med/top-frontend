@@ -70,34 +70,24 @@ const props = defineProps({
   maxOperator: String,
   minOperators: {
     type: Array,
-    default: () => [
-      RestrictionOperator.GreaterThanOrEqualTo,
-      RestrictionOperator.GreaterThan
-    ]
+    default: () => [RestrictionOperator.GreaterThanOrEqualTo, RestrictionOperator.GreaterThan]
   },
   maxOperators: {
     type: Array,
-    default: () => [
-      RestrictionOperator.LessThanOrEqualTo,
-      RestrictionOperator.LessThan
-    ]
+    default: () => [RestrictionOperator.LessThanOrEqualTo, RestrictionOperator.LessThan]
   },
   readonly: Boolean,
   type: String
 })
 
-const emit = defineEmits([
-  'update:minimum', 'update:maximum', 'update:minOperator', 'update:maxOperator'
-])
+const emit = defineEmits(['update:minimum', 'update:maximum', 'update:minOperator', 'update:maxOperator'])
 
 const { t } = useI18n()
 
 void nextTick(() => {
-  if (!props.minOperator)
-    emit('update:minOperator', RestrictionOperator.GreaterThanOrEqualTo)
+  if (!props.minOperator) emit('update:minOperator', RestrictionOperator.GreaterThanOrEqualTo)
 }).then(() => {
-  if (!props.maxOperator)
-    emit('update:maxOperator', RestrictionOperator.LessThan)
+  if (!props.maxOperator) emit('update:maxOperator', RestrictionOperator.LessThan)
 })
 
 const minimumValue = computed(() => {
@@ -117,7 +107,7 @@ const inputType = computed(() => {
   return 'number'
 })
 
-function updateMinimum (value?: number|string|null) {
+function updateMinimum(value?: number | string | null) {
   if (!value) emit('update:minimum', undefined)
   if (props.type === DataType.Number) {
     emit('update:minimum', value as number)
@@ -126,7 +116,7 @@ function updateMinimum (value?: number|string|null) {
   }
 }
 
-function updateMaximum (value?: number|string|null) {
+function updateMaximum(value?: number | string | null) {
   if (!value) emit('update:maximum', undefined)
   if (props.type === DataType.Number) {
     emit('update:maximum', value as number)

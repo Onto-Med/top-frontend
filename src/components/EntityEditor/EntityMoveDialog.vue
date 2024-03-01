@@ -13,9 +13,7 @@
         {{ t('movingNotPossible') }}
       </q-card-section>
       <q-card-section v-else>
-        <div class="text-bold q-mb-sm">
-          {{ superEntitiesLabel }}:
-        </div>
+        <div class="text-bold q-mb-sm">{{ superEntitiesLabel }}:</div>
         <q-list dense>
           <q-item v-for="(superEntity, index) in superEntities" :key="index">
             <entity-chip
@@ -80,23 +78,13 @@ const onCancelClick = onDialogCancel
 const router = useRouter()
 const entityStore = useEntity()
 const { organisationId, repositoryId } = storeToRefs(entityStore)
-const superEntities = ref<(Category|Concept|undefined)[]>([])
+const superEntities = ref<(Category | Concept | undefined)[]>([])
 
 const allowedEntityTypes = computed(() =>
-  isConcept(props.entity)
-    ? [EntityType.SingleConcept]
-    : [EntityType.Category]
+  isConcept(props.entity) ? [EntityType.SingleConcept] : [EntityType.Category]
 )
-const label = computed(() =>
-  isConcept(props.entity)
-    ? t('concept', 2)
-    : t('category', 2)
-)
-const superEntitiesLabel = computed(() =>
-  isConcept(props.entity)
-    ? t('superConcept', 2)
-    : t('superCategory', 2)
-)
+const label = computed(() => (isConcept(props.entity) ? t('concept', 2) : t('category', 2)))
+const superEntitiesLabel = computed(() => (isConcept(props.entity) ? t('superConcept', 2) : t('superCategory', 2)))
 
 onMounted(() => {
   if ((isCategory(props.entity) || isPhenotype(props.entity)) && props.entity.superCategories)
@@ -105,35 +93,38 @@ onMounted(() => {
     superEntities.value = JSON.parse(JSON.stringify(props.entity.superConcepts)) as Concept[]
 })
 
-function onOkClick () {
-  entityStore.moveEntity(props.entity, superEntities.value.filter(e => !!e) as Entity[])
+function onOkClick() {
+  entityStore
+    .moveEntity(props.entity, superEntities.value.filter((e) => !!e) as Entity[])
     .then(() => {
-      notify(t('thingMoved', { thing: t('entity')}), 'positive')
+      notify(t('thingMoved', { thing: t('entity') }), 'positive')
       onDialogOK()
     })
     .catch((e: Error) => renderError(e))
 }
 
-function addSuperEntity (superEntity: Category|Concept|undefined) {
-  if (!superEntity || superEntities.value.findIndex(c => c && c.id === superEntity.id) === -1)
+function addSuperEntity(superEntity: Category | Concept | undefined) {
+  if (!superEntity || superEntities.value.findIndex((c) => c && c.id === superEntity.id) === -1)
     if (props.entity.id !== superEntity?.id) superEntities.value.push(superEntity)
 }
 
-function setSuperEntity (index: number, superEntity: Category|Concept) {
-  if (superEntities.value.findIndex(c => c && c.id === superEntity.id) === -1)
+function setSuperEntity(index: number, superEntity: Category | Concept) {
+  if (superEntities.value.findIndex((c) => c && c.id === superEntity.id) === -1)
     if (props.entity.id !== superEntity.id) superEntities.value[index] = superEntity
 }
 
-function removeSuperEntity (index: number) {
+function removeSuperEntity(index: number) {
   superEntities.value.splice(index, 1)
 }
 
-async function routeToEntity (entity?: Entity) {
+async function routeToEntity(entity?: Entity) {
   if (!entity || !repositoryId.value || !organisationId.value) return
-  await router.push({
-    name: 'editor',
-    params: { organisationId: organisationId.value, repositoryId: repositoryId.value, entityId: entity.id }
-  }).then(() => onDialogHide())
+  await router
+    .push({
+      name: 'editor',
+      params: { organisationId: organisationId.value, repositoryId: repositoryId.value, entityId: entity.id }
+    })
+    .then(() => onDialogHide())
 }
 </script>
 

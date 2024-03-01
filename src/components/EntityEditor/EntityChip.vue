@@ -1,13 +1,11 @@
 <template>
-  <q-chip
-    v-if="loading"
-    :dense="dense"
-    :square="dense"
-    :label="t('loading') + '...'"
-  />
+  <q-chip v-if="loading" :dense="dense" :square="dense" :label="t('loading') + '...'" />
 
   <template v-else-if="!state">
-    <span v-if="dense" class="dense-chip">[{{ label }}]<!--
+    <span
+      v-if="dense"
+      class="dense-chip"
+    >[{{ label }}]<!--
       --><q-popup-edit ref="popup" :model-value="null" :cover="false" class="q-pa-none">
         <entity-search-input
           v-if="!disable"
@@ -123,8 +121,8 @@
   </q-chip>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, onMounted, watch, nextTick } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DataType, Entity, EntityType } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
@@ -133,84 +131,67 @@ import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue
 import { QPopupEdit } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 
-export default defineComponent({
-  name: 'EntityChip',
-  components: {
-    EntitySearchInput
-  },
-  props: {
-    entityId: String,
-    label: String,
-    entity: Object as () => Entity,
-    entityTypes: Array as () => EntityType[],
-    dataType: String as () => DataType,
-    organisationId: String,
-    repositoryId: String,
-    disable: Boolean,
-    changeable: Boolean,
-    removeable: Boolean,
-    dense: Boolean,
-    includePrimary: Boolean
-  },
-  emits: ['entityClicked', 'entitySet', 'removeClicked'],
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const { renderError } = useNotify()
-    const popup = ref(null as unknown as QPopupEdit)
-    const loading = ref(false)
-    const entityStore = useEntity()
-    const { getIcon, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
-    const state = ref(undefined as unknown as Entity|undefined)
+const props = defineProps<{
+  entityId?: string
+  label?: string
+  entity?: Entity
+  entityTypes?: EntityType[]
+  dataType?: DataType
+  organisationId?: string
+  repositoryId?: string
+  disable?: boolean
+  changeable?: boolean
+  removeable?: boolean
+  dense?: boolean
+  includePrimary?: boolean
+}>()
 
-    const reload = () => {
-      if (!props.entityId) {
-        void nextTick(() => popup.value?.show())
-        return
-      }
-      loading.value = true
-      if (props.entityId) {
-        entityStore
-          .loadEntity(props.entityId)
-          .then(e => {
-            state.value = e
-            loading.value = false
-          })
-          .catch((e: Error) => renderError(e))
-          .finally(() => loading.value = false)
-      }
-    }
+const emit = defineEmits(['entityClicked', 'entitySet', 'removeClicked'])
 
-    onMounted(() => {
-      if (props.entity)
-        state.value = props.entity
-      else reload()
-    })
+const { t } = useI18n()
+const { renderError } = useNotify()
+const popup = ref(null as unknown as QPopupEdit)
+const loading = ref(false)
+const entityStore = useEntity()
+const { getIcon, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
+const state = ref(undefined as unknown as Entity | undefined)
 
-    watch(
-      () => props.entityId,
-      (newVal, oldVal) => {
-        if (newVal !== oldVal) reload()
-      }
-    )
+const includePrimaryRepositories = ref(false)
 
-    return {
-      t,
-      getIcon,
-      getTitle,
-      getDescriptions,
-      isRestricted,
-      popup,
-      state,
-      loading,
-      includePrimaryRepositories: ref(false),
+onMounted(() => {
+  if (props.entity) state.value = props.entity
+  else reload()
+})
 
-      setEntity: (entity: Entity|undefined) => {
-        state.value = entity
-        emit('entitySet', entity)
-      }
-    };
-  },
-});
+watch(
+  () => props.entityId,
+  (newVal, oldVal) => {
+    if (newVal !== oldVal) reload()
+  }
+)
+
+function reload() {
+  if (!props.entityId) {
+    void nextTick(() => popup.value?.show())
+    return
+  }
+  loading.value = true
+  if (props.entityId) {
+    entityStore
+      .loadEntity(props.entityId)
+      .then((e) => {
+        state.value = e
+        loading.value = false
+      })
+      .catch((e: Error) => renderError(e))
+      .finally(() => (loading.value = false))
+  }
+}
+
+function setEntity(entity: Entity | undefined) {
+  state.value = entity
+  emit('entitySet', entity)
+}
 </script>
 
 <style lang="sass" scoped>

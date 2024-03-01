@@ -20,11 +20,7 @@
 
     <div class="col-12 col-sm q-pa-md">
       <p v-t="'queryImportDescription'" />
-      <q-file
-        v-model="importFile"
-        :label="t('queryImportFile')"
-        accept=".json"
-      >
+      <q-file v-model="importFile" :label="t('queryImportFile')" accept=".json">
         <template #prepend>
           <q-icon name="attach_file" />
         </template>
@@ -62,7 +58,12 @@
               <q-item v-close-popup clickable @click="addSelection(props.entity)">
                 <q-item-section>{{ t('addAsThing', { thing: t('outputEntry') }) }}</q-item-section>
               </q-item>
-              <q-item v-close-popup clickable :disable="isPhenotype(props.entity) && props.entity.dataType !== DataType.Boolean" @click="addCriterion(props.entity)">
+              <q-item
+                v-close-popup
+                clickable
+                :disable="isPhenotype(props.entity) && props.entity.dataType !== DataType.Boolean"
+                @click="addCriterion(props.entity)"
+              >
                 <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
               </q-item>
             </q-list>
@@ -78,7 +79,13 @@
             <q-item-section>
               <q-item-label class="text-h6">
                 {{ t('eligibilityCriterion', 2) }}
-                <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+                <q-icon
+                  v-show="!querySubjectPresent"
+                  name="error"
+                  color="negative"
+                  class="float-right"
+                  :title="t('incomplete')"
+                />
               </q-item-label>
               <q-item-label caption class="gt-sm">
                 {{ t('eligibilityCriterionSelection') }}
@@ -118,7 +125,13 @@
             <q-item-section>
               <q-item-label class="text-h6" :class="{ 'text-grey': !query.projection?.length }">
                 {{ t('output') }}
-                <q-icon v-show="!querySubjectPresent" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+                <q-icon
+                  v-show="!querySubjectPresent"
+                  name="error"
+                  color="negative"
+                  class="float-right"
+                  :title="t('incomplete')"
+                />
               </q-item-label>
               <q-item-label caption class="gt-sm">
                 {{ t('outputSelection') }}
@@ -215,7 +228,7 @@ const queryApi = inject(QueryApiKey)
 const emptyQuery = () => {
   return {
     id: (uuidv4 as () => string)(),
-    dataSource: undefined as string|undefined,
+    dataSource: undefined as string | undefined,
     criteria: [],
     projection: [],
     type: QueryType.Phenotype
@@ -238,15 +251,22 @@ fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) a
 
 const reloadEntities = async () => {
   treeLoading.value = true
-  await entityStore.reloadEntities()
-    .then(() => query.value.criteria = query.value.criteria?.filter(c => entities.value.findIndex(e => e.id === c.subjectId) !== -1))
+  await entityStore
+    .reloadEntities()
+    .then(
+      () =>
+        (query.value.criteria = query.value.criteria?.filter(
+          (c) => entities.value.findIndex((e) => e.id === c.subjectId) !== -1
+        ))
+    )
     .catch((e: Error) => renderError(e))
-    .finally(() => treeLoading.value = false)
+    .finally(() => (treeLoading.value = false))
 }
 
 const aggregationFunctionOptions = ref([] as ExpressionFunction[])
-entityStore.getFunction('aggregate', 'Last', 'First')
-  .then(r => aggregationFunctionOptions.value = r)
+entityStore
+  .getFunction('aggregate', 'Last', 'First')
+  .then((r) => (aggregationFunctionOptions.value = r))
   .catch((e: Error) => renderError(e))
 
 onMounted(() => {
@@ -255,28 +275,25 @@ onMounted(() => {
   reloadDataSources().catch((e: Error) => renderError(e))
 })
 
-watch(
-  splitterModel,
-  (newVal) => $q.localStorage.set('phenotypeQuerySplitterWidth', newVal)
-)
+watch(splitterModel, (newVal) => $q.localStorage.set('phenotypeQuerySplitterWidth', newVal))
 
-const configurationComplete = computed(() =>
-  query.value.dataSource
-)
+const configurationComplete = computed(() => query.value.dataSource)
 
-const querySubjectPresent = computed(() =>
-  query.value.criteria && query.value.criteria.length > 0
-  || query.value.projection && query.value.projection.length > 0
+const querySubjectPresent = computed(
+  () =>
+    (query.value.criteria && query.value.criteria.length > 0) ||
+    (query.value.projection && query.value.projection.length > 0)
 )
 
 async function reloadDataSources() {
   if (!organisation.value) return
-  await queryApi?.getOrganisationDataSources(organisation.value.id, QueryType.Phenotype)
-    .then(r => dataSources.value = r.data)
+  await queryApi
+    ?.getOrganisationDataSources(organisation.value.id, QueryType.Phenotype)
+    .then((r) => (dataSources.value = r.data))
 }
 
-function addCriterion (subject: Phenotype) {
-  if (!subject || subject.dataType !== DataType.Boolean && !isRestricted(subject)) return
+function addCriterion(subject: Phenotype) {
+  if (!subject || (subject.dataType !== DataType.Boolean && !isRestricted(subject))) return
   if (!query.value.criteria) query.value.criteria = []
   query.value.criteria.push({
     defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
@@ -286,12 +303,9 @@ function addCriterion (subject: Phenotype) {
   })
 }
 
-function addSelection (subject: Phenotype) {
+function addSelection(subject: Phenotype) {
   if (!query.value.projection) query.value.projection = []
-  if (
-    !subject
-    || !isPhenotype(subject) && !isRestricted(subject)
-  ) return
+  if (!subject || (!isPhenotype(subject) && !isRestricted(subject))) return
   query.value.projection.push({
     subjectId: subject.id as string,
     defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
@@ -299,41 +313,45 @@ function addSelection (subject: Phenotype) {
   })
 }
 
-function moveSelectEntry (oldIndex: number, newIndex: number) {
+function moveSelectEntry(oldIndex: number, newIndex: number) {
   if (!query.value.projection || newIndex < 0 || newIndex >= query.value.projection.length) return
   query.value.projection.splice(newIndex, 0, query.value.projection.splice(oldIndex, 1)[0])
 }
 
-function exportQuery () {
-  exportFile(
-    new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json',
-    JSON.stringify(query.value))
+function exportQuery() {
+  exportFile(new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json', JSON.stringify(query.value))
 }
 
-function importQuery () {
+function importQuery() {
   if (!importFile.value) return
   fileReader.readAsText(importFile.value)
   importFile.value = undefined
 }
 
-function onExecute () {
+function onExecute() {
   if (!query.value.name) {
     if (query.value.criteria?.length) {
-      query.value.name
-        = t('filterBy') + ': '
-        + "'" + getTitle(entityStore.getEntity(query.value.criteria[0].subjectId)) + "'"
-        + (query.value.criteria.length > 1 ? ' ' + t('andMore', query.value.criteria.length - 1) : '')
+      query.value.name =
+        t('filterBy') +
+        ': ' +
+        "'" +
+        getTitle(entityStore.getEntity(query.value.criteria[0].subjectId)) +
+        "'" +
+        (query.value.criteria.length > 1 ? ' ' + t('andMore', query.value.criteria.length - 1) : '')
     } else if (query.value.projection?.length) {
-      query.value.name
-        = t('output') + ': '
-        + "'" + getTitle(entityStore.getEntity(query.value.projection[0].subjectId)) + "'"
-        + (query.value.projection.length > 1 ? ' ' + t('andMore', query.value.projection.length - 1) : '')
+      query.value.name =
+        t('output') +
+        ': ' +
+        "'" +
+        getTitle(entityStore.getEntity(query.value.projection[0].subjectId)) +
+        "'" +
+        (query.value.projection.length > 1 ? ' ' + t('andMore', query.value.projection.length - 1) : '')
     }
   }
   emit('execute', JSON.parse(JSON.stringify(query.value)) as PhenotypeQuery)
 }
 
-function reset () {
+function reset() {
   query.value = emptyQuery()
   reloadEntities().catch((e: Error) => renderError(e))
 }

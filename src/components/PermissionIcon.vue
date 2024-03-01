@@ -1,10 +1,5 @@
 <template>
-  <q-icon
-    :name="iconName"
-    :size="size"
-    :title="iconTitle"
-    :color="color"
-  />
+  <q-icon :name="iconName" :size="size" :title="iconTitle" :color="color" />
 </template>
 
 <script setup lang="ts">
@@ -27,17 +22,19 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n()
 const { permissionTitle } = useEntityFormatter()
 
-const iconTitle = computed(
-  () => `${t('permission')}: ${permissionTitle(props.permission)}`
-)
+const iconTitle = computed(() => `${t('permission')}: ${permissionTitle(props.permission)}`)
 
 const iconName = computed(() => {
   if (!props.permission) return 'lock'
   switch (props.permission) {
-    case Permission.Manage: return 'engineering'
-    case Permission.Write: return 'edit'
-    case Permission.Read: return 'visibility'
-    default: return 'question_mark'
+    case Permission.Manage:
+      return 'engineering'
+    case Permission.Write:
+      return 'edit'
+    case Permission.Read:
+      return 'visibility'
+    default:
+      return 'question_mark'
   }
 })
 </script>

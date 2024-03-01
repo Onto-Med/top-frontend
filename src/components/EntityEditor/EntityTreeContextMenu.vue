@@ -1,6 +1,12 @@
 <template>
   <q-menu context-menu>
-    <q-list v-if="createable && (!entity || entity.createdAt && [EntityType.Category,EntityType.SingleConcept].includes(entity.entityType))" dense>
+    <q-list
+      v-if="
+        createable &&
+        (!entity || (entity.createdAt && [EntityType.Category, EntityType.SingleConcept].includes(entity.entityType)))
+      "
+      dense
+    >
       <q-item
         v-for="entityType in abstractEntityTypes"
         :key="entityType"
@@ -29,35 +35,29 @@
     <q-separator />
 
     <q-list v-if="createable && entity && entity.createdAt && !isRestricted(entity)" dense>
-      <q-item
-        v-close-popup
-        clickable
-        @click="showMoveDialog"
-      >
+      <q-item v-close-popup clickable @click="showMoveDialog">
         <q-item-section>{{ t('moveTo') }}</q-item-section>
       </q-item>
     </q-list>
 
     <q-list v-if="duplicatable && entity && entity.createdAt" dense>
-      <q-item
-        v-close-popup
-        clickable
-        @click="emitDuplicateEntity(entity)"
-      >
+      <q-item v-close-popup clickable @click="emitDuplicateEntity(entity)">
         <q-item-section>{{ t('duplicate') }}</q-item-section>
       </q-item>
     </q-list>
-    <q-list v-if="importable && (!entity || entity.createdAt && [EntityType.Category,EntityType.SingleConcept].includes(entity.entityType))" dense>
+    <q-list
+      v-if="
+        importable &&
+        (!entity || (entity.createdAt && [EntityType.Category, EntityType.SingleConcept].includes(entity.entityType)))
+      "
+      dense
+    >
       <q-item v-close-popup clickable @click="showTerminologyImportDialog">
         <q-item-section v-t="'terminologyImport.title'" />
       </q-item>
     </q-list>
     <q-list v-if="deletable && entity" dense>
-      <q-item
-        v-close-popup
-        clickable
-        @click="showDeleteDialog"
-      >
+      <q-item v-close-popup clickable @click="showDeleteDialog">
         <q-item-section v-t="'delete'" />
       </q-item>
     </q-list>
@@ -100,9 +100,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits([
-  'createEntityClicked', 'deleteEntityClicked', 'duplicateEntityClicked'
-])
+const emit = defineEmits(['createEntityClicked', 'deleteEntityClicked', 'duplicateEntityClicked'])
 
 const { t } = useI18n()
 const $q = useQuasar()
@@ -116,12 +114,15 @@ const entries = [
 
 const abstractEntityTypes = computed(() =>
   [
-    EntityType.Category, EntityType.SinglePhenotype, EntityType.CompositePhenotype,
-    EntityType.SingleConcept, EntityType.CompositeConcept
-  ].filter(e => props.allowedEntityTypes.includes(e))
+    EntityType.Category,
+    EntityType.SinglePhenotype,
+    EntityType.CompositePhenotype,
+    EntityType.SingleConcept,
+    EntityType.CompositeConcept
+  ].filter((e) => props.allowedEntityTypes.includes(e))
 )
 
-function showDeleteDialog () {
+function showDeleteDialog() {
   if (!props.entity) return
   $q.dialog({
     component: Dialog,
@@ -130,12 +131,12 @@ function showDeleteDialog () {
       checkbox: isCategory(props.entity),
       checkboxLabel: t('entityEditor.delete.cascade')
     }
-  }).onOk(cascade => {
+  }).onOk((cascade) => {
     emit('deleteEntityClicked', props.entity, cascade)
   })
 }
 
-function showMoveDialog () {
+function showMoveDialog() {
   if (!props.entity) return
   $q.dialog({
     component: EntityMoveDialog,
@@ -143,7 +144,7 @@ function showMoveDialog () {
   })
 }
 
-function showTerminologyImportDialog () {
+function showTerminologyImportDialog() {
   $q.dialog({
     component: TerminologyImportDialog,
     componentProps: {
@@ -153,11 +154,11 @@ function showTerminologyImportDialog () {
   })
 }
 
-function emitCreateEntity (entityType: EntityType, entityId: string|undefined) {
+function emitCreateEntity(entityType: EntityType, entityId: string | undefined) {
   void setTimeout(() => emit('createEntityClicked', entityType, entityId), 50)
 }
 
-function emitDuplicateEntity (entity?: Entity) {
+function emitDuplicateEntity(entity?: Entity) {
   if (!entity) return
   emit('duplicateEntityClicked', entity)
 }

@@ -47,20 +47,27 @@
       <q-item-label>
         {{ getTitle(subject, true) }}
       </q-item-label>
-      <q-item-label v-if="requiresAggregationFunction" caption class="gt-xs non-selectable">
+      <q-item-label v-if="isAggregationRequired" caption class="gt-xs non-selectable">
         <small>
           (<span v-if="defaultAggregationFunctionId" :title="t('aggregationFunction')">
-            {{ te('functions.' + defaultAggregationFunctionId) ? t('functions.' + defaultAggregationFunctionId) : defaultAggregationFunctionId }}
+            {{
+              te('functions.' + defaultAggregationFunctionId)
+                ? t('functions.' + defaultAggregationFunctionId)
+                : defaultAggregationFunctionId
+            }}
           </span>
           <span v-if="dateTimeRestrictionValues" :title="t('dateTimeRestriction')">
-            , {{ dateTimeRestrictionValues.join(' - ') }}
-          </span>)
+            , {{ dateTimeRestrictionValues.join(' - ') }} </span
+          >)
         </small>
       </q-item-label>
-      <q-item-label v-else-if="dateTimeRestrictionValues" caption :title="t('dateTimeRestriction')" class="gt-xs non-selectable">
-        <small>
-          ({{ dateTimeRestrictionValues.join(' - ') }})
-        </small>
+      <q-item-label
+        v-else-if="dateTimeRestrictionValues"
+        caption
+        :title="t('dateTimeRestriction')"
+        class="gt-xs non-selectable"
+      >
+        <small> ({{ dateTimeRestrictionValues.join(' - ') }}) </small>
       </q-item-label>
     </q-item-section>
     <q-item-section side>
@@ -76,7 +83,7 @@
         <query-subject-configuration
           :date-time-restriction="dateTimeRestriction"
           :default-aggregation-function-id="defaultAggregationFunctionId"
-          :show-aggregation-function="requiresAggregationFunction"
+          :show-aggregation-function="isAggregationRequired"
           :aggregation-function-options="aggregationFunctionOptions"
           @update:date-time-restriction="$emit('update:dateTimeRestriction', $event)"
           @update:default-aggregation-function-id="$emit('update:defaultAggregationFunctionId', $event)"
@@ -87,82 +94,78 @@
   </q-item>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue'
+<script setup lang="ts">
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import QuerySubjectConfiguration from './QuerySubjectConfiguration.vue'
 import { useEntity } from 'src/pinia/entity'
 import { DateTimeRestriction, Entity, ExpressionFunction } from '@onto-med/top-api'
 
-export default defineComponent({
-  components: { QuerySubjectConfiguration },
-  props: {
-    dateTimeRestriction: {
-      type: Object as () => DateTimeRestriction
-    },
-    defaultAggregationFunctionId: {
-      type: String,
-      require: true
-    },
-    aggregationFunctionOptions: {
-      type: Array as () => ExpressionFunction[]
-    },
-    subjectId: {
-      type: String,
-      required: true
-    },
-    sortable: Boolean,
-    upDisabled: Boolean,
-    downDisabled: Boolean,
-    excludable: Boolean,
-    inclusion: {
-      type: Boolean,
-      default: true
-    },
+const props = defineProps({
+  dateTimeRestriction: {
+    type: Object as () => DateTimeRestriction
   },
-  emits: [
-    'moveUp', 'moveDown', 'remove',
-    'update:dateTimeRestriction', 'update:defaultAggregationFunctionId', 'update:inclusion'
-  ],
-  setup (props) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { t, d, te } = useI18n()
-    const entityStore = useEntity()
-    const { getSynonyms, hasItemType, isRestricted, getIcon, getIconTooltip, getTitle, requiresAggregationFunction } = useEntityFormatter()
-    const subject = ref<Entity>()
-
-    const loadEntity = (subjectId: string) => entityStore.loadEntity(subjectId).then(e => subject.value = e)
-
-    watch(
-      () => props.subjectId,
-      (val) => loadEntity(val)
-    )
-    onBeforeMount(() => loadEntity(props.subjectId))
-
-    return {
-      t,
-      te,
-      d,
-      subject,
-      getSynonyms,
-      isRestricted,
-      getIcon,
-      getIconTooltip,
-      getTitle,
-      hasItemType,
-
-      requiresAggregationFunction: computed(() => subject.value ? requiresAggregationFunction(subject.value) : false),
-
-      dateTimeRestrictionValues: computed(() => {
-        if (
-          !props.dateTimeRestriction?.values
-          || !props.dateTimeRestriction.values.length
-          || !props.dateTimeRestriction.values.find(v => !!v)
-        ) return undefined
-        return props.dateTimeRestriction.values.map(e => e ? d(e, 'shortWithTime') : 'NA')
-      })
-    }
+  defaultAggregationFunctionId: {
+    type: String,
+    require: true
+  },
+  aggregationFunctionOptions: {
+    type: Array as () => ExpressionFunction[]
+  },
+  subjectId: {
+    type: String,
+    required: true
+  },
+  sortable: Boolean,
+  upDisabled: Boolean,
+  downDisabled: Boolean,
+  excludable: Boolean,
+  inclusion: {
+    type: Boolean,
+    default: true
   }
+})
+
+defineEmits([
+  'moveUp',
+  'moveDown',
+  'remove',
+  'update:dateTimeRestriction',
+  'update:defaultAggregationFunctionId',
+  'update:inclusion'
+])
+
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, d, te } = useI18n()
+const entityStore = useEntity()
+const { getSynonyms, hasItemType, isRestricted, getIcon, getIconTooltip, getTitle, requiresAggregationFunction } =
+  useEntityFormatter()
+const subject = ref<Entity>()
+
+watch(
+  () => props.subjectId,
+  (val) => loadEntity(val)
+)
+
+function loadEntity(subjectId: string) {
+  entityStore.loadEntity(subjectId).then(
+    (e) => (subject.value = e),
+    () => {}
+  )
+}
+
+onBeforeMount(() => loadEntity(props.subjectId))
+
+const isAggregationRequired = computed(() => (subject.value ? requiresAggregationFunction(subject.value) : false))
+
+const dateTimeRestrictionValues = computed(() => {
+  if (
+    !props.dateTimeRestriction?.values ||
+    !props.dateTimeRestriction.values.length ||
+    !props.dateTimeRestriction.values.find((v) => !!v)
+  )
+    return undefined
+  return props.dateTimeRestriction.values.map((e) => (e ? d(e, 'shortWithTime') : 'NA'))
 })
 </script>

@@ -39,7 +39,10 @@
             no-caps
             class="q-mb-md"
             :disable="readonly"
-            :options="[ { label: t('valueRange'), value: true }, { label: t('enumeration'), value: false } ]"
+            :options="[
+              { label: t('valueRange'), value: true },
+              { label: t('enumeration'), value: false }
+            ]"
             @update:model-value="handleHasRangeChanged"
           />
 
@@ -47,8 +50,8 @@
             v-if="hasRange"
             v-model:minimum="state.values[0]"
             v-model:maximum="state.values[1]"
-            v-model:min-operator="(state as NumberRestriction|DateTimeRestriction).minOperator"
-            v-model:max-operator="(state as NumberRestriction|DateTimeRestriction).maxOperator"
+            v-model:min-operator="(state as NumberRestriction | DateTimeRestriction).minOperator"
+            v-model:max-operator="(state as NumberRestriction | DateTimeRestriction).maxOperator"
             :readonly="readonly"
             :operators="operators"
             :type="state.type"
@@ -88,7 +91,16 @@
 </template>
 
 <script setup lang="ts">
-import { BooleanRestriction, DataType, DateTimeRestriction, NumberRestriction, Quantifier, Restriction, RestrictionOperator, StringRestriction } from '@onto-med/top-api'
+import {
+  BooleanRestriction,
+  DataType,
+  DateTimeRestriction,
+  NumberRestriction,
+  Quantifier,
+  Restriction,
+  RestrictionOperator,
+  StringRestriction
+} from '@onto-med/top-api'
 import { ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
@@ -97,7 +109,9 @@ import RangeInput from 'src/components/EntityEditor/RangeInput.vue'
 const props = defineProps({
   modelValue: {
     type: Object as () => Restriction,
-    default: () => { return {} }
+    default: () => {
+      return {}
+    }
   },
   name: String,
   label: String,
@@ -111,31 +125,36 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'update:expanded'])
 
 const { t } = useI18n()
-const state = reactive(JSON.parse(JSON.stringify(props.modelValue || {})) as NumberRestriction|StringRestriction|BooleanRestriction|DateTimeRestriction)
+const state = reactive(
+  JSON.parse(JSON.stringify(props.modelValue || {})) as
+    | NumberRestriction
+    | StringRestriction
+    | BooleanRestriction
+    | DateTimeRestriction
+)
 const canHaveRange = computed(() => [DataType.Number, DataType.DateTime].includes(state.type))
 const showHelp = ref(false)
 const hasRange = ref(
-  canHaveRange.value
-  && (
-    (props.modelValue as NumberRestriction|DateTimeRestriction).minOperator !== undefined
-    || (props.modelValue as NumberRestriction|DateTimeRestriction).maxOperator !== undefined
-  )
+  canHaveRange.value &&
+    ((props.modelValue as NumberRestriction | DateTimeRestriction).minOperator !== undefined ||
+      (props.modelValue as NumberRestriction | DateTimeRestriction).maxOperator !== undefined)
 )
 
 const defaultQuantifiers = computed(() =>
-  Object.values(Quantifier).map(d => { return { label: t('quantifierType.' + d), value: d } })
+  Object.values(Quantifier).map((d) => {
+    return { label: t('quantifierType.' + d), value: d }
+  })
 )
 
-const isValid = computed(() =>
-  state.quantifier
-  && (![Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier) || state.cardinality !== undefined)
+const isValid = computed(
+  () =>
+    state.quantifier &&
+    (![Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier) || state.cardinality !== undefined)
 )
 
 const inputType = computed(() => {
-  if (state.type === DataType.DateTime)
-    return 'datetime-local'
-  if (state.type === DataType.Number)
-    return 'number'
+  if (state.type === DataType.DateTime) return 'datetime-local'
+  if (state.type === DataType.Number) return 'number'
   return 'text'
 })
 
@@ -146,7 +165,7 @@ if (!state.values) {
 
 if (hasRange.value) {
   if ((state as NumberRestriction).minOperator === undefined)
-    (state as NumberRestriction).minOperator = RestrictionOperator.GreaterThanOrEqualTo;
+    (state as NumberRestriction).minOperator = RestrictionOperator.GreaterThanOrEqualTo
   if ((state as NumberRestriction).maxOperator === undefined)
     (state as NumberRestriction).maxOperator = RestrictionOperator.LessThan
 }
@@ -164,12 +183,14 @@ watch(
 
 function handleHasRangeChanged(newValue: boolean) {
   if (!newValue && [DataType.Number, DataType.DateTime].includes(state.type)) {
-    {(state as NumberRestriction|DateTimeRestriction).minOperator = undefined}
-    (state as NumberRestriction|DateTimeRestriction).maxOperator = undefined
+    {
+      ;(state as NumberRestriction | DateTimeRestriction).minOperator = undefined
+    }
+    ;(state as NumberRestriction | DateTimeRestriction).maxOperator = undefined
   } else {
     state.values?.splice(2)
     if ((state as NumberRestriction).minOperator === undefined)
-      (state as NumberRestriction).minOperator = RestrictionOperator.GreaterThanOrEqualTo;
+      (state as NumberRestriction).minOperator = RestrictionOperator.GreaterThanOrEqualTo
     if ((state as NumberRestriction).maxOperator === undefined)
       (state as NumberRestriction).maxOperator = RestrictionOperator.LessThan
   }
@@ -177,6 +198,6 @@ function handleHasRangeChanged(newValue: boolean) {
 
 function addValue() {
   if (!state.values) state.values = []
-    state.values.push(null as never)
+  state.values.push(null as never)
 }
 </script>
