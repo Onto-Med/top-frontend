@@ -1,30 +1,28 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <q-card>
-      <q-card-section class="row no-wrap justify-between">
-        <div>
-          <div class="text-h6">
-            {{ t('documentSearch.title') }}
-          </div>
-          <div v-if="query">
-            {{ t('dataOfQuery', { thing: query.name || query.id }) }}
-          </div>
-          <div v-else>
-            <span class="q-pt-md">{{ t('documentSearch.description') }}</span>
-            <q-select
-              v-model="dataSource"
-              :options="dataSources"
-              :label="t('dataSource')"
-              :error="!dataSource"
-              hide-bottom-space
-            />
-          </div>
+      <q-card-section>
+        <div class="text-h6">
+          {{ t('documentSearch.title') }}
         </div>
+        <div v-if="query">
+          {{ t('dataOfQuery', { thing: query.name || query.id }) }}
+        </div>
+        <q-select
+          v-else
+          v-model="dataSource"
+          :options="dataSources"
+          :label="t('dataSource')"
+          :error="!dataSource"
+          dense
+          hide-bottom-space
+          class="data-source-select"
+        />
       </q-card-section>
       <q-separator />
 
       <q-card-section class="q-pa-none">
-        <concept-cluster-form :data-source="dataSource" />
+        <concept-cluster-form :data-source="dataSource" class="cluster-form" />
       </q-card-section>
     </q-card>
   </q-page>
@@ -82,3 +80,9 @@ function loadQuery() {
       .catch((e: Error) => renderError(e))
 }
 </script>
+
+<style lang="sass" scoped>
+.data-source-select
+  min-width: 50px
+  max-width: 500px
+</style>

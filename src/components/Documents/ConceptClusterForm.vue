@@ -1,5 +1,5 @@
 <template>
-  <q-splitter v-model="splitterModel" :limits="[25, 75]" class="fit">
+  <q-splitter v-model="splitterModel" :limits="[25, 75]">
     <template #before>
       <q-card>
         <q-card-section class="row q-pl-md q-pa-none bg-grey-1">
@@ -86,53 +86,49 @@
     </template>
 
     <template #after>
-      <div class="row">
-        <div class="col">
-          <q-card-section class="bg-grey-1">
-            <div class="text-subtitle2">
-              {{ t('document', 2) }}
-            </div>
-          </q-card-section>
-
-          <q-separator />
-
-          <table-with-actions
-            flat
-            wrap-cells
-            :grid="$q.screen.xs"
-            :name="t('document')"
-            :page="documents"
-            :loading="documentsLoading"
-            :columns="cols"
-            :create="false"
-            :filterable="!query"
-            @request="reloadDocuments"
-            @row-clicked="chooseDocument($event)"
-          >
-            <template v-if="query" #title>
-              <div v-show="$q.screen.gt.xs" class="text-h6">{{ t('documentsOfQuery') }}: {{ query.name }}</div>
-            </template>
-            <template v-if="query" #action-buttons>
-              <q-btn
-                icon="clear"
-                :label="t('clear')"
-                :title="t('clearDocumentQueryResult')"
-                @click="$emit('update:query', undefined)"
-              />
-            </template>
-            <template #row-cells="rowCellProps">
-              <q-td :title="rowCellProps.row.id">
-                {{ rowCellProps.row.name }}
-              </q-td>
-              <q-td>
-                {{ rowCellProps.row.text }}
-              </q-td>
-            </template>
-          </table-with-actions>
-
-          <q-inner-loading :showing="documentsLoading" />
+      <q-card-section class="bg-grey-1">
+        <div class="text-subtitle2">
+          {{ t('document', 2) }}
         </div>
-      </div>
+      </q-card-section>
+
+      <q-separator />
+
+      <table-with-actions
+        flat
+        wrap-cells
+        :grid="$q.screen.xs"
+        :name="t('document')"
+        :page="documents"
+        :loading="documentsLoading"
+        :columns="cols"
+        :create="false"
+        :filterable="!query"
+        @request="reloadDocuments"
+        @row-clicked="chooseDocument($event)"
+      >
+        <template v-if="query" #title>
+          <div v-show="$q.screen.gt.xs" class="text-h6">{{ t('documentsOfQuery') }}: {{ query.name }}</div>
+        </template>
+        <template v-if="query" #action-buttons>
+          <q-btn
+            icon="clear"
+            :label="t('clear')"
+            :title="t('clearDocumentQueryResult')"
+            @click="$emit('update:query', undefined)"
+          />
+        </template>
+        <template #row-cells="rowCellProps">
+          <q-td :title="rowCellProps.row.id">
+            {{ rowCellProps.row.name }}
+          </q-td>
+          <q-td>
+            {{ rowCellProps.row.text }}
+          </q-td>
+        </template>
+      </table-with-actions>
+
+      <q-inner-loading :showing="documentsLoading" />
     </template>
   </q-splitter>
 </template>
