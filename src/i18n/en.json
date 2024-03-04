@@ -304,8 +304,8 @@
   "repositoryType": "Repository type|Repository types",
   "documentSearch": {
     "title": "Document search",
-    "description": "Please select the type of the document representation.",
-    "short": "Explorative document search"
+    "short": "Explorative document search",
+    "description": "Please select a data source you want to search for documents."
   },
   "phenotype_repository": "Phenotype repository",
   "concept_repository": "Concept repository",
