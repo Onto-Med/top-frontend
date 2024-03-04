@@ -290,14 +290,20 @@ const mostImportantNodesOptions = computed(() => [
 
 const loading = computed(() => conceptsLoading.value || documentsLoading.value)
 
-onMounted(async () => await entityStore.loadUser().then(() => reloadConcepts()))
+onMounted(() =>
+  entityStore
+    .loadUser()
+    .then(() => reloadConcepts())
+    .then(() => reloadDocuments())
+    .catch((e: Error) => renderError(e))
+)
 
-watch([mostImportantNodes, conceptMode, selectedConcepts], () => reloadDocuments().catch((e: Error) => renderError(e)))
+watch([mostImportantNodes, conceptMode, selectedConcepts], () => reloadDocuments())
 
-async function reloadConcepts() {
+function reloadConcepts() {
   if (!conceptApi || !documentApi || conceptsLoading.value) return
   conceptsLoading.value = true
-  await checkPipeline()
+  checkPipeline()
     .then(() => conceptApi.getConceptClusters(undefined, undefined, false))
     .then((r) => {
       concepts.value = r.data.content
@@ -316,13 +322,13 @@ async function reloadConcepts() {
     .finally(() => (conceptsLoading.value = false))
 }
 
-async function reloadDocuments(name?: string, page?: number) {
+function reloadDocuments(name?: string, page?: number) {
   if (!documentApi || documentsLoading.value) return
   documents.value = undefined
   document_.value = undefined
   const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
   documentsLoading.value = true
-  await documentApi
+  documentApi
     .getDocuments(
       datasource.value,
       name,
