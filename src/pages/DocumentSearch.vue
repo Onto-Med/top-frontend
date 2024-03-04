@@ -7,20 +7,12 @@
             {{ t('documentSearch.title') }}
           </div>
           <span class="q-pt-md">{{ t('documentSearch.description') }}</span>
-          <div class="row q-gutter-md">
-            <q-btn-toggle
-              v-model="searchType"
-              :options="searchTypeOptions"
-              no-caps
-              rounded
-            />
-          </div>
-        </div>
-        <div v-if="!props.queryId && searchType===SearchTypesEnum.SEARCH_QUERY" class="self-center">
-          <q-btn
-            color="primary"
-            label="Run Search Query on Documents"
-            :to="{ name: 'queryBuilder', params: { organisationId: organisationId } }"
+          <q-select
+            v-model="dataSource"
+            :options="dataSources"
+            :label="t('dataSource')"
+            :error="!dataSource"
+            hide-bottom-space
           />
         </div>
       </q-card-section>
@@ -28,14 +20,7 @@
 
       <q-card-section class="q-pa-none">
         <concept-cluster-form
-          v-if="searchType === SearchTypesEnum.CONCEPT_CLUSTER"
-        />
-        <search-query-form
-          v-if="searchType === SearchTypesEnum.SEARCH_QUERY"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          :query-id="queryId"
-          :query-name="queryName"
+          :data-source="dataSource"
         />
       </q-card-section>
     </q-card>
@@ -44,13 +29,14 @@
 
 <script setup lang="ts">
 import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
-import SearchQueryForm from 'components/Documents/SearchQueryForm.vue'
-import {useI18n} from 'vue-i18n'
-import {computed, ref, watch} from 'vue'
-import {useRouter} from 'vue-router'
-import {SearchTypesEnum} from 'src/config'
+import { useI18n } from 'vue-i18n'
+import { inject, onMounted, ref } from 'vue'
+import { SearchTypesEnum } from 'src/config'
+import { DataSource, QueryType } from '@onto-med/top-api'
+import { QueryApiKey } from 'src/boot/axios'
+import useNotify from 'src/mixins/useNotify'
 
-const props = defineProps({
+defineProps({
   initialSearchType: {
     type: String as () => SearchTypesEnum,
     default: SearchTypesEnum.CONCEPT_CLUSTER
@@ -62,29 +48,17 @@ const props = defineProps({
 })
 
 const { t } = useI18n()
-const router = useRouter()
-const searchType = ref(props.initialSearchType)
-const searchTypeOptions = computed(() =>
-  Object.values(SearchTypesEnum)
-    .map(st => ({ label: t(st), value: st }))
-)
+const { renderError } = useNotify()
+const dataSource = ref<DataSource>()
+const dataSources = ref<DataSource[]>([])
+const queryApi = inject(QueryApiKey)
 
-void setSearchTypeInRouteQuery(searchType.value)
+onMounted(() => reloadDataSources())
 
-watch(
-  searchType,
-  async (newValue) => await setSearchTypeInRouteQuery(newValue)
-)
-
-async function setSearchTypeInRouteQuery(searchType: SearchTypesEnum) {
-  if (searchType == SearchTypesEnum.SEARCH_QUERY && props.organisationId && props.repositoryId && props.queryId) {
-    await router.replace({
-      name: 'documentSearchByQuery',
-      params: props,
-      query: { searchType, queryName: props.queryName }
-    })
-  } else {
-    await router.replace({ name: 'documentSearch', query: { searchType } })
-  }
+function reloadDataSources() {
+  queryApi
+    ?.getDataSources(QueryType.Concept)
+    .then((r) => (dataSources.value = r.data))
+    .catch((e: Error) => renderError(e))
 }
 </script>

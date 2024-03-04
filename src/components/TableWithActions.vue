@@ -15,25 +15,28 @@
       >
         <template #top>
           <slot name="title">
-            <div class="text-h6">
-              {{ title || name }}
+            <div v-if="title" class="text-h6">
+              {{ title }}
             </div>
           </slot>
-          <q-space />
-          <q-input
-            v-if="filterable"
-            v-model="filter"
-            :label="t('searchThing', { thing: title || name })"
-            dense
-            debounce="300"
-            color="primary"
-            class="q-pr-md"
-            @update:model-value="onFilter"
-          >
-            <template #append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+          <q-space v-if="title" />
+          <div :class="{ 'col': !title }">
+            <q-input
+              v-if="filterable"
+              v-model="filter"
+              :label="t('searchThing', { thing: title || name })"
+              dense
+              debounce="300"
+              color="primary"
+              class="q-pr-md"
+              @update:model-value="onFilter"
+            >
+              <template #append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+          <q-space v-if="!title" />
           <q-btn-group>
             <slot name="action-buttons" />
             <q-btn
@@ -86,11 +89,11 @@
     <q-card-section class="q-pt-none">
       <div class="row justify-end items-center">
         <b class="text-grey-8">
-          {{ t('resultCountWithTotal', { count: page.content.length, total: page.totalElements }) }}
+          {{ t('resultCountWithTotal', { count: page?.content.length || 0, total: page?.totalElements || 0 }) }}
         </b>
         <q-pagination
-          :model-value="page.number"
-          :max="page.totalPages"
+          :model-value="page?.number || 0"
+          :max="page?.totalPages || 0"
           boundary-links
           direction-links
           color="grey-8"
@@ -115,10 +118,7 @@ const props = defineProps({
   /** The name to be used for button labels. It should be singular noun. */
   name: String,
   /** The page holding the content if the table. */
-  page: {
-    type: Object as () => OrganisationPage | RepositoryPage | DocumentPage,
-    required: true
-  },
+  page: Object as () => OrganisationPage | RepositoryPage | DocumentPage,
   columns: Array as () => QTableProps['columns'],
   loading: Boolean,
   /** Whether creating new entries is allowed. A respective button is displayed if true. */

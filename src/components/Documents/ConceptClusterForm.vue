@@ -91,35 +91,44 @@
           <q-card-section class="bg-grey-1">
             <div class="text-subtitle2">
               {{ t('document', 2) }}
-              <span v-if="selectedConcepts.length"> ({{ t('resultCount', documents.length) }}) </span>
             </div>
           </q-card-section>
 
           <q-separator />
 
-          <q-virtual-scroll
-            v-if="selectedConcepts.length"
-            v-slot="{ item }"
-            style="height: 72vh"
-            :items="documents"
-            separator
+          <table-with-actions
+            flat
+            wrap-cells
+            :grid="$q.screen.xs"
+            :name="t('document')"
+            :page="documents"
+            :loading="documentsLoading"
+            :columns="cols"
+            :create="false"
+            :filterable="!query"
+            @request="reloadDocuments"
+            @row-clicked="chooseDocument($event)"
           >
-            <q-item :key="item.id" class="cursor-pointer relative-position" clickable @click="chooseDocument(item.id)">
-              <q-item-section>
-                <q-item-label class="document-item">
-                  {{ item.name || item.id }}
-                </q-item-label>
-                <q-item-label caption lines="2">
-                  {{ item.text }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-virtual-scroll>
-
-          <div v-else class="row q-pa-md text-grey items-center">
-            <q-icon name="arrow_back_ios" size="xl" class="col-auto" />
-            <div class="col">{{ t('conceptCluster.selectConceptsDescription') }}</div>
-          </div>
+            <template v-if="query" #title>
+              <div v-show="$q.screen.gt.xs" class="text-h6">{{ t('documentsOfQuery') }}: {{ query.name }}</div>
+            </template>
+            <template v-if="query" #action-buttons>
+              <q-btn
+                icon="clear"
+                :label="t('clear')"
+                :title="t('clearDocumentQueryResult')"
+                @click="$emit('update:query', undefined)"
+              />
+            </template>
+            <template #row-cells="rowCellProps">
+              <q-td :title="rowCellProps.row.id">
+                {{ rowCellProps.row.name }}
+              </q-td>
+              <q-td>
+                {{ rowCellProps.row.text }}
+              </q-td>
+            </template>
+          </table-with-actions>
 
           <q-inner-loading :showing="documentsLoading" />
         </div>
@@ -132,10 +141,19 @@
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DocumentApiKey, ConceptClusterApiKey, ConceptgraphsApiKey } from 'src/boot/axios'
-import { Document, ConceptCluster, PipelineResponseStatus, DocumentGatheringMode } from '@onto-med/top-api'
+import {
+  Document,
+  ConceptCluster,
+  PipelineResponseStatus,
+  DocumentGatheringMode,
+  DataSource,
+  Query,
+  DocumentPage
+} from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
+import TableWithActions from 'components/TableWithActions.vue'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
-import { useQuasar } from 'quasar'
+import { QTableProps, useQuasar } from 'quasar'
 import Dialog from 'src/components/Dialog.vue'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
@@ -145,6 +163,13 @@ interface ConceptColor {
   color: string
 }
 
+defineProps<{
+  dataSource?: DataSource
+  query?: Query
+}>()
+
+defineEmits(['update:query'])
+
 const { t } = useI18n()
 const $q = useQuasar()
 const { renderError, notify } = useNotify()
@@ -153,7 +178,7 @@ const conceptApi = inject(ConceptClusterApiKey)
 const conceptGraphsApi = inject(ConceptgraphsApiKey)
 const entityStore = useEntity()
 const { isAdmin } = storeToRefs(entityStore)
-const documents = ref<Document[]>([])
+const documents = ref<DocumentPage>()
 const document_ = ref<Document>()
 const concepts = ref<ConceptCluster[]>([])
 const conceptsLoading = ref(false)
@@ -231,6 +256,15 @@ const splitterModel = ref(40)
 const processId = 'top-framework'
 const datasource = ref('')
 
+const cols = computed(
+  () =>
+    [
+      { name: 'actions' },
+      { name: 'name', field: 'name', label: t('name'), align: 'left' },
+      { name: 'text', field: 'text', label: t('content'), align: 'left' }
+    ] as QTableProps['columns']
+)
+
 const conceptModeOptions = computed(() => [
   {
     label: t('exclusive'),
@@ -282,28 +316,27 @@ async function reloadConcepts() {
     .finally(() => (conceptsLoading.value = false))
 }
 
-async function reloadDocuments() {
+async function reloadDocuments(name?: string, page?: number) {
   if (!documentApi || documentsLoading.value) return
-  documents.value = []
+  documents.value = undefined
   document_.value = undefined
   const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
-  if (conceptClusterIds.length > 0) {
-    documentsLoading.value = true
-    await documentApi
-      .getDocuments(
-        datasource.value,
-        undefined,
-        undefined,
-        undefined,
-        conceptClusterIds,
-        undefined,
-        conceptMode.value,
-        mostImportantNodes.value
-      )
-      .then((r) => (documents.value = r.data.content))
-      .catch((e: Error) => renderError(e))
-      .finally(() => (documentsLoading.value = false))
-  }
+  documentsLoading.value = true
+  await documentApi
+    .getDocuments(
+      datasource.value,
+      name,
+      undefined,
+      undefined,
+      conceptClusterIds,
+      undefined,
+      conceptMode.value,
+      mostImportantNodes.value,
+      page
+    )
+    .then((r) => (documents.value = r.data))
+    .catch((e: Error) => renderError(e))
+    .finally(() => (documentsLoading.value = false))
 }
 
 function setConceptMode(newMode = DocumentGatheringMode.Exclusive) {
