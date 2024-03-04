@@ -126,7 +126,7 @@ const emit = defineEmits(['hide', 'ok'])
 const { t } = useI18n()
 const { notify, renderError } = useNotify()
 const $q = useQuasar()
-const dialog = ref<QDialog|undefined>(undefined)
+const dialog = ref<QDialog | undefined>(undefined)
 const dataSource = ref<DataSource>()
 const dataSources = ref<DataSource[]>([])
 const availableDataSources = ref<DataSource[]>([])
@@ -152,8 +152,7 @@ const columns = computed(() => {
 
 onMounted(async () => {
   await reloadDataSources()
-  await queryApi?.getDataSources()
-    .then(r => availableDataSources.value = r.data)
+  await queryApi?.getDataSources().then((r) => (availableDataSources.value = r.data))
 })
 
 function hide() {
@@ -164,12 +163,13 @@ async function reloadDataSources() {
   if (loading.value || !queryApi) return
   loading.value = true
 
-  await queryApi.getOrganisationDataSources(props.organisation.id)
-    .then(r => {
+  await queryApi
+    .getOrganisationDataSources(props.organisation.id)
+    .then((r) => {
       dataSources.value = r.data
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 
 function resetDataSource() {
@@ -188,10 +188,11 @@ async function addDataSource() {
   if (!queryApi || !isAuthenticated.value || !dataSource.value) return
   loading.value = true
 
-  await queryApi.addOrganisationDataSource(props.organisation.id, dataSource.value)
+  await queryApi
+    .addOrganisationDataSource(props.organisation.id, dataSource.value)
     .then(() => {
       const source = dataSource.value as DataSource
-      const index = dataSources.value.findIndex(ds => ds.id === source.id)
+      const index = dataSources.value.findIndex((ds) => ds.id === source.id)
       if (index !== -1) {
         dataSources.value[index] = source
       } else {
@@ -201,7 +202,7 @@ async function addDataSource() {
       resetDataSource()
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 
 function deleteDataSource(dataSource: DataSource) {
@@ -213,16 +214,17 @@ function deleteDataSource(dataSource: DataSource) {
     }
   }).onOk(() => {
     loading.value = true
-    queryApi.removeOrganisationDataSource(props.organisation.id, dataSource)
+    queryApi
+      .removeOrganisationDataSource(props.organisation.id, dataSource)
       .then(() => {
-        const index = dataSources.value.findIndex(ds => ds.id === dataSource.id)
+        const index = dataSources.value.findIndex((ds) => ds.id === dataSource.id)
         if (index !== -1) {
           dataSources.value.splice(index, 1)
         }
         notify(t('thingRemoved', { thing: t('dataSource') }), 'positive')
       })
       .catch((e: Error) => renderError(e))
-      .finally(() => loading.value = false)
+      .finally(() => (loading.value = false))
   })
 }
 </script>

@@ -36,9 +36,7 @@
           <q-separator v-show="$q.screen.gt.sm && showHelp" vertical />
 
           <div v-show="$q.screen.gt.sm && showHelp" class="col-6 q-pa-md">
-            <div class="text-subtitle1">
-              {{ t('help') }}:
-            </div>
+            <div class="text-subtitle1">{{ t('help') }}:</div>
             {{ helpText }}
           </div>
         </q-card-section>
@@ -67,8 +65,7 @@ const emit = defineEmits(['update:expanded', 'update:showHelp'])
 const { t } = useI18n()
 
 function toggleHelp() {
-  if (!props.showHelp && !props.expanded)
-    emit('update:expanded', true)
+  if (!props.showHelp && !props.expanded) emit('update:expanded', true)
   emit('update:showHelp', !props.showHelp)
 }
 </script>

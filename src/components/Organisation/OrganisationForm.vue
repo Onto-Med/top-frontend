@@ -38,14 +38,17 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat :label="t('save')" color="primary" :disable="!isValid" @click="$emit('update:model-value', state)" />
+        <q-btn
+          flat
+          :label="t('save')"
+          color="primary"
+          :disable="!isValid"
+          @click="$emit('update:model-value', state)"
+        />
         <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
       </q-card-actions>
 
-      <q-inner-loading
-        :showing="loading"
-        :label="t('pleaseWait') + '...'"
-      />
+      <q-inner-loading :showing="loading" :label="t('pleaseWait') + '...'" />
     </q-card>
   </q-dialog>
 </template>
@@ -74,10 +77,10 @@ const isValid = computed(() => state.value.name && state.value.id)
 
 watch(
   () => props.modelValue,
-  (value) => state.value = copy(value)
+  (value) => (state.value = copy(value))
 )
 
-function setId(id: string|number|null) {
+function setId(id: string | number | null) {
   if (!isNew.value) return
   state.value.id = toValidId(id)
 }

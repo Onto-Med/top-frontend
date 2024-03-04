@@ -53,28 +53,23 @@
             />
           </q-btn-group>
         </template>
-        <template #header="props">
-          <q-tr :props="props">
-            <q-th
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-              class="bg-grey-1"
-            >
+        <template #header="headerProps">
+          <q-tr :props="headerProps">
+            <q-th v-for="col in headerProps.cols" :key="col.name" :props="headerProps" class="bg-grey-1">
               {{ col.label }}
             </q-th>
           </q-tr>
         </template>
-        <template #body="props">
-          <q-tr class="cursor-pointer" :props="props" @click="$emit('row-clicked', props.row)">
+        <template #body="bodyProps">
+          <q-tr class="cursor-pointer" :props="bodyProps" @click="$emit('row-clicked', bodyProps.row)">
             <q-td auto-width>
-              <slot name="actions" :row="props.row" />
+              <slot name="actions" :row="bodyProps.row" />
             </q-td>
-            <slot name="row-cells" :row="props.row">
-              <q-td>{{ props.row.name || props.row.id }}</q-td>
-              <q-td>{{ props.row.description }}</q-td>
-              <q-td :title="t('createdAt', { date: d(props.row.createdAt, 'long') })">
-                {{ d(props.row.updatedAt, 'long') }}
+            <slot name="row-cells" :row="bodyProps.row">
+              <q-td>{{ bodyProps.row.name || bodyProps.row.id }}</q-td>
+              <q-td>{{ bodyProps.row.description }}</q-td>
+              <q-td :title="t('createdAt', { date: d(bodyProps.row.createdAt, 'long') })">
+                {{ d(bodyProps.row.updatedAt, 'long') }}
               </q-td>
             </slot>
           </q-tr>
@@ -108,72 +103,64 @@
   </q-card>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { QTableProps } from 'quasar'
-import { defineComponent, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DocumentPage, OrganisationPage, RepositoryPage } from '@onto-med/top-api'
 
-export default defineComponent({
-  props: {
-    /** The title to be displayed above the table. It is recommended to use a plural noun. */
-    title: String,
-    /** The name to be used for button labels. It should be singular noun. */
-    name: String,
-    /** The page holding the content if the table. */
-    page: {
-      type: Object as () => OrganisationPage|RepositoryPage|DocumentPage,
-      required: true
-    },
-    columns: Array as () => QTableProps['columns'],
-    loading: Boolean,
-    /** Whether creating new entries is allowed. A respective button is displayed if true. */
-    create: Boolean,
-    /** Whether a search field is enabled */
-    filterable: {
-      type: Boolean,
-      default: true
-    },
-    /** Wrap text within table cells. */
-    wrapCells: Boolean
+const props = defineProps({
+  /** The title to be displayed above the table. It is recommended to use a plural noun. */
+  title: String,
+  /** The name to be used for button labels. It should be singular noun. */
+  name: String,
+  /** The page holding the content if the table. */
+  page: {
+    type: Object as () => OrganisationPage | RepositoryPage | DocumentPage,
+    required: true
   },
-  emits: ['row-clicked', 'create-clicked', 'request'],
-  setup(props, { emit }) {
-    const { t, d } = useI18n()
-    const filter = ref('')
-
-    return {
-      t,
-      d,
-      filter,
-
-      cols: computed(() => {
-        if (props.columns) return props.columns
-        return [
-          { name: 'actions' },
-          { name: 'name', field: 'name', label: t('name'), align: 'left', required: true },
-          { name: 'description', field: 'description', label: t('description'), align: 'left' },
-          { name: 'updatedAt', field: 'updatedAt', label: t('updatedAt'), align: 'left' }
-        ] as QTableProps['columns']
-      }),
-
-      rows: computed(() => props.page?.content),
-
-      onPageSelect (page: number) {
-        emit('request', filter.value, page)
-      },
-
-      onFilter () {
-        emit('request', filter.value, 1)
-      },
-
-      reload () {
-        filter.value = ''
-        emit('request', undefined, 1)
-      }
-    }
-  }
+  columns: Array as () => QTableProps['columns'],
+  loading: Boolean,
+  /** Whether creating new entries is allowed. A respective button is displayed if true. */
+  create: Boolean,
+  /** Whether a search field is enabled */
+  filterable: {
+    type: Boolean,
+    default: true
+  },
+  /** Wrap text within table cells. */
+  wrapCells: Boolean
 })
+
+const emit = defineEmits(['row-clicked', 'create-clicked', 'request'])
+
+const { t, d } = useI18n()
+const filter = ref('')
+
+const cols = computed(() => {
+  if (props.columns) return props.columns
+  return [
+    { name: 'actions' },
+    { name: 'name', field: 'name', label: t('name'), align: 'left', required: true },
+    { name: 'description', field: 'description', label: t('description'), align: 'left' },
+    { name: 'updatedAt', field: 'updatedAt', label: t('updatedAt'), align: 'left' }
+  ] as QTableProps['columns']
+})
+
+const rows = computed(() => props.page?.content)
+
+function onPageSelect(page: number) {
+  emit('request', filter.value, page)
+}
+
+function onFilter() {
+  emit('request', filter.value, 1)
+}
+
+function reload() {
+  filter.value = ''
+  emit('request', undefined, 1)
+}
 </script>
 
 <style lang="sass">

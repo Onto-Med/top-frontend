@@ -14,20 +14,10 @@
       <q-separator />
 
       <q-card-section class="q-pa-none">
-        <div
-          v-if="!entity"
-          v-t="'terminologyImport.description'"
-          class="text-italic q-pa-md"
-        />
+        <div v-if="!entity" v-t="'terminologyImport.description'" class="text-italic q-pa-md" />
         <div v-else>
           <div class="row q-px-sm q-pb-sm">
-            <entity-display
-              :entity="entity"
-              show-descriptions
-              show-entity-type
-              show-synonyms
-              class="col"
-            />
+            <entity-display :entity="entity" show-descriptions show-entity-type show-synonyms class="col" />
             <div v-if="isPhenotype(entity)" class="col-4">
               <enum-select v-model:selected="itemType" i18n-prefix="itemType" :enum="ItemType" dense required />
               <enum-select v-model:selected="dataType" i18n-prefix="dataType" :enum="DataType" dense required />
@@ -46,9 +36,9 @@
               <div v-for="(restriction, index) in restrictions" :key="index" class="row">
                 <range-input
                   v-model:min-operator="restriction.minOperator"
-                  v-model:minimum="(restriction.values as (number|Date|undefined)[])[0]"
+                  v-model:minimum="(restriction.values as (number | Date | undefined)[])[0]"
                   v-model:max-operator="restriction.maxOperator"
-                  v-model:maximum="(restriction.values as (number|Date|undefined)[])[1]"
+                  v-model:maximum="(restriction.values as (number | Date | undefined)[])[1]"
                   :type="entity.dataType"
                   class="col no-wrap"
                 />
@@ -78,7 +68,17 @@
 </template>
 
 <script setup lang="ts">
-import { Code, DataType, Entity, EntityType, ItemType, NumberRestriction, Phenotype, RepositoryType, SingleConcept } from '@onto-med/top-api'
+import {
+  Code,
+  DataType,
+  Entity,
+  EntityType,
+  ItemType,
+  NumberRestriction,
+  Phenotype,
+  RepositoryType,
+  SingleConcept
+} from '@onto-med/top-api'
 import { useDialogPluginComponent } from 'quasar'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -116,8 +116,7 @@ const dataType = ref<DataType>()
 const unit = ref<string>()
 
 const entity = computed(() => {
-  if (selection.value)
-    return toEntity(selection.value)
+  if (selection.value) return toEntity(selection.value)
   return undefined
 })
 
@@ -131,63 +130,69 @@ const isValid = computed(() => {
   return false
 })
 
-function addRestriction () {
-  if (!entity.value || props.repositoryType !== RepositoryType.PhenotypeRepository)
-    return
+function addRestriction() {
+  if (!entity.value || props.repositoryType !== RepositoryType.PhenotypeRepository) return
   restrictions.value.push({
     type: (entity.value as Phenotype).dataType as DataType,
     values: []
   })
 }
 
-function toEntity (code: Code) {
+function toEntity(code: Code) {
   if (props.repositoryType === RepositoryType.ConceptRepository) {
     return {
-      codes: [ code ],
+      codes: [code],
       entityType: EntityType.SingleConcept,
       id: (uuidv4 as () => string)(),
-      superConcepts: props.superEntity ? [ props.superEntity ]: [],
-      synonyms: code.synonyms?.map(s => ({ lang: locale.value, text: s })),
-      titles: [ {
-        lang: locale.value,
-        text: (code.name || t('unnamedConcept'))
-      } ]
+      superConcepts: props.superEntity ? [props.superEntity] : [],
+      synonyms: code.synonyms?.map((s) => ({ lang: locale.value, text: s })),
+      titles: [
+        {
+          lang: locale.value,
+          text: code.name || t('unnamedConcept')
+        }
+      ]
     } as SingleConcept
   }
   if (props.repositoryType === RepositoryType.PhenotypeRepository) {
     return {
-      codes: [ code ],
+      codes: [code],
       dataType: dataType.value,
       entityType: EntityType.SinglePhenotype,
       id: (uuidv4 as () => string)(),
       itemType: itemType.value,
-      superCategories: props.superEntity ? [ props.superEntity ]: [],
-      synonyms: code.synonyms?.map(s => ({ lang: locale.value, text: s })),
-      titles: [ {
-        lang: locale.value,
-        text: (code.name || t('unnamedPhenotype'))
-      } ],
+      superCategories: props.superEntity ? [props.superEntity] : [],
+      synonyms: code.synonyms?.map((s) => ({ lang: locale.value, text: s })),
+      titles: [
+        {
+          lang: locale.value,
+          text: code.name || t('unnamedPhenotype')
+        }
+      ],
       unit: dataType.value === DataType.Number ? unit.value : undefined
     } as Phenotype
   }
   return undefined
 }
 
-function onOkClick () {
+function onOkClick() {
   if (!entity.value) return
-  entityStore.saveEntity(entity.value)
+  entityStore
+    .saveEntity(entity.value)
     .then(() => {
       if (props.repositoryType === RepositoryType.PhenotypeRepository) {
-        return Promise.all(restrictions.value.map(async r => {
-          await entityStore.saveEntity({
-            id: (uuidv4 as () => string)(),
-            dataType: DataType.Boolean,
-            entityType: EntityType.SingleRestriction,
-            superPhenotype: entity.value,
-            titles: [ { lang: locale.value, text: restrictionToString(r) }],
-            restriction: r
-          } as Phenotype)
-        }))
+        return Promise.all(
+          restrictions.value.map(async (r) => {
+            await entityStore.saveEntity({
+              id: (uuidv4 as () => string)(),
+              dataType: DataType.Boolean,
+              entityType: EntityType.SingleRestriction,
+              superPhenotype: entity.value,
+              titles: [{ lang: locale.value, text: restrictionToString(r) }],
+              restriction: r
+            } as Phenotype)
+          })
+        )
       }
     })
     .then((r) => {

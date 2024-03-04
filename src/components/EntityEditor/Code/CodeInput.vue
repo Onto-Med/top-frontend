@@ -27,10 +27,7 @@
       </span>
     </template>
     <template #option="scope">
-      <q-item
-        v-bind="scope.itemProps"
-        :disable="disabledCodes.some(code => code.uri == scope.opt.uri)"
-      >
+      <q-item v-bind="scope.itemProps" :disable="disabledCodes.some((code) => code.uri == scope.opt.uri)">
         <q-item-section>
           <q-item-label>
             <!-- eslint-disable-next-line vue/no-v-html -->
@@ -65,18 +62,10 @@
       </q-item>
     </template>
     <template #before>
-      <code-system-input
-        v-model="codeSystemFilter"
-        class="system-input"
-      />
+      <code-system-input v-model="codeSystemFilter" class="system-input" />
     </template>
     <template #after>
-      <enum-select
-        v-if="selection"
-        v-model:selected="selection.scope"
-        :enum="CodeScope"
-        i18n-prefix="codeScope"
-      />
+      <enum-select v-if="selection" v-model:selected="selection.scope" :enum="CodeScope" i18n-prefix="codeScope" />
       <q-btn
         v-if="!noBtn"
         color="primary"
@@ -171,33 +160,37 @@ const manualCode = ref<Code>({
 
 const autoSuggestOptions = ref<Code[]>([])
 const loading = ref(false)
-const prevInput = ref(undefined as string|undefined)
+const prevInput = ref(undefined as string | undefined)
 const nextPage = ref(2)
 const totalPages = ref(0)
 
 const isValid = computed(() => validateCode(selection.value))
 const isValidManualCode = computed(() => validateCode(manualCode.value))
 
-async function loadOptions (input?: string, codeSystems?: CodeSystem[], page = 1): Promise<CodePage> {
+async function loadOptions(input?: string, codeSystems?: CodeSystem[], page = 1): Promise<CodePage> {
   if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
-  return codeApi?.getCodeSuggestions(
-    undefined,
-    input?.toLowerCase(),
-    codeSystems?.filter(cs => cs.externalId).map(cs => cs.externalId as string),
-    page
-  ).then(r => r.data)
-}
-
-function validateCode (code?: Code) {
-  return !!code
-    && code.code
-    && code.codeSystem?.uri
-    && !props.disabledCodes.some(code =>
-      manualCode.value.code == code.code && manualCode.value.codeSystem?.uri == code.codeSystem?.uri
+  return codeApi
+    ?.getCodeSuggestions(
+      undefined,
+      input?.toLowerCase(),
+      codeSystems?.filter((cs) => cs.externalId).map((cs) => cs.externalId as string),
+      page
     )
+    .then((r) => r.data)
 }
 
-function select (entry?: Code, manual = false) {
+function validateCode(code?: Code) {
+  return (
+    !!code &&
+    code.code &&
+    code.codeSystem?.uri &&
+    !props.disabledCodes.some(
+      (code) => manualCode.value.code == code.code && manualCode.value.codeSystem?.uri == code.codeSystem?.uri
+    )
+  )
+}
+
+function select(entry?: Code, manual = false) {
   if (!validateCode(entry)) return
   emit('select', entry)
   selection.value = undefined
@@ -214,7 +207,7 @@ function select (entry?: Code, manual = false) {
   }
 }
 
-function autoSuggest (searchString: string, update: (callBackFn: () => void) => void, abort: () => void) {
+function autoSuggest(searchString: string, update: (callBackFn: () => void) => void, abort: () => void) {
   if (searchString.length < 2) {
     abort()
     return
@@ -224,21 +217,27 @@ function autoSuggest (searchString: string, update: (callBackFn: () => void) => 
   nextPage.value = 2
   totalPages.value = 0
   loadOptions(searchString, codeSystemFilter.value ? [codeSystemFilter.value] : undefined)
-    .then(page => {
+    .then((page) => {
       totalPages.value = page.totalPages
-      update(() => autoSuggestOptions.value = page.content)
+      update(() => (autoSuggestOptions.value = page.content))
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 
-function onScroll ({ to, direction, ref }: ScrollDetails) {
+function onScroll({ to, direction, ref }: ScrollDetails) {
   const lastIndex = autoSuggestOptions.value.length - 1
-  if (loading.value || !prevInput.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease')
+  if (
+    loading.value ||
+    !prevInput.value ||
+    nextPage.value > totalPages.value ||
+    to !== lastIndex ||
+    direction === 'decrease'
+  )
     return
   loading.value = true
   loadOptions(prevInput.value, codeSystemFilter.value ? [codeSystemFilter.value] : undefined, nextPage.value)
-    .then(page => {
+    .then((page) => {
       totalPages.value = page.totalPages
       if (page.content.length > 0) {
         nextPage.value++
@@ -250,7 +249,7 @@ function onScroll ({ to, direction, ref }: ScrollDetails) {
       }
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 </script>
 

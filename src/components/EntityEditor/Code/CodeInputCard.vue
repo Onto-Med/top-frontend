@@ -51,8 +51,18 @@
         <q-list dense separator>
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
-              <a :href="entry.uri" target="_blank" class="code-link" :title="entry.uri ? t('showThing', { thing: t('code') }) : ''">
-                {{ entry.codeSystem?.shortName || entry.codeSystem?.externalId || entry.codeSystem?.uri || t('unknownCodeSystem') }}:
+              <a
+                :href="entry.uri"
+                target="_blank"
+                class="code-link"
+                :title="entry.uri ? t('showThing', { thing: t('code') }) : ''"
+              >
+                {{
+                  entry.codeSystem?.shortName ||
+                  entry.codeSystem?.externalId ||
+                  entry.codeSystem?.uri ||
+                  t('unknownCodeSystem')
+                }}:
                 <span v-if="entry.name">
                   {{ entry.name }}
                   <small v-show="entry.code">[{{ entry.code }}]</small>
@@ -141,17 +151,18 @@ const disabledCodes = computed(() => {
 
 function codeEquals(code1?: Code, code2?: Code, includeScope = false) {
   if (!code1 || !code2) return false
-  return code1.codeSystem.uri == code2.codeSystem.uri
-    && code1.code == code2.code
-    && (!includeScope || code1.scope == code2.scope)
+  return (
+    code1.codeSystem.uri == code2.codeSystem.uri &&
+    code1.code == code2.code &&
+    (!includeScope || code1.scope == code2.scope)
+  )
 }
 
 function addEntries(entries?: Code[]) {
   if (!entries) return [false]
   const newModelValue = props.modelValue.slice()
-  const results = entries.map(e => {
-    if (newModelValue.some(c => codeEquals(c, e, true)))
-      return false
+  const results = entries.map((e) => {
+    if (newModelValue.some((c) => codeEquals(c, e, true))) return false
     newModelValue.push(e)
     return true
   })
@@ -174,13 +185,11 @@ function removeEntryByIndex(index: number) {
 function showImportDialog() {
   $q.dialog({
     component: CodeImportDialog
-  }).onOk(
-    (codes: Code[]) => {
-      const accepted = addEntries(codes).filter(e => !!e).length
-      notify(t('codeImport.imported', accepted), 'positive')
-      emit('update:expanded', true)
-    }
-  )
+  }).onOk((codes: Code[]) => {
+    const accepted = addEntries(codes).filter((e) => !!e).length
+    notify(t('codeImport.imported', accepted), 'positive')
+    emit('update:expanded', true)
+  })
 }
 </script>
 

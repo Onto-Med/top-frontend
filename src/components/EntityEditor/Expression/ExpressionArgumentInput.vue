@@ -1,8 +1,9 @@
 <template>
-  <div class="expression-input" :class="{ 'row': !expand, 'text-primary': flash }">
+  <div class="expression-input" :class="{ row: !expand, 'text-primary': flash }">
     <slot name="prepend" />
     <div v-if="modelValue?.entityId || isEntity">
-      {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
+      {{ expand ? '&nbsp;'.repeat(indentLevel * indent) : ''
+      }}<!--
    --><entity-chip
         :entity-id="modelValue.entityId"
         :entity-types="entityTypes"
@@ -26,7 +27,7 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="modelValue?.values && modelValue?.values.length || modelValue?.constantId || isConstant">
+    <div v-else-if="(modelValue?.values && modelValue?.values.length) || modelValue?.constantId || isConstant">
       <expression-value-input
         :value="modelValue.values && modelValue?.values.length ? modelValue.values[0] : undefined"
         :constant-id="modelValue.constantId"
@@ -42,30 +43,18 @@
       <slot name="append" />
     </div>
     <template v-else>
-      <div
-        v-if="prefix"
-      >
-        <span
-          :class="{ hover: hover }"
-          class="clickable"
-          @mouseover="hover = true"
-          @mouseleave="hover = false"
-        >
-          {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}<!--
+      <div v-if="prefix">
+        <span :class="{ hover: hover }" class="clickable" @mouseover="hover = true" @mouseleave="hover = false">
+          {{ expand ? '&nbsp;'.repeat(indentLevel * indent) : ''
+          }}<!--
           --><b v-if="fun" :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
           <span v-else>[{{ t('selectThing', { thing: t('function') }) }}]</span>
           <span v-show="argumentCount">(</span>
         </span>
         <slot v-if="!argumentCount" name="append" />
       </div>
-      <div
-        v-else
-        class="clickable"
-        :class="{ hover: hover }"
-        @mouseover="hover = true"
-        @mouseleave="hover = false"
-      >
-        {{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }}(
+      <div v-else class="clickable" :class="{ hover: hover }" @mouseover="hover = true" @mouseleave="hover = false">
+        {{ expand ? '&nbsp;'.repeat(indentLevel * indent) : '' }}(
       </div>
 
       <div :class="expand ? '' : 'col row items-center'">
@@ -78,8 +67,10 @@
             @mouseleave="hover = false"
           >
             <span>
-              {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;' }}<!--
-              --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b><!--
+              {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;'
+              }}<!--
+              --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b
+              ><!--
               -->{{ !expand ? '&nbsp;' : '' }}
             </span>
           </span>
@@ -119,7 +110,7 @@
               :title="t('addMoreArguments')"
               @mouseover="hover = true"
               @mouseleave="hover = false"
-              @click.stop="handleArgumentUpdate(argumentCount, { })"
+              @click.stop="handleArgumentUpdate(argumentCount, {})"
             />
           </div>
         </template>
@@ -131,7 +122,7 @@
           @mouseover="hover = true"
           @mouseleave="hover = false"
         >
-          <span>{{ expand ? '&nbsp;'.repeat((indentLevel) * indent) : '' }})</span>
+          <span>{{ expand ? '&nbsp;'.repeat(indentLevel * indent) : '' }})</span>
           <template v-if="postfix">
             <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
           </template>
@@ -156,14 +147,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  Entity,
-  EntityType,
-  Expression,
-  ExpressionFunction,
-  NotationEnum,
-  Value
-} from '@onto-med/top-api'
+import { Entity, EntityType, Expression, ExpressionFunction, NotationEnum, Value } from '@onto-med/top-api'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 import ExpressionValueInput from 'src/components/EntityEditor/Expression/ExpressionValueInput.vue'
@@ -175,7 +159,7 @@ import { env, noDocFunctionTypes } from 'src/config'
 const props = defineProps({
   modelValue: {
     type: Object as () => Expression,
-    default: () => ({}),
+    default: () => ({})
   },
   readonly: Boolean,
   root: Boolean,
@@ -211,8 +195,7 @@ const hover = ref(false)
 const fun = computed(() => {
   if (!props.modelValue || !props.modelValue.functionId || !functions.value) return undefined
 
-  const fun = functions.value
-    .find(f => f.id === props.modelValue?.functionId)
+  const fun = functions.value.find((f) => f.id === props.modelValue?.functionId)
 
   if (fun) return fun
   return {
@@ -224,8 +207,9 @@ const fun = computed(() => {
 
 const argumentCount = computed(() => countArguments(props.modelValue, fun.value))
 
-const showMoreBtn = computed(() =>
-  !props.readonly && fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
+const showMoreBtn = computed(
+  () =>
+    !props.readonly && fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
 )
 
 const baseDocUrl = computed(() => {
@@ -239,32 +223,23 @@ const functionTitle = computed(() => {
 })
 
 const functionDocUrl = computed(() => {
-  if (!baseDocUrl.value || !fun.value?.type || noDocFunctionTypes.includes(fun.value.type))
-    return undefined
+  if (!baseDocUrl.value || !fun.value?.type || noDocFunctionTypes.includes(fun.value.type)) return undefined
   return `${baseDocUrl.value}/${fun.value.type || ''}/${fun.value.id}.html`
 })
 
-const prefix = computed(
-  () => !fun.value || fun.value.notation === NotationEnum.Prefix
-)
+const prefix = computed(() => !fun.value || fun.value.notation === NotationEnum.Prefix)
 
-const infix = computed(
-  () => fun.value && fun.value.notation === NotationEnum.Infix
-)
+const infix = computed(() => fun.value && fun.value.notation === NotationEnum.Infix)
 
-const postfix = computed(
-  () => fun.value && fun.value.notation === NotationEnum.Postfix
-)
+const postfix = computed(() => fun.value && fun.value.notation === NotationEnum.Postfix)
 
 onMounted(() => {
-  if (!functions.value)
-    entityStore.reloadFunctions()
-      .catch((e: Error) => renderError(e))
+  if (!functions.value) entityStore.reloadFunctions().catch((e: Error) => renderError(e))
 })
 
 function blink() {
   flash.value = true
-  setTimeout(() => flash.value = false, 500)
+  setTimeout(() => (flash.value = false), 500)
 }
 
 function countArguments(expression?: Expression, fun?: ExpressionFunction) {
@@ -274,19 +249,15 @@ function countArguments(expression?: Expression, fun?: ExpressionFunction) {
 }
 
 function handleArgumentUpdate(index: number, argument: Expression | undefined | null): void {
-  const newModelValue = JSON.parse(
-    JSON.stringify(props.modelValue)
-  ) as Expression
+  const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
   if (!newModelValue.arguments) newModelValue.arguments = []
   if (argument) newModelValue.arguments[index] = argument
   else newModelValue.arguments.splice(index, 1)
   emit('update:modelValue', newModelValue)
 }
 
-function setFunction(fun: ExpressionFunction|undefined) {
-  const newModelValue = (JSON.parse(
-    JSON.stringify(props.modelValue)
-  ) || {}) as Expression
+function setFunction(fun: ExpressionFunction | undefined) {
+  const newModelValue = (JSON.parse(JSON.stringify(props.modelValue)) || {}) as Expression
 
   if (!fun) {
     isEntity.value = false
@@ -312,7 +283,7 @@ function setFunction(fun: ExpressionFunction|undefined) {
   blink()
 }
 
-function setEntity(entity: Entity|undefined): void {
+function setEntity(entity: Entity | undefined): void {
   const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
   newModelValue.entityId = entity?.id
   isEntity.value = true
@@ -320,11 +291,10 @@ function setEntity(entity: Entity|undefined): void {
   emit('update:modelValue', newModelValue)
 }
 
-function setValue(value: Value|undefined): void {
+function setValue(value: Value | undefined): void {
   const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
   newModelValue.values = []
-  if (value)
-    newModelValue.values.push(value)
+  if (value) newModelValue.values.push(value)
   newModelValue.constantId = undefined
   newModelValue.arguments = undefined
   isEntity.value = false
@@ -332,7 +302,7 @@ function setValue(value: Value|undefined): void {
   emit('update:modelValue', newModelValue)
 }
 
-function setConstantId(constantId: string|undefined): void {
+function setConstantId(constantId: string | undefined): void {
   const newModelValue = JSON.parse(JSON.stringify(props.modelValue)) as Expression
   newModelValue.values = undefined
   newModelValue.constantId = constantId
@@ -344,7 +314,7 @@ function setConstantId(constantId: string|undefined): void {
 
 function enclose(): void {
   const newModelValue = {
-    arguments: [ JSON.parse(JSON.stringify(props.modelValue)) ]
+    arguments: [JSON.parse(JSON.stringify(props.modelValue))]
   } as Expression
   isEntity.value = false
   isConstant.value = false
@@ -358,8 +328,7 @@ function clear(): void {
 }
 
 function showFunctionDoc() {
-  if (functionDocUrl.value)
-    window.open(functionDocUrl.value, '_blank')
+  if (functionDocUrl.value) window.open(functionDocUrl.value, '_blank')
 }
 </script>
 

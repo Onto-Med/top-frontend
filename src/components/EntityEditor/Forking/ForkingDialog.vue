@@ -30,18 +30,18 @@
         :no-data-label="t('noDataPresent')"
         row-key="id"
       >
-        <template #body="props">
+        <template #body="bodyProps">
           <q-tr
             v-close-popup
-            :props="props"
+            :props="bodyProps"
             :title="t('showThing', { thing: t('fork') })"
             class="cursor-pointer"
-            @click="routeToEntity(props.row)"
+            @click="routeToEntity(bodyProps.row)"
           >
-            <q-td>{{ props.row.repository?.organisation?.name }}</q-td>
-            <q-td>{{ props.row.repository?.name }}</q-td>
-            <q-td>{{ props.row.author }}</q-td>
-            <q-td>{{ props.row.createdAt ? d(props.row.createdAt, 'long') : '' }}</q-td>
+            <q-td>{{ bodyProps.row.repository?.organisation?.name }}</q-td>
+            <q-td>{{ bodyProps.row.repository?.name }}</q-td>
+            <q-td>{{ bodyProps.row.author }}</q-td>
+            <q-td>{{ bodyProps.row.createdAt ? d(bodyProps.row.createdAt, 'long') : '' }}</q-td>
           </q-tr>
         </template>
       </q-table>
@@ -53,16 +53,13 @@
         <q-btn v-close-popup flat :label="t('close')" color="primary" />
       </q-card-actions>
 
-      <q-inner-loading
-        :showing="loading"
-        :label="t('pleaseWait') + '...'"
-      />
+      <q-inner-loading :showing="loading" :label="t('pleaseWait') + '...'" />
     </q-card>
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, inject, computed, watch } from 'vue'
+<script setup lang="ts">
+import { ref, inject, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { EntityApiKey } from 'src/boot/axios'
 import { Entity, ForkingStats } from '@onto-med/top-api'
@@ -71,64 +68,65 @@ import { useRouter } from 'vue-router'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { QTableProps } from 'quasar'
 
-export default defineComponent({
-  props: {
-    show: {
-      type: Boolean,
-      required: true
-    },
-    entity: {
-      type: Object as () => Entity,
-      required: true
-    }
-  },
-  emits: ['update:show'],
-  setup (props) {
-    const { t, d }     = useI18n()
-    const entityApi    = inject(EntityApiKey)
-    const { renderError } = useNotify()
-    const router       = useRouter()
-    const loading      = ref(false)
-    const forkingStats = ref(undefined as ForkingStats|undefined)
-    const { getTitle } = useEntityFormatter()
+const props = defineProps<{
+  show: boolean
+  entity: Entity
+}>()
 
-    const reload = async () => {
-      if (!entityApi || !props.entity || !props.entity.id || !props.entity.repository || !props.entity.repository.organisation) return
-      loading.value = true
+defineEmits(['update:show'])
 
-      await entityApi.getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
-        .then(r => forkingStats.value = r.data)
-        .catch((e: Error) => renderError(e))
-        .finally(() => loading.value = false)
-    }
+const { t, d } = useI18n()
+const entityApi = inject(EntityApiKey)
+const { renderError } = useNotify()
+const router = useRouter()
+const loading = ref(false)
+const forkingStats = ref(undefined as ForkingStats | undefined)
+const { getTitle } = useEntityFormatter()
 
-    watch(
-      () => props.show,
-      (newShow: boolean) => {
-        if (newShow && !forkingStats.value) void reload()
-      }
-    )
+const forkColumns = computed(
+  () =>
+    [
+      { name: 'organisation', label: t('organisation'), align: 'left' },
+      { name: 'repository', label: t('repository'), align: 'left' },
+      { name: 'userAccount', label: t('author'), align: 'left' },
+      { name: 'createdAt', label: t('createdAt') }
+    ] as QTableProps['columns']
+)
 
-    return {
-      t,
-      d,
-      loading,
-      reload,
-      forkingStats,
-      getTitle,
-
-      forkColumns: computed(() => [
-        { name: 'organisation', label: t('organisation'), align: 'left' },
-        { name: 'repository', label: t('repository'), align: 'left' },
-        { name: 'userAccount', label: t('author'), align: 'left' },
-        { name: 'createdAt', label: t('createdAt') }
-      ] as QTableProps['columns']),
-
-      routeToEntity (entity: Entity) {
-        if (!entity.repository || !entity.repository.organisation) return
-        void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
-      },
-    }
+watch(
+  () => props.show,
+  (newShow: boolean) => {
+    if (newShow && !forkingStats.value) void reload()
   }
-})
+)
+
+async function reload() {
+  if (
+    !entityApi ||
+    !props.entity ||
+    !props.entity.id ||
+    !props.entity.repository ||
+    !props.entity.repository.organisation
+  )
+    return
+  loading.value = true
+
+  await entityApi
+    .getForks(props.entity.repository.organisation.id, props.entity.repository.id, props.entity.id)
+    .then((r) => (forkingStats.value = r.data))
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+}
+
+function routeToEntity(entity: Entity) {
+  if (!entity.repository || !entity.repository.organisation) return
+  void router.push({
+    name: 'editor',
+    params: {
+      organisationId: entity.repository.organisation.id,
+      repositoryId: entity.repository.id,
+      entityId: entity.id
+    }
+  })
+}
 </script>

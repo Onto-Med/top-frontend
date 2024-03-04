@@ -45,10 +45,10 @@ interface TypedUcumLhcUtils {
 }
 
 const props = defineProps<{
-  modelValue?: string,
-  readonly?: boolean,
-  showLabel?: boolean,
-  fixedWidth?: boolean,
+  modelValue?: string
+  readonly?: boolean
+  showLabel?: boolean
+  fixedWidth?: boolean
   dense?: boolean
 }>()
 
@@ -60,9 +60,7 @@ const { t } = useI18n()
 const utils = ucumLhc.UcumLhcUtils.getInstance() as TypedUcumLhcUtils
 const options = ref(null as unknown as Array<Record<string, string>>)
 
-const validation = computed(() =>
-  utils.validateUnitString(props.modelValue)
-)
+const validation = computed(() => utils.validateUnitString(props.modelValue))
 
 const displayValue = computed(() => {
   if (validation.value && validation.value.status === 'valid') {
@@ -71,7 +69,6 @@ const displayValue = computed(() => {
   }
   return ''
 })
-
 
 function filterFn(val: string, update: (arg0: () => void) => void, abort: () => void) {
   console.log('test')
@@ -83,15 +80,17 @@ function filterFn(val: string, update: (arg0: () => void) => void, abort: () => 
   const result: Record<string, unknown> = utils.validateUnitString(val, true)
 
   if (result.suggestions) {
-    update(() =>
-      options.value = (result.suggestions as Array<Record<string, unknown>>)
-        .flatMap(s => s.units as Array<string[]>).map((u: string[]) => {
-          return { value: u[0], label: u[1] }
-        })
+    update(
+      () =>
+        (options.value = (result.suggestions as Array<Record<string, unknown>>)
+          .flatMap((s) => s.units as Array<string[]>)
+          .map((u: string[]) => {
+            return { value: u[0], label: u[1] }
+          }))
     )
   } else if (result.unit) {
     const unit = result.unit as Record<string, string>
-    update(() => options.value = [{ value: unit.code, label: unit.name }])
+    update(() => (options.value = [{ value: unit.code, label: unit.name }]))
   } else {
     abort()
   }

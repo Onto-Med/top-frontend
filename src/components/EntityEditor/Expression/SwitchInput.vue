@@ -19,7 +19,7 @@
           :readonly="readonly"
           type="number"
           debounce="500"
-          @update:model-value="setDefaultValue($event as number|undefined)"
+          @update:model-value="setDefaultValue($event as number | undefined)"
         />
       </td>
     </tr>
@@ -39,7 +39,13 @@
         />
       </td>
       <td>
-        <q-icon v-if="!mapping.entityId || !mapping.value" :title="t('invalid', { thing: t('mapping') })" color="negative" name="dangerous" size="sm" />
+        <q-icon
+          v-if="!mapping.entityId || !mapping.value"
+          :title="t('invalid', { thing: t('mapping') })"
+          color="negative"
+          name="dangerous"
+          size="sm"
+        />
         <q-icon v-else name="arrow_right_alt" size="md" />
       </td>
       <td>
@@ -50,7 +56,7 @@
           dense
           type="number"
           debounce="500"
-          @update:model-value="setMappingValue(index, $event as number|undefined)"
+          @update:model-value="setMappingValue(index, $event as number | undefined)"
         />
       </td>
       <td>
@@ -95,18 +101,17 @@ const emit = defineEmits(['update:modelValue', 'entityClicked'])
 const { t } = useI18n()
 const { organisationId, repositoryId } = storeToRefs(useEntity())
 const entityTypes = [
-  EntityType.SinglePhenotype, EntityType.SingleRestriction,
-  EntityType.CompositePhenotype, EntityType.CompositeRestriction
+  EntityType.SinglePhenotype,
+  EntityType.SingleRestriction,
+  EntityType.CompositePhenotype,
+  EntityType.CompositeRestriction
 ]
 
-const hasDefaultValue = computed(
-  () => props.modelValue.arguments && props.modelValue.arguments.length % 2 !== 0
-)
+const hasDefaultValue = computed(() => props.modelValue.arguments && props.modelValue.arguments.length % 2 !== 0)
 const defaultValue = computed(() => {
   if (props.modelValue.arguments && hasDefaultValue.value) {
     const values = props.modelValue.arguments[props.modelValue.arguments.length - 1].values
-    if (values && values.length)
-      return (values[0] as NumberValue).value
+    if (values && values.length) return (values[0] as NumberValue).value
   }
   return undefined
 })
@@ -133,14 +138,16 @@ function clone<T>(obj: T): T {
 function buildValueConstant(value?: number) {
   return {
     functionId: 'value',
-    values: [ { dataType: DataType.Number, value: value } as NumberValue ]
+    values: [{ dataType: DataType.Number, value: value } as NumberValue]
   } as Expression
 }
 
 function addMapping() {
   const newModelValue = clone(props.modelValue)
   if (!newModelValue.arguments) newModelValue.arguments = []
-  const defaultValue = hasDefaultValue.value ? newModelValue.arguments.splice(newModelValue.arguments.length - 1) : undefined
+  const defaultValue = hasDefaultValue.value
+    ? newModelValue.arguments.splice(newModelValue.arguments.length - 1)
+    : undefined
   newModelValue.arguments.push({ functionId: 'entity', entityId: undefined })
   newModelValue.arguments.push(buildValueConstant(undefined))
   if (defaultValue) newModelValue.arguments.push(...defaultValue)
@@ -153,23 +160,22 @@ function removeMappingByIndex(index: number) {
   emit('update:modelValue', newModelValue)
 }
 
-function setDefaultValue (value?: number) {
+function setDefaultValue(value?: number) {
   const newModelValue = clone(props.modelValue)
   if (!newModelValue.arguments) newModelValue.arguments = []
-  if (hasDefaultValue.value)
-    newModelValue.arguments.splice(newModelValue.arguments.length - 1)
+  if (hasDefaultValue.value) newModelValue.arguments.splice(newModelValue.arguments.length - 1)
   if (value) newModelValue.arguments.push(buildValueConstant(value))
   emit('update:modelValue', newModelValue)
 }
 
-function setMappingEntity (index: number, entityId?: string) {
+function setMappingEntity(index: number, entityId?: string) {
   const newModelValue = clone(props.modelValue)
   if (!newModelValue.arguments || !newModelValue.arguments[index * 2]) return
   newModelValue.arguments[index * 2] = { functionId: 'entity', entityId: entityId }
   emit('update:modelValue', newModelValue)
 }
 
-function setMappingValue (index: number, value?: number) {
+function setMappingValue(index: number, value?: number) {
   const newModelValue = clone(props.modelValue)
   if (!newModelValue.arguments || !newModelValue.arguments[index * 2 + 1]) return
   newModelValue.arguments[index * 2 + 1] = buildValueConstant(value)
@@ -177,7 +183,7 @@ function setMappingValue (index: number, value?: number) {
 }
 
 interface Mapping {
-  entityId?: string,
+  entityId?: string
   value?: number
 }
 </script>

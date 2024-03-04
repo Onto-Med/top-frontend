@@ -55,52 +55,37 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { Entity, ForkingInstruction } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useI18n } from 'vue-i18n'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
 
-export default defineComponent({
-  props: {
-    show: {
-      type: Boolean,
-      require: true
-    },
-    origin: Object as () => Entity
-  },
-  emits: ['update:show', 'createFork'],
-  setup (props, { emit }) {
-    const { t }          = useI18n()
-    const { getTitle, isRestricted }   = useEntityFormatter()
-    const { repository } = storeToRefs(useEntity())
-    const cascade = ref(false)
-    const update  = ref(false)
+defineProps<{
+  show: boolean
+  origin?: Entity
+}>()
 
-    const reset = () => {
-      cascade.value = false
-      update.value  = false
-    }
+const emit = defineEmits(['update:show', 'createFork'])
 
-    return {
-      t,
-      getTitle,
-      isRestricted,
-      repository,
-      cascade,
-      update,
+const { t } = useI18n()
+const { getTitle, isRestricted } = useEntityFormatter()
+const { repository } = storeToRefs(useEntity())
+const cascade = ref(false)
+const update = ref(false)
 
-      handleCreateFork () {
-        emit('createFork', {
-          cascade: cascade.value,
-          update:  update.value
-        } as ForkingInstruction)
-        reset()
-      }
-    }
-  },
-})
+function reset() {
+  cascade.value = false
+  update.value = false
+}
+
+function handleCreateFork() {
+  emit('createFork', {
+    cascade: cascade.value,
+    update: update.value
+  } as ForkingInstruction)
+  reset()
+}
 </script>
-

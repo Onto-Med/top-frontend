@@ -51,23 +51,8 @@
     </template>
 
     <template #toolbar>
-      <q-btn
-        flat
-        round
-        dense
-        icon="clear"
-        :disable="readonly"
-        :title="t('clearAll')"
-        @click.stop="showClearDialog"
-      />
-      <q-btn
-        flat
-        round
-        dense
-        icon="settings"
-        :title="t('setting', 2)"
-        @click.stop
-      >
+      <q-btn flat round dense icon="clear" :disable="readonly" :title="t('clearAll')" @click.stop="showClearDialog" />
+      <q-btn flat round dense icon="settings" :title="t('setting', 2)" @click.stop>
         <q-menu class="q-pa-sm">
           <div class="text-h6 q-mb-sm">
             {{ t('setting', 2) }}
@@ -93,7 +78,9 @@ import { useQuasar } from 'quasar'
 const props = defineProps({
   modelValue: {
     type: Object as () => Expression,
-    default: () => { return {} }
+    default: () => {
+      return {}
+    }
   },
   label: String,
   monospace: {
@@ -123,19 +110,11 @@ const expandExpression = ref<boolean>($q.localStorage.getItem('expandExpression'
 const indent = ref<number>($q.localStorage.getItem('expressionIndentSize') || 2)
 const showHelp = ref(false)
 
-const scores = computed(
-  () => props.canBeSwitch && props.modelValue && props.modelValue.functionId === 'switch'
-)
+const scores = computed(() => props.canBeSwitch && props.modelValue && props.modelValue.functionId === 'switch')
 
-watch(
-  expandExpression,
-  (newVal) => $q.localStorage.set('expandExpression', newVal)
-)
+watch(expandExpression, (newVal) => $q.localStorage.set('expandExpression', newVal))
 
-watch(
-  indent,
-  (newVal) => $q.localStorage.set('expressionIndentSize', newVal)
-)
+watch(indent, (newVal) => $q.localStorage.set('expressionIndentSize', newVal))
 
 function showClearDialog() {
   $q.dialog({
@@ -143,26 +122,22 @@ function showClearDialog() {
     componentProps: {
       message: t('confirmClearExpression')
     }
-  }).onOk(() =>
-    emit('update:modelValue', {})
-  )
+  }).onOk(() => emit('update:modelValue', {}))
 }
 
 function toggleExpressionType(state: boolean) {
   if (
-    (props.modelValue.functionId && props.modelValue.functionId !== 'switch')
-    || props.modelValue.arguments
-    || props.modelValue.constantId
-    || props.modelValue.entityId
+    (props.modelValue.functionId && props.modelValue.functionId !== 'switch') ||
+    props.modelValue.arguments ||
+    props.modelValue.constantId ||
+    props.modelValue.entityId
   ) {
     $q.dialog({
       component: Dialog,
       componentProps: {
         message: t('confirmChangeExpressionType')
       }
-    }).onOk(() =>
-      emit('update:modelValue', { functionId: state ? 'switch' : undefined })
-    )
+    }).onOk(() => emit('update:modelValue', { functionId: state ? 'switch' : undefined }))
   } else {
     emit('update:modelValue', { functionId: state ? 'switch' : undefined })
   }

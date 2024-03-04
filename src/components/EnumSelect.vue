@@ -29,15 +29,15 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
-  i18nPrefix: string,
-  description?: string,
-  label?: string,
-  options?: T[],
-  readonly?: boolean,
-  required?: boolean,
-  selected?: T,
-  showDescription?: boolean,
-  showTooltip?: boolean,
+  i18nPrefix: string
+  description?: string
+  label?: string
+  options?: T[]
+  readonly?: boolean
+  required?: boolean
+  selected?: T
+  showDescription?: boolean
+  showTooltip?: boolean
   enum?: object
 }>()
 
@@ -88,5 +88,6 @@ const localOptions = computed(() =>
         }
       }
     })
-    .sort((a, b) => a.label.localeCompare(b.label)))
+    .sort((a, b) => a.label.localeCompare(b.label))
+)
 </script>
