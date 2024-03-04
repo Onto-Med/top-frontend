@@ -58,8 +58,7 @@
 				"esbenp.prettier-vscode",
 				"formulahendry.auto-rename-tag",
 				"sdras.vue-vscode-snippets",
-				"mutantdino.resourcemonitor",
-				"Vue.vscode-typescript-vue-plugin"
+				"mutantdino.resourcemonitor"
 			]
 		}
 	}
