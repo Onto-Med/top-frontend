@@ -40,6 +40,15 @@
 
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
             <p>{{ t('conceptCluster.reviewDescription') }}</p>
+            <q-table
+              v-model="selectedClusters"
+              flat
+              :rows="clusters"
+              :columns="clusterColumns"
+              :selected-rows-label="getSelectedRowsString"
+              row-key="id"
+              selection="multiple"
+            />
           </q-step>
 
           <template #navigation>
@@ -68,8 +77,8 @@
 </template>
 
 <script setup lang="ts">
-import { DataSource, PipelineResponse, PipelineResponseStatus } from '@onto-med/top-api'
-import { QStepper, useDialogPluginComponent, useQuasar } from 'quasar'
+import { ConceptCluster, DataSource, PipelineResponse, PipelineResponseStatus } from '@onto-med/top-api'
+import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptgraphsApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { computed, inject, onMounted, ref } from 'vue'
@@ -89,6 +98,8 @@ const conceptgraphsApi = inject(ConceptgraphsApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
 const pipeline = ref<PipelineResponse>()
+const clusters = ref<ConceptCluster[]>()
+const selectedClusters = ref<ConceptCluster[]>([])
 
 const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
 
@@ -96,6 +107,14 @@ const pipelineStatus = computed(() => {
   if (!pipeline.value || !pipeline.value.status) return t('unavailable')
   return te(pipeline.value.status) ? t(pipeline.value.status) : pipeline.value.status
 })
+
+const clusterColumns = computed(
+  () =>
+    [
+      { name: 'id', required: true, label: t('id'), align: 'left', sortable: true },
+      { name: 'labels', label: t('label', 2), align: 'left', sortable: true }
+    ] as QTableProps['columns']
+)
 
 onMounted(() => loadPipeline())
 
@@ -126,5 +145,9 @@ function deletePipeline() {
   }).onOk(() => {
     throw Error('not implemented')
   })
+}
+
+function getSelectedRowsString() {
+  return t('recordSelected', selectedClusters.value.length)
 }
 </script>
