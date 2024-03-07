@@ -22,14 +22,14 @@
       <q-separator />
 
       <q-card-section class="q-pa-none">
-        <concept-cluster-form :data-source="dataSource" class="cluster-form" />
+        <document-search-form :data-source="dataSource" class="cluster-form" />
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
+import DocumentSearchForm from 'components/Documents/DocumentSearchForm.vue'
 import { useI18n } from 'vue-i18n'
 import { inject, onMounted, ref, watch } from 'vue'
 import { SearchTypesEnum } from 'src/config'
