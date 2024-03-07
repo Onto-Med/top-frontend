@@ -150,16 +150,16 @@ import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
 import { QTableProps, useQuasar } from 'quasar'
-import Dialog from 'src/components/Dialog.vue'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
+import ConceptClusterDialog from './ConceptClusterDialog.vue'
 
 interface ConceptColor {
   'background-color': string
   color: string
 }
 
-defineProps<{
+const props = defineProps<{
   dataSource?: DataSource
   query?: Query
 }>()
@@ -250,7 +250,6 @@ const conceptMode = ref(DocumentGatheringMode.Exclusive)
 const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
 const processId = 'top-framework'
-const datasource = ref('')
 
 const cols = computed(
   () =>
@@ -319,14 +318,14 @@ function reloadConcepts() {
 }
 
 function reloadDocuments(name?: string, page?: number) {
-  if (!documentApi || documentsLoading.value) return
+  if (!documentApi || documentsLoading.value || !props.dataSource) return
   documents.value = undefined
   document_.value = undefined
   const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
   documentsLoading.value = true
   documentApi
     .getDocuments(
-      datasource.value,
+      props.dataSource.id,
       name,
       undefined,
       undefined,
@@ -368,8 +367,9 @@ async function checkPipeline() {
 }
 
 async function chooseDocument(documentId: string) {
+  if (!props.dataSource) return
   await documentApi
-    ?.getSingleDocumentById(documentId, datasource.value)
+    ?.getSingleDocumentById(documentId, props.dataSource.id)
     .then((r) => {
       $q.dialog({
         component: DocumentDetailsDialog,
@@ -382,11 +382,11 @@ async function chooseDocument(documentId: string) {
 }
 
 function confirmRegenerate() {
-  if (!isAdmin.value) return
+  if (!isAdmin.value || !props.dataSource) return
   $q.dialog({
-    component: Dialog,
+    component: ConceptClusterDialog,
     componentProps: {
-      message: t('conceptCluster.confirmRegenerate')
+      dataSource: props.dataSource
     }
   }).onOk(() => {
     conceptGraphsApi

@@ -17,7 +17,18 @@
           dense
           hide-bottom-space
           class="data-source-select"
-        />
+        >
+          <template #option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                {{ scope.opt.title || scope.opt.id }}
+              </q-item-section>
+            </q-item>
+          </template>
+          <template #selected-item="scope">
+            {{ scope.opt.title || scope.opt.id }}
+          </template>
+        </q-select>
       </q-card-section>
       <q-separator />
 
