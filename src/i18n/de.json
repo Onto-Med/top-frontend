@@ -534,6 +534,19 @@
     "regenerate": "Regenerieren",
     "confirmRegenerate": "Möchten Sie die Konzeptcluster wirklich neu generieren? Der Vorgang dauert je nach Korpusgröße einige Minuten und vorherige Cluster werden verworfen.",
     "pipelineStarted": "Die Generierungspipeline wurde gestartet. In wenigen Minuten sollten neue Cluster verfügbar sein.",
-    "pipelineFailed": "Die Generierungspipeline ist fehlgeschlagen. Bitte versuche es erneut."
-  }
+    "pipelineFailed": "Die Generierungspipeline ist fehlgeschlagen. Bitte versuche es erneut.",
+    "reviewDescription": "Bitte wählen Sie aus der Vorverarbeitung unten relevante Cluster aus und Sie können diese dann veröffentlichen, damit sie für Dokumentabfragen verfügbar sind.",
+    "preProcessingDescription": "Um Konzeptcluster für eine Datenquelle zu generieren, müssen die in dieser Datenquelle enthaltenen Dokumente mithilfe einer Conceptgraph Pipeline vorverarbeitet werden. Abhängig von der Anzahl der Dokumente kann diese Pipeline mehrere Minuten dauern. Der Status wird unten aufgeführt. Es kann nur eine Pipeline für eine Datenquelle geben, was bedeutet, dass durch einen Neustart der Pipeline alle vorhandenen Konzeptcluster gelöscht werden!\nSobald die Vorverarbeitung abgeschlossen ist, können Sie zum nächsten Schritt navigieren und relevante Cluster auswählen, um sie den Benutzern zum Abrufen von Dokumenten zur Verfügung zu stellen.",
+    "confirmStart": "Durch das Starten der Vorverarbeitungspipeline werden alle vorhandenen Konzeptcluster für diese Datenquelle gelöscht. Möchten Sie fortfahren?",
+    "confirmDelete": "Möchten Sie diese Pipeline und alle aus dieser Datenquelle abgeleiteten Konzeptcluster wirklich löschen?"
+  },
+  "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
+  "clusterReview": "Cluster-Review|Cluster-Reviews",
+  "preProcessing": "Vorverarbeitung",
+  "status": "Status",
+  "pipeline": "Pipeline|Pipelines",
+  "startThing": "{thing} starten",
+  "finish": "Beenden",
+  "continue": "Fortfahren",
+  "successful": "Erfolgreich"
 }

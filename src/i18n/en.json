@@ -534,6 +534,19 @@
     "regenerate": "Regenerate",
     "confirmRegenerate": "Do you really want to regenerate the concept clusters? The process will take a few minutes, depending on the size of the corpus, and previous clusters will be dropped.",
     "pipelineStarted": "The generation pipeline has been started. In a few minutes, new clusters should be available.",
-    "pipelineFailed": "The generation pipeline has failed. Please try again."
-  }
+    "pipelineFailed": "The generation pipeline has failed. Please try again.",
+    "reviewDescription": "Please select relevant clusters from the pre-processing below, and you can then choose to publish them so that they are available for document queries.",
+    "preProcessingDescription": "In order to generate concept clusters for a data source, the documents contained in that data source must be pre-processed using a concept graph pipeline. Depending on the number of documents, this pipeline can take several minutes and it's status is listed below. There can only be one pipeline for a data source, which means that restarting the pipeline will delete all existing concept clusters!\nOnce the pre-processing is complete, you can navigate to the next step and select relevant clusters to make available to users for document retrieval.",
+    "confirmStart": "Starting the pre-processing pipeline will delete any existing concept clusters for this data source. Do you want to continue?",
+    "confirmDelete": "Do you really want to delete this pipeline and all the concept clusters derived from this data source?"
+  },
+  "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
+  "clusterReview": "Cluster review|Cluster reviews",
+  "preProcessing": "Pre-processing",
+  "status": "Status",
+  "pipeline": "Pipeline|Pipelines",
+  "startThing": "Start {thing}",
+  "finish": "Finish",
+  "continue": "Continue",
+  "successful": "Successful"
 }
