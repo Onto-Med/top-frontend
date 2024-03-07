@@ -20,10 +20,11 @@
             </div>
           </slot>
           <q-space v-if="title" />
-          <div :class="{ 'col': !title }">
+          <div :class="{ col: !title }">
             <q-input
               v-if="filterable"
               v-model="filter"
+              :disable="disable"
               :label="t('searchThing', { thing: title || name })"
               dense
               debounce="300"
@@ -42,14 +43,14 @@
             <q-btn
               v-if="create"
               color="primary"
-              :disabled="loading"
+              :disabled="loading || disable"
               :label="$q.screen.gt.xs ? t('createThing', { thing: name }) : ''"
               icon="add"
               @click="$emit('create-clicked')"
             />
             <q-btn
               color="secondary"
-              :disabled="loading"
+              :disabled="loading || disable"
               :label="$q.screen.gt.xs ? t('reload') : ''"
               icon="refresh"
               @click="reload()"
@@ -64,7 +65,7 @@
           </q-tr>
         </template>
         <template #body="bodyProps">
-          <q-tr class="cursor-pointer" :props="bodyProps" @click="$emit('row-clicked', bodyProps.row)">
+          <q-tr class="cursor-pointer" :props="bodyProps" @click="onRowClick(bodyProps.row)">
             <q-td auto-width>
               <slot name="actions" :row="bodyProps.row" />
             </q-td>
@@ -129,7 +130,9 @@ const props = defineProps({
     default: true
   },
   /** Wrap text within table cells. */
-  wrapCells: Boolean
+  wrapCells: Boolean,
+  /** Whether buttons and input fields should be disabled. */
+  disable: Boolean
 })
 
 const emit = defineEmits(['row-clicked', 'create-clicked', 'request'])
@@ -150,14 +153,22 @@ const cols = computed(() => {
 const rows = computed(() => props.page?.content)
 
 function onPageSelect(page: number) {
+  if (props.disable) return
   emit('request', filter.value, page)
 }
 
 function onFilter() {
+  if (props.disable) return
   emit('request', filter.value, 1)
 }
 
+function onRowClick(row: unknown) {
+  if (props.disable) return
+  emit('row-clicked', row)
+}
+
 function reload() {
+  if (props.disable) return
   filter.value = ''
   emit('request', undefined, 1)
 }
