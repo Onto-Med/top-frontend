@@ -548,5 +548,6 @@
   "startThing": "Start {thing}",
   "finish": "Finish",
   "continue": "Continue",
-  "successful": "Successful"
+  "successful": "Successful",
+  "label": "Label|Labels"
 }
