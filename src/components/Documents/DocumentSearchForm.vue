@@ -8,7 +8,7 @@
           </div>
           <q-space />
           <q-separator v-if="isAdmin" vertical />
-          <q-btn v-if="isAdmin" dense flat no-caps class="q-py-none" @click="confirmRegenerate">
+          <q-btn v-if="isAdmin" :disable="!dataSource" flat no-caps class="q-py-none" @click="showRegenerateDialog">
             <q-icon name="update" />
             <div class="q-pl-sm gt-xs">{{ t('conceptCluster.regenerate') }}</div>
           </q-btn>
@@ -75,7 +75,13 @@
               <div v-if="!concepts.length && !conceptsLoading" class="q-pa-md text-grey">
                 <div class="q-gutter-md text-center">
                   <div>{{ t('conceptCluster.noConceptsAvailable') }}</div>
-                  <q-btn icon="refresh" dense :label="t('reload')" @click="reloadConcepts" />
+                  <q-btn
+                    icon="refresh"
+                    dense
+                    :disable="!dataSource"
+                    :label="t('reload')"
+                    @click="reloadConcepts().catch((e: Error) => renderError(e))"
+                  />
                 </div>
               </div>
             </div>
@@ -97,6 +103,7 @@
       <table-with-actions
         flat
         wrap-cells
+        :disable="!dataSource"
         :grid="$q.screen.xs"
         :name="t('document')"
         :page="documents"
@@ -104,7 +111,7 @@
         :columns="cols"
         :create="false"
         :filterable="!query"
-        @request="reloadDocuments"
+        @request="reloadDocuments($event).catch((e: Error) => renderError(e))"
         @row-clicked="chooseDocument($event)"
       >
         <template v-if="query" #title>
@@ -293,12 +300,20 @@ onMounted(() =>
     .catch((e: Error) => renderError(e))
 )
 
-watch([mostImportantNodes, conceptMode, selectedConcepts], () => reloadDocuments())
+watch([mostImportantNodes, conceptMode, selectedConcepts], () => reloadDocuments().catch((e: Error) => renderError(e)))
+watch(
+  () => props.dataSource,
+  () =>
+    reloadConcepts()
+      .then(() => reloadDocuments())
+      .catch((e: Error) => renderError(e))
+)
 
-function reloadConcepts() {
-  if (!conceptApi || !documentApi || conceptsLoading.value) return
+async function reloadConcepts() {
+  if (!props.dataSource) concepts.value = []
+  if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value) return Promise.reject()
   conceptsLoading.value = true
-  checkPipeline()
+  return await checkPipeline()
     .then(() => conceptApi.getConceptClusters(undefined, undefined, false))
     .then((r) => {
       concepts.value = r.data.content
@@ -313,17 +328,17 @@ function reloadConcepts() {
         color: ''
       }) as ConceptColor[]
     })
-    .catch((e: Error) => renderError(e))
     .finally(() => (conceptsLoading.value = false))
 }
 
-function reloadDocuments(name?: string, page?: number) {
-  if (!documentApi || documentsLoading.value || !props.dataSource) return
+async function reloadDocuments(name?: string, page?: number) {
+  if (!props.dataSource) documents.value = undefined
+  if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource) return Promise.reject()
   documents.value = undefined
   document_.value = undefined
   const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
   documentsLoading.value = true
-  documentApi
+  return await documentApi
     .getDocuments(
       props.dataSource.id,
       name,
@@ -336,7 +351,6 @@ function reloadDocuments(name?: string, page?: number) {
       page
     )
     .then((r) => (documents.value = r.data))
-    .catch((e: Error) => renderError(e))
     .finally(() => (documentsLoading.value = false))
 }
 
@@ -358,6 +372,7 @@ function prepareSelectedConcepts() {
 }
 
 async function checkPipeline() {
+  if (!props.dataSource) return Promise.reject()
   return await conceptGraphsApi
     ?.getStoredProcesses()
     .then(
@@ -367,7 +382,7 @@ async function checkPipeline() {
 }
 
 async function chooseDocument(documentId: string) {
-  if (!props.dataSource) return
+  if (!props.dataSource) return Promise.reject()
   await documentApi
     ?.getSingleDocumentById(documentId, props.dataSource.id)
     .then((r) => {
@@ -381,7 +396,7 @@ async function chooseDocument(documentId: string) {
     .catch((e: Error) => renderError(e))
 }
 
-function confirmRegenerate() {
+function showRegenerateDialog() {
   if (!isAdmin.value || !props.dataSource) return
   $q.dialog({
     component: ConceptClusterDialog,
