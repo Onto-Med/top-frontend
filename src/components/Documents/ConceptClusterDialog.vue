@@ -1,11 +1,10 @@
 <template>
   <q-dialog ref="dialogRef">
     <q-card class="content">
-      <q-card-section class="row items-center">
-        <div class="text-h6">
+      <q-card-section class="row items-center q-gutter-sm">
+        <div class="col text-h6">
           {{ t('pipelineManagementOfDataSource', { dataSource: dataSource.title || dataSource.id }) }}
         </div>
-        <q-space />
         <q-btn v-close-popup icon="close" flat round dense />
       </q-card-section>
 
