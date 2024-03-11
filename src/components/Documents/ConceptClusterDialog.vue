@@ -79,12 +79,13 @@
 <script setup lang="ts">
 import { ConceptCluster, DataSource, PipelineResponse, PipelineResponseStatus } from '@onto-med/top-api'
 import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
+import { ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
 
-defineProps<{
+const props = defineProps<{
   dataSource: DataSource
 }>()
 
@@ -93,6 +94,7 @@ const { t, te } = useI18n()
 const { dialogRef } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const $q = useQuasar()
+const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
 const pipeline = ref<PipelineResponse>()
@@ -126,10 +128,8 @@ onMounted(() => {
 onUnmounted(() => window.clearInterval(interval.value))
 
 async function loadPipeline() {
-  // TODO: populate pipeline.value
-  return Promise.resolve({
-    data: { name: 'pipeline', response: 'response', status: PipelineResponseStatus.Successful }
-  })
+  return conceptPipelineApi
+    ?.getConceptPipelineById(props.dataSource.id)
     .then((r) => {
       pipeline.value = r.data
       if (
@@ -166,7 +166,9 @@ function confirmDeletePipeline() {
 }
 
 async function startPipeline() {
-  return Promise.reject('not implemented').then(() => (interval.value = window.setInterval(() => loadPipeline, 5000)))
+  return conceptPipelineApi
+    ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id)
+    .then(() => (interval.value = window.setInterval(() => loadPipeline, 5000)))
 }
 
 async function deletePipeline() {
