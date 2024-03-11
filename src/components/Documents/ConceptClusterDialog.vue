@@ -26,14 +26,14 @@
                 icon="play_arrow"
                 color="secondary"
                 no-caps
-                @click="startPipeline()"
+                @click="confirmStartPipeline()"
               />
               <q-btn
                 :label="t('deleteThing', { thing: t('pipeline') })"
                 icon="delete"
                 color="red"
                 no-caps
-                @click="deletePipeline()"
+                @click="confirmDeletePipeline()"
               />
             </q-btn-group>
           </q-step>
@@ -79,13 +79,12 @@
 <script setup lang="ts">
 import { ConceptCluster, DataSource, PipelineResponse, PipelineResponseStatus } from '@onto-med/top-api'
 import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
-import { ConceptgraphsApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
 
-const props = defineProps<{
+defineProps<{
   dataSource: DataSource
 }>()
 
@@ -94,12 +93,12 @@ const { t, te } = useI18n()
 const { dialogRef } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const $q = useQuasar()
-const conceptgraphsApi = inject(ConceptgraphsApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
 const pipeline = ref<PipelineResponse>()
 const clusters = ref<ConceptCluster[]>()
 const selectedClusters = ref<ConceptCluster[]>([])
+const interval = ref<number>()
 
 const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
 
@@ -116,35 +115,63 @@ const clusterColumns = computed(
     ] as QTableProps['columns']
 )
 
-onMounted(() => loadPipeline())
+onMounted(() => {
+  loadPipeline()
+    .then(() => {
+      if (!pipeline.value) interval.value = window.setInterval(() => loadPipeline, 5000)
+    })
+    .catch((e: Error) => renderError(e))
+})
 
-// TODO: setup timeout that reloads the pipeline if it has not finished yet
-// TODO: onUnmount: delete timeout
+onUnmounted(() => window.clearInterval(interval.value))
 
-function loadPipeline() {
-  conceptgraphsApi?.getConceptGraphStatistics(undefined, props.dataSource.id).catch((e: Error) => renderError(e))
+async function loadPipeline() {
+  // TODO: populate pipeline.value
+  return Promise.resolve({
+    data: { name: 'pipeline', response: 'response', status: PipelineResponseStatus.Successful }
+  })
+    .then((r) => {
+      pipeline.value = r.data
+      if (
+        pipeline.value?.status == PipelineResponseStatus.Successful ||
+        pipeline.value?.status == PipelineResponseStatus.Failed
+      )
+        window.clearInterval(interval.value)
+    })
+    .then(() => window.clearInterval(interval.value))
 }
 
-function startPipeline() {
+function confirmStartPipeline() {
   $q.dialog({
     component: Dialog,
     componentProps: {
       message: t('conceptCluster.confirmStart')
     }
   }).onOk(() => {
-    throw Error('not implemented')
+    deletePipeline()
+      .then(() => startPipeline())
+      .catch((e: Error) => renderError(e))
   })
 }
 
-function deletePipeline() {
+function confirmDeletePipeline() {
   $q.dialog({
     component: Dialog,
     componentProps: {
       message: t('conceptCluster.confirmDelete')
     }
   }).onOk(() => {
-    throw Error('not implemented')
+    deletePipeline().catch((e: Error) => renderError(e))
   })
+}
+
+async function startPipeline() {
+  return Promise.reject('not implemented').then(() => (interval.value = window.setInterval(() => loadPipeline, 5000)))
+}
+
+async function deletePipeline() {
+  window.clearInterval(interval.value)
+  return Promise.reject('not implemented')
 }
 
 function getSelectedRowsString() {
