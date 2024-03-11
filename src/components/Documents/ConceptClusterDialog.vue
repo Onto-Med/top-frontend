@@ -18,6 +18,7 @@
             </p>
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ pipelineStatus }}
+              <q-spinner v-if="interval" size="xs" class="q-ml-sm" />
             </p>
             <q-btn-group>
               <q-btn
