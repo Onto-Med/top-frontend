@@ -489,7 +489,7 @@
   "manage": "Manage",
   "edit": "Edit",
   "404Description": "The requested page does not exist.",
-  "concept_cluster": "Concept cluster",
+  "concept_cluster": "Concept cluster|Concept clusters",
   "search_query": "Search query|Search queries",
   "clear": "Clear",
   "documentsOfQuery": "Documents of query",
@@ -538,7 +538,8 @@
     "reviewDescription": "Please select relevant clusters from the pre-processing below, and you can then choose to publish them so that they are available for document queries.",
     "preProcessingDescription": "In order to generate concept clusters for a data source, the documents contained in that data source must be pre-processed using a concept graph pipeline. Depending on the number of documents, this pipeline can take several minutes and it's status is listed below. There can only be one pipeline for a data source, which means that restarting the pipeline will delete all existing concept clusters!\nOnce the pre-processing is complete, you can navigate to the next step and select relevant clusters to make available to users for document retrieval.",
     "confirmStart": "Starting the pre-processing pipeline will delete any existing concept clusters for this data source. Do you want to continue?",
-    "confirmDelete": "Do you really want to delete this pipeline and all the concept clusters derived from this data source?"
+    "confirmDelete": "Do you really want to delete this pipeline and all the concept clusters derived from this data source?",
+    "confirmPublish": "Publishing the selected concept clusters will remove all previously published clusters. Do you want to continue?"
   },
   "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
   "clusterReview": "Cluster review|Cluster reviews",
@@ -549,5 +550,6 @@
   "finish": "Finish",
   "continue": "Continue",
   "successful": "Successful",
-  "label": "Label|Labels"
+  "label": "Label|Labels",
+  "publishThing": "Publish {thing}"
 }

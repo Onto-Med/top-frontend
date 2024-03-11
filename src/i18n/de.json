@@ -489,7 +489,7 @@
   "manage": "Verwalten",
   "edit": "Bearbeiten",
   "404Description": "Die angeforderte Seite existiert nicht.",
-  "concept_cluster": "Konzept-Cluster",
+  "concept_cluster": "Konzept-Cluster|Konzept-Cluster",
   "search_query": "Such-Abfrage|Such-Abfragen",
   "clear": "Leeren",
   "documentsOfQuery": "Dokumente der Abfrage",
@@ -538,7 +538,8 @@
     "reviewDescription": "Bitte wählen Sie relevante Cluster aus der Vorverarbeitung unten aus. Sie können diese dann veröffentlichen, damit sie für Dokumentenabfragen zur Verfügung stehen.",
     "preProcessingDescription": "Um Konzeptcluster für eine Datenquelle zu generieren, müssen die in dieser Datenquelle enthaltenen Dokumente mithilfe einer Conceptgraph Pipeline vorverarbeitet werden. Abhängig von der Anzahl der Dokumente kann diese Pipeline mehrere Minuten dauern. Der Status wird unten aufgeführt. Es kann nur eine Pipeline für eine Datenquelle geben, was bedeutet, dass durch einen Neustart der Pipeline alle vorhandenen Konzeptcluster gelöscht werden!\nSobald die Vorverarbeitung abgeschlossen ist, können Sie zum nächsten Schritt navigieren und relevante Cluster auswählen, um sie den Benutzern zum Abrufen von Dokumenten zur Verfügung zu stellen.",
     "confirmStart": "Durch das Starten der Vorverarbeitungspipeline werden alle vorhandenen Konzeptcluster für diese Datenquelle gelöscht. Möchten Sie fortfahren?",
-    "confirmDelete": "Möchten Sie diese Pipeline und alle aus dieser Datenquelle abgeleiteten Konzeptcluster wirklich löschen?"
+    "confirmDelete": "Möchten Sie diese Pipeline und alle aus dieser Datenquelle abgeleiteten Konzeptcluster wirklich löschen?",
+    "confirmPublish": "Durch die Veröffentlichung der ausgewählten Konzept-Cluster werden alle zuvor veröffentlichten Cluster entfernt. Möchten Sie fortfahren?"
   },
   "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
   "clusterReview": "Cluster-Review|Cluster-Reviews",
@@ -549,5 +550,6 @@
   "finish": "Beenden",
   "continue": "Fortfahren",
   "successful": "Erfolgreich",
-  "label": "Label|Labels"
+  "label": "Label|Labels",
+  "publishThing": "{thing} veröffentlichen"
 }

@@ -40,6 +40,13 @@
 
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
             <p>{{ t('conceptCluster.reviewDescription') }}</p>
+            <q-btn
+              no-caps
+              :label="t('publishThing', { thing: t('concept_cluster', 2) })"
+              color="secondary"
+              class="q-mb-sm"
+              @click="confirmPublishClusters()"
+            />
             <q-table
               v-model="selectedClusters"
               flat
@@ -79,7 +86,7 @@
 <script setup lang="ts">
 import { ConceptCluster, DataSource, PipelineResponse, PipelineResponseStatus } from '@onto-med/top-api'
 import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
-import { ConceptPipelineApiKey } from 'src/boot/axios'
+import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -95,6 +102,7 @@ const { dialogRef } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const $q = useQuasar()
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
+const conceptClusterApi = inject(ConceptClusterApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
 const pipeline = ref<PipelineResponse>()
@@ -162,6 +170,22 @@ function confirmDeletePipeline() {
     }
   }).onOk(() => {
     deletePipeline().catch((e: Error) => renderError(e))
+  })
+}
+
+function confirmPublishClusters() {
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('conceptCluster.confirmPublish')
+    }
+  }).onOk(() => {
+    conceptClusterApi
+      ?.createConceptClustersForPipelineId(
+        props.dataSource.id,
+        selectedClusters.value.map((c) => c.id)
+      )
+      .catch((e: Error) => renderError(e))
   })
 }
 
