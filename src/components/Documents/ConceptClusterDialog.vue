@@ -17,7 +17,7 @@
             <p>
               <small>{{ t('conceptCluster.preProcessingDescription') }}</small>
             </p>
-            <p>
+            <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ pipelineStatus }}
             </p>
             <q-btn-group>
@@ -30,6 +30,7 @@
               />
               <q-btn
                 :label="t('deleteThing', { thing: t('pipeline') })"
+                :disable="!pipeline"
                 icon="delete"
                 color="red"
                 no-caps
