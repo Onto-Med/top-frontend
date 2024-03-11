@@ -173,7 +173,7 @@ async function startPipeline() {
 
 async function deletePipeline() {
   window.clearInterval(interval.value)
-  return Promise.reject('not implemented')
+  return conceptPipelineApi?.deleteConceptPipelineById(props.dataSource.id)
 }
 
 function getSelectedRowsString() {

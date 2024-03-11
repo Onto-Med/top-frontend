@@ -143,7 +143,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DocumentApiKey, ConceptClusterApiKey, ConceptgraphsApiKey } from 'src/boot/axios'
+import { DocumentApiKey, ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import {
   Document,
   ConceptCluster,
@@ -178,7 +178,7 @@ const $q = useQuasar()
 const { renderError, notify } = useNotify()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
-const conceptGraphsApi = inject(ConceptgraphsApiKey)
+const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const entityStore = useEntity()
 const { isAdmin } = storeToRefs(entityStore)
 const documents = ref<DocumentPage>()
@@ -256,7 +256,7 @@ const selectedColors = ref<ConceptColor[]>([])
 const conceptMode = ref(DocumentGatheringMode.Exclusive)
 const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
-const processId = 'top-framework'
+const pipelineId = 'top-framework'
 
 const cols = computed(
   () =>
@@ -373,10 +373,12 @@ function prepareSelectedConcepts() {
 
 async function checkPipeline() {
   if (!props.dataSource) return Promise.reject()
-  return await conceptGraphsApi
-    ?.getStoredProcesses()
+  return await conceptPipelineApi
+    ?.getConceptPipelines()
     .then(
-      (r) => r.data.filter((p) => p.name === processId && p.finished_steps?.some((s) => s.name === 'graph')).length > 0
+      (r) =>
+        r.data.filter((p) => p.pipelineId === pipelineId && p.finished_steps?.some((s) => s.name === 'graph')).length >
+        0
     )
     .then((r) => (!r ? Promise.reject() : true))
 }
@@ -404,8 +406,8 @@ function showRegenerateDialog() {
       dataSource: props.dataSource
     }
   }).onOk(() => {
-    conceptGraphsApi
-      ?.startConceptGraphPipelineWithoutUpload(processId)
+    conceptPipelineApi
+      ?.startConceptGraphPipeline(pipelineId)
       .then((r) => {
         if (r.data.status == PipelineResponseStatus.Successful) {
           concepts.value = []
