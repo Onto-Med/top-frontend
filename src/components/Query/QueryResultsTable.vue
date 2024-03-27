@@ -156,7 +156,7 @@ const cols = computed(
 
 onMounted(() => {
   interval.value = window.setInterval(() => {
-    props.page.content.map(async (query) => {
+    void props.page.content.map(async (query) => {
       if (getQueryResult(query)?.finishedAt || skippedQueries.value.has(query.id)) return
       await loadResult(query).catch((e: Error) => {
         skippedQueries.value.add(query.id)
