@@ -111,7 +111,7 @@
         :columns="cols"
         :create="false"
         :filterable="!query"
-        @request="reloadDocuments($event).catch((e: Error) => renderError(e))"
+        @request="reloadDocuments"
         @row-clicked="chooseDocument($event)"
       >
         <template v-if="query" #title>
@@ -331,7 +331,7 @@ async function reloadConcepts() {
     .finally(() => (conceptsLoading.value = false))
 }
 
-async function reloadDocuments(name?: string, page?: number) {
+async function reloadDocuments(name: string|undefined = undefined, page = 1) {
   if (!props.dataSource) documents.value = undefined
   if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource) return Promise.reject()
   documents.value = undefined
@@ -383,10 +383,11 @@ async function checkPipeline() {
     .then((r) => (!r ? Promise.reject() : true))
 }
 
-async function chooseDocument(documentId: string) {
+async function chooseDocument(document: Document) {
+  if (document.id == null) return
   if (!props.dataSource) return Promise.reject()
   await documentApi
-    ?.getSingleDocumentById(documentId, props.dataSource.id)
+    ?.getSingleDocumentById(document.id, props.dataSource.id)
     .then((r) => {
       $q.dialog({
         component: DocumentDetailsDialog,
