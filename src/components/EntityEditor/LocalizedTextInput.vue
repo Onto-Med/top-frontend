@@ -99,22 +99,23 @@ const { t } = useI18n()
 
 const showHelp = ref(false)
 
-const duplicatedLangs = computed((): (string|undefined)[] => {
+const duplicatedLangs = computed((): (string | undefined)[] => {
   return props.modelValue
-    .map(x => x.lang)
-    .filter((l: string|undefined, i: number, a: Array<string|undefined>) => a.indexOf(l) !== i)
+    .map((x) => x.lang)
+    .filter((l: string | undefined, i: number, a: Array<string | undefined>) => a.indexOf(l) !== i)
 })
 
-const unusedSupportedLangs = computed((): (string|undefined)[] => {
-  return props.supportedLangs.filter(l => !props.modelValue.map(x => x.lang).includes(l))
+const unusedSupportedLangs = computed((): (string | undefined)[] => {
+  return props.supportedLangs.filter((l) => !props.modelValue.map((x) => x.lang).includes(l))
 })
 
 const empty = computed(() => !props.modelValue || props.modelValue.length < 1)
 
-const hasError = computed(() =>
-  (props.required && empty.value)
-  || props.unique && duplicatedLangs.value.length > 0
-  || (props.modelValue && props.modelValue?.findIndex(x => !x.lang || !x.text) !== -1)
+const hasError = computed(
+  () =>
+    (props.required && empty.value) ||
+    (props.unique && duplicatedLangs.value.length > 0) ||
+    (props.modelValue && props.modelValue?.findIndex((x) => !x.lang || !x.text) !== -1)
 )
 
 function removeEntryByIndex(index: number) {
@@ -123,7 +124,7 @@ function removeEntryByIndex(index: number) {
   emit('update:modelValue', newModelValue)
 }
 
-function updateEntryByIndex(index: number, text?: string|number|null, lang?: string) {
+function updateEntryByIndex(index: number, text?: string | number | null, lang?: string) {
   let newModelValue = props.modelValue.slice()
   newModelValue[index].text = text as string
   newModelValue[index].lang = lang as string

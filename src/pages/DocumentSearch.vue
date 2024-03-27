@@ -1,54 +1,52 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <q-card>
-      <q-card-section class="row no-wrap justify-between">
-        <div>
-          <div class="text-h6">
-            {{ t('documentSearch.title') }}
-          </div>
-          <span class="q-pt-md">{{ t('documentSearch.description') }}</span>
-          <div class="row q-gutter-md">
-            <q-btn-toggle
-              v-model="searchType"
-              :options="searchTypeOptions"
-              no-caps
-              rounded
-            />
-          </div>
+      <q-card-section>
+        <div class="text-h6">
+          {{ t('documentSearch.title') }}
         </div>
-        <div v-if="!props.queryId && searchType===SearchTypesEnum.SEARCH_QUERY" class="self-center">
-          <q-btn
-            color="primary"
-            label="Run Search Query on Documents"
-            :to="{ name: 'queryBuilder', params: { organisationId: organisationId } }"
-          />
+        <div v-if="query">
+          {{ t('dataOfQuery', { thing: query.name || query.id }) }}
         </div>
+        <q-select
+          v-else
+          v-model="dataSource"
+          :options="dataSources"
+          :label="t('dataSource')"
+          :error="!dataSource"
+          dense
+          hide-bottom-space
+          class="data-source-select"
+        >
+          <template #option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                {{ scope.opt.title || scope.opt.id }}
+              </q-item-section>
+            </q-item>
+          </template>
+          <template #selected-item="scope">
+            {{ scope.opt.title || scope.opt.id }}
+          </template>
+        </q-select>
       </q-card-section>
       <q-separator />
 
       <q-card-section class="q-pa-none">
-        <concept-cluster-form
-          v-if="searchType === SearchTypesEnum.CONCEPT_CLUSTER"
-        />
-        <search-query-form
-          v-if="searchType === SearchTypesEnum.SEARCH_QUERY"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          :query-id="queryId"
-          :query-name="queryName"
-        />
+        <document-search-form :data-source="dataSource" class="cluster-form" />
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import ConceptClusterForm from 'components/Documents/ConceptClusterForm.vue'
-import SearchQueryForm from 'components/Documents/SearchQueryForm.vue'
-import {useI18n} from 'vue-i18n'
-import {computed, ref, watch} from 'vue'
-import {useRouter} from 'vue-router'
-import {SearchTypesEnum} from 'src/config'
+import DocumentSearchForm from 'components/Documents/DocumentSearchForm.vue'
+import { useI18n } from 'vue-i18n'
+import { inject, onMounted, ref, watch } from 'vue'
+import { SearchTypesEnum } from 'src/config'
+import { DataSource, Query, QueryType } from '@onto-med/top-api'
+import { QueryApiKey } from 'src/boot/axios'
+import useNotify from 'src/mixins/useNotify'
 
 const props = defineProps({
   initialSearchType: {
@@ -62,29 +60,40 @@ const props = defineProps({
 })
 
 const { t } = useI18n()
-const router = useRouter()
-const searchType = ref(props.initialSearchType)
-const searchTypeOptions = computed(() =>
-  Object.values(SearchTypesEnum)
-    .map(st => ({ label: t(st), value: st }))
-)
-
-void setSearchTypeInRouteQuery(searchType.value)
+const { renderError } = useNotify()
+const dataSource = ref<DataSource>()
+const dataSources = ref<DataSource[]>([])
+const queryApi = inject(QueryApiKey)
+const query = ref<Query>()
 
 watch(
-  searchType,
-  async (newValue) => await setSearchTypeInRouteQuery(newValue)
+  () => props.queryId,
+  () => loadQuery()
 )
 
-async function setSearchTypeInRouteQuery(searchType: SearchTypesEnum) {
-  if (searchType == SearchTypesEnum.SEARCH_QUERY && props.organisationId && props.repositoryId && props.queryId) {
-    await router.replace({
-      name: 'documentSearchByQuery',
-      params: props,
-      query: { searchType, queryName: props.queryName }
-    })
-  } else {
-    await router.replace({ name: 'documentSearch', query: { searchType } })
-  }
+onMounted(() => {
+  loadQuery()
+  reloadDataSources()
+})
+
+function reloadDataSources() {
+  queryApi
+    ?.getDataSources(QueryType.Concept)
+    .then((r) => (dataSources.value = r.data))
+    .catch((e: Error) => renderError(e))
+}
+
+function loadQuery() {
+  if (props.organisationId && props.repositoryId && props.queryId)
+    queryApi
+      ?.getQueryById(props.organisationId, props.repositoryId, props.queryId)
+      .then((r) => (query.value = r.data))
+      .catch((e: Error) => renderError(e))
 }
 </script>
+
+<style lang="sass" scoped>
+.data-source-select
+  min-width: 50px
+  max-width: 500px
+</style>

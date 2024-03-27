@@ -4,7 +4,12 @@
       <q-toolbar class="q-gutter-sm">
         <q-toolbar-title class="text-subtitle1 ellipsis">
           {{ getTitle(local) }}
-          <small v-if="!isNew" class="gt-xs" :class="{'text-accent': isOtherVersion }" :title="isOtherVersion ? t('displayingOtherVersion') : ''">
+          <small
+            v-if="!isNew"
+            class="gt-xs"
+            :class="{ 'text-accent': isOtherVersion }"
+            :title="isOtherVersion ? t('displayingOtherVersion') : ''"
+          >
             {{ t('version') }}: {{ local.version }}
             <span v-if="local.createdAt">({{ d(local.createdAt, 'long') }})</span>
           </small>
@@ -29,7 +34,7 @@
           :icon="$q.screen.lt.md ? 'save' : undefined"
           :label="$q.screen.gt.sm ? t('save') : ''"
           :title="t('ctrl') + '+S'"
-          :disabled="readonly || !dirty && !isNew"
+          :disabled="readonly || (!dirty && !isNew)"
           @click="save()"
         />
         <q-btn
@@ -103,7 +108,7 @@
                 icon="content_copy"
                 class="fixed-top-right q-mr-md text-grey"
                 :title="t('copy')"
-                @click="copyToClipboard(local)"
+                @click="doCopyToClipboard(local)"
               />
               <pre>{{ local }}</pre>
             </q-scroll-area>
@@ -130,11 +135,7 @@
         @restore="$emit('restoreVersion', $event)"
       />
 
-      <forking-dialog
-        v-model:show="showForking"
-        :entity="entity"
-        @entity-clicked="$emit('entityClicked', $event)"
-      />
+      <forking-dialog v-model:show="showForking" :entity="entity" @entity-clicked="$emit('entityClicked', $event)" />
     </div>
 
     <entity-form
@@ -142,12 +143,11 @@
       :titles="local.titles"
       :synonyms="local.synonyms"
       :descriptions="local.descriptions"
-      :data-type="local.dataType"
-      :item-type="local.itemType"
-      :restriction="local.restriction"
-      :expression="local.expression"
-      :unit="local.unit"
-      :super-categories="local.superConcepts"
+      :data-type="(local as Phenotype).dataType"
+      :item-type="(local as Phenotype).itemType"
+      :restriction="(local as Phenotype).restriction"
+      :expression="(local as Phenotype).expression"
+      :unit="(local as Phenotype).unit"
       :codes="local.codes"
       :entity-id="local.id"
       :entity-type="local.entityType"
@@ -176,9 +176,9 @@
       :data-type="undefined"
       :item-type="undefined"
       :restriction="undefined"
-      :expression="local.expression"
+      :expression="(local as Phenotype).expression"
       :unit="undefined"
-      :super-concepts="local.superConcepts"
+      :super-concepts="(local as Concept).superConcepts"
       :codes="local.codes"
       :entity-id="local.id"
       :entity-type="local.entityType"
@@ -200,17 +200,14 @@
       @entity-clicked="$emit('entityClicked', $event)"
     />
 
-    <q-inner-loading
-      :showing="loading"
-      :label="t('pleaseWait') + '...'"
-    />
+    <q-inner-loading :showing="loading" :label="t('pleaseWait') + '...'" />
   </div>
 </template>
 
-<script lang="ts">
-import { ref, computed, defineComponent, watch, onMounted, inject } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {EntityType, DataType, Category, Phenotype, Concept} from '@onto-med/top-api'
+import { EntityType, DataType, Category, Phenotype, Concept } from '@onto-med/top-api'
 import VersionHistoryDialog from 'src/components/EntityEditor/VersionHistoryDialog.vue'
 import ForkingDialog from 'src/components/EntityEditor/Forking/ForkingDialog.vue'
 import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
@@ -222,175 +219,147 @@ import { EntityApiKey } from 'src/boot/axios'
 import { copyToClipboard, useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 
-export default defineComponent({
-  name: 'EntityTab',
-  components: {
-    VersionHistoryDialog,
-    ForkingDialog,
-    EntityForm
+const props = defineProps({
+  entity: {
+    type: Object as () => Category | Phenotype | Concept,
+    required: true
   },
-  props: {
-    entity: {
-      type: Object as () => Category|Phenotype|Concept,
-      required: true
-    },
-    version: Number,
-    repositoryId: {
-      type: String,
-      required: true
-    },
-    organisationId: {
-      type: String,
-      required: true
-    },
-    hotkeysEnabled: {
-      type: Boolean,
-      default: true
-    },
-    isOpen: {
-      type: Boolean,
-      default: false
-    },
-    dirty: Boolean,
-    readonly: Boolean
+  version: Number,
+  repositoryId: {
+    type: String,
+    required: true
   },
-  emits: ['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'save', 'reset'],
-  setup (props, { emit }) {
-    const { t, d } = useI18n()
-    const clone = (value: Category|Phenotype|Concept) => {
-      if (isConcept(value)) {
-        return JSON.parse(JSON.stringify(value)) as Concept
-      }
-      return JSON.parse(JSON.stringify(value)) as Phenotype
-    }
-    const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType, isConcept } = useEntityFormatter()
-    const { notify, renderError } = useNotify()
-    const router    = useRouter()
-    const local     = ref(clone(props.entity))
-    const entityApi = inject(EntityApiKey)
-    const entityStore = useEntity()
-    const showJson  = ref(false)
-    const loading   = ref(false)
-    const showVersionHistory = ref(false)
-    const restrictionKey     = ref(0)
-    const showSuperCategoryInput = ref(false)
-    const versionHistoryDialogKey = ref(1)
-    const isNew = computed(() => !local.value.version)
-    const $q = useQuasar()
+  organisationId: {
+    type: String,
+    required: true
+  },
+  hotkeysEnabled: {
+    type: Boolean,
+    default: true
+  },
+  isOpen: {
+    type: Boolean,
+    default: false
+  },
+  dirty: Boolean,
+  readonly: Boolean
+})
 
-    watch(
-      () => props.entity,
-      (value: Category|Phenotype|Concept) => {
-        local.value = clone(value)
-      },
-      { deep: true }
-    )
+const emit = defineEmits(['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'save', 'reset'])
 
-    const prefillFromVersion = (entity: Category|Phenotype): void => {
-      local.value = clone(entity)
-      restrictionKey.value++
-      void router.replace({
-        name: 'editor',
-        params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
-        query: { version: entity.version }
-      })
-      emit('changeVersion', entity.version)
-    }
+const { t, d } = useI18n()
+const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType, isConcept } = useEntityFormatter()
+const { notify, renderError } = useNotify()
+const router = useRouter()
+const local = ref(clone(props.entity))
+const entityApi = inject(EntityApiKey)
+const entityStore = useEntity()
+const showJson = ref(false)
+const loading = ref(false)
+const showVersionHistory = ref(false)
+const restrictionKey = ref(0)
+const versionHistoryDialogKey = ref(1)
+const isNew = computed(() => !local.value.version)
+const $q = useQuasar()
 
-    const isValid = computed((): boolean => {
-      var result = true
+const showForking = ref(false)
+const isOtherVersion = computed(() => local.value.version != props.entity.version)
+const isForking = true
 
-      result &&= local.value.titles != undefined && local.value.titles.length > 0 && local.value.titles.filter(t => !t.lang || !t.text).length === 0
-      result &&= local.value.descriptions == undefined || local.value.descriptions.filter(d => !d.lang || !d.text).length === 0
-      result &&= local.value.synonyms == undefined || local.value.synonyms.filter(s => !s.lang || !s.text).length === 0
+const isValid = computed((): boolean => {
+  var result = true
 
-      result &&= !hasItemType(props.entity) || !!(local.value as Phenotype).itemType
-      result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
-      result &&= !isRestricted(local.value) || local.value.restriction?.quantifier !== undefined
-      result &&= !hasExpression(local.value) || local.value.expression !== undefined
+  result &&=
+    local.value.titles != undefined &&
+    local.value.titles.length > 0 &&
+    local.value.titles.filter((t) => !t.lang || !t.text).length === 0
+  result &&=
+    local.value.descriptions == undefined || local.value.descriptions.filter((d) => !d.lang || !d.text).length === 0
+  result &&= local.value.synonyms == undefined || local.value.synonyms.filter((s) => !s.lang || !s.text).length === 0
 
-      return result
-    })
+  result &&= !hasItemType(props.entity) || !!(local.value as Phenotype).itemType
+  result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
+  result &&= !isRestricted(local.value) || local.value.restriction?.quantifier !== undefined
+  result &&= !hasExpression(local.value) || local.value.expression !== undefined
 
-    const save = () => {
-      if ((isNew.value || props.dirty)) {
-        if (isValid.value) {
-          if (isPhenotype(local.value) && local.value.expression?.functionId === 'switch' && hasDataType(local.value))
-            local.value.dataType = DataType.Number
-          emit('save')
-          versionHistoryDialogKey.value++
-        } else {
-          notify(t('pleaseCheckInput'))
-        }
-      }
-    }
+  return result
+})
 
-    const keylistener = (e: KeyboardEvent) => {
-      if (!props.hotkeysEnabled) return
-      if (e.code === 'KeyS' && (e.ctrlKey || e.metaKey)) {
-        save()
-      } else return
-      e.preventDefault()
-    }
+watch(
+  () => props.entity,
+  (value: Category | Phenotype | Concept) => {
+    local.value = clone(value)
+  },
+  { deep: true }
+)
 
-    const reset = () => {
-      emit('reset')
-      restrictionKey.value++
-    }
+onMounted(() => {
+  document.addEventListener('keydown', keylistener)
+  if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
+  loading.value = true
+  entityApi
+    .getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
+    .then((r) => prefillFromVersion(r.data))
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+})
 
-    onMounted(() => {
-      document.addEventListener('keydown', keylistener)
-      if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
-      loading.value = true
-      entityApi.getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
-        .then((r) => prefillFromVersion(r.data))
-        .catch((e: Error) => renderError(e))
-        .finally(() => loading.value = false)
-    })
+function clone(value: Category | Phenotype | Concept) {
+  if (isConcept(value)) {
+    return JSON.parse(JSON.stringify(value)) as Concept
+  }
+  return JSON.parse(JSON.stringify(value)) as Phenotype
+}
 
-    return {
-      t,
-      d,
-      getTitle,
-      isRestricted,
-      hasDataType,
-      reset,
+function prefillFromVersion(entity: Category | Phenotype): void {
+  local.value = clone(entity)
+  restrictionKey.value++
+  void router.replace({
+    name: 'editor',
+    params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
+    query: { version: entity.version }
+  })
+  emit('changeVersion', entity.version)
+}
 
-      local,
-      showJson,
-      showVersionHistory,
-      showForking: ref(false),
-      loading,
-      restrictionKey,
-      EntityType,
-      DataType,
-      versionHistoryDialogKey,
-      showSuperCategoryInput,
-      isNew,
-
-      isOtherVersion: computed(() => local.value.version != props.entity.version),
-      isForking: true,
-
-      save,
-
-      prefillFromVersion,
-
-      copyToClipboard (text: unknown): void {
-        copyToClipboard(JSON.stringify(text))
-          .catch(() => notify(t('copyFailed')))
-      },
-
-      showClearDialog () {
-        $q.dialog({
-          component: Dialog,
-          componentProps: {
-            message: t('confirmDiscardChanges')
-          }
-        }).onOk(() => reset())
-      }
+function save() {
+  if (isNew.value || props.dirty) {
+    if (isValid.value) {
+      if (isPhenotype(local.value) && local.value.expression?.functionId === 'switch' && hasDataType(local.value))
+        local.value.dataType = DataType.Number
+      emit('save')
+      versionHistoryDialogKey.value++
+    } else {
+      notify(t('pleaseCheckInput'))
     }
   }
-})
+}
+
+function keylistener(e: KeyboardEvent) {
+  if (!props.hotkeysEnabled) return
+  if (e.code === 'KeyS' && (e.ctrlKey || e.metaKey)) {
+    save()
+  } else return
+  e.preventDefault()
+}
+
+function reset() {
+  emit('reset')
+  restrictionKey.value++
+}
+
+function doCopyToClipboard(text: unknown): void {
+  copyToClipboard(JSON.stringify(text)).catch(() => notify(t('copyFailed')))
+}
+
+function showClearDialog() {
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('confirmDiscardChanges')
+    }
+  }).onOk(() => reset())
+}
 </script>
 
 <style lang="sass">

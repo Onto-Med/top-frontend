@@ -7,11 +7,7 @@
   <div v-else>
     <q-item>
       <q-item-section v-if="showEntityType" avatar top>
-        <q-icon
-          :name="getIcon(entity)"
-          :title="getIconTooltip(entity)"
-          size="2rem"
-        />
+        <q-icon :name="getIcon(entity)" :title="getIconTooltip(entity)" size="2rem" />
       </q-item-section>
       <q-item-section>
         <q-item-label v-if="showRepository" overline>
@@ -81,19 +77,9 @@ const props = defineProps({
 defineEmits(['entityClicked'])
 
 const { t } = useI18n()
-const {
-  getDescriptions, getIcon, getIconTooltip,
-  getSynonyms, getTitle, hasExpression
-} = useEntityFormatter()
+const { getDescriptions, getIcon, getIconTooltip, getSynonyms, getTitle, hasExpression } = useEntityFormatter()
 
-const descriptions = computed(
-  () => getDescriptions(props.entity)
-)
-const synonyms = computed(
-  () => getSynonyms(props.entity)
-)
-const expression = computed(
-  () => hasExpression(props.entity) ? props.entity.expression : undefined
-)
-
+const descriptions = computed(() => getDescriptions(props.entity))
+const synonyms = computed(() => getSynonyms(props.entity))
+const expression = computed(() => (hasExpression(props.entity) ? props.entity.expression : undefined))
 </script>

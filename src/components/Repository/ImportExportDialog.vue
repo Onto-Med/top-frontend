@@ -1,5 +1,8 @@
 <template>
-  <q-dialog :model-value="show" @update:model-value="result = undefined; $emit('update:show', $event)">
+  <q-dialog
+    :model-value="show"
+    @update:model-value="onShowChanged"
+  >
     <q-card class="export-dialog">
       <q-card-section class="text-h6">
         {{ t('importOrExportThing', { thing: t('repository') }) }}
@@ -20,7 +23,12 @@
             option-label="id"
           />
 
-          <q-file v-model="importFile" :label="t('repositoryImportFile')" :accept="acceptedExtension" :disable="!importConverter">
+          <q-file
+            v-model="importFile"
+            :label="t('repositoryImportFile')"
+            :accept="acceptedExtension"
+            :disable="!importConverter"
+          >
             <template #prepend>
               <q-icon name="attach_file" />
             </template>
@@ -78,10 +86,7 @@
           </q-input>
         </q-card-section>
 
-        <q-inner-loading
-          :showing="loading"
-          :label="t('pleaseWait') + '...'"
-        />
+        <q-inner-loading :showing="loading" :label="t('pleaseWait') + '...'" />
       </div>
 
       <q-separator />
@@ -94,8 +99,8 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, inject, onMounted, computed } from 'vue'
+<script setup lang="ts">
+import { ref, inject, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RepositoryApiKey } from 'src/boot/axios'
 import { Converter, Purpose, Repository } from '@onto-med/top-api'
@@ -104,93 +109,80 @@ import { copyToClipboard, exportFile } from 'quasar'
 import { useEntity } from 'src/pinia/entity'
 import { storeToRefs } from 'pinia'
 
-export default defineComponent({
-  props: {
-    show: {
-      type: Boolean,
-      required: true
-    },
-    repository: {
-      type: Object as () => Repository,
-      required: true
-    }
-  },
-  emits: ['update:show', 'import'],
-  setup (props, { emit }) {
-    const { t, d }      = useI18n()
-    const repositoryApi = inject(RepositoryApiKey)
-    const entityStore   = useEntity()
-    const { notify, renderError } = useNotify()
-    const exportConverter = ref(undefined as Converter|undefined)
-    const importConverter = ref(undefined as Converter|undefined)
-    const loading        = ref(false)
-    const result         = ref(undefined as string|undefined)
-    const { converters } = storeToRefs(entityStore)
-    const importFile     = ref<File|undefined>(undefined)
+const props = defineProps<{
+  show: boolean
+  repository: Repository
+}>()
 
-    onMounted(() => entityStore.loadConverters())
+const emit = defineEmits(['update:show', 'import'])
 
-    return {
-      t,
-      d,
-      exportConverter,
-      importConverter,
-      loading,
-      result,
-      exportConverters: computed(() => converters.value?.filter(c => c.purpose === Purpose.Export)),
-      importConverters: computed(() => converters.value?.filter(c => c.purpose === Purpose.Import)),
-      acceptedExtension: computed(() =>
-        importConverter.value && importConverter.value.fileExtension
-        ? '.' + importConverter.value.fileExtension
-        : undefined
-      ),
-      importFile,
+const { t } = useI18n()
+const repositoryApi = inject(RepositoryApiKey)
+const entityStore = useEntity()
+const { notify, renderError } = useNotify()
+const exportConverter = ref(undefined as Converter | undefined)
+const importConverter = ref(undefined as Converter | undefined)
+const loading = ref(false)
+const result = ref(undefined as string | undefined)
+const { converters } = storeToRefs(entityStore)
+const importFile = ref<File | undefined>(undefined)
 
-      doExport: async () => {
-        if (loading.value || !exportConverter.value || !repositoryApi || !props.repository.organisation) return
-        loading.value = true
+onMounted(() => entityStore.loadConverters())
 
-        await repositoryApi.exportRepository(props.repository.organisation.id, props.repository.id, exportConverter.value.id)
-          .then(r => {
-            if (typeof r.data === 'object' || Array.isArray(r.data)) {
-              result.value = JSON.stringify(r.data)
-            } else {
-              result.value = r.data as string
-            }
-          })
-          .catch((e: Error) => renderError(e))
-          .finally(() => loading.value = false)
-      },
+const exportConverters = computed(() => converters.value?.filter((c) => c.purpose === Purpose.Export))
+const importConverters = computed(() => converters.value?.filter((c) => c.purpose === Purpose.Import))
+const acceptedExtension = computed(() =>
+  importConverter.value && importConverter.value.fileExtension ? '.' + importConverter.value.fileExtension : undefined
+)
 
-      doImport: () => {
-        if (!repositoryApi || !importConverter.value || !importFile.value || !props.repository.organisation) return
-        loading.value = true
+async function doExport() {
+  if (loading.value || !exportConverter.value || !repositoryApi || !props.repository.organisation) return
+  loading.value = true
 
-        repositoryApi.importRepository(props.repository.organisation.id, props.repository.id, importConverter.value.id, importFile.value)
-          .then(() => {
-            notify(t('importFinished'), 'positive')
-            emit('import')
-            importConverter.value = undefined
-            importFile.value = undefined
-          })
-          .catch((e: Error) => renderError(e))
-          .finally(() => loading.value = false)
-      },
-
-      copyResult: () => {
-        if (result.value)
-          copyToClipboard(result.value)
-            .then(() => notify(t('copiedToClipboard'), 'positive'))
-            .catch(() => notify(t('copyFailed')))
-      },
-
-      copyToFile: () => {
-        if (result.value)
-          exportFile(`${props.repository.id}.${exportConverter.value?.fileExtension || 'txt'}`, result.value)
+  await repositoryApi
+    .exportRepository(props.repository.organisation.id, props.repository.id, exportConverter.value.id)
+    .then((r) => {
+      if (typeof r.data === 'object' || Array.isArray(r.data)) {
+        result.value = JSON.stringify(r.data)
+      } else {
+        result.value = r.data as string
       }
-    }
-  }
-})
+    })
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+}
+
+function doImport() {
+  if (!repositoryApi || !importConverter.value || !importFile.value || !props.repository.organisation) return
+  loading.value = true
+
+  repositoryApi
+    .importRepository(props.repository.organisation.id, props.repository.id, importConverter.value.id, importFile.value)
+    .then(() => {
+      notify(t('importFinished'), 'positive')
+      emit('import')
+      importConverter.value = undefined
+      importFile.value = undefined
+    })
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+}
+
+function copyResult() {
+  if (result.value)
+    copyToClipboard(result.value)
+      .then(() => notify(t('copiedToClipboard'), 'positive'))
+      .catch(() => notify(t('copyFailed')))
+}
+
+function copyToFile() {
+  if (result.value) exportFile(`${props.repository.id}.${exportConverter.value?.fileExtension || 'txt'}`, result.value)
+}
+
+function onShowChanged(newVal: boolean) {
+  result.value = undefined
+  emit('update:show', newVal)
+}
 </script>
 
 <style lang="sass" scoped>

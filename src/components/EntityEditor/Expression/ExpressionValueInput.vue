@@ -1,11 +1,7 @@
 <template>
   <div class="clickable">
-    <span v-show="expand">{{ '&nbsp;'.repeat((indentLevel) * indent) }}</span>
-    <span
-      v-if="defaultConstant"
-      :title="t('rightClickShowDoc')"
-      @click.right="showConstantDoc(defaultConstant)"
-    >
+    <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
+    <span v-if="defaultConstant" :title="t('rightClickShowDoc')" @click.right="showConstantDoc(defaultConstant)">
       {{ defaultConstant.title || defaultConstant.id }}
     </span>
     <span v-else-if="value">
@@ -43,10 +39,7 @@
           class="items-center justify-between text-no-wrap"
           @click="$emit('update:constantId', constant.id)"
         >
-          <q-item-section
-            :title="t('rightClickShowDoc')"
-            @click.right="showConstantDoc(constant)"
-          >
+          <q-item-section :title="t('rightClickShowDoc')" @click.right="showConstantDoc(constant)">
             {{ constant.title || constant.id }}
           </q-item-section>
         </q-item>
@@ -87,7 +80,7 @@ import { useI18n } from 'vue-i18n'
 import { env } from 'src/config'
 
 const props = defineProps({
-  value: Object as () => Value|undefined,
+  value: Object as () => Value | undefined,
   constantId: String,
   readonly: Boolean,
   expand: Boolean,
@@ -106,24 +99,18 @@ const emit = defineEmits(['update:value', 'update:constantId', 'enclose', 'remov
 const { t } = useI18n()
 const popup = ref(null as unknown as QPopupEdit)
 const entityStore = useEntity()
-const constants = ref(undefined as Constant[]|undefined)
+const constants = ref(undefined as Constant[] | undefined)
 const dataType = ref(DataType.Number)
 const isValueSet = computed(() => props.value || defaultConstant.value)
 
-void entityStore.getConstants()
-  .then(o => constants.value = o)
+void entityStore.getConstants().then((o) => (constants.value = o))
 
 onMounted(() => {
-  if (!props.value && !props.constantId)
-    popup.value.show()
+  if (!props.value && !props.constantId) popup.value.show()
 })
 
-const defaultConstant = computed(
-  () => constants.value?.find(c => c.id === props.constantId)
-)
-const isStringValue = computed(
-  () => props.value?.dataType === DataType.String
-)
+const defaultConstant = computed(() => constants.value?.find((c) => c.id === props.constantId))
+const isStringValue = computed(() => props.value?.dataType === DataType.String)
 
 const baseDocUrl = computed(() => {
   const baseUrl = env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL
@@ -137,23 +124,19 @@ const dataTypeIcon = computed(() => {
   return 'question_mark'
 })
 
-function toValue(value: string|number|Date|boolean|undefined, dataType: DataType): Value|undefined {
-  if (dataType === DataType.String)
-    return { value: value, dataType: dataType } as StringValue
-  if (dataType === DataType.Number)
-    return { value: value, dataType: dataType } as NumberValue
-  if (dataType === DataType.DateTime)
-    return { value: value, dataType: dataType } as DateTimeValue
-  if (dataType === DataType.Boolean)
-    return { value: value, dataType: dataType } as BooleanValue
+function toValue(value: string | number | Date | boolean | undefined, dataType: DataType): Value | undefined {
+  if (dataType === DataType.String) return { value: value, dataType: dataType } as StringValue
+  if (dataType === DataType.Number) return { value: value, dataType: dataType } as NumberValue
+  if (dataType === DataType.DateTime) return { value: value, dataType: dataType } as DateTimeValue
+  if (dataType === DataType.Boolean) return { value: value, dataType: dataType } as BooleanValue
   return undefined
 }
 
-function setValue (value: string|number|Date|boolean|undefined) {
+function setValue(value: string | number | Date | boolean | undefined) {
   emit('update:value', toValue(value, dataType.value))
 }
 
-function toggleDataType () {
+function toggleDataType() {
   if (dataType.value === DataType.Number) dataType.value = DataType.DateTime
   else if (dataType.value === DataType.DateTime) dataType.value = DataType.String
   else dataType.value = DataType.Number
@@ -165,8 +148,7 @@ function toInputType(dataType: DataType): string {
 }
 
 function showConstantDoc(constant: Constant) {
-  if (baseDocUrl.value)
-    window.open(`${baseDocUrl.value}/${constant.id}.html`, '_blank')
+  if (baseDocUrl.value) window.open(`${baseDocUrl.value}/${constant.id}.html`, '_blank')
 }
 </script>
 

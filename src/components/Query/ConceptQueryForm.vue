@@ -28,11 +28,7 @@
 
     <div class="col-12 col-sm q-pa-md">
       <p v-t="'queryImportDescription'" />
-      <q-file
-        v-model="importFile"
-        :label="t('queryImportFile')"
-        accept=".json"
-      >
+      <q-file v-model="importFile" :label="t('queryImportFile')" accept=".json">
         <template #prepend>
           <q-icon name="attach_file" />
         </template>
@@ -132,7 +128,7 @@ import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import { useEntity } from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { computed, inject, onMounted, ref, watch} from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { exportFile, useQuasar } from 'quasar'
@@ -152,37 +148,35 @@ const queryApi = inject(QueryApiKey)
 
 const name = ref<string>()
 const dataSource = ref<string>()
-const entity = ref<SingleConcept|CompositeConcept>()
+const entity = ref<SingleConcept | CompositeConcept>()
 const allString = 'all'
-const language = ref<string|undefined>(allString)
+const language = ref<string | undefined>(allString)
 
-const languageOptions = computed(
-  () => languages.concat({ value: allString, label: t('allLanguages', 2) })
-)
+const languageOptions = computed(() => languages.concat({ value: allString, label: t('allLanguages', 2) }))
 
 const treeLoading = ref(false)
-const importFile = ref(undefined as File|undefined)
+const importFile = ref(undefined as File | undefined)
 const fileReader = new FileReader()
 
 const splitterModel = ref<number>($q.localStorage.getItem('conceptQuerySplitterWidth') || 35)
 const dataSources = ref([] as DataSource[])
 
-function prefillQuery (query: ConceptQuery) {
+function prefillQuery(query: ConceptQuery) {
   entity.value = entityStore.getEntity(query.entityId)
   language.value = query.language
 }
 
 fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as ConceptQuery)
 
-async function reloadEntities () {
+async function reloadEntities() {
   treeLoading.value = true
-  await entityStore.reloadEntities()
+  await entityStore
+    .reloadEntities()
     .then(() => {
-      if (entities.value.findIndex(e => e.id === entity.value?.id) === -1)
-        entity.value = undefined
+      if (entities.value.findIndex((e) => e.id === entity.value?.id) === -1) entity.value = undefined
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => treeLoading.value = false)
+    .finally(() => (treeLoading.value = false))
 }
 
 onMounted(() => {
@@ -191,16 +185,9 @@ onMounted(() => {
   reloadDataSources().catch((e: Error) => renderError(e))
 })
 
-watch(
-  splitterModel,
-  (newVal) => $q.localStorage.set('conceptQuerySplitterWidth', newVal)
-)
+watch(splitterModel, (newVal) => $q.localStorage.set('conceptQuerySplitterWidth', newVal))
 
-const configurationComplete = computed(() =>
-  dataSource.value
-    && language.value
-    && entity.value
-)
+const configurationComplete = computed(() => dataSource.value && language.value && entity.value)
 
 const query = computed(() => {
   return {
@@ -215,35 +202,40 @@ const query = computed(() => {
 
 async function reloadDataSources() {
   if (!organisation.value) return
-  await queryApi?.getOrganisationDataSources(organisation.value.id, QueryType.Concept)
-    .then(r => dataSources.value = r.data)
+  await queryApi
+    ?.getOrganisationDataSources(organisation.value.id, QueryType.Concept)
+    .then((r) => (dataSources.value = r.data))
 }
 
-function exportQuery () {
+function exportQuery() {
   exportFile(
     new Date().toISOString() + '_documentQuery_' + (name.value || 'top_query') + '.json',
-    JSON.stringify(query.value))
+    JSON.stringify(query.value)
+  )
 }
 
-function importQuery () {
+function importQuery() {
   if (!importFile.value) return
   fileReader.readAsText(importFile.value)
   importFile.value = undefined
 }
 
-function onExecute () {
+function onExecute() {
   if (!name.value && entity.value) {
     name.value = getTitle(entity.value)
   }
 
-  emit('execute', JSON.parse(
-    JSON.stringify(
-      query.value,
-      (key, value: string) => (key === 'language' && value === allString) ? undefined : value)
-  ) as ConceptQuery)
+  emit(
+    'execute',
+    JSON.parse(
+      JSON.stringify(query.value, (key, value: string) =>
+        key === 'language' && value === allString ? undefined : value
+      )
+    ) as ConceptQuery
+  )
 }
 
-function reset () {
+function reset() {
   name.value = undefined
   dataSource.value = undefined
   entity.value = undefined

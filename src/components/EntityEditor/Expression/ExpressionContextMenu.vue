@@ -70,11 +70,7 @@
       <q-item v-if="value && !changing" clickable @click="showChangeOptions()">
         <q-item-section v-t="'change'" />
       </q-item>
-      <q-item
-        v-if="removable"
-        clickable
-        @click="onRemove"
-      >
+      <q-item v-if="removable" clickable @click="onRemove">
         <q-item-section v-t="'remove'" />
       </q-item>
     </q-list>
@@ -113,13 +109,14 @@ const entityStore = useEntity()
 const { renderError } = useNotify()
 const { functions } = storeToRefs(entityStore)
 const menu = ref<QMenu>()
-const filter = ref<string[]|undefined>(undefined)
+const filter = ref<string[] | undefined>(undefined)
 const functionTypes = computed(() => {
-  return functions.value?.map(f => f.type)
+  return functions.value
+    ?.map((f) => f.type)
     .filter((t, index, self) => self.indexOf(t) === index)
-    .filter(t => !props.includeFunctionTypes || !!t && props.includeFunctionTypes.includes(t))
-    .filter(t => !props.excludeFunctionTypes || !!t && !props.excludeFunctionTypes.includes(t))
-    .map(type => {
+    .filter((t) => !props.includeFunctionTypes || (!!t && props.includeFunctionTypes.includes(t)))
+    .filter((t) => !props.excludeFunctionTypes || (!!t && !props.excludeFunctionTypes.includes(t)))
+    .map((type) => {
       const x = type || 'none'
       return {
         label: te('functionType.' + x) ? t('functionType.' + x) : x,
@@ -129,30 +126,29 @@ const functionTypes = computed(() => {
 })
 
 onMounted(() => {
-  if (!functions.value)
-    entityStore.reloadFunctions()
-      .catch((e: Error) => renderError(e))
+  if (!functions.value) entityStore.reloadFunctions().catch((e: Error) => renderError(e))
 })
 
 const filteredFunctionTypes = computed(() =>
-  (!filter.value || filter.value.length === 0)
+  !filter.value || filter.value.length === 0
     ? functionTypes.value
-    : functionTypes.value?.filter(t => filter.value?.includes(t.value))
+    : functionTypes.value?.filter((t) => filter.value?.includes(t.value))
 )
 
-const functionGroups = computed(() =>
-  functions.value?.filter(
-    f => !props.excludeFunctions || !!f && !props.excludeFunctions.includes(f.id)
-  ).reduce(
-    (map, f) => {
-      const t = f.type || 'none'
-      var entry = map.get(t)
-      if (entry) entry.push(f)
-      else map.set(t, [ f ])
-      return map
-    },
-    new Map() as Map<string, ExpressionFunction[]>
-  ) || new Map()
+const functionGroups = computed(
+  () =>
+    functions.value
+      ?.filter((f) => !props.excludeFunctions || (!!f && !props.excludeFunctions.includes(f.id)))
+      .reduce(
+        (map, f) => {
+          const t = f.type || 'none'
+          var entry = map.get(t)
+          if (entry) entry.push(f)
+          else map.set(t, [f])
+          return map
+        },
+        new Map() as Map<string, ExpressionFunction[]>
+      ) || new Map()
 )
 
 const changing = ref(false)
@@ -190,8 +186,7 @@ function onEnclose() {
 }
 
 function onHide() {
-  if (props.value)
-    changing.value = false
+  if (props.value) changing.value = false
 }
 
 function onRemove() {

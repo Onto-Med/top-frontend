@@ -40,15 +40,13 @@
                 @update:selected="$emit('update:dataType', $event)"
               />
 
-              <enum-select
-                v-else
-                :selected="DataType.Boolean"
-                i18n-prefix="dataType"
-                readonly
-              />
+              <enum-select v-else :selected="DataType.Boolean" i18n-prefix="dataType" readonly />
 
               <unit-input
-                v-if="[EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entityType) && dataType === DataType.Number"
+                v-if="
+                  [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entityType) &&
+                  dataType === DataType.Number
+                "
                 :model-value="unit"
                 :readonly="readonly"
                 show-label
@@ -81,7 +79,12 @@
         :help-text="t('entityEditor.formulaHelp')"
         :organisation-id="organisationId"
         :repository-id="repositoryId"
-        :entity-types="[EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.SinglePhenotype, EntityType.SingleRestriction]"
+        :entity-types="[
+          EntityType.CompositePhenotype,
+          EntityType.CompositeRestriction,
+          EntityType.SinglePhenotype,
+          EntityType.SingleRestriction
+        ]"
         :exclude-function-types="['textFunction']"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
@@ -217,20 +220,28 @@ const props = defineProps({
 })
 
 defineEmits([
-  'entityClicked', 'update:codes', 'update:descriptions', 'update:synonyms', 'update:unit', 'update:expression',
-  'update:restriction', 'update:dataType', 'update:titles', 'update:itemType'
+  'entityClicked',
+  'update:codes',
+  'update:descriptions',
+  'update:synonyms',
+  'update:unit',
+  'update:expression',
+  'update:restriction',
+  'update:dataType',
+  'update:titles',
+  'update:itemType'
 ])
 
 const { t } = useI18n()
 const router = useRouter()
 const { isRestricted, hasDataType, hasItemType, getTitle } = useEntityFormatter()
 const entityStore = useEntity()
-const superPhenotype = ref(undefined as Phenotype|undefined)
+const superPhenotype = ref(undefined as Phenotype | undefined)
 
 onMounted(async () => {
   await entityStore
     .loadSuperPhenotype(props.entityId)
-    .then(e => superPhenotype.value = e)
+    .then((e) => (superPhenotype.value = e))
     .catch((e: Error) => console.log(e))
 })
 
@@ -240,7 +251,7 @@ const showDescriptions = ref(props.descriptions && props.descriptions.length > 0
 const showSynonyms = ref(props.synonyms && props.synonyms.length > 0)
 const showCodes = ref(props.codes && props.codes.length > 0)
 
-function routeToEntity(entity: Entity|undefined) {
+function routeToEntity(entity: Entity | undefined) {
   if (!entity || !entity.repository || !entity.repository.organisation) return
   void router.push({
     name: 'editor',
