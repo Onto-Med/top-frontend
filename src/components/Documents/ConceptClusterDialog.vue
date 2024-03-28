@@ -30,7 +30,7 @@
               />
               <q-btn
                 :label="t('deleteThing', { thing: t('pipeline') })"
-                :disable="!pipeline"
+                :disable="!runningPipeline"
                 icon="delete"
                 color="red"
                 no-caps
@@ -85,7 +85,13 @@
 </template>
 
 <script setup lang="ts">
-import { ConceptCluster, DataSource, PipelineResponse, PipelineResponseStatus } from '@onto-med/top-api'
+import {
+  ConceptCluster,
+  ConceptGraphPipeline, ConceptGraphPipelineStepsEnum,
+  DataSource,
+  PipelineResponse,
+  PipelineResponseStatus
+} from '@onto-med/top-api'
 import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
@@ -106,16 +112,17 @@ const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
-const pipeline = ref<PipelineResponse>()
+const runningPipeline = ref<PipelineResponse>()
+const finishedPipeline = ref<ConceptGraphPipeline>()
 const clusters = ref<ConceptCluster[]>()
 const selectedClusters = ref<ConceptCluster[]>([])
 const interval = ref<number>()
 
-const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
+const isPipelineFinished = computed(() => runningPipeline.value?.status === PipelineResponseStatus.Successful)
 
 const pipelineStatus = computed(() => {
-  if (!pipeline.value || !pipeline.value.status) return t('unavailable')
-  return te(pipeline.value.status) ? t(pipeline.value.status) : pipeline.value.status
+  if (!runningPipeline.value || !runningPipeline.value.status) return t('unavailable')
+  return te(runningPipeline.value.status) ? t(runningPipeline.value.status) : runningPipeline.value.status
 })
 
 const clusterColumns = computed(
@@ -129,7 +136,7 @@ const clusterColumns = computed(
 onMounted(() => {
   loadPipeline()
     .then(() => {
-      if (!pipeline.value) interval.value = window.setInterval(() => loadPipeline, 5000)
+      if (!runningPipeline.value) interval.value = window.setInterval(() => loadPipeline, 5000)
     })
     .catch((e: Error) => renderError(e))
 })
@@ -138,12 +145,12 @@ onUnmounted(() => window.clearInterval(interval.value))
 
 async function loadPipeline() {
   return conceptPipelineApi
-    ?.getConceptPipelineById(props.dataSource.id)
+    ?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => {
-      pipeline.value = r.data
+      finishedPipeline.value = r.data
       if (
-        pipeline.value?.status == PipelineResponseStatus.Successful ||
-        pipeline.value?.status == PipelineResponseStatus.Failed
+        runningPipeline.value?.status == PipelineResponseStatus.Successful ||
+        runningPipeline.value?.status == PipelineResponseStatus.Failed
       )
         window.clearInterval(interval.value)
     })
