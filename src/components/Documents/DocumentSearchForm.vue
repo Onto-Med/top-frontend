@@ -141,24 +141,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { DocumentApiKey, ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
+import {computed, inject, onMounted, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey} from 'src/boot/axios'
 import {
-  Document,
   ConceptCluster,
-  PipelineResponseStatus,
-  DocumentGatheringMode,
+  ConceptGraphPipelineStepsEnum,
   DataSource,
-  Query,
-  DocumentPage
+  Document,
+  DocumentGatheringMode,
+  DocumentPage,
+  PipelineResponseStatus,
+  Query
 } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
-import { QTableProps, useQuasar } from 'quasar'
-import { useEntity } from 'src/pinia/entity'
-import { storeToRefs } from 'pinia'
+import {QTableProps, useQuasar} from 'quasar'
+import {useEntity} from 'src/pinia/entity'
+import {storeToRefs} from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
 
 interface ConceptColor {
@@ -303,10 +304,12 @@ onMounted(() =>
 watch([mostImportantNodes, conceptMode, selectedConcepts], () => reloadDocuments().catch((e: Error) => renderError(e)))
 watch(
   () => props.dataSource,
-  () =>
-    reloadConcepts()
-      .then(() => reloadDocuments())
+  () => {
+    reloadDocuments()
       .catch((e: Error) => renderError(e))
+    reloadConcepts()
+      .catch((e: Error) => renderError(e))
+  }
 )
 
 async function reloadConcepts() {
@@ -374,11 +377,12 @@ function prepareSelectedConcepts() {
 async function checkPipeline() {
   if (!props.dataSource) return Promise.reject()
   return await conceptPipelineApi
-    ?.getConceptPipelines()
+    ?.getConceptGraphPipelines()
     .then(
       (r) =>
-        r.data.filter((p) => p.pipelineId === pipelineId && p.finished_steps?.some((s) => s.name === 'graph')).length >
-        0
+        r.data.filter(
+          (p) => p.pipelineId === pipelineId &&
+            p.finished_steps?.some((s) => s.name === ConceptGraphPipelineStepsEnum.Graph)).length > 0
     )
     .then((r) => (!r ? Promise.reject() : true))
 }
