@@ -137,8 +137,7 @@ onMounted(() => {
 onUnmounted(() => window.clearInterval(interval.value))
 
 async function loadPipeline() {
-  return conceptPipelineApi
-    ?.getConceptPipelineById(props.dataSource.id)
+  return conceptPipelineApi?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => {
       pipeline.value = r.data
       if (
