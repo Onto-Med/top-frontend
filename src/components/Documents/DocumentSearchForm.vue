@@ -65,7 +65,7 @@
                 v-model="selectedConcepts"
                 :style="selectedColors[index]"
                 :val="index"
-                :label="concept.labels"
+                :label="concept.labels?.join(' | ')"
                 :title="concept.labels"
                 :disable="loading"
                 class="ellipsis"

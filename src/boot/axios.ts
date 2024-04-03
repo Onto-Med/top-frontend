@@ -20,7 +20,7 @@ export const QueryApiKey: InjectionKey<QueryApi> = Symbol('queryApi')
 export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 export const PhraseApiKey: InjectionKey<PhraseApi> = Symbol('phraseApi')
 export const ConceptClusterApiKey: InjectionKey<ConceptclusterApi> = Symbol('conceptClusterApi')
-export const ConceptPipelineApiKey: InjectionKey<ConceptPipelineApi> = Symbol('conceptPipelinApi')
+export const ConceptPipelineApiKey: InjectionKey<ConceptPipelineApi> = Symbol('conceptPipelineApi')
 export const UserApiKey: InjectionKey<UserApi> = Symbol('userApi')
 export const CodeApiKey: InjectionKey<CodeApi> = Symbol('codeApi')
 
