@@ -30,7 +30,7 @@
               />
               <q-btn
                 :label="t('deleteThing', { thing: t('pipeline') })"
-                :disable="!runningPipeline"
+                :disable="!pipeline"
                 icon="delete"
                 color="red"
                 no-caps
@@ -61,7 +61,7 @@
             <q-separator />
             <q-stepper-navigation class="q-mt-md">
               <q-btn
-                :disable="!isPipelineFinished"
+                :disable="!isCGPipelineFinished"
                 :label="step === 2 ? t('finish') : t('continue')"
                 color="primary"
                 @click="conceptGraphStep"
@@ -115,7 +115,7 @@ const conceptGraphs = ref<ConceptGraphObject[]>([])
 const selectedGraphs = ref<ConceptGraphObject[]>([])
 const interval = ref<number>()
 
-const isPipelineFinished = computed(() => runningPipeline.value?.status === PipelineResponseStatus.Successful)
+const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
 
 const pipelineStatus = computed(() => {
   if (!runningPipeline.value || !runningPipeline.value.status) return t('unavailable')
@@ -145,12 +145,13 @@ async function loadPipeline() {
   return conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => {
-      finishedPipeline.value = r.data
+      pipeline.value = r.data
       if (
-        runningPipeline.value?.status == PipelineResponseStatus.Successful ||
-        runningPipeline.value?.status == PipelineResponseStatus.Failed
+        pipeline.value?.status == PipelineResponseStatus.Successful ||
+        pipeline.value?.status == PipelineResponseStatus.Failed
       )
         window.clearInterval(interval.value)
+      }
     })
     .then(() => window.clearInterval(interval.value))
 }
