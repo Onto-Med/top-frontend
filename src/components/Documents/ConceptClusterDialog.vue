@@ -30,7 +30,7 @@
               />
               <q-btn
                 :label="t('deleteThing', { thing: t('pipeline') })"
-                :disable="!pipeline"
+                :disable="!cgPipeline"
                 icon="delete"
                 color="red"
                 no-caps
@@ -63,7 +63,7 @@
             <q-separator />
             <q-stepper-navigation class="q-mt-md">
               <q-btn
-                :disable="!isPipelineFinished"
+                :disable="!isCGPipelineFinished"
                 :label="step === 2 ? t('finish') : t('continue')"
                 color="primary"
                 @click="stepper?.next()"
@@ -85,7 +85,12 @@
 </template>
 
 <script setup lang="ts">
-import { ConceptCluster, DataSource, PipelineResponse, PipelineResponseStatus } from '@onto-med/top-api'
+import {
+  ConceptCluster,
+  ConceptGraphPipeline, ConceptGraphPipelineStepsEnum,
+  DataSource, PipelineResponse,
+  // PipelineResponseStatus
+} from '@onto-med/top-api'
 import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
@@ -105,13 +110,15 @@ const $q = useQuasar()
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
 const stepper = ref<QStepper>()
-const step = ref(1)
 const pipeline = ref<PipelineResponse>()
+const cgPipeline = ref<ConceptGraphPipeline>()
 const clusters = ref<ConceptCluster[]>()
 const selectedClusters = ref<ConceptCluster[]>([])
 const interval = ref<number>()
 
-const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
+// const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
+const isCGPipelineFinished = computed(() => cgPipeline.value?.status?.some((s) => s.name === ConceptGraphPipelineStepsEnum.Graph))
+const step = isCGPipelineFinished.value ? ref(2) : ref(1)
 
 const pipelineStatus = computed(() => {
   if (!pipeline.value || !pipeline.value.status) return t('unavailable')
@@ -139,12 +146,13 @@ onUnmounted(() => window.clearInterval(interval.value))
 async function loadPipeline() {
   return conceptPipelineApi?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => {
-      pipeline.value = r.data
-      if (
-        pipeline.value?.status == PipelineResponseStatus.Successful ||
-        pipeline.value?.status == PipelineResponseStatus.Failed
-      )
+      cgPipeline.value = r.data
+      console.log('ConceptCluster')
+      console.log(cgPipeline.value)
+      console.log(isCGPipelineFinished)
+      if (isCGPipelineFinished.value) {
         window.clearInterval(interval.value)
+      }
     })
     .then(() => window.clearInterval(interval.value))
 }

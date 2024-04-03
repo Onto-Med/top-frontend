@@ -380,8 +380,9 @@ async function checkPipeline() {
     ?.getConceptGraphPipelines()
     .then(
       (r) =>
-        r.data.filter((p) => p.pipelineId === pipelineId && p.finished_steps?.some((s) => s.name === ConceptGraphPipelineStepsEnum.Graph)).length >
-        0
+        r.data.filter((p) =>
+          p.pipelineId === pipelineId &&
+          p.status?.some((s) => s.name === ConceptGraphPipelineStepsEnum.Graph)).length > 0
     )
     .then((r) => (!r ? Promise.reject() : true))
 }

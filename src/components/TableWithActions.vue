@@ -150,7 +150,11 @@ const cols = computed(() => {
   ] as QTableProps['columns']
 })
 
-const rows = computed(() => props.page?.content)
+//ToDo: some how this didn't work in the former form anymore; couldn't mount the DocumentSearch
+const rows = computed(() => {
+  if (props.page?.content === undefined) return []
+  return props.page?.content
+} )
 
 function onPageSelect(page: number) {
   if (props.disable) return
