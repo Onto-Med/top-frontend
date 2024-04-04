@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import DocumentSearchForm from 'components/Documents/DocumentSearchForm.vue'
 import { useI18n } from 'vue-i18n'
-import { inject, onMounted, ref, watch } from 'vue'
+import {inject, onMounted, ref, watch} from 'vue'
 import { SearchTypesEnum } from 'src/config'
 import { DataSource, Query, QueryType } from '@onto-med/top-api'
 import { QueryApiKey } from 'src/boot/axios'
