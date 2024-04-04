@@ -38,7 +38,6 @@
               />
             </q-btn-group>
           </q-step>
-
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
             <p>{{ t('conceptCluster.reviewDescription') }}</p>
             <q-btn
@@ -49,16 +48,15 @@
               @click="confirmPublishClusters()"
             />
             <q-table
-              v-model="selectedClusters"
-              flat
-              :rows="clusters"
-              :columns="clusterColumns"
-              :selected-rows-label="getSelectedRowsString"
-              row-key="id"
-              selection="multiple"
+            v-model:selected="selectedGraphs"
+            flat
+            :rows="conceptGraphs"
+            :columns="graphColumns"
+            :selected-rows-label="getSelectedRowsString"
+            row-key="id"
+            selection="multiple"
             />
           </q-step>
-
           <template #navigation>
             <q-separator />
             <q-stepper-navigation class="q-mt-md">
@@ -66,7 +64,7 @@
                 :disable="!isPipelineFinished"
                 :label="step === 2 ? t('finish') : t('continue')"
                 color="primary"
-                @click="stepper?.next()"
+                @click="conceptGraphStep"
               />
               <q-btn
                 v-if="step > 1"
@@ -87,7 +85,7 @@
 <script setup lang="ts">
 import {
   ConceptCluster,
-  ConceptGraphPipeline, ConceptGraphPipelineStepsEnum,
+  ConceptGraphPipeline,
   DataSource,
   PipelineResponse,
   PipelineResponseStatus
@@ -112,10 +110,9 @@ const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
-const runningPipeline = ref<PipelineResponse>()
-const finishedPipeline = ref<ConceptGraphPipeline>()
-const clusters = ref<ConceptCluster[]>()
-const selectedClusters = ref<ConceptCluster[]>([])
+const pipeline = ref<ConceptGraphPipeline>()
+const conceptGraphs = ref<ConceptGraphObject[]>([])
+const selectedGraphs = ref<ConceptGraphObject[]>([])
 const interval = ref<number>()
 
 const isPipelineFinished = computed(() => runningPipeline.value?.status === PipelineResponseStatus.Successful)
@@ -125,11 +122,12 @@ const pipelineStatus = computed(() => {
   return te(runningPipeline.value.status) ? t(runningPipeline.value.status) : runningPipeline.value.status
 })
 
-const clusterColumns = computed(
+const graphColumns = computed(
   () =>
     [
-      { name: 'id', required: true, label: t('id'), align: 'left', sortable: true },
-      { name: 'labels', label: t('label', 2), align: 'left', sortable: true }
+      { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true },
+      { name: 'nodes', field: 'nodes', label: t('node', 2), align: 'left', sortable: true },
+      { name: 'edges', field: 'edges', label: t('edge', 2), align: 'left', sortable: true }
     ] as QTableProps['columns']
 )
 
@@ -191,7 +189,7 @@ function confirmPublishClusters() {
     conceptClusterApi
       ?.createConceptClustersForPipelineId(
         props.dataSource.id,
-        selectedClusters.value.map((c) => c.id)
+        selectedGraphs.value.map((c) => c.id)
       )
       .catch((e: Error) => renderError(e))
   })
@@ -209,6 +207,28 @@ async function deletePipeline() {
 }
 
 function getSelectedRowsString() {
-  return t('recordSelected', selectedClusters.value.length)
+  return t('recordSelected', selectedGraphs.value.length)
+}
+
+function conceptGraphStep() {
+  if (step.value === 1) loadConceptGraphs()
+  stepper?.value?.next()
+}
+
+function loadConceptGraphs() {
+  conceptGraphs.value.length = 0
+  conceptPipelineApi?.getConceptGraphStatistics(props.dataSource.id)
+    .then((r) => {
+      for(const id in r.data) {
+        conceptGraphs.value.push({id: id, nodes: r.data[id].nodes, edges: r.data[id].edges} as ConceptGraphObject)
+      }
+    })
+    .catch((e: Error) => renderError(e))
+}
+
+interface ConceptGraphObject {
+  id: string;
+  nodes: number;
+  edges: number;
 }
 </script>

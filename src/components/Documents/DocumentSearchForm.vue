@@ -65,8 +65,8 @@
                 v-model="selectedConcepts"
                 :style="selectedColors[index]"
                 :val="index"
-                :label="concept.labels"
-                :title="concept.labels"
+                :label="concept.labels?.join(' | ')"
+                :title="concept.labels?.join(' | ')"
                 :disable="loading"
                 class="ellipsis"
                 dense
@@ -146,7 +146,6 @@ import {useI18n} from 'vue-i18n'
 import {ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey} from 'src/boot/axios'
 import {
   ConceptCluster,
-  ConceptGraphPipelineStepsEnum,
   DataSource,
   Document,
   DocumentGatheringMode,
@@ -340,6 +339,7 @@ async function reloadDocuments(name: string|undefined = undefined, page = 1) {
   documents.value = undefined
   document_.value = undefined
   const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
+  console.log(conceptClusterIds)
   documentsLoading.value = true
   return await documentApi
     .getDocuments(
@@ -377,12 +377,9 @@ function prepareSelectedConcepts() {
 async function checkPipeline() {
   if (!props.dataSource) return Promise.reject()
   return await conceptPipelineApi
-    ?.getConceptGraphPipelines()
+    ?.getConceptGraphPipelineById(props.dataSource.id)
     .then(
-      (r) =>
-        r.data.filter(
-          (p) => p.pipelineId === pipelineId &&
-            p.finished_steps?.some((s) => s.name === ConceptGraphPipelineStepsEnum.Graph)).length > 0
+      (r) => r.data.status === PipelineResponseStatus.Successful
     )
     .then((r) => (!r ? Promise.reject() : true))
 }

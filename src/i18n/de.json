@@ -551,5 +551,7 @@
   "continue": "Fortfahren",
   "successful": "Erfolgreich",
   "label": "Label|Labels",
-  "publishThing": "{thing} veröffentlichen"
+  "publishThing": "{thing} veröffentlichen",
+  "node": "Knoten|Knoten",
+  "edge": "Kante|Kanten"
 }

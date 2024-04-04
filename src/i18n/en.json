@@ -551,5 +551,7 @@
   "continue": "Continue",
   "successful": "Successful",
   "label": "Label|Labels",
-  "publishThing": "Publish {thing}"
+  "publishThing": "Publish {thing}",
+  "node": "Node|Nodes",
+  "edge": "Edge|Edges"
 }
