@@ -40,6 +40,9 @@
           </q-step>
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
             <p>{{ t('conceptCluster.reviewDescription') }}</p>
+            <p class="text-subtitle1">
+              <b>{{ t('status') }}:</b> {{ (clusterPipelineStatus === undefined || clusterPipelineStatus === PipelineResponseStatus.Failed)? t('unavailable') : t(clusterPipelineStatus) }}
+            </p>
             <q-btn
               no-caps
               :label="t('publishThing', { thing: t('concept_cluster', 2) })"
@@ -61,10 +64,17 @@
             <q-separator />
             <q-stepper-navigation class="q-mt-md">
               <q-btn
-                :disable="!isCGPipelineFinished"
-                :label="step === 2 ? t('finish') : t('continue')"
+                v-if="step === 1"
+                :disable="!isPipelineFinished"
+                :label="t('continue')"
                 color="primary"
                 @click="conceptGraphStep"
+              />
+              <q-btn
+                v-if="step === 2"
+                v-close-popup="1"
+                :label="t('finish')"
+                color="primary"
               />
               <q-btn
                 v-if="step > 1"
@@ -90,16 +100,20 @@ import {
   PipelineResponse,
   PipelineResponseStatus
 } from '@onto-med/top-api'
-import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
-import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
+import {QStepper, QTableProps, useDialogPluginComponent, useQuasar} from 'quasar'
+import {ConceptClusterApiKey, ConceptPipelineApiKey} from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import Dialog from '../Dialog.vue'
 
-const props = defineProps<{
-  dataSource: DataSource
-}>()
+const props = defineProps({
+  dataSource: {
+    type: Object as () => DataSource,
+    required: true
+  },
+  conceptCluster: Array as () => ConceptCluster[]
+})
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
@@ -114,6 +128,8 @@ const pipeline = ref<ConceptGraphPipeline>()
 const conceptGraphs = ref<ConceptGraphObject[]>([])
 const selectedGraphs = ref<ConceptGraphObject[]>([])
 const interval = ref<number>()
+const clusterPipeline = ref<PipelineResponse>()
+const clusterPipelineStatus = ref<PipelineResponseStatus>()
 
 const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
 
@@ -140,6 +156,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => window.clearInterval(interval.value))
+
+watch( [clusterPipeline], () => clusterPipelineStatus.value = clusterPipeline.value?.status )
 
 async function loadPipeline() {
   return conceptPipelineApi
@@ -192,6 +210,7 @@ function confirmPublishClusters() {
         props.dataSource.id,
         selectedGraphs.value.map((c) => c.id)
       )
+      .then((r) => clusterPipeline.value = r.data)
       .catch((e: Error) => renderError(e))
   })
 }
@@ -212,6 +231,7 @@ function getSelectedRowsString() {
 }
 
 function conceptGraphStep() {
+  //ToDo: if there is a way to close the Dialog programmatically, one can do it here and avoid the definition of the two buttons for the stepper navigation
   if (step.value === 1) loadConceptGraphs()
   stepper?.value?.next()
 }
@@ -221,7 +241,10 @@ function loadConceptGraphs() {
   conceptPipelineApi?.getConceptGraphStatistics(props.dataSource.id)
     .then((r) => {
       for(const id in r.data) {
-        conceptGraphs.value.push({id: id, nodes: r.data[id].nodes, edges: r.data[id].edges} as ConceptGraphObject)
+        let graph = {id: id, nodes: r.data[id].nodes, edges: r.data[id].edges} as ConceptGraphObject
+        conceptGraphs.value.push(graph)
+        //ToDO: doesn't work -> I get a 'props.conceptCluster.some is not a function'
+        // if (selectedGraphs.value.length === 0 && props.conceptCluster.some((c) => c.id === id)) selectedGraphs.value.push(graph)
       }
     })
     .catch((e: Error) => renderError(e))
