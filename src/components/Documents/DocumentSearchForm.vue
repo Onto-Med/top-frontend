@@ -316,7 +316,7 @@ async function reloadConcepts() {
   if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value) return Promise.reject()
   conceptsLoading.value = true
   return await checkPipeline()
-    .then(() => conceptApi.getConceptClusters(undefined, undefined, false))
+    .then(() => conceptApi.getConceptClusters(undefined, undefined, false, props.dataSource?.id))
     .then((r) => {
       concepts.value = r.data.content
       concepts.value.forEach((_, index) => {
@@ -339,7 +339,6 @@ async function reloadDocuments(name: string|undefined = undefined, page = 1) {
   documents.value = undefined
   document_.value = undefined
   const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
-  console.log(conceptClusterIds)
   documentsLoading.value = true
   return await documentApi
     .getDocuments(
@@ -405,7 +404,8 @@ function showRegenerateDialog() {
   $q.dialog({
     component: ConceptClusterDialog,
     componentProps: {
-      dataSource: props.dataSource
+      dataSource: props.dataSource,
+      conceptCluster: concepts
     }
   }).onOk(() => {
     conceptPipelineApi
