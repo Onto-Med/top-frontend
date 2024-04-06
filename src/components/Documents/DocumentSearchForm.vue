@@ -329,6 +329,7 @@ async function reloadConcepts() {
         'background-color': '',
         color: ''
       }) as ConceptColor[]
+      selectedConcepts.value = []
     })
     .finally(() => (conceptsLoading.value = false))
 }
