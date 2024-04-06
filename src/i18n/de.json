@@ -552,5 +552,6 @@
   "label": "Label|Labels",
   "publishThing": "{thing} veröffentlichen",
   "node": "Knoten|Knoten",
-  "edge": "Kante|Kanten"
+  "edge": "Kante|Kanten",
+  "quoteThing": "\"{thing}\""
 }

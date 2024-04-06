@@ -6,7 +6,7 @@
           {{ t('documentSearch.title') }}
         </div>
         <div v-if="query">
-          {{ t('dataOfQuery', { thing: query.name || query.id }) }}
+          {{ t('dataOfQuery', { thing: query.name || query.id }) }} ({{ t('dataSource') }}: {{t('quoteThing', { thing: dataSource.id })}})
         </div>
         <q-select
           v-else
@@ -33,7 +33,7 @@
       <q-separator />
 
       <q-card-section class="q-pa-none">
-        <document-search-form :data-source="dataSource" class="cluster-form" />
+        <document-search-form :data-source="dataSource" :document-filter="documentIds" class="cluster-form" />
       </q-card-section>
     </q-card>
   </q-page>
@@ -41,11 +41,11 @@
 
 <script setup lang="ts">
 import DocumentSearchForm from 'components/Documents/DocumentSearchForm.vue'
-import { useI18n } from 'vue-i18n'
-import {inject, onMounted, ref, watch} from 'vue'
-import { SearchTypesEnum } from 'src/config'
-import { DataSource, Query, QueryType } from '@onto-med/top-api'
-import { QueryApiKey } from 'src/boot/axios'
+import {useI18n} from 'vue-i18n'
+import {computed, inject, onMounted, ref, watch} from 'vue'
+import {SearchTypesEnum} from 'src/config'
+import {DataSource, Query, QueryType} from '@onto-med/top-api'
+import {QueryApiKey} from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 
 const props = defineProps({
@@ -65,6 +65,9 @@ const dataSource = ref<DataSource>()
 const dataSources = ref<DataSource[]>([])
 const queryApi = inject(QueryApiKey)
 const query = ref<Query>()
+const documentIds = ref<Array<string>>()
+
+const isSearchQuery = computed(() => props.initialSearchType === SearchTypesEnum.SEARCH_QUERY)
 
 watch(
   () => props.queryId,
@@ -75,6 +78,22 @@ onMounted(() => {
   loadQuery()
   reloadDataSources()
 })
+
+function setUpSQResults() {
+  //ToDo: log errors
+  if (props.organisationId === undefined || props.repositoryId === undefined || props.queryId === undefined) return;
+  queryApi?.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
+    .then((r) => documentIds.value = r.data)
+    .catch((e: Error) => renderError(e))
+
+  if (query.value === undefined) return;
+  queryApi?.getDataSources(QueryType.Concept)
+    .then((r) => {
+      dataSource.value = r.data.find((d) => d.id === query.value?.dataSource)
+    })
+    .catch((e: Error) => renderError(e))
+  console.log(dataSource.value)
+}
 
 function reloadDataSources() {
   queryApi
@@ -87,7 +106,8 @@ function loadQuery() {
   if (props.organisationId && props.repositoryId && props.queryId)
     queryApi
       ?.getQueryById(props.organisationId, props.repositoryId, props.queryId)
-      .then((r) => (query.value = r.data))
+      .then((r) => query.value = r.data )
+      .then(() => {if (isSearchQuery.value) setUpSQResults()})
       .catch((e: Error) => renderError(e))
 }
 </script>
