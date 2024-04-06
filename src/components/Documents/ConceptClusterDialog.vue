@@ -17,8 +17,8 @@
               <small>{{ t('conceptCluster.preProcessingDescription') }}</small>
             </p>
             <p class="text-subtitle1">
-              <b>{{ t('status') }}:</b> {{ pipelineStatus }}
-              <q-spinner v-if="interval" size="xs" class="q-ml-sm" />
+              <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
+              <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
             </p>
             <q-btn-group>
               <q-btn
@@ -30,7 +30,7 @@
               />
               <q-btn
                 :label="t('deleteThing', { thing: t('pipeline') })"
-                :disable="!pipeline"
+                :disable="!graphPipeline"
                 icon="delete"
                 color="red"
                 no-caps
@@ -41,7 +41,7 @@
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
             <p>{{ t('conceptCluster.reviewDescription') }}</p>
             <p class="text-subtitle1">
-              <b>{{ t('status') }}:</b> {{ (clusterPipelineStatus === undefined || clusterPipelineStatus === PipelineResponseStatus.Failed)? t('unavailable') : t(clusterPipelineStatus) }}
+              <b>{{ t('status') }}:</b> {{ clusterPipelineStatus }}
             </p>
             <q-btn
               no-caps
@@ -65,7 +65,7 @@
             <q-stepper-navigation class="q-mt-md">
               <q-btn
                 v-if="step === 1"
-                :disable="!isPipelineFinished"
+                :disable="!isGraphPipelineFinished"
                 :label="t('continue')"
                 color="primary"
                 @click="conceptGraphStep"
@@ -103,7 +103,7 @@ import {
 import {QStepper, QTableProps, useDialogPluginComponent, useQuasar} from 'quasar'
 import {ConceptClusterApiKey, ConceptPipelineApiKey} from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue'
+import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import Dialog from '../Dialog.vue'
 
@@ -115,6 +115,8 @@ const props = defineProps({
   conceptCluster: Array as () => ConceptCluster[]
 })
 
+const emit = defineEmits(['clusterReload'])
+
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
 const { dialogRef } = useDialogPluginComponent()
@@ -124,18 +126,22 @@ const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
-const pipeline = ref<ConceptGraphPipeline>()
+const graphPipeline = ref<ConceptGraphPipeline>()
+const clusterPipeline = ref<PipelineResponse>()
 const conceptGraphs = ref<ConceptGraphObject[]>([])
 const selectedGraphs = ref<ConceptGraphObject[]>([])
-const interval = ref<number>()
-const clusterPipeline = ref<PipelineResponse>()
-const clusterPipelineStatus = ref<PipelineResponseStatus>()
+const graphPipelineInterval = ref<number>()
 
-const isPipelineFinished = computed(() => pipeline.value?.status === PipelineResponseStatus.Successful)
+const isGraphPipelineFinished = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Successful)
+// const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
 
-const pipelineStatus = computed(() => {
-  if (!runningPipeline.value || !runningPipeline.value.status) return t('unavailable')
-  return te(runningPipeline.value.status) ? t(runningPipeline.value.status) : runningPipeline.value.status
+const graphPipelineStatus = computed(() => {
+  if (!graphPipeline.value || !graphPipeline.value.status) return t('unavailable')
+  return te(graphPipeline.value.status) ? t(graphPipeline.value.status) : graphPipeline.value.status
+})
+const clusterPipelineStatus = computed(() => {
+  if (!clusterPipeline.value || !clusterPipeline.value.status) return t('unavailable')
+  return te(clusterPipeline.value.status) ? t(clusterPipeline.value.status) : clusterPipeline.value.status
 })
 
 const graphColumns = computed(
@@ -150,28 +156,25 @@ const graphColumns = computed(
 onMounted(() => {
   loadPipeline()
     .then(() => {
-      if (!runningPipeline.value) interval.value = window.setInterval(() => loadPipeline, 5000)
+      if (!graphPipeline.value) graphPipelineInterval.value = window.setInterval(() => loadPipeline, 5000)
     })
     .catch((e: Error) => renderError(e))
 })
 
-onUnmounted(() => window.clearInterval(interval.value))
-
-watch( [clusterPipeline], () => clusterPipelineStatus.value = clusterPipeline.value?.status )
+onUnmounted(() => window.clearInterval(graphPipelineInterval.value))
 
 async function loadPipeline() {
   return conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => {
-      pipeline.value = r.data
+      graphPipeline.value = r.data
       if (
-        pipeline.value?.status == PipelineResponseStatus.Successful ||
-        pipeline.value?.status == PipelineResponseStatus.Failed
+        graphPipeline.value?.status == PipelineResponseStatus.Successful ||
+        graphPipeline.value?.status == PipelineResponseStatus.Failed
       )
-        window.clearInterval(interval.value)
-      }
+        window.clearInterval(graphPipelineInterval.value)
     })
-    .then(() => window.clearInterval(interval.value))
+    .then(() => window.clearInterval(graphPipelineInterval.value))
 }
 
 function confirmStartPipeline() {
@@ -205,12 +208,19 @@ function confirmPublishClusters() {
       message: t('conceptCluster.confirmPublish')
     }
   }).onOk(() => {
-    conceptClusterApi
-      ?.createConceptClustersForPipelineId(
-        props.dataSource.id,
-        selectedGraphs.value.map((c) => c.id)
-      )
-      .then((r) => clusterPipeline.value = r.data)
+    conceptClusterApi?.deleteConceptClustersForPipelineId(props.dataSource.id)
+      .then(() =>
+        conceptClusterApi
+          ?.createConceptClustersForPipelineId(
+            props.dataSource.id,
+            selectedGraphs.value.map((c) => c.id)
+          )
+          .then((r) => {
+            clusterPipeline.value = r.data
+            //ToDo: don't really know where the emit needs to be caught; basically I want to 'reloadConcepts()' in 'DocumentSearchForm' when new clusters are published
+            emit('clusterReload')
+          })
+          .catch((e: Error) => renderError(e)))
       .catch((e: Error) => renderError(e))
   })
 }
@@ -218,11 +228,11 @@ function confirmPublishClusters() {
 async function startPipeline() {
   return conceptPipelineApi
     ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id)
-    .then(() => (interval.value = window.setInterval(() => loadPipeline, 5000)))
+    .then(() => (graphPipelineInterval.value = window.setInterval(() => loadPipeline, 5000)))
 }
 
 async function deletePipeline() {
-  window.clearInterval(interval.value)
+  window.clearInterval(graphPipelineInterval.value)
   return conceptPipelineApi?.deleteConceptPipelineById(props.dataSource.id)
 }
 
@@ -244,8 +254,16 @@ function loadConceptGraphs() {
         let graph = {id: id, nodes: r.data[id].nodes, edges: r.data[id].edges} as ConceptGraphObject
         conceptGraphs.value.push(graph)
         //ToDO: doesn't work -> I get a 'props.conceptCluster.some is not a function'
+        //ToDo: what I want is, to pre-select the Graphs for which a concept cluster is already published
         // if (selectedGraphs.value.length === 0 && props.conceptCluster.some((c) => c.id === id)) selectedGraphs.value.push(graph)
       }
+    })
+    .then(() => {
+      conceptClusterApi?.getProcess(props.dataSource?.id)
+        .then((r) => {
+          clusterPipeline.value = r.data
+        })
+        .catch((e: Error) => renderError(e))
     })
     .catch((e: Error) => renderError(e))
 }
