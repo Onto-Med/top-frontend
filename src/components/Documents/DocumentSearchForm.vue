@@ -169,6 +169,7 @@ interface ConceptColor {
 const props = defineProps<{
   dataSource?: DataSource
   query?: Query
+  documentFilter?: Array<string>
 }>()
 
 defineEmits(['update:query'])
@@ -345,7 +346,7 @@ async function reloadDocuments(name: string|undefined = undefined, page = 1) {
     .getDocuments(
       props.dataSource.id,
       name,
-      undefined,
+      props.documentFilter,
       undefined,
       conceptClusterIds,
       undefined,

@@ -553,5 +553,6 @@
   "label": "Label|Labels",
   "publishThing": "Publish {thing}",
   "node": "Node|Nodes",
-  "edge": "Edge|Edges"
+  "edge": "Edge|Edges",
+  "quoteThing": "'{thing}'"
 }
