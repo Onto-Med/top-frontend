@@ -94,7 +94,7 @@
 
 <script setup lang="ts">
 import {
-  ConceptCluster,
+  ConceptCluster, ConceptGraph, ConceptGraphNodes, //ConceptGraphNodes,
   ConceptGraphPipeline,
   DataSource,
   PipelineResponse,
@@ -106,6 +106,7 @@ import useNotify from 'src/mixins/useNotify'
 import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import Dialog from '../Dialog.vue'
+import {AxiosResponse} from "axios";
 
 const props = defineProps({
   dataSource: {
@@ -149,7 +150,8 @@ const graphColumns = computed(
     [
       { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true },
       { name: 'nodes', field: 'nodes', label: t('node', 2), align: 'left', sortable: true },
-      { name: 'edges', field: 'edges', label: t('edge', 2), align: 'left', sortable: true }
+      { name: 'edges', field: 'edges', label: t('edge', 2), align: 'left', sortable: true },
+      { name: 'phrases', field: 'phrases', label: t('phrase', 2), align: 'left', sortable: false },
     ] as QTableProps['columns']
 )
 
@@ -250,15 +252,29 @@ function loadConceptGraphs() {
   conceptPipelineApi?.getConceptGraphStatistics(props.dataSource.id)
     .then((r) => {
       for(const id in r.data) {
-        let graph = {id: id, nodes: r.data[id].nodes, edges: r.data[id].edges} as ConceptGraphObject
+        let labels: string[] = []
+        conceptPipelineApi?.getConceptGraph(props.dataSource.id, id)
+          .then((r: AxiosResponse<ConceptGraph>) => {
+            r.data.nodes?.toSorted((a: ConceptGraphNodes, b: ConceptGraphNodes) => {
+              if (a.documents === undefined) return 1
+              if (b.documents === undefined) return -1
+              return b.documents.length - a.documents.length
+            }).slice(0,3).forEach((n) => {
+              if (n.label != undefined) labels.push(n.label)
+            })
+          })
+          .catch((e: Error) => renderError(e))
+        console.log(labels)
+        let graph = {id: id, nodes: r.data[id].nodes, edges: r.data[id].edges, phrases: labels.join(' | ')} as ConceptGraphObject
         conceptGraphs.value.push(graph)
+        console.log(graph)
         //ToDO: doesn't work -> I get a 'props.conceptCluster.some is not a function'
         //ToDo: what I want is, to pre-select the Graphs for which a concept cluster is already published
         // if (selectedGraphs.value.length === 0 && props.conceptCluster.some((c) => c.id === id)) selectedGraphs.value.push(graph)
       }
     })
     .then(() => {
-      conceptClusterApi?.getProcess(props.dataSource?.id)
+      conceptClusterApi?.getConceptClusterProcess(props.dataSource?.id)
         .then((r) => {
           clusterPipeline.value = r.data
         })
@@ -271,5 +287,6 @@ interface ConceptGraphObject {
   id: string;
   nodes: number;
   edges: number;
+  phrases: string;
 }
 </script>

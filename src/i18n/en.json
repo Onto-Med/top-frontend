@@ -553,5 +553,6 @@
   "publishThing": "Publish {thing}",
   "node": "Node|Nodes",
   "edge": "Edge|Edges",
-  "quoteThing": "'{thing}'"
+  "quoteThing": "'{thing}'",
+  "phrase": "Phrase|Phrases"
 }
