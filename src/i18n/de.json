@@ -554,5 +554,6 @@
   "publishThing": "{thing} veröffentlichen",
   "node": "Knoten|Knoten",
   "edge": "Kante|Kanten",
-  "quoteThing": "\"{thing}\""
+  "quoteThing": "\"{thing}\"",
+  "phrase": "Term|Terme"
 }
