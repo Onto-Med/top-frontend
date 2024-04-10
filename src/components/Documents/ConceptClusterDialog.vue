@@ -255,14 +255,11 @@ function loadConceptGraphs() {
         let labels: string[] = []
         conceptPipelineApi?.getConceptGraph(props.dataSource.id, id)
           .then((r) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             r.data.nodes?.toSorted((a: ConceptGraphNodes, b: ConceptGraphNodes) => {
               if (a.documents === undefined) return 1
               if (b.documents === undefined) return -1
               return b.documents.length - a.documents.length
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             }).slice(0,3).forEach((n) => {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
               if (n.label != undefined) labels.push(n.label)
             })
           })
