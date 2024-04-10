@@ -94,7 +94,7 @@
 
 <script setup lang="ts">
 import {
-  ConceptCluster, ConceptGraph, ConceptGraphNodes, //ConceptGraphNodes,
+  ConceptCluster, ConceptGraphNodes,
   ConceptGraphPipeline,
   DataSource,
   PipelineResponse,
@@ -106,7 +106,6 @@ import useNotify from 'src/mixins/useNotify'
 import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import Dialog from '../Dialog.vue'
-import {AxiosResponse} from "axios";
 
 const props = defineProps({
   dataSource: {
@@ -254,12 +253,15 @@ function loadConceptGraphs() {
       for(const id in r.data) {
         let labels: string[] = []
         conceptPipelineApi?.getConceptGraph(props.dataSource.id, id)
-          .then((r: AxiosResponse<ConceptGraph>) => {
+          .then((r) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             r.data.nodes?.toSorted((a: ConceptGraphNodes, b: ConceptGraphNodes) => {
               if (a.documents === undefined) return 1
               if (b.documents === undefined) return -1
               return b.documents.length - a.documents.length
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             }).slice(0,3).forEach((n) => {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
               if (n.label != undefined) labels.push(n.label)
             })
           })
@@ -270,7 +272,8 @@ function loadConceptGraphs() {
         console.log(graph)
         //ToDO: doesn't work -> I get a 'props.conceptCluster.some is not a function'
         //ToDo: what I want is, to pre-select the Graphs for which a concept cluster is already published
-        // if (selectedGraphs.value.length === 0 && props.conceptCluster.some((c) => c.id === id)) selectedGraphs.value.push(graph)
+        console.log(props.conceptCluster)
+        if (props.conceptCluster != undefined && selectedGraphs.value.length === 0 && props.conceptCluster.some((c) => c.id === id)) selectedGraphs.value.push(graph)
       }
     })
     .then(() => {
