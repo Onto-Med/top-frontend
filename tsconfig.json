@@ -6,7 +6,7 @@
     "lib": [
       "ESNext.Array",
       "DOM",
-      "es2019"
+      "ESNext"
     ],
     "esModuleInterop": true
   }
