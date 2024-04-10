@@ -51,13 +51,13 @@
               @click="confirmPublishClusters()"
             />
             <q-table
-            v-model:selected="selectedGraphs"
-            flat
-            :rows="conceptGraphs"
-            :columns="graphColumns"
-            :selected-rows-label="getSelectedRowsString"
-            row-key="id"
-            selection="multiple"
+              v-model:selected="selectedGraphs"
+              flat
+              :rows="conceptGraphs"
+              :columns="graphColumns"
+              :selected-rows-label="getSelectedRowsString"
+              row-key="id"
+              selection="multiple"
             />
           </q-step>
           <template #navigation>
@@ -70,12 +70,7 @@
                 color="primary"
                 @click="conceptGraphStep"
               />
-              <q-btn
-                v-if="step === 2"
-                v-close-popup="1"
-                :label="t('finish')"
-                color="primary"
-              />
+              <q-btn v-if="step === 2" v-close-popup="1" :label="t('finish')" color="primary" />
               <q-btn
                 v-if="step > 1"
                 flat
@@ -94,17 +89,18 @@
 
 <script setup lang="ts">
 import {
-  ConceptCluster, ConceptGraphNodes,
+  ConceptCluster,
+  ConceptGraphNodes,
   ConceptGraphPipeline,
   DataSource,
   PipelineResponse,
   PipelineResponseStatus
 } from '@onto-med/top-api'
-import {QStepper, QTableProps, useDialogPluginComponent, useQuasar} from 'quasar'
-import {ConceptClusterApiKey, ConceptPipelineApiKey} from 'src/boot/axios'
+import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
+import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
+import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
 
 const props = defineProps({
@@ -150,7 +146,7 @@ const graphColumns = computed(
       { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true },
       { name: 'nodes', field: 'nodes', label: t('node', 2), align: 'left', sortable: true },
       { name: 'edges', field: 'edges', label: t('edge', 2), align: 'left', sortable: true },
-      { name: 'phrases', field: 'phrases', label: t('phrase', 2), align: 'left', sortable: false },
+      { name: 'phrases', field: 'phrases', label: t('phrase', 2), align: 'left', sortable: false }
     ] as QTableProps['columns']
 )
 
@@ -209,7 +205,8 @@ function confirmPublishClusters() {
       message: t('conceptCluster.confirmPublish')
     }
   }).onOk(() => {
-    conceptClusterApi?.deleteConceptClustersForPipelineId(props.dataSource.id)
+    conceptClusterApi
+      ?.deleteConceptClustersForPipelineId(props.dataSource.id)
       .then(() =>
         conceptClusterApi
           ?.createConceptClustersForPipelineId(
@@ -221,7 +218,8 @@ function confirmPublishClusters() {
             //ToDo: don't really know where the emit needs to be caught; basically I want to 'reloadConcepts()' in 'DocumentSearchForm' when new clusters are published
             emit('clusterReload')
           })
-          .catch((e: Error) => renderError(e)))
+          .catch((e: Error) => renderError(e))
+      )
       .catch((e: Error) => renderError(e))
   })
 }
@@ -249,33 +247,46 @@ function conceptGraphStep() {
 
 function loadConceptGraphs() {
   conceptGraphs.value.length = 0
-  conceptPipelineApi?.getConceptGraphStatistics(props.dataSource.id)
+  conceptPipelineApi
+    ?.getConceptGraphStatistics(props.dataSource.id)
     .then(async (r) => {
-      for(const id in r.data) {
-        let labels = await conceptPipelineApi.getConceptGraph(props.dataSource.id, id)
+      for (const id in r.data) {
+        let labels = await conceptPipelineApi
+          .getConceptGraph(props.dataSource.id, id)
           .then((r) => {
             if (!r.data.nodes) return []
-            return r.data.nodes.toSorted((a: ConceptGraphNodes, b: ConceptGraphNodes) => {
-              if (a.documents === undefined) return 1
-              if (b.documents === undefined) return -1
-              return b.documents.length - a.documents.length
-            }).slice(0, 3).map((n) => n.label).filter((l): l is string => !!l)
+            return r.data.nodes
+              .toSorted((a: ConceptGraphNodes, b: ConceptGraphNodes) => {
+                if (a.documents === undefined) return 1
+                if (b.documents === undefined) return -1
+                return b.documents.length - a.documents.length
+              })
+              .slice(0, 3)
+              .map((n) => n.label)
+              .filter((l): l is string => !!l)
           })
           .catch((e: Error) => {
             renderError(e)
             return []
           })
         console.log(labels)
-        let graph = {id: id, nodes: r.data[id].nodes, edges: r.data[id].edges, phrases: labels.join(' | ')} as ConceptGraphObject
+        let graph = {
+          id: id,
+          nodes: r.data[id].nodes,
+          edges: r.data[id].edges,
+          phrases: labels.join(' | ')
+        } as ConceptGraphObject
         conceptGraphs.value.push(graph)
         console.log(graph)
         //ToDo: what I want is, to pre-select the Graphs for which a concept cluster is already published
         console.log(props.conceptCluster)
-        if (props.conceptCluster != undefined && selectedGraphs.value.length === 0 && props.conceptCluster.some((c) => c.id === id)) selectedGraphs.value.push(graph)
+        if (selectedGraphs.value.length === 0 && props.conceptCluster?.some((c) => c.id === id))
+          selectedGraphs.value.push(graph)
       }
     })
     .then(() => {
-      conceptClusterApi?.getConceptClusterProcess(props.dataSource?.id)
+      conceptClusterApi
+        ?.getConceptClusterProcess(props.dataSource?.id)
         .then((r) => {
           clusterPipeline.value = r.data
         })
@@ -285,9 +296,9 @@ function loadConceptGraphs() {
 }
 
 interface ConceptGraphObject {
-  id: string;
-  nodes: number;
-  edges: number;
-  phrases: string;
+  id: string
+  nodes: number
+  edges: number
+  phrases: string
 }
 </script>
