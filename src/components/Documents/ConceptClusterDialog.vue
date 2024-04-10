@@ -250,25 +250,25 @@ function conceptGraphStep() {
 function loadConceptGraphs() {
   conceptGraphs.value.length = 0
   conceptPipelineApi?.getConceptGraphStatistics(props.dataSource.id)
-    .then((r) => {
+    .then(async (r) => {
       for(const id in r.data) {
-        let labels: string[] = []
-        conceptPipelineApi?.getConceptGraph(props.dataSource.id, id)
+        let labels = await conceptPipelineApi.getConceptGraph(props.dataSource.id, id)
           .then((r) => {
-            r.data.nodes?.toSorted((a: ConceptGraphNodes, b: ConceptGraphNodes) => {
+            if (!r.data.nodes) return []
+            return r.data.nodes.toSorted((a: ConceptGraphNodes, b: ConceptGraphNodes) => {
               if (a.documents === undefined) return 1
               if (b.documents === undefined) return -1
               return b.documents.length - a.documents.length
-            }).slice(0,3).forEach((n) => {
-              if (n.label != undefined) labels.push(n.label)
-            })
+            }).slice(0, 3).map((n) => n.label).filter((l): l is string => !!l)
           })
-          .catch((e: Error) => renderError(e))
+          .catch((e: Error) => {
+            renderError(e)
+            return []
+          })
         console.log(labels)
         let graph = {id: id, nodes: r.data[id].nodes, edges: r.data[id].edges, phrases: labels.join(' | ')} as ConceptGraphObject
         conceptGraphs.value.push(graph)
         console.log(graph)
-        //ToDO: doesn't work -> I get a 'props.conceptCluster.some is not a function'
         //ToDo: what I want is, to pre-select the Graphs for which a concept cluster is already published
         console.log(props.conceptCluster)
         if (props.conceptCluster != undefined && selectedGraphs.value.length === 0 && props.conceptCluster.some((c) => c.id === id)) selectedGraphs.value.push(graph)
