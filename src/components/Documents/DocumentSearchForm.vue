@@ -92,10 +92,16 @@
     </template>
 
     <template #after>
-      <q-card-section class="bg-grey-1">
-        <div class="text-subtitle2">
+      <q-card-section class="row q-pl-md q-pa-none bg-grey-1">
+        <div class="text-subtitle2 q-py-md">
           {{ t('document', 2) }}
         </div>
+        <q-space />
+        <q-separator vertical />
+        <q-btn :disable="!dataSource" flat no-caps class="q-py-none" @click="routeToDocumentQuery">
+          <q-icon name="update" />
+          <div class="q-pl-sm gt-xs">{{ t('buildQuery') }}</div>
+        </q-btn>
       </q-card-section>
 
       <q-separator />
@@ -423,6 +429,10 @@ function showRegenerateDialog() {
       })
       .catch((e: Error) => renderError(e))
   })
+}
+
+function routeToDocumentQuery() {
+  //ToDo: route to DocumentSearchQuery with selected dataSource (and selected clusters?)
 }
 </script>
 

@@ -277,11 +277,10 @@ function loadConceptGraphs() {
           phrases: labels.join(' | ')
         } as ConceptGraphObject
         conceptGraphs.value.push(graph)
-        console.log(graph)
         //ToDo: what I want is, to pre-select the Graphs for which a concept cluster is already published
-        console.log(props.conceptCluster)
-        if (selectedGraphs.value.length === 0 && props.conceptCluster?.some((c) => c.id === id))
-          selectedGraphs.value.push(graph)
+        // if (selectedGraphs.value.length === 0 && props.conceptCluster?.some((c) => c.id === id)) {
+        //   selectedGraphs.value.push(graph)
+        // }
       }
     })
     .then(() => {
