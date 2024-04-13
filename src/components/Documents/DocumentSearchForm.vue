@@ -149,7 +149,7 @@
 <script setup lang="ts">
 import {computed, inject, onMounted, ref, watch} from 'vue'
 import {useI18n} from 'vue-i18n'
-import {ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey} from 'src/boot/axios'
+import {ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey, PhraseApiKey} from 'src/boot/axios'
 import {
   ConceptCluster,
   DataSource,
@@ -186,6 +186,7 @@ const { renderError, notify } = useNotify()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
+const phraseApi = inject(PhraseApiKey)
 const entityStore = useEntity()
 const { isAdmin } = storeToRefs(entityStore)
 const documents = ref<DocumentPage>()
@@ -394,8 +395,23 @@ async function checkPipeline() {
 async function chooseDocument(document: Document) {
   if (document.id == null) return
   if (!props.dataSource) return Promise.reject()
+  const phraseIds = new Array<string>();
+  for (const c of selectedConcepts.value) {
+    let phrasePage = 0;
+    let totalPhrasePages = 0;
+    phraseIds.push('$color::' + conceptColors[c]['background-color'])
+    do {
+      await phraseApi?.getPhrases(undefined, concepts.value[c]?.id, ++phrasePage)
+        .then((r) => {
+          totalPhrasePages = r.data.totalPages
+          r.data.content.forEach(p => phraseIds.push(p.id))
+        })
+        .catch((e: Error) => renderError(e))
+    } while (phrasePage < totalPhrasePages)
+  }
+  console.log(phraseIds)
   await documentApi
-    ?.getSingleDocumentById(document.id, props.dataSource.id)
+    ?.getSingleDocumentById(document.id, props.dataSource.id, phraseIds, undefined)
     .then((r) => {
       $q.dialog({
         component: DocumentDetailsDialog,
