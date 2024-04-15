@@ -396,7 +396,7 @@ async function chooseDocument(document: Document) {
   if (!props.dataSource) return Promise.reject()
   const conceptIds = new Array<string>();
   for (const c of selectedConcepts.value) {
-    conceptIds.push('$color::' + conceptColors[c]['background-color'] + '::color$' + c)
+    conceptIds.push('$color::' + conceptColors[c]['background-color'] + '|' + conceptColors[c]['color'] + '::color$' + concepts.value[c].id)
   }
   console.log(conceptIds)
   await documentApi
