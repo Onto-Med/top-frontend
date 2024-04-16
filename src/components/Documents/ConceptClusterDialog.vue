@@ -20,9 +20,18 @@
               <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
               <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
             </p>
+            <q-select
+              v-model="language"
+              :options="languages"
+              :label="t('language')"
+              :error="!language"
+              emit-value
+              map-options
+            />
             <q-btn-group>
               <q-btn
                 :label="t('startThing', { thing: t('pipeline') })"
+                :disable="!language"
                 icon="play_arrow"
                 color="secondary"
                 no-caps
@@ -100,6 +109,7 @@ import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quas
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
+import { languages } from 'src/config'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
 
@@ -120,6 +130,7 @@ const { renderError } = useNotify()
 const $q = useQuasar()
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
+const language = ref<string | undefined>()
 const stepper = ref<QStepper>()
 const step = ref(1)
 const graphPipeline = ref<ConceptGraphPipeline>()
@@ -226,7 +237,7 @@ function confirmPublishClusters() {
 
 async function startPipeline() {
   return conceptPipelineApi
-    ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id)
+    ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
     .then(() => (graphPipelineInterval.value = window.setInterval(() => loadPipeline, 5000)))
 }
 
