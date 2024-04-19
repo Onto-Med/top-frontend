@@ -65,6 +65,7 @@
               :rows="conceptGraphs"
               :columns="graphColumns"
               :selected-rows-label="getSelectedRowsString"
+              wrap-cells
               row-key="id"
               selection="multiple"
             />
@@ -154,10 +155,10 @@ const clusterPipelineStatus = computed(() => {
 const graphColumns = computed(
   () =>
     [
-      { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true },
+      { name: 'phrases', field: 'phrases', label: t('phrase', 2), align: 'left', sortable: false },
       { name: 'nodes', field: 'nodes', label: t('node', 2), align: 'left', sortable: true },
       { name: 'edges', field: 'edges', label: t('edge', 2), align: 'left', sortable: true },
-      { name: 'phrases', field: 'phrases', label: t('phrase', 2), align: 'left', sortable: false }
+      { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true }
     ] as QTableProps['columns']
 )
 
