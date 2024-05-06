@@ -91,7 +91,8 @@ const props = defineProps({
   indent: {
     type: Number,
     default: 2
-  }
+  },
+  simpleConstant: Boolean
 })
 
 const emit = defineEmits(['update:value', 'update:constantId', 'enclose', 'remove'])
@@ -103,7 +104,9 @@ const constants = ref(undefined as Constant[] | undefined)
 const dataType = ref(DataType.Number)
 const isValueSet = computed(() => props.value || defaultConstant.value)
 
-void entityStore.getConstants().then((o) => (constants.value = o))
+if (!props.simpleConstant) {
+  void entityStore.getConstants().then((o) => (constants.value = o))
+}
 
 onMounted(() => {
   if (!props.value && !props.constantId) popup.value.show()
