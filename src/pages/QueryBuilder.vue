@@ -40,6 +40,7 @@
       <concept-query-form
         v-if="isConceptQuery"
         ref="conceptQueryForm"
+        preselected-data-source="preSelectedDataSource"
         @execute="execute"
       />
       <phenotype-query-form
@@ -95,7 +96,17 @@
 </template>
 
 <script setup lang="ts">
-import {ConceptQuery, Permission, PhenotypeQuery, Query, QueryPage, Repository, RepositoryType} from '@onto-med/top-api'
+import {
+  ConceptQuery,
+  DataSource,
+  Permission,
+  PhenotypeQuery,
+  Query,
+  QueryPage,
+  QueryType,
+  Repository,
+  RepositoryType
+} from '@onto-med/top-api'
 import {storeToRefs} from 'pinia'
 import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
@@ -113,7 +124,8 @@ import EnumSelect from 'src/components/EnumSelect.vue'
 import {useRouter} from 'vue-router'
 
 const props = defineProps({
-  queryId: String
+  queryId: String,
+  dataSourceId: String
 })
 const { t } = useI18n()
 const $q = useQuasar()
@@ -137,6 +149,7 @@ const isDarkModeActive = computed(() => $q.dark.isActive)
 const minifyResults = ref(true)
 const resultsScrollArea = ref<QScrollArea>()
 const resultsDrawer = ref(true)
+const preSelectedDataSource = ref<DataSource>()
 
 const drawerWidth = computed(() => {
   return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
@@ -154,6 +167,23 @@ onMounted(() => {
     queryApi?.getQueryById(organisation.value.id, repository.value.id, props.queryId)
       .then(r => prefillQuery(r.data))
       .catch((e: Error) => renderError(e))
+
+  const ds = Array<DataSource>()
+  if (props.dataSourceId)
+    queryApi?.getDataSources()
+      .then(r => r.data.filter(function (dataSource) {
+        return dataSource.id === props.dataSourceId
+      }).forEach(d => ds.push(d)))
+      .then(() => {
+        if (ds.length != 0) {
+          if (ds[0].queryType === QueryType.Concept) {
+            repositoryTypeFilter.value = RepositoryType.ConceptRepository
+          }
+          preSelectedDataSource.value = ds[0]
+        }
+      })
+      .catch((e: Error) => renderError(e))
+
   void loadQueryPage(1)
 })
 

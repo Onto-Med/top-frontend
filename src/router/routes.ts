@@ -18,8 +18,15 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'queryBuilder',
         path: '/query/:organisationId?/:repositoryId?/:queryId?',
-        props: true,
         component: () => import('pages/QueryBuilder.vue'),
+        props: ({ params, query }) => {
+          return {
+            organisationId: params.organisationId,
+            repositoryId: params.repositoryId,
+            queryId: params.queryId,
+            dataSourceId: query.dataSourceId,
+          }
+        }
       },
       {
         name: 'editor',

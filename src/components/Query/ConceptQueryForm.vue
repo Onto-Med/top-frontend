@@ -137,6 +137,9 @@ import { languages } from 'src/config'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { QueryApiKey } from 'src/boot/axios'
 
+const props = defineProps({
+  preselectedDataSource: Object as () => DataSource
+})
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
 const $q = useQuasar()
@@ -183,6 +186,10 @@ onMounted(() => {
   if (!organisation.value || !repository.value) return
   reloadEntities().catch((e: Error) => renderError(e))
   reloadDataSources().catch((e: Error) => renderError(e))
+  if (props.preselectedDataSource) {
+    console.log(props.preselectedDataSource)
+    dataSource.value = props.preselectedDataSource.id
+  }
 })
 
 watch(splitterModel, (newVal) => $q.localStorage.set('conceptQuerySplitterWidth', newVal))
