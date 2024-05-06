@@ -101,7 +101,7 @@
         :repository-id="repositoryId"
         :entity-types="[EntityType.CompositeConcept, EntityType.SingleConcept]"
         :include-function-types="['component', 'textFunction']"
-        :exclude-functions="['Constant']"
+        :exclude-functions="[]"
         @entity-clicked="$emit('entityClicked', $event)"
         @update:model-value="$emit('update:expression', $event)"
       />

@@ -166,6 +166,7 @@ import {QTableProps, useQuasar} from 'quasar'
 import {useEntity} from 'src/pinia/entity'
 import {storeToRefs} from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
+import {useRouter} from 'vue-router';
 
 interface ConceptColor {
   'background-color': string
@@ -183,6 +184,7 @@ defineEmits(['update:query'])
 const { t } = useI18n()
 const $q = useQuasar()
 const { renderError, notify } = useNotify()
+const router = useRouter()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
@@ -311,6 +313,7 @@ watch([mostImportantNodes, conceptMode, selectedConcepts], () => reloadDocuments
 watch(
   () => props.dataSource,
   () => {
+    concepts.value.length = 0
     reloadDocuments()
       .catch((e: Error) => renderError(e))
     reloadConcepts()
@@ -319,7 +322,7 @@ watch(
 )
 
 async function reloadConcepts() {
-  if (!props.dataSource) concepts.value = []
+  if (!props.dataSource) concepts.value.length = 0
   if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value) return Promise.reject()
   conceptsLoading.value = true
   return await checkPipeline()
@@ -437,6 +440,12 @@ function showRegenerateDialog() {
 
 function routeToDocumentQuery() {
   //ToDo: route to DocumentSearchQuery with selected dataSource (and selected clusters?)
+  console.log(props.dataSource)
+  void router.replace({
+    name: 'queryBuilder',
+    params: { organisationId: undefined, repositoryId: undefined, queryId: undefined },
+    query: { dataSourceId: props.dataSource?.id }
+  })
 }
 </script>
 
