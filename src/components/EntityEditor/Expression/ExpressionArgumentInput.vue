@@ -35,6 +35,7 @@
         :indent-level="indentLevel"
         :indent="indent"
         :expand="expand"
+        :simple-constant="simpleConstants"
         @update:value="setValue($event)"
         @update:constant-id="setConstantId($event)"
         @enclose="enclose()"
@@ -87,6 +88,7 @@
             :include-function-types="includeFunctionTypes"
             :exclude-function-types="excludeFunctionTypes"
             :exclude-functions="excludeFunctions"
+            :simple-constants="simpleConstants"
             @update:model-value="handleArgumentUpdate(index, $event)"
             @entity-clicked="$emit('entityClicked', $event)"
           >
@@ -177,7 +179,8 @@ const props = defineProps({
   entityTypes: Array as () => EntityType[],
   includeFunctionTypes: Array as () => string[],
   excludeFunctionTypes: Array as () => string[],
-  excludeFunctions: Array as () => string[]
+  excludeFunctions: Array as () => string[],
+  simpleConstants: Boolean
 })
 
 const emit = defineEmits(['update:modelValue', 'entityClicked'])
