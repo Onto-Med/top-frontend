@@ -5,9 +5,10 @@
         <div class="text-h6">
           {{ t('documentSearch.title') }}
         </div>
-        <div v-if="query">
+        <q-chip v-if="query" square removable @remove="resetPage">
           {{ t('dataOfQuery', { thing: query.name || query.id }) }} ({{ t('dataSource') }}: {{t('quoteThing', { thing: dataSource.id })}})
-        </div>
+        </q-chip>
+
         <q-select
           v-else
           v-model="dataSource"
@@ -47,6 +48,7 @@ import {SearchTypesEnum} from 'src/config'
 import {DataSource, Query, QueryType} from '@onto-med/top-api'
 import {QueryApiKey} from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
+import {useRouter} from 'vue-router';
 
 const props = defineProps({
   initialSearchType: {
@@ -68,6 +70,7 @@ const query = ref<Query>()
 const documentIds = ref<Array<string>>()
 
 const isSearchQuery = computed(() => props.initialSearchType === SearchTypesEnum.SEARCH_QUERY)
+const router = useRouter()
 
 watch(
   () => props.queryId,
@@ -92,7 +95,6 @@ function setUpSQResults() {
       dataSource.value = r.data.find((d) => d.id === query.value?.dataSource)
     })
     .catch((e: Error) => renderError(e))
-  console.log(dataSource.value)
 }
 
 function reloadDataSources() {
@@ -109,6 +111,14 @@ function loadQuery() {
       .then((r) => query.value = r.data )
       .then(() => {if (isSearchQuery.value) setUpSQResults()})
       .catch((e: Error) => renderError(e))
+}
+
+function resetPage() {
+  query.value = undefined
+  documentIds.value = []
+  void router.push({
+    name: 'documentSearch'
+  })
 }
 </script>
 

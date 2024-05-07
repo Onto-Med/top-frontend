@@ -320,6 +320,14 @@ watch(
       .catch((e: Error) => renderError(e))
   }
 )
+// Doesn't work if this is put into the watch sources list above
+watch(
+  () =>  props.documentFilter,
+  () => {
+    reloadDocuments()
+      .catch((e: Error) => renderError(e))
+  }
+)
 
 async function reloadConcepts() {
   if (!props.dataSource) concepts.value.length = 0
