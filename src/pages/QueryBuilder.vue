@@ -166,23 +166,6 @@ onMounted(() => {
     queryApi?.getQueryById(organisation.value.id, repository.value.id, props.queryId)
       .then(r => prefillQuery(r.data))
       .catch((e: Error) => renderError(e))
-
-  const ds = Array<DataSource>()
-  if (props.dataSourceId)
-    queryApi?.getDataSources()
-      .then(r => r.data.filter(function (dataSource) {
-        return dataSource.id === props.dataSourceId
-      }).forEach(d => ds.push(d)))
-      .then(() => {
-        if (ds.length != 0) {
-          if (ds[0].queryType === QueryType.Concept) {
-            repositoryTypeFilter.value = RepositoryType.ConceptRepository
-          }
-          preSelectedDataSource.value = ds[0]
-        }
-      })
-      .catch((e: Error) => renderError(e))
-
   void loadQueryPage(1)
 })
 
@@ -261,7 +244,7 @@ function prefillQuery (query?: Query) {
   if (!query) return
   if (isConceptQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    conceptQueryForm.value?.prefillQuery(query as ConceptQuery, preSelectedDataSource)
+    conceptQueryForm.value?.prefillQuery(query as ConceptQuery, preSelectedDataSource.value)
   } else if (isPhenotypeQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     phenotypeQueryForm.value?.prefillQuery(query)
@@ -280,7 +263,36 @@ function setRepository (repo?: Repository) {
   } else {
     reset(repo)
   }
+  setPreselectedDataSource(repo)
 }
+
+function setPreselectedDataSource(repo?: Repository) {
+  const ds = Array<DataSource>()
+  if (props.dataSourceId) {
+    if (repo?.organisation)
+      queryApi?.getOrganisationDataSources(repo.organisation.id)
+        .then(r => r.data.filter(function (dataSource) {
+          return dataSource.id === props.dataSourceId
+        }).forEach(d => ds.push(d)))
+        .then(() => {
+          if (ds.length != 0) {
+            if (ds[0].queryType === QueryType.Concept) {
+              repositoryTypeFilter.value = RepositoryType.ConceptRepository
+            }
+            preSelectedDataSource.value = ds[0]
+          } else {
+            if (props.dataSourceId)
+              $q.notify({
+                type: 'warning',
+                message: 'The preselected datasource "' + props.dataSourceId + '" doesn\'t seem to be configured for the organisation "' + repo.organisation?.id + '".',
+                timeout: 5000
+              })
+          }
+        })
+        .catch((e: Error) => renderError(e))
+  }
+}
+
 </script>
 
 <style lang="sass" scoped>
