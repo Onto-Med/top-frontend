@@ -40,7 +40,6 @@
       <concept-query-form
         v-if="isConceptQuery"
         ref="conceptQueryForm"
-        preselected-data-source="preSelectedDataSource"
         @execute="execute"
       />
       <phenotype-query-form
@@ -193,7 +192,7 @@ function reset (repository?: Repository) {
     .then(() => {
       if (isConceptQuery.value) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        conceptQueryForm.value?.reset()
+        conceptQueryForm.value?.reset(preSelectedDataSource.value)
       } else if (isPhenotypeQuery.value) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         phenotypeQueryForm.value?.reset()
@@ -262,7 +261,7 @@ function prefillQuery (query?: Query) {
   if (!query) return
   if (isConceptQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    conceptQueryForm.value?.prefillQuery(query as ConceptQuery)
+    conceptQueryForm.value?.prefillQuery(query as ConceptQuery, preSelectedDataSource)
   } else if (isPhenotypeQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     phenotypeQueryForm.value?.prefillQuery(query)
