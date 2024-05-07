@@ -439,8 +439,6 @@ function showRegenerateDialog() {
 }
 
 function routeToDocumentQuery() {
-  //ToDo: route to DocumentSearchQuery with selected dataSource (and selected clusters?)
-  console.log(props.dataSource)
   void router.replace({
     name: 'queryBuilder',
     params: { organisationId: undefined, repositoryId: undefined, queryId: undefined },

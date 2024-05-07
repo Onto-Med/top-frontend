@@ -137,9 +137,6 @@ import { languages } from 'src/config'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { QueryApiKey } from 'src/boot/axios'
 
-const props = defineProps({
-  preselectedDataSource: Object as () => DataSource
-})
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
 const $q = useQuasar()
@@ -164,12 +161,13 @@ const fileReader = new FileReader()
 const splitterModel = ref<number>($q.localStorage.getItem('conceptQuerySplitterWidth') || 35)
 const dataSources = ref([] as DataSource[])
 
-function prefillQuery(query: ConceptQuery) {
+function prefillQuery(query: ConceptQuery, preselectedDataSource: DataSource|undefined) {
   entity.value = entityStore.getEntity(query.entityId)
   language.value = query.language
+  dataSource.value = preselectedDataSource != undefined ? preselectedDataSource.id : undefined
 }
 
-fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as ConceptQuery)
+fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as ConceptQuery, undefined)
 
 async function reloadEntities() {
   treeLoading.value = true
@@ -186,10 +184,6 @@ onMounted(() => {
   if (!organisation.value || !repository.value) return
   reloadEntities().catch((e: Error) => renderError(e))
   reloadDataSources().catch((e: Error) => renderError(e))
-  if (props.preselectedDataSource) {
-    console.log(props.preselectedDataSource)
-    dataSource.value = props.preselectedDataSource.id
-  }
 })
 
 watch(splitterModel, (newVal) => $q.localStorage.set('conceptQuerySplitterWidth', newVal))
@@ -242,9 +236,9 @@ function onExecute() {
   )
 }
 
-function reset() {
+function reset(preselectedDataSource: DataSource|undefined) {
   name.value = undefined
-  dataSource.value = undefined
+  dataSource.value = preselectedDataSource != undefined ? preselectedDataSource.id : undefined
   entity.value = undefined
   language.value = allString
   reloadEntities().catch((e: Error) => renderError(e))
