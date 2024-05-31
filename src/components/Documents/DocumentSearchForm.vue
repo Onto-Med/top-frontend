@@ -99,7 +99,7 @@
         <q-space />
         <q-separator vertical />
         <q-btn :disable="!dataSource" flat no-caps class="q-py-none" @click="routeToDocumentQuery">
-          <q-icon name="update" />
+          <q-icon name="manage_search" />
           <div class="q-pl-sm gt-xs">{{ t('buildQuery') }}</div>
         </q-btn>
       </q-card-section>
