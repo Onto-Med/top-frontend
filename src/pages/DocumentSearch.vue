@@ -6,7 +6,10 @@
           {{ t('documentSearch.title') }}
         </div>
         <q-chip v-if="query" square removable @remove="resetPage">
-          {{ t('dataOfQuery', { thing: query.name || query.id }) }} ({{ t('dataSource') }}: {{t('quoteThing', { thing: dataSource.id })}})
+          {{ t('dataOfQuery', { thing: query.name || query.id }) }}
+          ({{ t('dataSource') }}:&nbsp;
+          <span v-if="dataSource">{{ t('quoteThing', { thing: dataSource.id }) }}</span>
+          <i v-else class="text-negative">{{ t('unavailable') }}</i>)
         </q-chip>
 
         <q-select
