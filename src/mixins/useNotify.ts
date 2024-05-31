@@ -25,7 +25,8 @@ export default function (this: void) {
   return {
     notify,
 
-    renderError: (e: AxiosError | Error): void => {
+    renderError: (e?: AxiosError | Error): void => {
+      if (!e) return
       let message = e.message
       if (e.hasOwnProperty('response')) {
         const response = (e as AxiosError).response
