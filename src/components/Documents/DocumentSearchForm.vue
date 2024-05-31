@@ -57,7 +57,7 @@
         <q-separator />
 
         <q-card-section class="q-pa-none">
-          <q-scroll-area style="height: 60vh">
+          <q-scroll-area style="height: 62vh">
             <div class="column q-pa-md">
               <q-checkbox
                 v-for="(concept, index) in concepts"
