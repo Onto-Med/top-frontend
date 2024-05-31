@@ -58,7 +58,7 @@
             class="col-6"
             :class="{ 'col-sm-4': !env.DOCUMENTS_ENABLED, 'col-sm-3': env.DOCUMENTS_ENABLED }"
           >
-            <q-avatar icon="groups" size="8rem" />
+            <q-avatar :icon="entry.icon" size="8rem" />
             <div class="text-h6">
               {{ entry.label }}
               <q-badge v-if="statistic" :label="statistic[entry.key as statisticKey]" />
