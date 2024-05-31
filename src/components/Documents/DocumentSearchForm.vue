@@ -58,7 +58,7 @@
 
         <q-card-section class="q-pa-none">
           <q-scroll-area style="height: 60vh">
-            <div class="column">
+            <div class="column q-pa-md">
               <q-checkbox
                 v-for="(concept, index) in concepts"
                 :key="concept.id"
