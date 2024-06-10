@@ -81,8 +81,8 @@ watch(
 )
 
 onMounted(() => {
-  loadQuery()
   reloadDataSources()
+  loadQuery()
 })
 
 function setUpSQResults() {
@@ -111,8 +111,11 @@ function loadQuery() {
   if (props.organisationId && props.repositoryId && props.queryId)
     queryApi
       ?.getQueryById(props.organisationId, props.repositoryId, props.queryId)
-      .then((r) => query.value = r.data )
-      .then(() => {if (isSearchQuery.value) setUpSQResults()})
+      .then((r) => {
+        query.value = r.data
+        dataSource.value = dataSources.value.find((d) => d.id == r.data.dataSource)
+      })
+      .then(() => { if (isSearchQuery.value) setUpSQResults() })
       .catch((e: Error) => renderError(e))
 }
 
