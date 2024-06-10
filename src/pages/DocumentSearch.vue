@@ -87,12 +87,12 @@ onMounted(() => {
 
 function setUpSQResults() {
   //ToDo: log errors
-  if (props.organisationId === undefined || props.repositoryId === undefined || props.queryId === undefined) return;
+  if (!props.organisationId || !props.repositoryId || !props.queryId) return
   queryApi?.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
     .then((r) => documentIds.value = r.data)
     .catch((e: Error) => renderError(e))
 
-  if (query.value === undefined) return;
+  if (!query.value) return
   queryApi?.getDataSources(QueryType.Concept)
     .then((r) => {
       dataSource.value = r.data.find((d) => d.id === query.value?.dataSource)
@@ -108,6 +108,8 @@ function reloadDataSources() {
 }
 
 function loadQuery() {
+  query.value = undefined
+  documentIds.value = []
   if (props.organisationId && props.repositoryId && props.queryId)
     queryApi
       ?.getQueryById(props.organisationId, props.repositoryId, props.queryId)
