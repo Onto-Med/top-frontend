@@ -45,13 +45,13 @@
 
 <script setup lang="ts">
 import DocumentSearchForm from 'components/Documents/DocumentSearchForm.vue'
-import {useI18n} from 'vue-i18n'
-import {computed, inject, onMounted, ref, watch} from 'vue'
-import {SearchTypesEnum} from 'src/config'
-import {DataSource, Query, QueryType} from '@onto-med/top-api'
-import {QueryApiKey} from 'src/boot/axios'
+import { useI18n } from 'vue-i18n'
+import { computed, inject, onMounted, ref, watch } from 'vue'
+import { SearchTypesEnum } from 'src/config'
+import { DataSource, Query, QueryType } from '@onto-med/top-api'
+import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import {useRouter} from 'vue-router';
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   initialSearchType: {
@@ -86,14 +86,16 @@ onMounted(() => {
 })
 
 function setUpSQResults() {
-  //ToDo: log errors
+  // ToDo: log errors
   if (!props.organisationId || !props.repositoryId || !props.queryId) return
-  queryApi?.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
-    .then((r) => documentIds.value = r.data)
+  queryApi
+    ?.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
+    .then((r) => (documentIds.value = r.data))
     .catch((e: Error) => renderError(e))
 
   if (!query.value) return
-  queryApi?.getDataSources(QueryType.Concept)
+  queryApi
+    ?.getDataSources(QueryType.Concept)
     .then((r) => {
       dataSource.value = r.data.find((d) => d.id === query.value?.dataSource)
     })
@@ -117,7 +119,9 @@ function loadQuery() {
         query.value = r.data
         dataSource.value = dataSources.value.find((d) => d.id == r.data.dataSource)
       })
-      .then(() => { if (isSearchQuery.value) setUpSQResults() })
+      .then(() => {
+        if (isSearchQuery.value) setUpSQResults()
+      })
       .catch((e: Error) => renderError(e))
 }
 
