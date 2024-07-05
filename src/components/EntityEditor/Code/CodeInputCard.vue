@@ -51,59 +51,45 @@
         <q-list dense separator>
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
-              <a
-                :href="entry.uri"
-                target="_blank"
-                class="code-link"
-                :title="entry.uri ? t('showThing', { thing: t('code') }) : ''"
-              >
-                {{
-                  entry.codeSystem?.shortName ||
-                  entry.codeSystem?.externalId ||
-                  entry.codeSystem?.uri ||
-                  t('unknownCodeSystem')
-                }}:
-                <span v-if="entry.name">
-                  {{ entry.name }}
-                  <small v-show="entry.code">[{{ entry.code }}]</small>
-                </span>
-                <span v-else>
-                  {{ entry.code }}
-                </span>
-              </a>
-              <q-space />
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label caption>
-                {{ te('codeScopes.' + entry.scope) ? t('codeScopes.' + entry.scope) : entry.scope }}
-                <q-popup-edit
-                  v-slot="scope"
-                  :model-value="entry.scope"
-                  buttons
-                  :label-cancel="t('cancel')"
-                  :label-set="t('set')"
-                  @update:model-value="updateScopeByIndex(index, $event)"
-                >
-                  <enum-select
-                    v-model:selected="scope.value"
-                    i18n-prefix="codeScope"
-                    :enum="CodeScope"
-                    dense
-                    autofocus
-                    required
-                  />
-                </q-popup-edit>
-              </q-item-label>
-            </q-item-section>
-            <q-item-section avatar>
-              <q-btn
+              <q-tree
                 dense
-                color="red"
-                icon="remove"
-                :disable="readonly"
-                :title="t('remove')"
-                @click="removeEntryByIndex(index)"
-              />
+                :nodes="[entry]"
+                node-key="uri"
+                children-key="children"
+              >
+                <template v-slot:default-header="prop">
+                  <a
+                      :href="prop.node.uri"
+                      target="_blank"
+                      class="code-link"
+                      :title="prop.node.uri ? t('showThing', { thing: t('code') }) : ''"
+                  >
+                    {{
+                      prop.node.codeSystem?.shortName ||
+                      prop.node.codeSystem?.externalId ||
+                      prop.node.codeSystem?.uri ||
+                      t('unknownCodeSystem')
+                    }}:
+                    <span v-if="prop.node.name">
+                      {{ prop.node.name }}
+                      <small v-show="prop.node.code">[{{ prop.node.code }}]</small>
+                    </span>
+                    <span v-else>
+                      {{ prop.node.code }}
+                    </span>
+                  </a>
+                  <q-space/>
+                  <q-btn
+                      dense
+                      color="red"
+                      icon="remove"
+                      :disable="readonly"
+                      :title="t('remove')"
+                      @click="removeEntry(prop.node)"
+                      size="75%"
+                  />
+                </template>
+              </q-tree>
             </q-item-section>
           </q-item>
         </q-list>
@@ -114,7 +100,8 @@
 
 <script setup lang="ts">
 import { Code, CodeScope } from '@onto-med/top-api'
-import { computed, ref } from 'vue'
+import { CodeApiKey } from 'src/boot/axios'
+import { computed, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import CodeInput from './CodeInput.vue'
@@ -142,6 +129,7 @@ const $q = useQuasar()
 const { notify } = useNotify()
 const showManualForm = ref(false)
 const showHelp = ref(false)
+const codeApi = inject(CodeApiKey)
 
 const disabledCodes = computed(() => {
   // It is allowed to have the same codes twice, one with scope 'self' and one with 'leaves'.
@@ -158,16 +146,22 @@ function codeEquals(code1?: Code, code2?: Code, includeScope = false) {
   )
 }
 
-function addEntries(entries?: Code[]) {
+async function addEntries(entries?: Code[]) {
   if (!entries) return [false]
-  const newModelValue = props.modelValue.slice()
-  const results = entries.map((e) => {
-    if (newModelValue.some((c) => codeEquals(c, e, true))) return false
-    newModelValue.push(e)
-    return true
-  })
-  emit('update:modelValue', newModelValue)
-  return results
+  if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
+
+  return await codeApi?.getCode(encodeURIComponent(entries[0].uri!), entries[0].codeSystem.externalId!, entries[0].scope)
+    .then((r) => {
+      entries[0] = r.data
+      const newModelValue = props.modelValue.slice()
+      const results = entries.map((e) => {
+        if (newModelValue.some((c) => codeEquals(c, e, true))) return false
+        newModelValue.push(e)
+        return true
+      })
+      emit('update:modelValue', newModelValue)
+      return results
+    })
 }
 
 function updateScopeByIndex(index: number, scope: CodeScope) {
@@ -181,6 +175,27 @@ function removeEntryByIndex(index: number) {
   newModelValue.splice(index, 1)
   emit('update:modelValue', newModelValue)
 }
+
+function removeEntry(codeToRemove: Code) {
+  let newModelValue = props.modelValue.slice()
+  if (newModelValue.includes(codeToRemove)) {
+    newModelValue.splice(newModelValue.indexOf(codeToRemove), 1)
+  } else {
+    for (const code of newModelValue) {
+      removeNestedSubNode(code, codeToRemove);
+    }
+  }
+  emit('update:modelValue', newModelValue)
+};
+
+function removeNestedSubNode(code: Code, codeToRemove: Code) {
+  if (code.children?.includes(codeToRemove)) {
+    code.children?.splice(code.children?.indexOf(codeToRemove), 1)
+  }
+  for (const childCode of code.children) {
+    removeNestedSubNode(childCode, codeToRemove)
+  }
+} 
 
 function showImportDialog() {
   $q.dialog({
