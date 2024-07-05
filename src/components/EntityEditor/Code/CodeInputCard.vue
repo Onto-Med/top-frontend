@@ -159,9 +159,26 @@ async function addEntries(entries?: Code[]) {
         newModelValue.push(e)
         return true
       })
-      emit('update:modelValue', newModelValue)
+
+      const newNewModelValue: Code[] = []
+      for (const code of newModelValue) {
+        newNewModelValue.push(code)
+        flatten(code, newModelValue, newNewModelValue)
+      }
+
+      emit('update:modelValue', newNewModelValue)
       return results
     })
+}
+
+function flatten(code: Code, source: Code[], target: Code[]) {
+  if (code.children) {
+    for (const childCode of code.children) {
+      target.push(childCode)
+      flatten(childCode, source, target)
+    }
+    code.children = []
+  }
 }
 
 function updateScopeByIndex(index: number, scope: CodeScope) {
