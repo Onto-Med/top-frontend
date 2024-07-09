@@ -132,48 +132,37 @@ const showHelp = ref(false)
 const codeApi = inject(CodeApiKey)
 
 const disabledCodes = computed(() => {
-  // It is allowed to have the same codes twice, one with scope 'self' and one with 'leaves'.
-  // For simplicity, we just check if a code is already duplicated.
   return props.modelValue.filter((c1, i1) => props.modelValue.some((c2, i2) => codeEquals(c1, c2) && i1 != i2))
 })
 
-function codeEquals(code1?: Code, code2?: Code, includeScope = false) {
+function codeEquals(code1?: Code, code2?: Code) {
   if (!code1 || !code2) return false
   return (
     code1.codeSystem.uri == code2.codeSystem.uri &&
-    code1.code == code2.code &&
-    (!includeScope || code1.scope == code2.scope)
+    code1.code == code2.code
   )
 }
 
-async function addEntries(entries?: Code[]) {
+function addEntries(entries?: [{code?: Code, scope?: CodeScope}]) {
   if (!entries) return [false]
   if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
 
-  return await codeApi?.getCode(encodeURIComponent(entries[0].uri!), entries[0].codeSystem.externalId!, entries[0].scope)
-    .then((r) => {
-      entries[0] = r.data
-      const newModelValue = props.modelValue.slice()
-      const results = entries.map((e) => {
-        if (newModelValue.some((c) => codeEquals(c, e, true))) return false
-        newModelValue.push(e)
-        return true
+  const newModelValue = props.modelValue.slice()
+  return Promise.all(entries.map(async({code: code, scope: scope}) => {
+    if (newModelValue.some((c) => codeEquals(c, code))) return false
+    if(scope == CodeScope.Self) {
+      newModelValue.push(code!)
+    } else {
+      await codeApi?.getCode(encodeURIComponent(code!.uri!), code?.codeSystem?.externalId || '', scope)
+      .then((r) => {
+        newModelValue.push(r.data);
       })
-      emit('update:modelValue', newModelValue)
-      return results
-    })
-}
-
-function updateScopeByIndex(index: number, scope: CodeScope) {
-  let newModelValue = props.modelValue.slice()
-  newModelValue[index].scope = scope
-  emit('update:modelValue', newModelValue)
-}
-
-function removeEntryByIndex(index: number) {
-  let newModelValue = props.modelValue.slice()
-  newModelValue.splice(index, 1)
-  emit('update:modelValue', newModelValue)
+    }
+    return true
+  })).then((r) => {
+    emit('update:modelValue', newModelValue)
+    return r
+  })
 }
 
 function removeEntry(codeToRemove: Code) {
@@ -188,11 +177,11 @@ function removeEntry(codeToRemove: Code) {
   emit('update:modelValue', newModelValue)
 };
 
-function removeNestedSubNode(code: Code, codeToRemove: Code) {
-  if (code.children?.includes(codeToRemove)) {
+function removeNestedSubNode(code?: Code, codeToRemove: Code) {
+  if (code?.children?.includes(codeToRemove)) {
     code.children?.splice(code.children?.indexOf(codeToRemove), 1)
   }
-  for (const childCode of code.children) {
+  for (const childCode of code?.children || []) {
     removeNestedSubNode(childCode, codeToRemove)
   }
 } 
@@ -201,7 +190,7 @@ function showImportDialog() {
   $q.dialog({
     component: CodeImportDialog
   }).onOk((codes: Code[]) => {
-    const accepted = addEntries(codes).filter((e) => !!e).length
+    const accepted = true // addEntries(codes.map((code) => {code: code, scope: CodeScope.Self})).filter((e) => !!e).length
     notify(t('codeImport.imported', accepted), 'positive')
     emit('update:expanded', true)
   })
