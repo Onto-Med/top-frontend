@@ -147,7 +147,7 @@ function codeEquals(code1?: Code, code2?: Code) {
   )
 }
 
-async function addEntries(entries?: CodeWithScope[]) {
+function addEntries(entries?: CodeWithScope[]) {
   if (!entries) return Promise.resolve([false])
   if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
 
@@ -194,11 +194,11 @@ function showImportDialog() {
   $q.dialog({
     component: CodeImportDialog
   }).onOk((codes: Code[]) => {
-    (async () => { await addEntries(codes.map((code) => {return {code: code, scope: CodeScope.Self}})).then((r) => {
+      addEntries(codes.map((code) => {return {code: code, scope: CodeScope.Self}})).then((r) => {
       const accepted = r.filter((e) => !!e).length
       notify(t('codeImport.imported', accepted), 'positive')
       emit('update:expanded', true)
-    })})
+    }).catch((e: Error) => {notify(t('codeImport.failed') + ` (${e.message})`)})
   })
 }
 </script>
