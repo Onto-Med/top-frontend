@@ -58,7 +58,9 @@
 				"esbenp.prettier-vscode",
 				"formulahendry.auto-rename-tag",
 				"sdras.vue-vscode-snippets",
-				"mutantdino.resourcemonitor"
+				"mutantdino.resourcemonitor",
+				"Gruntfuggly.todo-tree",
+				"waderyan.gitblame"
 			]
 		}
 	}
