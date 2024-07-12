@@ -438,7 +438,7 @@ function showRegenerateDialog() {
 }
 
 function routeToDocumentQuery() {
-  void router.replace({
+  void router.push({
     name: 'queryBuilder',
     params: { organisationId: undefined, repositoryId: undefined, queryId: undefined },
     query: { dataSourceId: props.dataSource?.id }
