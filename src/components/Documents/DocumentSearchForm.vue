@@ -147,9 +147,9 @@
 </template>
 
 <script setup lang="ts">
-import {computed, inject, onMounted, ref, watch} from 'vue'
-import {useI18n} from 'vue-i18n'
-import {ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey} from 'src/boot/axios'
+import { computed, inject, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey } from 'src/boot/axios'
 import {
   ConceptCluster,
   DataSource,
@@ -162,11 +162,11 @@ import {
 import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
-import {QTableProps, useQuasar} from 'quasar'
-import {useEntity} from 'src/pinia/entity'
-import {storeToRefs} from 'pinia'
+import { QTableProps, useQuasar } from 'quasar'
+import { useEntity } from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
-import {useRouter} from 'vue-router';
+import { useRouter } from 'vue-router'
 
 interface ConceptColor {
   'background-color': string
@@ -183,7 +183,7 @@ defineEmits(['update:query'])
 
 const { t } = useI18n()
 const $q = useQuasar()
-const { renderError, notify } = useNotify()
+const { renderError } = useNotify()
 const router = useRouter()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
@@ -265,7 +265,6 @@ const selectedColors = ref<ConceptColor[]>([])
 const conceptMode = ref(DocumentGatheringMode.Exclusive)
 const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
-const pipelineId = 'top-framework'
 
 const cols = computed(
   () =>
@@ -314,18 +313,15 @@ watch(
   () => props.dataSource,
   () => {
     concepts.value.length = 0
-    reloadDocuments()
-      .catch((e: Error) => renderError(e))
-    reloadConcepts()
-      .catch((e: Error) => renderError(e))
+    reloadDocuments().catch((e: Error) => renderError(e))
+    reloadConcepts().catch((e: Error) => renderError(e))
   }
 )
 // Doesn't work if this is put into the watch sources list above
 watch(
-  () =>  props.documentFilter,
+  () => props.documentFilter,
   () => {
-    reloadDocuments()
-      .catch((e: Error) => renderError(e))
+    reloadDocuments().catch((e: Error) => renderError(e))
   }
 )
 
@@ -352,7 +348,7 @@ async function reloadConcepts() {
     .finally(() => (conceptsLoading.value = false))
 }
 
-async function reloadDocuments(name: string|undefined = undefined, page = 1) {
+async function reloadDocuments(name: string | undefined = undefined, page = 1) {
   if (!props.dataSource) documents.value = undefined
   if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource) return Promise.reject()
   documents.value = undefined
@@ -396,18 +392,24 @@ async function checkPipeline() {
   if (!props.dataSource) return Promise.reject()
   return await conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
-    .then(
-      (r) => r.data.status === PipelineResponseStatus.Successful
-    )
+    .then((r) => r.data.status === PipelineResponseStatus.Successful)
     .then((r) => (!r ? Promise.reject() : true))
 }
 
 async function chooseDocument(document: Document) {
   if (document.id == null) return
   if (!props.dataSource) return Promise.reject()
-  const conceptIds = new Array<string>();
+  const conceptIds = new Array<string>()
   for (const c of selectedConcepts.value) {
-    if (c != undefined) conceptIds.push('$color::' + conceptColors[c]['background-color'] + '|' + conceptColors[c]['color'] + '::color$' + concepts.value[c].id)
+    if (c != undefined)
+      conceptIds.push(
+        '$color::' +
+          conceptColors[c]['background-color'] +
+          '|' +
+          conceptColors[c]['color'] +
+          '::color$' +
+          concepts.value[c].id
+      )
   }
   await documentApi
     ?.getSingleDocumentById(document.id, props.dataSource.id, conceptIds, undefined)
@@ -431,18 +433,7 @@ function showRegenerateDialog() {
       conceptCluster: concepts
     }
   }).onOk(() => {
-    conceptPipelineApi
-      ?.startConceptGraphPipeline(pipelineId)
-      .then((r) => {
-        if (r.data.status == PipelineResponseStatus.Successful) {
-          concepts.value = []
-          selectedColors.value = []
-          notify(t('conceptCluster.pipelineStarted'), 'positive')
-        } else {
-          notify(r.data.response || t('conceptCluster.pipelineFailed'), 'negative')
-        }
-      })
-      .catch((e: Error) => renderError(e))
+    reloadConcepts().catch((e: Error) => renderError(e))
   })
 }
 

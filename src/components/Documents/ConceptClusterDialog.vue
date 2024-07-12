@@ -74,13 +74,11 @@
             <q-separator />
             <q-stepper-navigation class="q-mt-md">
               <q-btn
-                v-if="step === 1"
                 :disable="!isGraphPipelineFinished"
                 :label="t('continue')"
                 color="primary"
                 @click="conceptGraphStep"
               />
-              <q-btn v-if="step === 2" v-close-popup="1" :label="t('finish')" color="primary" />
               <q-btn
                 v-if="step > 1"
                 flat
@@ -122,11 +120,9 @@ const props = defineProps({
   conceptCluster: Array as () => ConceptCluster[]
 })
 
-const emit = defineEmits(['clusterReload'])
-
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
-const { dialogRef } = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const $q = useQuasar()
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
@@ -227,8 +223,7 @@ function confirmPublishClusters() {
           )
           .then((r) => {
             clusterPipeline.value = r.data
-            //ToDo: don't really know where the emit needs to be caught; basically I want to 'reloadConcepts()' in 'DocumentSearchForm' when new clusters are published
-            emit('clusterReload')
+            onDialogOK()
           })
           .catch((e: Error) => renderError(e))
       )
@@ -252,9 +247,12 @@ function getSelectedRowsString() {
 }
 
 function conceptGraphStep() {
-  //ToDo: if there is a way to close the Dialog programmatically, one can do it here and avoid the definition of the two buttons for the stepper navigation
-  if (step.value === 1) loadConceptGraphs()
-  stepper?.value?.next()
+  if (step.value === 1) {
+    loadConceptGraphs()
+    stepper?.value?.next()
+  } else {
+    onDialogHide()
+  }
 }
 
 function loadConceptGraphs() {
@@ -281,7 +279,6 @@ function loadConceptGraphs() {
             renderError(e)
             return []
           })
-        console.log(labels)
         let graph = {
           id: id,
           nodes: r.data[id].nodes,
@@ -289,10 +286,9 @@ function loadConceptGraphs() {
           phrases: labels.join(' | ')
         } as ConceptGraphObject
         conceptGraphs.value.push(graph)
-        //ToDo: what I want is, to pre-select the Graphs for which a concept cluster is already published
-        // if (selectedGraphs.value.length === 0 && props.conceptCluster?.some((c) => c.id === id)) {
-        //   selectedGraphs.value.push(graph)
-        // }
+        if (props.conceptCluster?.some((c) => c.id === id)) {
+          selectedGraphs.value.push(graph)
+        }
       }
     })
     .then(() => {

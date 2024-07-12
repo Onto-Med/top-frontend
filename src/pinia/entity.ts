@@ -253,8 +253,6 @@ export const useEntity = defineStore('entity', {
           } as NumberRestriction | StringRestriction | BooleanRestriction | DateTimeRestriction
       }
 
-      //ToDo: something for when superClass is of {Single,Composite}Concept category?
-
       if (superClass) {
         const short = {
           id: superClass.id,

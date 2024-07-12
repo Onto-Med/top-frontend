@@ -86,7 +86,6 @@ onMounted(() => {
 })
 
 function setUpSQResults() {
-  // ToDo: log errors
   if (!props.organisationId || !props.repositoryId || !props.queryId) return
   queryApi
     ?.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
