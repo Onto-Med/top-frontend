@@ -470,7 +470,6 @@ function getTabTitle(tab: EditorTab) {
  */
 async function confirmCloseUnsavedTabs(tab?: EditorTab) {
   return new Promise<void>((resolve, reject) => {
-    console.log(tabs.value)
     if (tab && !tab.dirty && !!tab.selectedVersion || !hasUnsavedTabs.value)
       return resolve()
     $q.dialog({
