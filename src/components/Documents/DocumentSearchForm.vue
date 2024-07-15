@@ -430,7 +430,7 @@ function showRegenerateDialog() {
     component: ConceptClusterDialog,
     componentProps: {
       dataSource: props.dataSource,
-      conceptCluster: concepts
+      conceptCluster: concepts.value
     }
   }).onOk(() => {
     reloadConcepts().catch((e: Error) => renderError(e))
