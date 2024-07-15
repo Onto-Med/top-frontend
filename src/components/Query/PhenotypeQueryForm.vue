@@ -66,6 +66,12 @@
               >
                 <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
               </q-item>
+
+              <q-separator />
+
+              <q-item v-close-popup clickable @click="routeToEntity(props.entity)">
+                <q-item-section>{{ t('goToThing', { thing: t('definition') }) }}</q-item-section>
+              </q-item>
             </q-list>
           </template>
         </entity-tree>
@@ -219,7 +225,7 @@ import { QueryApiKey } from 'src/boot/axios'
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
 const $q = useQuasar()
-const { getTitle, isCategory, isPhenotype, isRestricted, requiresAggregationFunction } = useEntityFormatter()
+const { getTitle, isCategory, isPhenotype, isRestricted, requiresAggregationFunction, routeToEntity } = useEntityFormatter()
 const entityStore = useEntity()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
