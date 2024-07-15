@@ -9,7 +9,8 @@
           {{ t('dataOfQuery', { thing: query.name || query.id }) }}
           ({{ t('dataSource') }}:&nbsp;
           <span v-if="dataSource">{{ t('quoteThing', { thing: dataSource.id }) }}</span>
-          <i v-else class="text-negative">{{ t('unavailable') }}</i>)
+          <i v-else class="text-negative">{{ t('unavailable') }}</i
+          >)
         </q-chip>
 
         <q-select
@@ -37,7 +38,13 @@
       <q-separator />
 
       <q-card-section class="q-pa-none">
-        <document-search-form :data-source="dataSource" :document-filter="documentIds" class="cluster-form" />
+        <document-search-form
+          :query="query"
+          :data-source="dataSource"
+          :document-filter="documentIds"
+          class="cluster-form"
+          @clear-query="resetPage()"
+        />
       </q-card-section>
     </q-card>
   </q-page>
@@ -46,22 +53,16 @@
 <script setup lang="ts">
 import DocumentSearchForm from 'components/Documents/DocumentSearchForm.vue'
 import { useI18n } from 'vue-i18n'
-import { computed, inject, onMounted, ref, watch } from 'vue'
-import { SearchTypesEnum } from 'src/config'
+import { inject, onMounted, ref, watch } from 'vue'
 import { DataSource, Query, QueryType } from '@onto-med/top-api'
 import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
-  initialSearchType: {
-    type: String as () => SearchTypesEnum,
-    default: SearchTypesEnum.CONCEPT_CLUSTER
-  },
   organisationId: String,
   repositoryId: String,
-  queryId: String,
-  queryName: String
+  queryId: String
 })
 
 const { t } = useI18n()
@@ -71,8 +72,6 @@ const dataSources = ref<DataSource[]>([])
 const queryApi = inject(QueryApiKey)
 const query = ref<Query>()
 const documentIds = ref<Array<string>>()
-
-const isSearchQuery = computed(() => props.initialSearchType === SearchTypesEnum.SEARCH_QUERY)
 const router = useRouter()
 
 watch(
@@ -118,18 +117,14 @@ function loadQuery() {
         query.value = r.data
         dataSource.value = dataSources.value.find((d) => d.id == r.data.dataSource)
       })
-      .then(() => {
-        if (isSearchQuery.value) setUpSQResults()
-      })
+      .then(setUpSQResults)
       .catch((e: Error) => renderError(e))
 }
 
 function resetPage() {
   query.value = undefined
   documentIds.value = []
-  void router.push({
-    name: 'documentSearch'
-  })
+  void router.push({ name: 'documentSearch' })
 }
 </script>
 

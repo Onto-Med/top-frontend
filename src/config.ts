@@ -27,11 +27,6 @@ export const noDocFunctionTypes = [
   'textFunction'
 ]
 
-export enum SearchTypesEnum {
-  CONCEPT_CLUSTER = 'concept_cluster',
-  SEARCH_QUERY = 'search_query'
-}
-
 /**
  * To add new languages please insert respective configurations to the following exports.
  */

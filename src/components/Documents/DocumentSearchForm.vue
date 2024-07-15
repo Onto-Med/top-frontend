@@ -117,19 +117,14 @@
         :columns="cols"
         :create="false"
         :filterable="!query"
-        @request="reloadDocuments"
-        @row-clicked="chooseDocument($event)"
+        @request="reloadDocuments($event).catch((e: Error) => renderError(e))"
+        @row-clicked="chooseDocument($event).catch((e: Error) => renderError(e))"
       >
         <template v-if="query" #title>
           <div v-show="$q.screen.gt.xs" class="text-h6">{{ t('documentsOfQuery') }}: {{ query.name }}</div>
         </template>
         <template v-if="query" #action-buttons>
-          <q-btn
-            icon="clear"
-            :label="t('clear')"
-            :title="t('clearDocumentQueryResult')"
-            @click="$emit('update:query', undefined)"
-          />
+          <q-btn icon="clear" :label="t('clear')" :title="t('clearDocumentQueryResult')" @click="emit('clearQuery')" />
         </template>
         <template #row-cells="rowCellProps">
           <q-td :title="rowCellProps.row.id">
@@ -179,7 +174,7 @@ const props = defineProps<{
   documentFilter?: Array<string>
 }>()
 
-defineEmits(['update:query'])
+const emit = defineEmits(['clearQuery'])
 
 const { t } = useI18n()
 const $q = useQuasar()
@@ -303,25 +298,21 @@ const loading = computed(() => conceptsLoading.value || documentsLoading.value)
 onMounted(() =>
   entityStore
     .loadUser()
-    .then(() => reloadConcepts())
+    .then(reloadConcepts)
     .then(() => reloadDocuments())
     .catch((e: Error) => renderError(e))
 )
 
-watch([mostImportantNodes, conceptMode, selectedConcepts], () => reloadDocuments().catch((e: Error) => renderError(e)))
+watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () =>
+  reloadDocuments().catch((e: Error) => renderError(e))
+)
 watch(
   () => props.dataSource,
   () => {
     concepts.value.length = 0
-    reloadDocuments().catch((e: Error) => renderError(e))
-    reloadConcepts().catch((e: Error) => renderError(e))
-  }
-)
-// Doesn't work if this is put into the watch sources list above
-watch(
-  () => props.documentFilter,
-  () => {
-    reloadDocuments().catch((e: Error) => renderError(e))
+    reloadConcepts()
+      .then(() => reloadDocuments())
+      .catch((e: Error) => renderError(e))
   }
 )
 
@@ -329,7 +320,7 @@ async function reloadConcepts() {
   if (!props.dataSource) concepts.value.length = 0
   if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value) return Promise.reject()
   conceptsLoading.value = true
-  return await checkPipeline()
+  return checkPipeline()
     .then(() => conceptApi.getConceptClusters(undefined, undefined, false, props.dataSource?.id))
     .then((r) => {
       concepts.value = r.data.content
@@ -348,14 +339,14 @@ async function reloadConcepts() {
     .finally(() => (conceptsLoading.value = false))
 }
 
-async function reloadDocuments(name: string | undefined = undefined, page = 1) {
+async function reloadDocuments(name?: string, page = 1) {
   if (!props.dataSource) documents.value = undefined
   if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource) return Promise.reject()
   documents.value = undefined
   document_.value = undefined
   const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
   documentsLoading.value = true
-  return await documentApi
+  return documentApi
     .getDocuments(
       props.dataSource.id,
       name,

@@ -113,7 +113,6 @@ import GridDialog from './GridDialog.vue'
 import { storeToRefs } from 'pinia'
 import { exportFile, useQuasar, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
-import { SearchTypesEnum } from 'src/config'
 import useNotify from 'src/mixins/useNotify'
 import { useEntity } from 'src/pinia/entity'
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
@@ -200,10 +199,6 @@ function routeToDocumentView(query: Query) {
         organisationId: organisationId.value,
         repositoryId: repositoryId.value,
         queryId: query.id
-      },
-      query: {
-        queryName: query.name,
-        searchType: SearchTypesEnum.SEARCH_QUERY
       }
     })
 }
