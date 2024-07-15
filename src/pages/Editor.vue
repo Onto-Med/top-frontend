@@ -200,7 +200,7 @@ const isConceptRepository = computed(() =>
   repository.value && repository.value.repositoryType === RepositoryType.ConceptRepository
 )
 
-const hasUnsavedTabs = computed(() => tabs.value.some(t => t.dirty || !t.selectedVersion))
+const hasUnsavedTabs = computed(() => tabs.value.some(t => t.dirty || !t.state.version))
 
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
@@ -467,6 +467,7 @@ function getTabTitle(tab: EditorTab) {
  */
 async function confirmCloseUnsavedTabs(tab?: EditorTab) {
   return new Promise<void>((resolve, reject) => {
+    console.log(tabs.value)
     if (tab && !tab.dirty && !!tab.selectedVersion || !hasUnsavedTabs.value)
       return resolve()
     $q.dialog({

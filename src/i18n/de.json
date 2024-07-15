@@ -526,5 +526,6 @@
   "unavailable": "nicht verfügbar",
   "tryAgain": "Erneut versuchen",
   "dataOfQuery": "Daten der Abfrage \"{thing}\"",
-  "fileToDisplay": "Anzuzeigende Datei|Anzuzeigende Dateien"
+  "fileToDisplay": "Anzuzeigende Datei|Anzuzeigende Dateien",
+  "definition": "Definition|Definitionen"
 }

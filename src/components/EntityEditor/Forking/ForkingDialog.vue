@@ -64,7 +64,6 @@ import { useI18n } from 'vue-i18n'
 import { EntityApiKey } from 'src/boot/axios'
 import { Entity, ForkingStats } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
-import { useRouter } from 'vue-router'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { QTableProps } from 'quasar'
 
@@ -78,10 +77,9 @@ defineEmits(['update:show'])
 const { t, d } = useI18n()
 const entityApi = inject(EntityApiKey)
 const { renderError } = useNotify()
-const router = useRouter()
 const loading = ref(false)
 const forkingStats = ref(undefined as ForkingStats | undefined)
-const { getTitle } = useEntityFormatter()
+const { getTitle, routeToEntity } = useEntityFormatter()
 
 const forkColumns = computed(
   () =>
@@ -116,17 +114,5 @@ async function reload() {
     .then((r) => (forkingStats.value = r.data))
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
-}
-
-function routeToEntity(entity: Entity) {
-  if (!entity.repository || !entity.repository.organisation) return
-  void router.push({
-    name: 'editor',
-    params: {
-      organisationId: entity.repository.organisation.id,
-      repositoryId: entity.repository.id,
-      entityId: entity.id
-    }
-  })
 }
 </script>
