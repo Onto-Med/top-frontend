@@ -19,6 +19,8 @@
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
               <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
+              <q-icon v-else-if="isGraphPipelineFailed" name="bolt" color="red" />
+              <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
             </p>
             <q-select
               v-model="language"
@@ -137,16 +139,11 @@ const selectedGraphs = ref<ConceptGraphObject[]>([])
 const graphPipelineInterval = ref<number>()
 
 const isGraphPipelineFinished = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Successful)
+const isGraphPipelineFailed = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Failed)
 // const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
 
-const graphPipelineStatus = computed(() => {
-  if (!graphPipeline.value || !graphPipeline.value.status) return t('unavailable')
-  return te(graphPipeline.value.status) ? t(graphPipeline.value.status) : graphPipeline.value.status
-})
-const clusterPipelineStatus = computed(() => {
-  if (!clusterPipeline.value || !clusterPipeline.value.status) return t('unavailable')
-  return te(clusterPipeline.value.status) ? t(clusterPipeline.value.status) : clusterPipeline.value.status
-})
+const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
+const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
 
 const graphColumns = computed(
   () =>
@@ -160,26 +157,34 @@ const graphColumns = computed(
 
 onMounted(() => {
   loadPipeline()
-    .then(() => {
-      if (!graphPipeline.value) graphPipelineInterval.value = window.setInterval(() => loadPipeline, 5000)
-    })
-    .catch((e: Error) => renderError(e))
 })
 
 onUnmounted(() => window.clearInterval(graphPipelineInterval.value))
 
-async function loadPipeline() {
-  return conceptPipelineApi
+function statusToString(status?: PipelineResponseStatus) {
+  return !status ? t('unavailable') : te(status) ? t(status) : status
+}
+
+function loadPipeline() {
+  conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => {
-      graphPipeline.value = r.data
       if (
-        graphPipeline.value?.status == PipelineResponseStatus.Successful ||
-        graphPipeline.value?.status == PipelineResponseStatus.Failed
-      )
+        !r.data.pipelineId ||
+        r.data.status == PipelineResponseStatus.Successful ||
+        r.data.status == PipelineResponseStatus.Failed
+      ) {
         window.clearInterval(graphPipelineInterval.value)
+        graphPipelineInterval.value = undefined
+        if (!r.data.pipelineId) return
+      }
+      graphPipeline.value = r.data
     })
-    .then(() => window.clearInterval(graphPipelineInterval.value))
+    .then(() => {
+      if (graphPipeline.value?.status === PipelineResponseStatus.Running)
+        graphPipelineInterval.value = window.setInterval(loadPipeline, 5000)
+    })
+    .catch((e: Error) => renderError(e))
 }
 
 function confirmStartPipeline() {
@@ -190,7 +195,7 @@ function confirmStartPipeline() {
     }
   }).onOk(() => {
     deletePipeline()
-      .then(() => startPipeline())
+      .then(startPipeline)
       .catch((e: Error) => renderError(e))
   })
 }
@@ -234,11 +239,16 @@ function confirmPublishClusters() {
 async function startPipeline() {
   return conceptPipelineApi
     ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
-    .then(() => (graphPipelineInterval.value = window.setInterval(() => loadPipeline, 5000)))
+    .then((r) => {
+      graphPipeline.value = r.data
+      if (r.data.status == PipelineResponseStatus.Running)
+        graphPipelineInterval.value = window.setInterval(loadPipeline, 5000)
+    })
 }
 
 async function deletePipeline() {
   window.clearInterval(graphPipelineInterval.value)
+  graphPipelineInterval.value = undefined
   return conceptPipelineApi?.deleteConceptPipelineById(props.dataSource.id)
 }
 
