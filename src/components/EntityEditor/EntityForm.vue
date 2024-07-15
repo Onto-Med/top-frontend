@@ -154,7 +154,6 @@ import {
   Code,
   Concept,
   DataType,
-  Entity,
   EntityType,
   Expression,
   ItemType,
@@ -170,7 +169,6 @@ import UnitInput from 'src/components/UnitInput.vue'
 import CodeInputCard from 'src/components/EntityEditor/Code/CodeInputCard.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useEntity } from 'src/pinia/entity'
-import { useRouter } from 'vue-router'
 
 const props = defineProps({
   version: Number,
@@ -233,8 +231,7 @@ defineEmits([
 ])
 
 const { t } = useI18n()
-const router = useRouter()
-const { isRestricted, hasDataType, hasItemType, getTitle } = useEntityFormatter()
+const { isRestricted, hasDataType, hasItemType, getTitle, routeToEntity } = useEntityFormatter()
 const entityStore = useEntity()
 const superPhenotype = ref(undefined as Phenotype | undefined)
 
@@ -250,16 +247,4 @@ const showExpression = ref(true)
 const showDescriptions = ref(props.descriptions && props.descriptions.length > 0)
 const showSynonyms = ref(props.synonyms && props.synonyms.length > 0)
 const showCodes = ref(props.codes && props.codes.length > 0)
-
-function routeToEntity(entity: Entity | undefined) {
-  if (!entity || !entity.repository || !entity.repository.organisation) return
-  void router.push({
-    name: 'editor',
-    params: {
-      organisationId: entity.repository.organisation.id,
-      repositoryId: entity.repository.id,
-      entityId: entity.id
-    }
-  })
-}
 </script>

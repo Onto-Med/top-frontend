@@ -18,11 +18,13 @@ import {
 } from '@onto-med/top-api'
 import { useEntity } from 'src/pinia/entity'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 export default function (this: void) {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { locale, t, te } = useI18n()
   const entityStore = useEntity()
+  const router = useRouter()
 
   const getLocalizedPropertyValues = (entity: Entity, property: keyof Entity): string[] => {
     const lang = locale.value.split('-')[0]
@@ -281,6 +283,26 @@ export default function (this: void) {
 
     paginationLabel: (firstRowIndex: number, endRowIndex: number, totalRowNumber: number) => {
       return `${firstRowIndex}-${endRowIndex} ${t('of')} ${totalRowNumber}`
+    },
+
+    routeToEntity: (entity?: Entity, push = true) => {
+      if (!entity?.repository || !entity.repository.organisation) return Promise.resolve()
+      const params = {
+        organisationId: entity.repository.organisation.id,
+        repositoryId: entity.repository.id,
+        entityId: entity.id
+      }
+      if (push) {
+        return router.push({
+          name: 'editor',
+          params
+        })
+      } else {
+        return router.replace({
+          name: 'editor',
+          params
+        })
+      }
     }
   }
 }

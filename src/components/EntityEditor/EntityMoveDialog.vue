@@ -25,7 +25,7 @@
               removeable
               @remove-clicked="removeSuperEntity(index)"
               @entity-set="setSuperEntity(index, $event)"
-              @entity-clicked="routeToEntity(superEntity)"
+              @entity-clicked="routeToEntity(superEntity).then(() => onDialogHide())"
             />
           </q-item>
           <q-item>
@@ -61,7 +61,6 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import EntityChip from './EntityChip.vue'
 import useNotify from 'src/mixins/useNotify'
-import { useRouter } from 'vue-router'
 
 const props = defineProps({
   entity: {
@@ -73,9 +72,8 @@ const props = defineProps({
 const { t } = useI18n()
 const { notify, renderError } = useNotify()
 const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } = useDialogPluginComponent()
-const { getTitle, isCategory, isConcept, isPhenotype, isRestricted } = useEntityFormatter()
+const { getTitle, isCategory, isConcept, isPhenotype, isRestricted, routeToEntity } = useEntityFormatter()
 const onCancelClick = onDialogCancel
-const router = useRouter()
 const entityStore = useEntity()
 const { organisationId, repositoryId } = storeToRefs(entityStore)
 const superEntities = ref<(Category | Concept | undefined)[]>([])
@@ -115,16 +113,6 @@ function setSuperEntity(index: number, superEntity: Category | Concept) {
 
 function removeSuperEntity(index: number) {
   superEntities.value.splice(index, 1)
-}
-
-async function routeToEntity(entity?: Entity) {
-  if (!entity || !repositoryId.value || !organisationId.value) return
-  await router
-    .push({
-      name: 'editor',
-      params: { organisationId: organisationId.value, repositoryId: repositoryId.value, entityId: entity.id }
-    })
-    .then(() => onDialogHide())
 }
 </script>
 

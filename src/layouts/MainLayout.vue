@@ -214,7 +214,7 @@ import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import FancyEntitySearch from 'src/components/EntityEditor/FancyEntitySearch.vue'
 import packageInfo from '../../package.json'
 import { ref, computed, watch } from 'vue'
-import { AppDescription, Entity } from '@onto-med/top-api'
+import { AppDescription } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
 import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
 import { storeToRefs } from 'pinia'
@@ -222,11 +222,13 @@ import { env} from 'src/config'
 import { inject } from 'vue'
 import { DefaultApiKey } from 'src/boot/axios'
 import { onMounted } from 'vue'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 const { t } = useI18n()
 const router = useRouter()
 const entityStore = useEntity()
 const $q = useQuasar()
+const { routeToEntity } = useEntityFormatter()
 const leftDrawerOpen = ref<boolean>(!($q.localStorage.getItem('minimiseDrawer') as boolean))
 const { keycloak, organisation } = storeToRefs(entityStore)
 const drawer = ref(undefined as QMenu|undefined)
@@ -300,11 +302,6 @@ function toggleLeftDrawer() {
     drawer.value.show()
   else
     leftDrawerOpen.value = !leftDrawerOpen.value
-}
-
-function routeToEntity(entity: Entity) {
-  if (!entity.repository || !entity.repository.organisation) return
-  void router.push({ name: 'editor', params: { organisationId: entity.repository.organisation.id, repositoryId: entity.repository.id, entityId: entity.id } })
 }
 </script>
 
