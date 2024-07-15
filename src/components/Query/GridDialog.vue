@@ -23,6 +23,7 @@
           :column-defs="colDefs"
           :default-col-def="defaultColDef"
           :column-types="columnTypes"
+          suppress-field-dot-notation
           class="ag-theme-quartz"
         >
         </ag-grid-vue>
