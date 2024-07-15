@@ -250,6 +250,7 @@ async function deletePipeline() {
   window.clearInterval(graphPipelineInterval.value)
   graphPipelineInterval.value = undefined
   return conceptPipelineApi?.deleteConceptPipelineById(props.dataSource.id)
+    .then(() => graphPipeline.value = undefined)
 }
 
 function getSelectedRowsString() {
