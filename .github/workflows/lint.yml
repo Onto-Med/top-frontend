@@ -3,7 +3,7 @@ name: Lint and test
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - .devcontainer/**
       - docker-entrypoint.d/**
@@ -14,7 +14,7 @@ on:
       - nginx.conf
   pull_request:
     branches:
-      - master
+      - main
     paths-ignore:
       - .devcontainer/**
       - docker-entrypoint.d/**
