@@ -53,13 +53,16 @@
             <p>{{ t('conceptCluster.reviewDescription') }}</p>
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ clusterPipelineStatus }}
+              <q-spinner v-if="clusterPipelineInterval" size="xs" class="q-ml-sm" />
+              <q-icon v-else-if="isClusterPipelineFailed" name="bolt" color="red" />
+              <q-icon v-else-if="isClusterPipelineFinished" name="check" color="positive" />
             </p>
             <q-btn
               no-caps
               :label="t('publishThing', { thing: t('concept_cluster', 2) })"
               color="secondary"
               class="q-mb-sm"
-              @click="confirmPublishClusters()"
+              @click="confirmPublishClusters"
             />
             <q-table
               v-model:selected="selectedGraphs"
@@ -76,19 +79,21 @@
             <q-separator />
             <q-stepper-navigation class="q-mt-md">
               <q-btn
+                v-if="step == 1"
                 :disable="!isGraphPipelineFinished"
                 :label="t('continue')"
                 color="primary"
                 @click="conceptGraphStep"
               />
-              <q-btn
-                v-if="step > 1"
-                flat
-                :label="t('back')"
-                color="primary"
-                class="q-ml-sm"
-                @click="stepper?.previous()"
-              />
+              <div v-else>
+                <q-btn
+                  :disable="!isClusterPipelineFinished"
+                  :label="t('finish')"
+                  color="primary"
+                  @click="conceptGraphStep"
+                />
+                <q-btn flat :label="t('back')" color="primary" class="q-ml-sm" @click="stepper?.previous()" />
+              </div>
             </q-stepper-navigation>
           </template>
         </q-stepper>
@@ -124,7 +129,7 @@ const props = defineProps({
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
-const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
+const { dialogRef, onDialogHide } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const $q = useQuasar()
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
@@ -137,10 +142,12 @@ const clusterPipeline = ref<PipelineResponse>()
 const conceptGraphs = ref<ConceptGraphObject[]>([])
 const selectedGraphs = ref<ConceptGraphObject[]>([])
 const graphPipelineInterval = ref<number>()
+const clusterPipelineInterval = ref<number>()
 
 const isGraphPipelineFinished = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Successful)
 const isGraphPipelineFailed = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Failed)
-// const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
+const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
+const isClusterPipelineFailed = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Failed)
 
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
@@ -156,7 +163,7 @@ const graphColumns = computed(
 )
 
 onMounted(() => {
-  loadPipeline()
+  loadGraphPipeline()
 })
 
 onUnmounted(() => window.clearInterval(graphPipelineInterval.value))
@@ -165,7 +172,7 @@ function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
 }
 
-function loadPipeline() {
+function loadGraphPipeline() {
   conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => {
@@ -182,7 +189,29 @@ function loadPipeline() {
     })
     .then(() => {
       if (graphPipeline.value?.status === PipelineResponseStatus.Running)
-        graphPipelineInterval.value = window.setInterval(loadPipeline, 5000)
+        graphPipelineInterval.value = window.setInterval(loadGraphPipeline, 5000)
+    })
+    .catch((e: Error) => renderError(e))
+}
+
+function loadClusterPipeline() {
+  conceptClusterApi
+    ?.getConceptClusterProcess(props.dataSource?.id)
+    .then((r) => {
+      if (
+        !r.data.pipelineId ||
+        r.data.status == PipelineResponseStatus.Successful ||
+        r.data.status == PipelineResponseStatus.Failed
+      ) {
+        window.clearInterval(clusterPipelineInterval.value)
+        clusterPipelineInterval.value = undefined
+        if (!r.data.pipelineId) return
+      }
+      clusterPipeline.value = r.data
+    })
+    .then(() => {
+      if (clusterPipeline.value?.status === PipelineResponseStatus.Running)
+        clusterPipelineInterval.value = window.setInterval(loadClusterPipeline, 5000)
     })
     .catch((e: Error) => renderError(e))
 }
@@ -226,10 +255,7 @@ function confirmPublishClusters() {
             props.dataSource.id,
             selectedGraphs.value.map((c) => c.id)
           )
-          .then((r) => {
-            clusterPipeline.value = r.data
-            onDialogOK()
-          })
+          .then(loadClusterPipeline)
           .catch((e: Error) => renderError(e))
       )
       .catch((e: Error) => renderError(e))
@@ -239,11 +265,7 @@ function confirmPublishClusters() {
 async function startPipeline() {
   return conceptPipelineApi
     ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
-    .then((r) => {
-      graphPipeline.value = r.data
-      if (r.data.status == PipelineResponseStatus.Running)
-        graphPipelineInterval.value = window.setInterval(loadPipeline, 5000)
-    })
+    .then(loadGraphPipeline)
 }
 
 async function deletePipeline() {
@@ -303,14 +325,7 @@ function loadConceptGraphs() {
         }
       }
     })
-    .then(() => {
-      conceptClusterApi
-        ?.getConceptClusterProcess(props.dataSource?.id)
-        .then((r) => {
-          clusterPipeline.value = r.data
-        })
-        .catch((e: Error) => renderError(e))
-    })
+    .then(loadClusterPipeline)
     .catch((e: Error) => renderError(e))
 }
 
