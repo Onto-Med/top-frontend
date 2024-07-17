@@ -492,7 +492,7 @@
   "concept_cluster": "Concept cluster|Concept clusters",
   "search_query": "Search query|Search queries",
   "clear": "Clear",
-  "documentsOfQuery": "Documents of query",
+  "documentsOf": "Documents of",
   "codeMissing": "Code is missing|Codes are missing",
   "codeMissingDescription": "It is recommended to provide at least one code to ensure the reusability of this model.",
   "codeImport": {

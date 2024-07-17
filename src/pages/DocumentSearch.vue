@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <q-card>
-      <q-card-section>
+      <q-card-section class="document-search-title">
         <div class="text-h6">
           {{ t('documentSearch.title') }}
         </div>
@@ -129,6 +129,8 @@ function resetPage() {
 </script>
 
 <style lang="sass" scoped>
+.document-search-title
+  min-height: 104px
 .data-source-select
   min-width: 50px
   max-width: 500px

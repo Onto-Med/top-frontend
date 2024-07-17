@@ -2,15 +2,15 @@
   <q-splitter v-model="splitterModel" :limits="[25, 75]">
     <template #before>
       <q-card>
-        <q-card-section class="row q-pl-md q-pa-none bg-grey-1">
-          <div class="text-subtitle2 q-py-md">
+        <q-card-section class="row q-pl-md q-pa-none bg-grey-1 no-wrap">
+          <div class="text-subtitle2 q-py-md ellipsis">
             {{ t('concept', 2) }}
           </div>
           <q-space />
           <q-separator v-if="isAdmin" vertical />
-          <q-btn v-if="isAdmin" :disable="!dataSource" flat no-caps class="q-py-none" @click="showRegenerateDialog">
+          <q-btn v-if="isAdmin" :disable="!dataSource" flat no-caps no-wrap class="q-py-none" @click="showRegenerateDialog">
             <q-icon name="update" />
-            <div class="q-pl-sm gt-xs">{{ t('conceptCluster.regenerate') }}</div>
+            <div class="q-pl-sm gt-xs ellipsis">{{ t('conceptCluster.regenerate') }}</div>
           </q-btn>
         </q-card-section>
 
@@ -92,15 +92,15 @@
     </template>
 
     <template #after>
-      <q-card-section class="row q-pl-md q-pa-none bg-grey-1">
-        <div class="text-subtitle2 q-py-md">
+      <q-card-section class="row q-pl-md q-pa-none bg-grey-1 no-wrap">
+        <div class="text-subtitle2 q-py-md ellipsis">
           {{ t('document', 2) }}
         </div>
         <q-space />
         <q-separator vertical />
-        <q-btn :disable="!dataSource" flat no-caps class="q-py-none" @click="routeToDocumentQuery">
+        <q-btn :disable="!dataSource" flat no-caps no-wrap class="q-py-none" @click="routeToDocumentQuery">
           <q-icon name="manage_search" />
-          <div class="q-pl-sm gt-xs">{{ t('buildQuery') }}</div>
+          <div class="q-pl-sm gt-xs ellipsis">{{ t('buildQuery') }}</div>
         </q-btn>
       </q-card-section>
 
@@ -117,14 +117,13 @@
         :columns="cols"
         :create="false"
         :filterable="!query"
+        :title="query ? (t('documentsOf') + ': '  + query.name) : undefined"
+        title-class="text-body1 text-weight-medium"
         @request="reloadDocuments($event).catch((e: Error) => renderError(e))"
         @row-clicked="chooseDocument($event).catch((e: Error) => renderError(e))"
       >
-        <template v-if="query" #title>
-          <div v-show="$q.screen.gt.xs" class="text-h6">{{ t('documentsOfQuery') }}: {{ query.name }}</div>
-        </template>
         <template v-if="query" #action-buttons>
-          <q-btn icon="clear" :label="t('clear')" :title="t('clearDocumentQueryResult')" @click="emit('clearQuery')" />
+          <q-btn icon="clear" no-wrap :label="t('clear')" :title="t('clearDocumentQueryResult')" @click="emit('clearQuery')" />
         </template>
         <template #row-cells="rowCellProps">
           <q-td :title="rowCellProps.row.id">

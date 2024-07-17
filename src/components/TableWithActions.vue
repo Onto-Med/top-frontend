@@ -15,7 +15,7 @@
       >
         <template #top>
           <slot name="title">
-            <div v-if="title" class="text-h6">
+            <div v-if="title" class="ellipsis" :class="titleClass">
               {{ title }}
             </div>
           </slot>
@@ -46,6 +46,7 @@
               :disabled="loading || disable"
               :label="$q.screen.gt.xs ? t('createThing', { thing: name }) : ''"
               icon="add"
+              no-wrap
               @click="$emit('create-clicked')"
             />
             <q-btn
@@ -53,6 +54,7 @@
               :disabled="loading || disable"
               :label="$q.screen.gt.xs ? t('reload') : ''"
               icon="refresh"
+              no-wrap
               @click="reload()"
             />
           </q-btn-group>
@@ -116,6 +118,11 @@ import { DocumentPage, OrganisationPage, RepositoryPage } from '@onto-med/top-ap
 const props = defineProps({
   /** The title to be displayed above the table. It is recommended to use a plural noun. */
   title: String,
+  /** Class to be used for the title. Defaults to 'text-h6'. */
+  titleClass: {
+    type: String,
+    default: 'text-h6'
+  },
   /** The name to be used for button labels. It should be singular noun. */
   name: String,
   /** The page holding the content if the table. */
@@ -176,8 +183,11 @@ function reload() {
 
 <style lang="sass">
 .sticky-header-table
-  max-height: 72vh
+  max-height: 69vh
 
+  .q-table__top
+    flex-wrap: nowrap
+    min-height: 64px
   thead tr th
     position: sticky
     z-index: 1
