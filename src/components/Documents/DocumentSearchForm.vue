@@ -119,7 +119,7 @@
         :filterable="!query"
         :title="query ? (t('documentsOf') + ': '  + query.name) : undefined"
         title-class="text-body1 text-weight-medium"
-        @request="reloadDocuments($event).catch((e: Error) => renderError(e))"
+        @request="(name, page) => reloadDocuments(name, page).catch((e: Error) => renderError(e))"
         @row-clicked="chooseDocument($event).catch((e: Error) => renderError(e))"
       >
         <template v-if="query" #action-buttons>
