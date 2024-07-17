@@ -8,7 +8,15 @@
           </div>
           <q-space />
           <q-separator v-if="isAdmin" vertical />
-          <q-btn v-if="isAdmin" :disable="!dataSource" flat no-caps no-wrap class="q-py-none" @click="showRegenerateDialog">
+          <q-btn
+            v-if="isAdmin"
+            :disable="!dataSource"
+            flat
+            no-caps
+            no-wrap
+            class="q-py-none"
+            @click="showRegenerateDialog"
+          >
             <q-icon name="update" />
             <div class="q-pl-sm gt-xs ellipsis">{{ t('conceptCluster.regenerate') }}</div>
           </q-btn>
@@ -117,13 +125,19 @@
         :columns="cols"
         :create="false"
         :filterable="!query"
-        :title="query ? (t('documentsOf') + ': '  + query.name) : undefined"
+        :title="query ? t('documentsOf') + ': ' + query.name : undefined"
         title-class="text-body1 text-weight-medium"
         @request="(name, page) => reloadDocuments(name, page).catch((e: Error) => renderError(e))"
         @row-clicked="chooseDocument($event).catch((e: Error) => renderError(e))"
       >
         <template v-if="query" #action-buttons>
-          <q-btn icon="clear" no-wrap :label="t('clear')" :title="t('clearDocumentQueryResult')" @click="emit('clearQuery')" />
+          <q-btn
+            icon="clear"
+            no-wrap
+            :label="t('clear')"
+            :title="t('clearDocumentQueryResult')"
+            @click="emit('clearQuery')"
+          />
         </template>
         <template #row-cells="rowCellProps">
           <q-td :title="rowCellProps.row.id">
