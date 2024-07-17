@@ -40,10 +40,6 @@
             @duplicate-entity="handleEntityDuplication"
             @dblclick="preserve()"
           />
-          <q-separator />
-          <q-expansion-item v-if="isConceptRepository" :label="t('concept_cluster')">
-            content
-          </q-expansion-item>
         </div>
       </template>
 
