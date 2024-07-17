@@ -166,7 +166,10 @@ onMounted(() => {
   loadGraphPipeline()
 })
 
-onUnmounted(() => window.clearInterval(graphPipelineInterval.value))
+onUnmounted(() => {
+  window.clearInterval(graphPipelineInterval.value)
+  window.clearInterval(clusterPipelineInterval.value)
+})
 
 function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
@@ -189,9 +192,16 @@ function loadGraphPipeline() {
     })
     .then(() => {
       if (graphPipeline.value?.status === PipelineResponseStatus.Running)
-        graphPipelineInterval.value = window.setInterval(loadGraphPipeline, 5000)
+        graphPipelineInterval.value = window.setTimeout(loadGraphPipeline, 5000)
     })
-    .catch((e: Error) => renderError(e))
+    .catch((e: Error) => {
+      graphPipelineInterval.value = undefined
+      graphPipeline.value = {
+        pipelineId: props.dataSource?.id,
+        status: PipelineResponseStatus.Failed
+      }
+      renderError(e)
+    })
 }
 
 function loadClusterPipeline() {
@@ -211,9 +221,16 @@ function loadClusterPipeline() {
     })
     .then(() => {
       if (clusterPipeline.value?.status === PipelineResponseStatus.Running)
-        clusterPipelineInterval.value = window.setInterval(loadClusterPipeline, 5000)
+        clusterPipelineInterval.value = window.setTimeout(loadClusterPipeline, 5000)
     })
-    .catch((e: Error) => renderError(e))
+    .catch((e: Error) => {
+      clusterPipelineInterval.value = undefined
+      clusterPipeline.value = {
+        pipelineId: props.dataSource?.id,
+        status: PipelineResponseStatus.Failed
+      }
+      renderError(e)
+    })
 }
 
 function confirmStartPipeline() {
