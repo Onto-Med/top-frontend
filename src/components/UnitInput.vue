@@ -71,7 +71,6 @@ const displayValue = computed(() => {
 })
 
 function filterFn(val: string, update: (arg0: () => void) => void, abort: () => void) {
-  console.log('test')
   if (!val || val.length === 0) {
     abort()
     return

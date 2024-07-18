@@ -44,6 +44,7 @@
         :include-function-types="includeFunctionTypes"
         :exclude-function-types="excludeFunctionTypes"
         :exclude-functions="excludeFunctions"
+        :simple-constants="simpleConstants"
         root
         @update:model-value="$emit('update:modelValue', $event)"
         @entity-clicked="$emit('entityClicked', $event)"
@@ -97,6 +98,7 @@ const props = defineProps({
     default: () => []
   },
   canBeSwitch: Boolean,
+  simpleConstants: Boolean,
   includeFunctionTypes: Array as () => string[],
   excludeFunctionTypes: Array as () => string[],
   excludeFunctions: Array as () => string[]

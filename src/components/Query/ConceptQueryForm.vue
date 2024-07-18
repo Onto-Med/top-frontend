@@ -161,12 +161,13 @@ const fileReader = new FileReader()
 const splitterModel = ref<number>($q.localStorage.getItem('conceptQuerySplitterWidth') || 35)
 const dataSources = ref([] as DataSource[])
 
-function prefillQuery(query: ConceptQuery) {
+function prefillQuery(query: ConceptQuery, preselectedDataSource: DataSource | undefined) {
   entity.value = entityStore.getEntity(query.entityId)
   language.value = query.language
+  dataSource.value = (preselectedDataSource != undefined) ? preselectedDataSource.id : undefined
 }
 
-fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as ConceptQuery)
+fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as ConceptQuery, undefined)
 
 async function reloadEntities() {
   treeLoading.value = true
@@ -235,9 +236,9 @@ function onExecute() {
   )
 }
 
-function reset() {
+function reset(preselectedDataSource: DataSource|undefined) {
   name.value = undefined
-  dataSource.value = undefined
+  dataSource.value = (preselectedDataSource != undefined) ? preselectedDataSource.id : undefined
   entity.value = undefined
   language.value = allString
   reloadEntities().catch((e: Error) => renderError(e))

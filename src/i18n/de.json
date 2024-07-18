@@ -304,8 +304,8 @@
   "repositoryType": "Repositoriumstyp|Repositoriumstypen",
   "documentSearch": {
     "title": "Dokumentensuche",
-    "description": "Bitte wählen sie die Art der Dokumentrepräsentation aus.",
-    "short": "Explorative Dokumentensuche"
+    "short": "Explorative Dokumentensuche",
+    "description": "Bitte wählen Sie eine Datenquelle aus, in der Sie nach Dokumenten suchen möchten."
   },
   "concept_repository": "Konzept Repositorium",
   "phenotype_repository": "Phänotyp Repositorium",
@@ -489,10 +489,10 @@
   "manage": "Verwalten",
   "edit": "Bearbeiten",
   "404Description": "Die angeforderte Seite existiert nicht.",
-  "concept_cluster": "Konzept-Cluster",
+  "concept_cluster": "Konzept-Cluster|Konzept-Cluster",
   "search_query": "Such-Abfrage|Such-Abfragen",
   "clear": "Leeren",
-  "documentsOfQuery": "Dokumente der Abfrage",
+  "documentsOf": "Dokumente von",
   "codeMissing": "Code fehlt|Codes fehlen",
   "codeMissingDescription": "Es wird empfohlen, mindestens einen Code bereitzustellen, um die Wiederverwendbarkeit dieses Modells sicherzustellen.",
   "codeImport": {
@@ -527,5 +527,33 @@
   "tryAgain": "Erneut versuchen",
   "dataOfQuery": "Daten der Abfrage \"{thing}\"",
   "fileToDisplay": "Anzuzeigende Datei|Anzuzeigende Dateien",
-  "definition": "Definition|Definitionen"
+  "definition": "Definition|Definitionen",
+  "conceptCluster": {
+    "noConceptsAvailable": "Derzeit liegen keine Konzepte vor. Möglicherweise müssen sie zunächst aus einem Textkorpus generiert werden. Bitte nutzen Sie die Schaltfläche oben, um den Generierungsprozess zu starten.",
+    "selectConceptsDescription": "Bitte geben Sie auf der rechten Seite die Konzepte an, nach denen Sie suchen möchten.",
+    "regenerate": "Regenerieren",
+    "confirmRegenerate": "Möchten Sie die Konzeptcluster wirklich neu generieren? Der Vorgang dauert je nach Korpusgröße einige Minuten und vorherige Cluster werden verworfen.",
+    "pipelineStarted": "Die Generierungspipeline wurde gestartet. In wenigen Minuten sollten neue Cluster verfügbar sein.",
+    "pipelineFailed": "Die Generierungspipeline ist fehlgeschlagen. Bitte versuche es erneut.",
+    "reviewDescription": "Bitte wählen Sie relevante Cluster aus der Vorverarbeitung unten aus. Sie können diese dann veröffentlichen, damit sie für Dokumentenabfragen zur Verfügung stehen.",
+    "preProcessingDescription": "Um Konzeptcluster für eine Datenquelle zu generieren, müssen die in dieser Datenquelle enthaltenen Dokumente mithilfe einer Conceptgraph Pipeline vorverarbeitet werden. Abhängig von der Anzahl der Dokumente kann diese Pipeline mehrere Minuten dauern. Der Status wird unten aufgeführt. Es kann nur eine Pipeline für eine Datenquelle geben, was bedeutet, dass durch einen Neustart der Pipeline alle vorhandenen Konzeptcluster gelöscht werden!\nSobald die Vorverarbeitung abgeschlossen ist, können Sie zum nächsten Schritt navigieren und relevante Cluster auswählen, um sie den Benutzern zum Abrufen von Dokumenten zur Verfügung zu stellen.",
+    "confirmStart": "Durch das Starten der Vorverarbeitungspipeline werden alle vorhandenen Konzeptcluster für diese Datenquelle gelöscht. Möchten Sie fortfahren?",
+    "confirmDelete": "Möchten Sie diese Pipeline und alle aus dieser Datenquelle abgeleiteten Konzeptcluster wirklich löschen?",
+    "confirmPublish": "Durch die Veröffentlichung der ausgewählten Konzept-Cluster werden alle zuvor veröffentlichten Cluster entfernt. Möchten Sie fortfahren?"
+  },
+  "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
+  "clusterReview": "Cluster-Review|Cluster-Reviews",
+  "preProcessing": "Vorverarbeitung",
+  "status": "Status",
+  "pipeline": "Pipeline|Pipelines",
+  "startThing": "{thing} starten",
+  "finish": "Beenden",
+  "continue": "Fortfahren",
+  "successful": "Erfolgreich",
+  "label": "Label|Labels",
+  "publishThing": "{thing} veröffentlichen",
+  "node": "Knoten|Knoten",
+  "edge": "Kante|Kanten",
+  "quoteThing": "\"{thing}\"",
+  "phrase": "Term|Terme"
 }

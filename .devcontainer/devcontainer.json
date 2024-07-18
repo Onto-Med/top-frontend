@@ -59,7 +59,8 @@
 				"formulahendry.auto-rename-tag",
 				"sdras.vue-vscode-snippets",
 				"mutantdino.resourcemonitor",
-				"Vue.vscode-typescript-vue-plugin"
+				"Gruntfuggly.todo-tree",
+				"waderyan.gitblame"
 			]
 		}
 	}

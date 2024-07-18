@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
-import { DocumentApi, PhraseApi, ConceptclusterApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, UserApi, CodeApi } from '@onto-med/top-api'
+import { DocumentApi, PhraseApi, ConceptclusterApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, UserApi, CodeApi, ConceptPipelineApi } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
 import { env } from 'src/config'
@@ -20,6 +20,7 @@ export const QueryApiKey: InjectionKey<QueryApi> = Symbol('queryApi')
 export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 export const PhraseApiKey: InjectionKey<PhraseApi> = Symbol('phraseApi')
 export const ConceptClusterApiKey: InjectionKey<ConceptclusterApi> = Symbol('conceptClusterApi')
+export const ConceptPipelineApiKey: InjectionKey<ConceptPipelineApi> = Symbol('conceptPipelineApi')
 export const UserApiKey: InjectionKey<UserApi> = Symbol('userApi')
 export const CodeApiKey: InjectionKey<CodeApi> = Symbol('codeApi')
 
@@ -47,7 +48,7 @@ export default boot(({ app }) => {
   app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))
   app.provide(PhraseApiKey, new PhraseApi(undefined, '', axiosInstance))
   app.provide(ConceptClusterApiKey, new ConceptclusterApi(undefined, '', axiosInstance))
+  app.provide(ConceptPipelineApiKey, new ConceptPipelineApi(undefined, '', axiosInstance))
   app.provide(UserApiKey, new UserApi(undefined, '', axiosInstance))
   app.provide(CodeApiKey, new CodeApi(undefined, '', axiosInstance))
-});
-
+})

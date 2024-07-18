@@ -18,8 +18,15 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'queryBuilder',
         path: '/query/:organisationId?/:repositoryId?/:queryId?',
-        props: true,
         component: () => import('pages/QueryBuilder.vue'),
+        props: ({ params, query }) => {
+          return {
+            organisationId: params.organisationId,
+            repositoryId: params.repositoryId,
+            queryId: params.queryId,
+            dataSourceId: query.dataSourceId,
+          }
+        }
       },
       {
         name: 'editor',
@@ -56,22 +63,17 @@ const routes: RouteRecordRaw[] = [
         meta: {
           disabled: !env.DOCUMENTS_ENABLED
         },
-        props: ({ params, query }) => {
+        props: ({ params }) => {
           return {
             organisationId: params.organisationId,
             repositoryId: params.repositoryId,
-            queryId: params.queryId,
-            queryName: query.queryName,
-            initialSearchType: query.searchType
+            queryId: params.queryId
           }
         }
       },
       {
         name: 'documentSearch',
         path: '/document',
-        props: route => {
-          return { initialSearchType: route.query.searchType }
-        },
         component: () => import('pages/DocumentSearch.vue'),
         meta: {
           disabled: !env.DOCUMENTS_ENABLED

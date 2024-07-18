@@ -97,31 +97,34 @@
 <script setup lang="ts">
 import {
   ConceptQuery,
+  DataSource,
   Permission,
   PhenotypeQuery,
   Query,
   QueryPage,
+  QueryType,
   Repository,
   RepositoryType
 } from '@onto-med/top-api'
-import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import {storeToRefs} from 'pinia'
+import {useEntity} from 'src/pinia/entity'
 import useNotify from 'src/mixins/useNotify'
-import { onMounted, ref, computed, inject } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { v4 as uuidv4 } from 'uuid'
-import { QueryApiKey } from 'src/boot/axios'
-import { QScrollArea, useQuasar } from 'quasar'
+import {computed, inject, onMounted, ref} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {v4 as uuidv4} from 'uuid'
+import {QueryApiKey} from 'src/boot/axios'
+import {QScrollArea, useQuasar} from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import Dialog from 'src/components/Dialog.vue'
 import ConceptQueryForm from 'src/components/Query/ConceptQueryForm.vue'
 import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
 import EnumSelect from 'src/components/EnumSelect.vue'
-import { useRouter } from 'vue-router'
+import {useRouter} from 'vue-router'
 
 const props = defineProps({
-  queryId: String
+  queryId: String,
+  dataSourceId: String
 })
 const { t } = useI18n()
 const $q = useQuasar()
@@ -145,6 +148,7 @@ const isDarkModeActive = computed(() => $q.dark.isActive)
 const minifyResults = ref(true)
 const resultsScrollArea = ref<QScrollArea>()
 const resultsDrawer = ref(true)
+const preSelectedDataSource = ref<DataSource>()
 
 const drawerWidth = computed(() => {
   return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
@@ -171,7 +175,7 @@ function reset (repository?: Repository) {
     .then(() => {
       if (isConceptQuery.value) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        conceptQueryForm.value?.reset()
+        conceptQueryForm.value?.reset(preSelectedDataSource.value)
       } else if (isPhenotypeQuery.value) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         phenotypeQueryForm.value?.reset()
@@ -240,7 +244,7 @@ function prefillQuery (query?: Query) {
   if (!query) return
   if (isConceptQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    conceptQueryForm.value?.prefillQuery(query as ConceptQuery)
+    conceptQueryForm.value?.prefillQuery(query as ConceptQuery, preSelectedDataSource.value)
   } else if (isPhenotypeQuery.value) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     phenotypeQueryForm.value?.prefillQuery(query)
@@ -259,7 +263,36 @@ function setRepository (repo?: Repository) {
   } else {
     reset(repo)
   }
+  setPreselectedDataSource(repo)
 }
+
+function setPreselectedDataSource(repo?: Repository) {
+  const ds = Array<DataSource>()
+  if (props.dataSourceId) {
+    if (repo?.organisation)
+      queryApi?.getOrganisationDataSources(repo.organisation.id)
+        .then(r => r.data.filter(function (dataSource) {
+          return dataSource.id === props.dataSourceId
+        }).forEach(d => ds.push(d)))
+        .then(() => {
+          if (ds.length != 0) {
+            if (ds[0].queryType === QueryType.Concept) {
+              repositoryTypeFilter.value = RepositoryType.ConceptRepository
+            }
+            preSelectedDataSource.value = ds[0]
+          } else {
+            if (props.dataSourceId)
+              $q.notify({
+                type: 'warning',
+                message: 'The preselected datasource "' + props.dataSourceId + '" doesn\'t seem to be configured for the organisation "' + repo.organisation?.id + '".',
+                timeout: 5000
+              })
+          }
+        })
+        .catch((e: Error) => renderError(e))
+  }
+}
+
 </script>
 
 <style lang="sass" scoped>

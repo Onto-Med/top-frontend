@@ -27,7 +27,6 @@
 
             <export-dialog v-model:show="showExportDialog" :repository="repository" @import="reloadEntities()" />
           </div>
-
           <entity-tree
             v-model:selected="selected"
             :nodes="entities"
@@ -467,7 +466,6 @@ function getTabTitle(tab: EditorTab) {
  */
 async function confirmCloseUnsavedTabs(tab?: EditorTab) {
   return new Promise<void>((resolve, reject) => {
-    console.log(tabs.value)
     if (tab && !tab.dirty && !!tab.selectedVersion || !hasUnsavedTabs.value)
       return resolve()
     $q.dialog({

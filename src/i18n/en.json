@@ -304,8 +304,8 @@
   "repositoryType": "Repository type|Repository types",
   "documentSearch": {
     "title": "Document search",
-    "description": "Please select the type of the document representation.",
-    "short": "Explorative document search"
+    "short": "Explorative document search",
+    "description": "Please select a data source you want to search for documents."
   },
   "phenotype_repository": "Phenotype repository",
   "concept_repository": "Concept repository",
@@ -489,10 +489,10 @@
   "manage": "Manage",
   "edit": "Edit",
   "404Description": "The requested page does not exist.",
-  "concept_cluster": "Concept cluster",
+  "concept_cluster": "Concept cluster|Concept clusters",
   "search_query": "Search query|Search queries",
   "clear": "Clear",
-  "documentsOfQuery": "Documents of query",
+  "documentsOf": "Documents of",
   "codeMissing": "Code is missing|Codes are missing",
   "codeMissingDescription": "It is recommended to provide at least one code to ensure the reusability of this model.",
   "codeImport": {
@@ -527,5 +527,33 @@
   "tryAgain": "Try again",
   "dataOfQuery": "Data of query '{thing}'",
   "fileToDisplay": "File to display|Files to display",
-  "definition": "Definition|Definitions"
+  "definition": "Definition|Definitions",
+  "conceptCluster": {
+    "noConceptsAvailable": "No concepts are currently available. They may need to be generated from a text corpus first. Please use the button above to start the generation process.",
+    "selectConceptsDescription": "On the right-hand side of the page, please specify the concepts you would like to use to search for documents.",
+    "regenerate": "Regenerate",
+    "confirmRegenerate": "Do you really want to regenerate the concept clusters? The process will take a few minutes, depending on the size of the corpus, and previous clusters will be dropped.",
+    "pipelineStarted": "The generation pipeline has been started. In a few minutes, new clusters should be available.",
+    "pipelineFailed": "The generation pipeline has failed. Please try again.",
+    "reviewDescription": "Please select relevant clusters from the pre-processing below, and you can then choose to publish them so that they are available for document queries.",
+    "preProcessingDescription": "In order to generate concept clusters for a data source, the documents contained in that data source must be pre-processed using a concept graph pipeline. Depending on the number of documents, this pipeline can take several minutes and it's status is listed below. There can only be one pipeline for a data source, which means that restarting the pipeline will delete all existing concept clusters!\nOnce the pre-processing is complete, you can navigate to the next step and select relevant clusters to make available to users for document retrieval.",
+    "confirmStart": "Starting the pre-processing pipeline will delete any existing concept clusters for this data source. Do you want to continue?",
+    "confirmDelete": "Do you really want to delete this pipeline and all the concept clusters derived from this data source?",
+    "confirmPublish": "Publishing the selected concept clusters will remove all previously published clusters. Do you want to continue?"
+  },
+  "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
+  "clusterReview": "Cluster review|Cluster reviews",
+  "preProcessing": "Pre-processing",
+  "status": "Status",
+  "pipeline": "Pipeline|Pipelines",
+  "startThing": "Start {thing}",
+  "finish": "Finish",
+  "continue": "Continue",
+  "successful": "Successful",
+  "label": "Label|Labels",
+  "publishThing": "Publish {thing}",
+  "node": "Node|Nodes",
+  "edge": "Edge|Edges",
+  "quoteThing": "'{thing}'",
+  "phrase": "Phrase|Phrases"
 }

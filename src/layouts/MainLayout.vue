@@ -241,7 +241,7 @@ const links = computed(() => {
   const links = [
     {
       title: t('query', 2),
-      icon: 'person_search',
+      icon: 'manage_search',
       caption: t('navbar.query.caption'),
       routeName: 'queryBuilder',
       isHidden: keycloak.value && !keycloak.value.authenticated

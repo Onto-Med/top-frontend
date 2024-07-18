@@ -30,7 +30,7 @@
         <q-card v-ripple class="fit text-center cursor-pointer q-hoverable" @click="routeTo('queryBuilder')">
           <span class="q-focus-helper" />
           <q-card-section class="row justify-center items-center">
-            <q-icon name="person_search" size="lg" />
+            <q-icon name="manage_search" size="lg" />
             <div class="q-ml-sm text-h6">
               {{ t('home_.runQuery.header') }}
             </div>
