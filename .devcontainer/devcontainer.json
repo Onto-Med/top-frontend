@@ -24,7 +24,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "yarn install",
+	"postCreateCommand": "npm install",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -48,7 +48,6 @@
 			"extensions": [
 				"dbaeumer.vscode-eslint",
 				"Vue.volar",
-				"gamunu.vscode-yarn",
 				"hollowtree.vue-snippets",
 				"dariofuzinato.vue-peek",
 				"mhutchie.git-graph",
@@ -60,7 +59,8 @@
 				"sdras.vue-vscode-snippets",
 				"mutantdino.resourcemonitor",
 				"Gruntfuggly.todo-tree",
-				"waderyan.gitblame"
+				"waderyan.gitblame",
+				"fill-labs.dependi"
 			]
 		}
 	}

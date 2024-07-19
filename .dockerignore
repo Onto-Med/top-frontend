@@ -1,7 +1,8 @@
-.devcontainer
-.quasar
-.vscode
-.env
-.git
-node_modules
+.devcontainer/
+.quasar/
+.vscode/
+.git/
+.github/
+dist/
+node_modules/
 Dockerfile
