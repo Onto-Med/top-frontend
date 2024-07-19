@@ -8,7 +8,7 @@ A Quasar Framework app
 
 ### Install the dependencies
 
-1. Install [npm](https://www.npmjs.com/package/npm), [Yarn](https://classic.yarnpkg.com/lang/en/docs/install) and [Quasar CLI](https://quasar.dev/start/quasar-cli/),
+1. Install [npm](https://www.npmjs.com/package/npm) and [Quasar CLI](https://quasar.dev/start/quasar-cli/),
 or use the `.devcontainer/devcontainer.json` configuration to build a [Development Container](https://containers.dev/).
 
 2. The npm package `@onto-med/top-api` is hosted in the GitHub Packages registry, thus requires authentication.
@@ -20,7 +20,7 @@ or use the `.devcontainer/devcontainer.json` configuration to build a [Developme
        You will now be prompted for your username and "password" (enter your personal access token, *not* your GitHub account password).
     4. For the devcontainer setup, you need to create a `.devcontainer/.env` file containing your GitHub personal access token (see `.devcontainer/.env.dist`)
 
-3. Run `yarn` (skip this step in the devcontainer setup)
+3. Run `npm install` (skip this step in the devcontainer setup)
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
@@ -44,7 +44,7 @@ You can specify the following environment variables via `.env` file or command l
 
 ### Lint the files
 ```bash
-yarn run lint
+npm run lint
 ```
 
 ### Build the app for production
