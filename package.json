@@ -23,12 +23,12 @@
   },
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "^2.4.0",
-    "@lhncbc/ucum-lhc": "^5.0.0",
+    "@lhncbc/ucum-lhc": "6.0.2",
     "@onto-med/top-api": "^0.10.0",
-    "@quasar/extras": "^1.16.8",
+    "@quasar/extras": "^1.16.12",
     "@types/papaparse": "^5.3.14",
     "@zip.js/zip.js": "^2.7.34",
-    "ag-grid-vue3": "^31.0.3",
+    "ag-grid-vue3": "32.0.2",
     "core-js": "^3.33.2",
     "papaparse": "^5.4.1",
     "pinia": "^2.1.7",
@@ -36,7 +36,8 @@
     "uuid": "^9.0.1",
     "vue": "^3.3.8",
     "vue-i18n": "^9.7.0",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "fork-ts-checker-webpack-plugin": ">=6.5.3"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",

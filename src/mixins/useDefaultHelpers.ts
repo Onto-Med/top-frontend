@@ -16,7 +16,7 @@ export default function (this: void) {
      * @returns The resulting TOP entity ID.
      */
     toValidId: (input: string | number | null): string => {
-      return input ? (input as string).replace(/[^\w\d\-]/ig, '_').toLowerCase() : ''
+      return input ? (input as string).replace(/[^\w\d\-]/ig, '_').toLowerCase() : '';
     }
-  }
+  };
 }
