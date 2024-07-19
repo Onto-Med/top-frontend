@@ -59,7 +59,8 @@
 				"sdras.vue-vscode-snippets",
 				"mutantdino.resourcemonitor",
 				"Gruntfuggly.todo-tree",
-				"waderyan.gitblame"
+				"waderyan.gitblame",
+				"fill-labs.dependi"
 			]
 		}
 	}
