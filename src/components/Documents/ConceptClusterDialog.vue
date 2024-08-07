@@ -47,6 +47,14 @@
                 no-caps
                 @click="confirmDeletePipeline()"
               />
+              <q-btn
+                :label="t('editThing', { thing: t('pipeline') })"
+                :disable="!isAdmin"
+                icon="settings"
+                color="orange"
+                no-caps
+                @click="configurePipeline()"
+              />
             </q-btn-group>
           </q-step>
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
@@ -118,6 +126,9 @@ import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { languages } from 'src/config'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
+import { storeToRefs } from 'pinia'
+import { useEntity } from 'src/pinia/entity'
+import PipelineConfigForm from 'components/Documents/PipelineConfigForm.vue'
 
 const props = defineProps({
   dataSource: {
@@ -132,6 +143,8 @@ const { t, te } = useI18n()
 const { dialogRef, onDialogHide } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const $q = useQuasar()
+const entityStore = useEntity()
+const { isAdmin } = storeToRefs(entityStore)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
 const language = ref<string | undefined>()
@@ -344,6 +357,16 @@ function loadConceptGraphs() {
     })
     .then(loadClusterPipeline)
     .catch((e: Error) => renderError(e))
+}
+
+function configurePipeline() {
+  $q.dialog({
+    component: PipelineConfigForm,
+    componentProps: {
+    }
+  }).onOk(() => {
+    console.log('Ok config')
+  })
 }
 
 interface ConceptGraphObject {

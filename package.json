@@ -30,14 +30,15 @@
     "@zip.js/zip.js": "^2.7.34",
     "ag-grid-vue3": "32.0.2",
     "core-js": "^3.33.2",
+    "fork-ts-checker-webpack-plugin": ">=6.5.3",
+    "json-editor-vue": "^0.15.1",
     "papaparse": "^5.4.1",
     "pinia": "^2.1.7",
     "quasar": "^2.14.0",
     "uuid": "^9.0.1",
     "vue": "^3.3.8",
     "vue-i18n": "^9.7.0",
-    "vue-router": "^4.2.5",
-    "fork-ts-checker-webpack-plugin": ">=6.5.3"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",

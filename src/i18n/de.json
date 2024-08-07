@@ -542,6 +542,7 @@
     "confirmPublish": "Durch die Veröffentlichung der ausgewählten Konzept-Cluster werden alle zuvor veröffentlichten Cluster entfernt. Möchten Sie fortfahren?"
   },
   "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
+  "configurationOfPipeline": "Pipeline Konfiguration",
   "clusterReview": "Cluster-Review|Cluster-Reviews",
   "preProcessing": "Vorverarbeitung",
   "status": "Status",
