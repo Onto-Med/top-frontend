@@ -175,6 +175,8 @@ const graphColumns = computed(
     ] as QTableProps['columns']
 )
 
+const pipelineJsonConfig = ref('')
+
 onMounted(() => {
   loadGraphPipeline()
 })
@@ -293,9 +295,15 @@ function confirmPublishClusters() {
 }
 
 async function startPipeline() {
-  return conceptPipelineApi
-    ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
-    .then(loadGraphPipeline)
+  if (pipelineJsonConfig.value != '') {
+    return conceptPipelineApi
+      ?.startConceptGraphPipelineWithJson(pipelineJsonConfig.value)
+      .then(loadGraphPipeline)
+  } else {
+    return conceptPipelineApi
+      ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
+      .then(loadGraphPipeline)
+  }
 }
 
 async function deletePipeline() {
@@ -360,12 +368,19 @@ function loadConceptGraphs() {
 }
 
 function configurePipeline() {
+  let pipelineIdSubmit = undefined
+  if (isGraphPipelineFinished.value) pipelineIdSubmit = graphPipeline.value?.pipelineId
   $q.dialog({
     component: PipelineConfigForm,
     componentProps: {
-    }
-  }).onOk(() => {
-    console.log('Ok config')
+      pipelineId: pipelineIdSubmit
+    },
+  }).onOk((jsonConfig: string) => {
+    pipelineJsonConfig.value = jsonConfig
+    console.log(pipelineJsonConfig.value)
+  }).onCancel(() => {
+    //ToDo: need something here to be done on Cancel?
+    console.log(pipelineJsonConfig.value)
   })
 }
 
