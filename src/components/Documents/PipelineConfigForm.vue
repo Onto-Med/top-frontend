@@ -30,17 +30,21 @@ import { inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ConceptPipelineApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { useDialogPluginComponent } from 'quasar'
+import { Notify, useDialogPluginComponent } from 'quasar'
 
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const { t } = useI18n()
-const jsonConfig = ref<string>('{ }')
+const jsonConfig = ref<object|string>('')
 const props = defineProps({
   pipelineId: {
     type: String,
     default: undefined
+  },
+  savedConfig: {
+    type: String,
+    default: ''
   }
 })
 const pipelineConfigError = ref(false)
@@ -50,18 +54,22 @@ onMounted(() => {
 })
 
 function loadConfig() {
-  //ToDo: as i18n
-  let errStr = 'Couldn\'t find configuration.\n' +
-    'Please refer to the `concept-graphs-api` documentation on how to write your own.\n' +
-    'Else default values will be used.'
+  let errStr = t('conceptCluster.configurationGetError')
+  let defaultConfig = props.pipelineId === undefined
   pipelineConfigError.value = true
   conceptPipelineApi?.getConceptGraphPipelineConfiguration(props.pipelineId)
     .then((r) => {
-      if (!r.data || r.data.trim() === '' || r.data.trim() === '{}') {
+      //ToDo: should be ResponseEntity<String> but is parsed (automatically?) as Object/JSON?
+      if (!r.data || r.data.length === 0) {
         jsonConfig.value = errStr
       } else {
+        if (defaultConfig && !(props.savedConfig != '')) Notify.create({ 'message': t('conceptCluster.configurationGetDefaultWarning') , 'type': 'warning' })
         jsonConfig.value = r.data
         pipelineConfigError.value = false
+      }
+      if (props.savedConfig != '') {
+        Notify.create({ 'message': t('conceptCluster.configurationGetSavedWarning'), 'type': 'warning' })
+        jsonConfig.value = props.savedConfig
       }
     })
     .catch((e: Error) => {

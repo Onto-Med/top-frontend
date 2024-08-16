@@ -539,7 +539,10 @@
     "preProcessingDescription": "Um Konzeptcluster für eine Datenquelle zu generieren, müssen die in dieser Datenquelle enthaltenen Dokumente mithilfe einer Conceptgraph Pipeline vorverarbeitet werden. Abhängig von der Anzahl der Dokumente kann diese Pipeline mehrere Minuten oder bis zu ein paar Stunden dauern. Der Status wird unten aufgeführt. Es kann nur eine Pipeline für eine Datenquelle geben, was bedeutet, dass durch einen Neustart der Pipeline alle vorhandenen Konzeptcluster gelöscht werden!\nSobald die Vorverarbeitung abgeschlossen ist, können Sie zum nächsten Schritt navigieren und relevante Cluster auswählen, um sie den Benutzern zum Abrufen von Dokumenten zur Verfügung zu stellen.",
     "confirmStart": "Durch das Starten der Vorverarbeitungspipeline werden alle vorhandenen Konzeptcluster für diese Datenquelle gelöscht. Möchten Sie fortfahren?",
     "confirmDelete": "Möchten Sie diese Pipeline und alle aus dieser Datenquelle abgeleiteten Konzeptcluster wirklich löschen?",
-    "confirmPublish": "Durch die Veröffentlichung der ausgewählten Konzept-Cluster werden alle zuvor veröffentlichten Cluster entfernt. Möchten Sie fortfahren?"
+    "confirmPublish": "Durch die Veröffentlichung der ausgewählten Konzept-Cluster werden alle zuvor veröffentlichten Cluster entfernt. Möchten Sie fortfahren?",
+    "configurationGetError": "Konnte keine entsprechende Kopnfiguration finden.\nFür eine Dokumentation, wie eine eigene geschrieben werden kann, bitte bei `concept-graphs-api` nachschauen.\nAndernfalls werden Standard-Werte verwendet.",
+    "configurationGetSavedWarning": "Lade die Konfiguration der letzten Bearbeitung.",
+    "configurationGetDefaultWarning": "Benutze Standard-Konfiguration."
   },
   "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
   "configurationOfPipeline": "Pipeline Konfiguration",

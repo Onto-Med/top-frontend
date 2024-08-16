@@ -175,7 +175,7 @@ const graphColumns = computed(
     ] as QTableProps['columns']
 )
 
-const pipelineJsonConfig = ref('')
+const pipelineJsonConfig = ref<string>('')
 
 onMounted(() => {
   loadGraphPipeline()
@@ -296,8 +296,12 @@ function confirmPublishClusters() {
 
 async function startPipeline() {
   if (pipelineJsonConfig.value != '') {
+    //ToDo: right now pipelineJsonConfig.value is only the 'config' entry; need to embed this into the following object
+    // {'name': ... 'language': ..., 'skip_present': ..., 'return_statistics': ...,
+    //  'config': pipelineJsonConfig.value, 'document_server': FROM_DATA_ADAPTER}
+    let jsonBody = `{"name": "${props.dataSource?.id}", "language": "${language.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`
     return conceptPipelineApi
-      ?.startConceptGraphPipelineWithJson(pipelineJsonConfig.value)
+      ?.startConceptGraphPipelineWithJson(jsonBody)
       .then(loadGraphPipeline)
   } else {
     return conceptPipelineApi
@@ -370,17 +374,17 @@ function loadConceptGraphs() {
 function configurePipeline() {
   let pipelineIdSubmit = undefined
   if (isGraphPipelineFinished.value) pipelineIdSubmit = graphPipeline.value?.pipelineId
+  //ToDo: pipelineJsonConfig is not persisted between closing/opening ConceptClusterDialog
   $q.dialog({
     component: PipelineConfigForm,
     componentProps: {
-      pipelineId: pipelineIdSubmit
+      pipelineId: pipelineIdSubmit,
+      savedConfig: pipelineJsonConfig.value
     },
   }).onOk((jsonConfig: string) => {
     pipelineJsonConfig.value = jsonConfig
-    console.log(pipelineJsonConfig.value)
   }).onCancel(() => {
     //ToDo: need something here to be done on Cancel?
-    console.log(pipelineJsonConfig.value)
   })
 }
 
