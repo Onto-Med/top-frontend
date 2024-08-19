@@ -189,6 +189,8 @@
   "thingSaved": "{thing} has been saved",
   "deleteThing": "Delete {thing}",
   "thingDeleted": "{thing} has been deleted",
+  "stopThing": "Stop {thing}",
+  "thingStopped": "{thing} has been stopped",
   "editThing": "Edit {thing}",
   "help": "Help",
   "version": "Version|Versions",
@@ -542,7 +544,9 @@
     "confirmPublish": "Publishing the selected concept clusters will remove all previously published clusters. Do you want to continue?",
     "configurationGetError": "Couldn't find configuration.\nPlease refer to the `concept-graphs-api` documentation on how to write your own.\nElse default values will be used.",
     "configurationGetSavedWarning": "Using saved configuration from last edit.",
-    "configurationGetDefaultWarning": "Showing default configuration file."
+    "configurationGetDefaultWarning": "Showing default configuration file ({lang}).",
+    "confirmStop": "Do you really want to stop the pipeline? If so, you can skip the steps that were already successfully done later.",
+    "skipPresent": "Skip already successfully run steps?"
   },
   "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
   "configurationOfPipeline": "Pipeline configuration",

@@ -189,6 +189,8 @@
   "thingSaved": "{thing} wurde gespeichert",
   "deleteThing": "{thing} löschen",
   "thingDeleted": "{thing} wurde gelöscht",
+  "stopThing": "Stoppe {thing}",
+  "thingStopped": "{thing} wurde gestoppt",
   "editThing": "{thing} bearbeiten",
   "help": "Hilfe",
   "version": "Version|Versionen",
@@ -542,7 +544,9 @@
     "confirmPublish": "Durch die Veröffentlichung der ausgewählten Konzept-Cluster werden alle zuvor veröffentlichten Cluster entfernt. Möchten Sie fortfahren?",
     "configurationGetError": "Konnte keine entsprechende Kopnfiguration finden.\nFür eine Dokumentation, wie eine eigene geschrieben werden kann, bitte bei `concept-graphs-api` nachschauen.\nAndernfalls werden Standard-Werte verwendet.",
     "configurationGetSavedWarning": "Lade die Konfiguration der letzten Bearbeitung.",
-    "configurationGetDefaultWarning": "Benutze Standard-Konfiguration."
+    "configurationGetDefaultWarning": "Benutze Standard-Konfiguration ({lang}).",
+    "confirmStop": "Wollen Sie die Prozessierung wirklich stoppen? Wenn ja, können Sie die erfolgreich durchgeführten Schritte später überspringen.",
+    "skipPresent": "Überspringen von vorhandenden erfolgreichen Prozessierungs-Schritten?"
   },
   "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
   "configurationOfPipeline": "Pipeline Konfiguration",

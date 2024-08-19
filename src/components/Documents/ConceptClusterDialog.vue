@@ -22,6 +22,13 @@
               <q-icon v-else-if="isGraphPipelineFailed" name="bolt" color="red" />
               <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
             </p>
+            <q-checkbox
+              v-model="skipPresent"
+              size="lg"
+              :label="t('conceptCluster.skipPresent')"
+              checked-icon="task_alt"
+              unchecked-icon="highlight_off"
+            />
             <q-select
               v-model="language"
               :options="languages"
@@ -33,13 +40,14 @@
             <q-btn-group>
               <q-btn
                 :label="t('startThing', { thing: t('pipeline') })"
-                :disable="!language"
+                :disable="!language || isGraphPipelineRunning"
                 icon="play_arrow"
                 color="secondary"
                 no-caps
                 @click="confirmStartPipeline()"
               />
               <q-btn
+                v-if="!isGraphPipelineRunning"
                 :label="t('deleteThing', { thing: t('pipeline') })"
                 :disable="!graphPipeline"
                 icon="delete"
@@ -48,8 +56,16 @@
                 @click="confirmDeletePipeline()"
               />
               <q-btn
+                v-if="isGraphPipelineRunning"
+                :label="t('stopThing', { thing: t('pipeline') })"
+                icon="stop"
+                color="red"
+                no-caps
+                @click="confirmStopPipeline()"
+              />
+              <q-btn
                 :label="t('editThing', { thing: t('pipeline') })"
-                :disable="!isAdmin"
+                :disable="!isAdmin || isGraphPipelineRunning || !language"
                 icon="settings"
                 color="orange"
                 no-caps
@@ -119,10 +135,10 @@ import {
   PipelineResponse,
   PipelineResponseStatus
 } from '@onto-med/top-api'
-import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
+import { Notify, QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import { languages } from 'src/config'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
@@ -156,11 +172,14 @@ const conceptGraphs = ref<ConceptGraphObject[]>([])
 const selectedGraphs = ref<ConceptGraphObject[]>([])
 const graphPipelineInterval = ref<number>()
 const clusterPipelineInterval = ref<number>()
+const skipPresent = ref<boolean>(true)
 
 const isGraphPipelineFinished = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Successful)
 const isGraphPipelineFailed = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Failed)
+const isGraphPipelineRunning = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Running)
 const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
 const isClusterPipelineFailed = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Failed)
+// const isClusterPipelineRunning = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Running)
 
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
@@ -185,6 +204,9 @@ onUnmounted(() => {
   window.clearInterval(graphPipelineInterval.value)
   window.clearInterval(clusterPipelineInterval.value)
 })
+
+//ToDo: maybe don't erase config on language switch when a manual save was already commited?
+watch(language, () => {pipelineJsonConfig.value = ''})
 
 function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
@@ -261,6 +283,17 @@ function confirmStartPipeline() {
   })
 }
 
+function confirmStopPipeline() {
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('conceptCluster.confirmStop')
+    }
+  }).onOk(() => {
+    stopPipeline().catch((e: Error) => renderError(e))
+  })
+}
+
 function confirmDeletePipeline() {
   $q.dialog({
     component: Dialog,
@@ -296,10 +329,8 @@ function confirmPublishClusters() {
 
 async function startPipeline() {
   if (pipelineJsonConfig.value != '') {
-    //ToDo: right now pipelineJsonConfig.value is only the 'config' entry; need to embed this into the following object
-    // {'name': ... 'language': ..., 'skip_present': ..., 'return_statistics': ...,
-    //  'config': pipelineJsonConfig.value, 'document_server': FROM_DATA_ADAPTER}
-    let jsonBody = `{"name": "${props.dataSource?.id}", "language": "${language.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`
+    let jsonBody = (`{"name": "${props.dataSource?.id}", "language": "${language.value}", "return_statistics": "false",
+     "skip_present": "${skipPresent.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`)
     return conceptPipelineApi
       ?.startConceptGraphPipelineWithJson(jsonBody)
       .then(loadGraphPipeline)
@@ -316,6 +347,12 @@ async function deletePipeline() {
   return conceptPipelineApi
     ?.deleteConceptPipelineById(props.dataSource.id)
     .then(() => (graphPipeline.value = undefined))
+}
+
+// eslint-disable-next-line @typescript-eslint/require-await
+async function stopPipeline() {
+  Notify.create({ 'message': 'Not Implemented!', 'type': 'error' })
+  //ToDo!
 }
 
 function getSelectedRowsString() {
@@ -372,6 +409,8 @@ function loadConceptGraphs() {
 }
 
 function configurePipeline() {
+  // pipelineId only gets submitted to 'configure dialog' (and therefore a configuration for it is loaded)
+  // when the relevant 'graphPipeline' is finished, else a language default configuration is loaded
   let pipelineIdSubmit = undefined
   if (isGraphPipelineFinished.value) pipelineIdSubmit = graphPipeline.value?.pipelineId
   //ToDo: pipelineJsonConfig is not persisted between closing/opening ConceptClusterDialog
@@ -379,7 +418,8 @@ function configurePipeline() {
     component: PipelineConfigForm,
     componentProps: {
       pipelineId: pipelineIdSubmit,
-      savedConfig: pipelineJsonConfig.value
+      savedConfig: pipelineJsonConfig.value,
+      language: language.value
     },
   }).onOk((jsonConfig: string) => {
     pipelineJsonConfig.value = jsonConfig

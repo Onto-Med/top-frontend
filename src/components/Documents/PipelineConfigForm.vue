@@ -45,6 +45,10 @@ const props = defineProps({
   savedConfig: {
     type: String,
     default: ''
+  },
+  language: {
+    type: String,
+    default: 'en'
   }
 })
 const pipelineConfigError = ref(false)
@@ -57,13 +61,16 @@ function loadConfig() {
   let errStr = t('conceptCluster.configurationGetError')
   let defaultConfig = props.pipelineId === undefined
   pipelineConfigError.value = true
-  conceptPipelineApi?.getConceptGraphPipelineConfiguration(props.pipelineId)
+  conceptPipelineApi?.getConceptGraphPipelineConfiguration(props.pipelineId, props.language)
     .then((r) => {
       //ToDo: should be ResponseEntity<String> but is parsed (automatically?) as Object/JSON?
       if (!r.data || r.data.length === 0) {
         jsonConfig.value = errStr
       } else {
-        if (defaultConfig && !(props.savedConfig != '')) Notify.create({ 'message': t('conceptCluster.configurationGetDefaultWarning') , 'type': 'warning' })
+        if (defaultConfig && !(props.savedConfig != '')) Notify.create(
+          { 'message': t('conceptCluster.configurationGetDefaultWarning',
+          { lang: t(props.language) }) , 'type': 'warning' }
+        )
         jsonConfig.value = r.data
         pipelineConfigError.value = false
       }
