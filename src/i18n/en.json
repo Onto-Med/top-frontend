@@ -558,6 +558,7 @@
   "finish": "Finish",
   "continue": "Continue",
   "successful": "Successful",
+  "stopped": "Stopping",
   "label": "Label|Labels",
   "publishThing": "Publish {thing}",
   "node": "Node|Nodes",

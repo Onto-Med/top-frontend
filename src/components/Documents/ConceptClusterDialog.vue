@@ -18,9 +18,20 @@
             </p>
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
-              <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
-              <q-icon v-else-if="isGraphPipelineFailed" name="bolt" color="red" />
-              <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
+<!--              <span v-if="graphPipelineInterval">-->
+                <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
+<!--              </span>-->
+<!--              <span v-else-if="isGraphPipelineFailed">-->
+<!--                <q-icon name="bolt" color="red" />-->
+                <q-icon v-else-if="isGraphPipelineFailed" size="xs" name="help" color="red">
+                  <q-tooltip :delay="250">
+                    {{ graphPipelineStatusDetails }}
+                  </q-tooltip>
+                </q-icon>
+<!--              </span>-->
+<!--              <span v-else-if="isGraphPipelineFinished">-->
+                <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
+<!--              </span>-->
             </p>
             <q-checkbox
               v-model="skipPresent"
@@ -40,7 +51,7 @@
             <q-btn-group>
               <q-btn
                 :label="t('startThing', { thing: t('pipeline') })"
-                :disable="!language || isGraphPipelineRunning"
+                :disable="!language || isGraphPipelineRunning || isGraphPipelineStopping"
                 icon="play_arrow"
                 color="secondary"
                 no-caps
@@ -49,7 +60,7 @@
               <q-btn
                 v-if="!isGraphPipelineRunning"
                 :label="t('deleteThing', { thing: t('pipeline') })"
-                :disable="!graphPipeline"
+                :disable="!graphPipeline || isGraphPipelineStopping"
                 icon="delete"
                 color="red"
                 no-caps
@@ -131,6 +142,8 @@ import {
   ConceptCluster,
   ConceptGraphNodes,
   ConceptGraphPipeline,
+  ConceptGraphPipelineStatus,
+  ConceptGraphPipelineStatusEnum,
   DataSource,
   PipelineResponse,
   PipelineResponseStatus
@@ -177,12 +190,14 @@ const skipPresent = ref<boolean>(true)
 const isGraphPipelineFinished = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Successful)
 const isGraphPipelineFailed = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Failed)
 const isGraphPipelineRunning = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Running)
+const isGraphPipelineStopping = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Stopped)
 const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
 const isClusterPipelineFailed = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Failed)
 // const isClusterPipelineRunning = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Running)
 
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
+const graphPipelineStatusDetails = computed(() => statusDetailsToString(graphPipeline.value?.steps))
 
 const graphColumns = computed(
   () =>
@@ -212,6 +227,16 @@ function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
 }
 
+function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
+  let returnString = 'Unfinished steps: '
+  steps
+    ?.filter((step: ConceptGraphPipelineStatus) => {return step.status != ConceptGraphPipelineStatusEnum.Finished})
+    .forEach((step: ConceptGraphPipelineStatus) => {
+      returnString += '\"' + step.name + '\", '
+    })
+  return returnString.slice(0, returnString.length - 2)
+}
+
 function loadGraphPipeline() {
   conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
@@ -228,7 +253,7 @@ function loadGraphPipeline() {
       graphPipeline.value = r.data
     })
     .then(() => {
-      if (graphPipeline.value?.status === PipelineResponseStatus.Running)
+      if (graphPipeline.value?.status === PipelineResponseStatus.Running || graphPipeline.value?.status === PipelineResponseStatus.Stopped)
         graphPipelineInterval.value = window.setTimeout(loadGraphPipeline, 5000)
     })
     .catch((e: Error) => {
@@ -351,8 +376,11 @@ async function deletePipeline() {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 async function stopPipeline() {
-  Notify.create({ 'message': 'Not Implemented!', 'type': 'error' })
-  //ToDo!
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
+  return conceptPipelineApi
+    ?.stopConceptGraphPipeline(props.dataSource.id)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    .then(() => Notify.create({ 'message': 'Stopping Pipeline', 'type': 'warning' }))
 }
 
 function getSelectedRowsString() {
@@ -412,6 +440,7 @@ function configurePipeline() {
   // pipelineId only gets submitted to 'configure dialog' (and therefore a configuration for it is loaded)
   // when the relevant 'graphPipeline' is finished, else a language default configuration is loaded
   let pipelineIdSubmit = undefined
+  //ToDo: config of an unfinished pipeline is not loaded with this setup
   if (isGraphPipelineFinished.value) pipelineIdSubmit = graphPipeline.value?.pipelineId
   //ToDo: pipelineJsonConfig is not persisted between closing/opening ConceptClusterDialog
   $q.dialog({

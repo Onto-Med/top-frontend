@@ -12,6 +12,7 @@
             <q-toolbar class="bg-secondary text-white">
               <q-toolbar-title>
                 {{ t('configurationOfPipeline') }}
+                <q-btn flat round dense icon="download" @click="downloadConfig"/>
               </q-toolbar-title>
               <div class="q-gutter-sm">
                 <q-btn flat round dense icon="done" @click="saveConfig" />
@@ -94,6 +95,11 @@ function saveConfig() {
 function closeConfig() {
   //ToDo: warning pop up if changes were detected?
   onDialogCancel()
+}
+
+function downloadConfig() {
+  //ToDo!
+  Notify.create({ 'message': 'Not yet implemented.', 'type': 'negative' })
 }
 </script>
 
