@@ -18,20 +18,13 @@
             </p>
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
-<!--              <span v-if="graphPipelineInterval">-->
                 <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
-<!--              </span>-->
-<!--              <span v-else-if="isGraphPipelineFailed">-->
-<!--                <q-icon name="bolt" color="red" />-->
                 <q-icon v-else-if="isGraphPipelineFailed" size="xs" name="help" color="red">
                   <q-tooltip :delay="250">
                     {{ graphPipelineStatusDetails }}
                   </q-tooltip>
                 </q-icon>
-<!--              </span>-->
-<!--              <span v-else-if="isGraphPipelineFinished">-->
                 <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
-<!--              </span>-->
             </p>
             <q-checkbox
               v-model="skipPresent"

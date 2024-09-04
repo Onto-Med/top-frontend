@@ -393,6 +393,7 @@
   "updatedAt": "Aktualisiert am {date}",
   "goToThing": "Gehe zu {thing}",
   "downloadDataSet": "Gesamten Datensatz herunterladen",
+  "downloadConfig": "Konfiguration herunterladen",
   "includePrimaryRepositories": "Öffentliche Repositorien einschließen",
   "includePrimaryRepositoriesDescription": "Aktivieren Sie diese Option, um die Entitätssuche auf alle Entitäten in öffentlichen Repositorien zu erweitern.",
   "forkCouldNotBeCreated": "Es konnte kein Fork erstellt werden, da möglicherweise bereits ein aktueller Fork in diesem Repositorium vorhanden ist.",

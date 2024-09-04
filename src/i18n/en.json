@@ -393,6 +393,7 @@
   "updatedAt": "Updated at {date}",
   "goToThing": "Go to {thing}",
   "downloadDataSet": "Download whole data set",
+  "downloadConfig": "Download configuration",
   "includePrimaryRepositories": "Include public repositories",
   "includePrimaryRepositoriesDescription": "Check this option to expand the entity search to all entities in public repositories.",
   "forkCouldNotBeCreated": "A fork could not be created because there may already be an up-to-date fork in this repository.",
