@@ -49,7 +49,12 @@
                 color="secondary"
                 no-caps
                 @click="confirmStartPipeline()"
-              />
+              >
+                <q-tooltip v-if="!language || isGraphPipelineRunning || isGraphPipelineStopping" :delay="250">
+                  <div v-if="!language"> {{ "Please choose a language first before starting a pipeline." }} </div>
+                  <div v-else> {{ "A pipeline seems to be running or is in the process of being stopped. You can't start a new one at the moment." }} </div>
+                </q-tooltip>
+              </q-btn>
               <q-btn
                 v-if="!isGraphPipelineRunning"
                 :label="t('deleteThing', { thing: t('pipeline') })"
@@ -74,7 +79,13 @@
                 color="orange"
                 no-caps
                 @click="configurePipeline()"
-              />
+              >
+                <q-tooltip v-if="!isAdmin || isGraphPipelineRunning || !language" :delay="250">
+                  <div v-if="!language"> {{ "Please choose a language first before starting a pipeline." }} </div>
+                  <div v-else-if="!isAdmin"> {{ "Only administrators can edit a pipeline's configuration." }} </div>
+                  <div v-else> {{ "A pipeline seems to be running. You can't edit its configuration now." }} </div>
+                </q-tooltip>
+              </q-btn>
             </q-btn-group>
           </q-step>
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
