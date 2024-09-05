@@ -19,11 +19,7 @@
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
                 <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
-                <q-icon v-else-if="isGraphPipelineFailed" size="xs" name="help" color="red">
-                  <q-tooltip :delay="250">
-                    {{ graphPipelineStatusDetails }}
-                  </q-tooltip>
-                </q-icon>
+                <q-icon v-else-if="isGraphPipelineFailed" :title="graphPipelineStatusDetails" size="xs" name="help" color="red" />
                 <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
             </p>
             <q-checkbox
@@ -51,8 +47,8 @@
                 @click="confirmStartPipeline()"
               >
                 <q-tooltip v-if="!language || isGraphPipelineRunning || isGraphPipelineStopping" :delay="250">
-                  <div v-if="!language"> {{ "Please choose a language first before starting a pipeline." }} </div>
-                  <div v-else> {{ "A pipeline seems to be running or is in the process of being stopped. You can't start a new one at the moment." }} </div>
+                  <div v-if="!language"> {{ t('conceptCluster.tooltips.noLanguage') + " " + t('conceptCluster.tooltips.starting') }} </div>
+                  <div v-else> {{ t('conceptCluster.tooltips.running', {'optional': t('pipeline') + " "}) + "/" + t('conceptCluster.tooltips.stopped', {'optional': ""}) + ". " + t('conceptCluster.tooltips.cantStart') }} </div>
                 </q-tooltip>
               </q-btn>
               <q-btn
@@ -81,9 +77,9 @@
                 @click="configurePipeline()"
               >
                 <q-tooltip v-if="!isAdmin || isGraphPipelineRunning || !language" :delay="250">
-                  <div v-if="!language"> {{ "Please choose a language first before starting a pipeline." }} </div>
-                  <div v-else-if="!isAdmin"> {{ "Only administrators can edit a pipeline's configuration." }} </div>
-                  <div v-else> {{ "A pipeline seems to be running. You can't edit its configuration now." }} </div>
+                  <div v-if="!language"> {{ t('conceptCluster.tooltips.noLanguage') + " " + t('conceptCluster.tooltips.editing') }} </div>
+                  <div v-else-if="!isAdmin"> {{ t('conceptCluster.tooltips.onlyAdmins') + " " + t('conceptCluster.tooltips.editing') }} </div>
+                  <div v-else> {{ t('conceptCluster.tooltips.running', {'optional': t('pipeline') + " "}) + ". " + t('conceptCluster.tooltips.cantEdit') }} </div>
                 </q-tooltip>
               </q-btn>
             </q-btn-group>

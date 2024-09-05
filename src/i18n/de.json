@@ -547,7 +547,17 @@
     "configurationGetSavedWarning": "Lade die Konfiguration der letzten Bearbeitung.",
     "configurationGetDefaultWarning": "Benutze Standard-Konfiguration ({lang}).",
     "confirmStop": "Wollen Sie die Prozessierung wirklich stoppen? Wenn ja, können Sie die erfolgreich durchgeführten Schritte später überspringen.",
-    "skipPresent": "Überspringen von vorhandenden erfolgreichen Prozessierungs-Schritten?"
+    "skipPresent": "Überspringen von vorhandenden erfolgreichen Prozessierungs-Schritten?",
+    "tooltips": {
+      "noLanguage": "Sie müssen zuerste eine Sprache auswählen, um dann",
+      "onlyAdmins": "Nur Administratoren sind berechtigt,",
+      "running": "{optional}scheint derzeit zu laufen",
+      "stopped": "{optional}wird gerade gestoppt",
+      "editing": "eine Pipeline zu konfigurieren.",
+      "starting": "eine Pipeline zu starten.",
+      "cantStart": "Sie können keine neue für diese Datenquelle starten.",
+      "cantEdit": "Sie können derzeit die Konfiguration nicht ändern."
+    }
   },
   "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
   "configurationOfPipeline": "Pipeline Konfiguration",

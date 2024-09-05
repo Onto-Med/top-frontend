@@ -547,7 +547,17 @@
     "configurationGetSavedWarning": "Using saved configuration from last edit.",
     "configurationGetDefaultWarning": "Showing default configuration file ({lang}).",
     "confirmStop": "Do you really want to stop the pipeline? If so, you can skip the steps that were already successfully done later.",
-    "skipPresent": "Skip already successfully run steps?"
+    "skipPresent": "Skip already successfully run steps?",
+    "tooltips": {
+      "noLanguage": "You have to choose a language first before you are allowed",
+      "onlyAdmins": "Only administrators are allowed",
+      "running": "{optional}seems to be running",
+      "stopped": "{optional}is in the process of being stopped",
+      "editing": "to edit a pipeline's configuration.",
+      "starting": "to start a pipeline.",
+      "cantStart": "You can't start a new one for this data source at the moment.",
+      "cantEdit": "You can't edit its configuration now."
+    }
   },
   "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
   "configurationOfPipeline": "Pipeline configuration",

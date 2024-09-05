@@ -12,11 +12,7 @@
             <q-toolbar class="bg-secondary text-white">
               <q-toolbar-title>
                 {{ t('configurationOfPipeline') }}
-                <q-btn flat round dense icon="download" @click="downloadConfig">
-                  <q-tooltip :delay="500">
-                    {{ t('downloadConfig') }}
-                  </q-tooltip>
-                </q-btn>
+                <q-btn flat round dense icon="download" :title="t('downloadConfig')" @click="downloadConfig" />
               </q-toolbar-title>
               <div class="q-gutter-sm">
                 <q-btn flat round dense icon="done" @click="saveConfig" />
