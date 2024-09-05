@@ -551,7 +551,7 @@
     "tooltips": {
       "noLanguage": "Sie müssen zuerste eine Sprache auswählen, um dann",
       "onlyAdmins": "Nur Administratoren sind berechtigt,",
-      "running": "{optional}scheint derzeit zu laufen",
+      "running": "{optional}scheint im Moment zu laufen",
       "stopped": "{optional}wird gerade gestoppt",
       "editing": "eine Pipeline zu konfigurieren.",
       "starting": "eine Pipeline zu starten.",

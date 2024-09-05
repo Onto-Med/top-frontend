@@ -41,16 +41,12 @@
               <q-btn
                 :label="t('startThing', { thing: t('pipeline') })"
                 :disable="!language || isGraphPipelineRunning || isGraphPipelineStopping"
+                :title="startPipelineButtonTitle"
                 icon="play_arrow"
                 color="secondary"
                 no-caps
                 @click="confirmStartPipeline()"
-              >
-                <q-tooltip v-if="!language || isGraphPipelineRunning || isGraphPipelineStopping" :delay="250">
-                  <div v-if="!language"> {{ t('conceptCluster.tooltips.noLanguage') + " " + t('conceptCluster.tooltips.starting') }} </div>
-                  <div v-else> {{ t('conceptCluster.tooltips.running', {'optional': t('pipeline') + " "}) + "/" + t('conceptCluster.tooltips.stopped', {'optional': ""}) + ". " + t('conceptCluster.tooltips.cantStart') }} </div>
-                </q-tooltip>
-              </q-btn>
+              />
               <q-btn
                 v-if="!isGraphPipelineRunning"
                 :label="t('deleteThing', { thing: t('pipeline') })"
@@ -71,17 +67,12 @@
               <q-btn
                 :label="t('editThing', { thing: t('pipeline') })"
                 :disable="!isAdmin || isGraphPipelineRunning || !language"
+                :title="configPipelineButtonTitle"
                 icon="settings"
                 color="orange"
                 no-caps
                 @click="configurePipeline()"
-              >
-                <q-tooltip v-if="!isAdmin || isGraphPipelineRunning || !language" :delay="250">
-                  <div v-if="!language"> {{ t('conceptCluster.tooltips.noLanguage') + " " + t('conceptCluster.tooltips.editing') }} </div>
-                  <div v-else-if="!isAdmin"> {{ t('conceptCluster.tooltips.onlyAdmins') + " " + t('conceptCluster.tooltips.editing') }} </div>
-                  <div v-else> {{ t('conceptCluster.tooltips.running', {'optional': t('pipeline') + " "}) + ". " + t('conceptCluster.tooltips.cantEdit') }} </div>
-                </q-tooltip>
-              </q-btn>
+              />
             </q-btn-group>
           </q-step>
           <q-step :name="2" :title="t('clusterReview')" icon="rule">
@@ -94,6 +85,7 @@
             </p>
             <q-btn
               no-caps
+              :disable="!isAdmin || isClusterPipelineRunning"
               :label="t('publishThing', { thing: t('concept_cluster', 2) })"
               color="secondary"
               class="q-mb-sm"
@@ -193,7 +185,7 @@ const isGraphPipelineRunning = computed(() => graphPipeline.value?.status === Pi
 const isGraphPipelineStopping = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Stopped)
 const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
 const isClusterPipelineFailed = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Failed)
-// const isClusterPipelineRunning = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Running)
+const isClusterPipelineRunning = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Running)
 
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
@@ -207,6 +199,24 @@ const graphColumns = computed(
       { name: 'edges', field: 'edges', label: t('edge', 2), align: 'left', sortable: true },
       { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true }
     ] as QTableProps['columns']
+)
+
+const configPipelineButtonTitle = computed(
+  () => {
+    if (!language.value) return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.editing')
+    else if (!isAdmin.value) return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.editing')
+    else if (isGraphPipelineRunning.value) return t('conceptCluster.tooltips.running', {'optional': t('pipeline') + ' '}) + '. ' + t('conceptCluster.tooltips.cantEdit')
+    else return ''
+  }
+)
+
+const startPipelineButtonTitle = computed(
+  () => {
+    if (!language.value) return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.starting')
+    else if (!isAdmin.value) return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.starting')
+    else if (isGraphPipelineRunning.value || isGraphPipelineStopping.value) return t('conceptCluster.tooltips.running', {'optional': t('pipeline') + ' '}) + '/' + t('conceptCluster.tooltips.stopped', {'optional': ''}) + '. ' + t('conceptCluster.tooltips.cantStart')
+    else return ''
+  }
 )
 
 const pipelineJsonConfig = ref<string>('')
