@@ -4,7 +4,7 @@
         <q-page-container>
           <q-page style="padding-top: 50px">
             <JsonEditorVue
-              v-model="jsonConfig"
+              v-model="jsonConfig.jsonString"
               v-bind="{/* local props & attrs */}"
             />
           </q-page>
@@ -37,7 +37,11 @@ const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const { t } = useI18n()
-const jsonConfig = ref<object|string>('')
+const jsonConfig = ref<JsonConfigObject>( {
+  jsonString: '',
+  jsonError: t('conceptCluster.configurationGetError'),
+  successful: false
+})
 const props = defineProps({
   pipelineId: {
     type: String,
@@ -52,43 +56,45 @@ const props = defineProps({
     default: 'en'
   }
 })
-const pipelineConfigError = ref(false)
 
 onMounted(() => {
   loadConfig()
 })
 
 function loadConfig() {
-  let errStr = t('conceptCluster.configurationGetError')
   let defaultConfig = props.pipelineId === undefined
-  pipelineConfigError.value = true
   conceptPipelineApi?.getConceptGraphPipelineConfiguration(props.pipelineId, props.language)
     .then((r) => {
       //ToDo: should be ResponseEntity<String> but is parsed (automatically?) as Object/JSON?
       if (!r.data || r.data.length === 0) {
-        jsonConfig.value = errStr
+        jsonConfig.value.jsonString = jsonConfig.value.jsonError
+        jsonConfig.value.successful = false
       } else {
         if (defaultConfig && !(props.savedConfig != '')) Notify.create(
           { 'message': t('conceptCluster.configurationGetDefaultWarning',
           { lang: t(props.language) }) , 'type': 'warning' }
         )
-        jsonConfig.value = r.data
-        pipelineConfigError.value = false
+        jsonConfig.value.jsonString = r.data
+        jsonConfig.value.successful = true
       }
       if (props.savedConfig != '') {
         Notify.create({ 'message': t('conceptCluster.configurationGetSavedWarning'), 'type': 'warning' })
-        jsonConfig.value = props.savedConfig
+        jsonConfig.value.jsonString = props.savedConfig
+        jsonConfig.value.successful = true
       }
     })
     .catch((e: Error) => {
-      jsonConfig.value = errStr
+      jsonConfig.value.jsonString = jsonConfig.value.jsonError
+      jsonConfig.value.successful = false
       renderError(e)
     })
 }
 
 function saveConfig() {
   //ToDo: some sanity check?
-  if (pipelineConfigError.value) jsonConfig.value = ''
+  if (!jsonConfig.value.successful) {
+    jsonConfig.value.jsonString = ''
+  }
   onDialogOK(jsonConfig.value)
 }
 
@@ -100,6 +106,12 @@ function closeConfig() {
 function downloadConfig() {
   //ToDo!
   Notify.create({ 'message': 'Not yet implemented.', 'type': 'negative' })
+}
+
+interface JsonConfigObject {
+  jsonString: string,
+  jsonError: string,
+  successful: boolean
 }
 </script>
 
