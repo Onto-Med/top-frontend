@@ -18,10 +18,17 @@
             </p>
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
-              <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
-              <q-icon v-else-if="isGraphPipelineFailed" name="bolt" color="red" />
-              <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
+                <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
+                <q-icon v-else-if="isGraphPipelineFailed" :title="graphPipelineStatusDetails" size="xs" name="help" color="red" />
+                <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
             </p>
+            <q-checkbox
+              v-model="skipPresent"
+              size="lg"
+              :label="t('conceptCluster.skipPresent')"
+              checked-icon="task_alt"
+              unchecked-icon="highlight_off"
+            />
             <q-select
               v-model="language"
               :options="languages"
@@ -33,19 +40,38 @@
             <q-btn-group>
               <q-btn
                 :label="t('startThing', { thing: t('pipeline') })"
-                :disable="!language"
+                :disable="!language || isGraphPipelineRunning || isGraphPipelineStopping"
+                :title="startPipelineButtonTitle"
                 icon="play_arrow"
                 color="secondary"
                 no-caps
                 @click="confirmStartPipeline()"
               />
               <q-btn
+                v-if="!isGraphPipelineRunning"
                 :label="t('deleteThing', { thing: t('pipeline') })"
-                :disable="!graphPipeline"
+                :disable="!graphPipeline || isGraphPipelineStopping"
                 icon="delete"
                 color="red"
                 no-caps
                 @click="confirmDeletePipeline()"
+              />
+              <q-btn
+                v-if="isGraphPipelineRunning"
+                :label="t('stopThing', { thing: t('pipeline') })"
+                icon="stop"
+                color="red"
+                no-caps
+                @click="confirmStopPipeline()"
+              />
+              <q-btn
+                :label="t('editThing', { thing: t('pipeline') })"
+                :disable="!isAdmin || isGraphPipelineRunning || !language"
+                :title="configPipelineButtonTitle"
+                icon="settings"
+                color="orange"
+                no-caps
+                @click="configurePipeline()"
               />
             </q-btn-group>
           </q-step>
@@ -59,6 +85,7 @@
             </p>
             <q-btn
               no-caps
+              :disable="!isAdmin || isClusterPipelineRunning"
               :label="t('publishThing', { thing: t('concept_cluster', 2) })"
               color="secondary"
               class="q-mb-sm"
@@ -107,17 +134,22 @@ import {
   ConceptCluster,
   ConceptGraphNodes,
   ConceptGraphPipeline,
+  ConceptGraphPipelineStatus,
+  ConceptGraphPipelineStatusEnum,
   DataSource,
   PipelineResponse,
   PipelineResponseStatus
 } from '@onto-med/top-api'
-import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
+import { Notify, QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import { languages } from 'src/config'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
+import { storeToRefs } from 'pinia'
+import { useEntity } from 'src/pinia/entity'
+import PipelineConfigForm from 'components/Documents/PipelineConfigForm.vue'
 
 const props = defineProps({
   dataSource: {
@@ -132,6 +164,8 @@ const { t, te } = useI18n()
 const { dialogRef, onDialogHide } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const $q = useQuasar()
+const entityStore = useEntity()
+const { isAdmin } = storeToRefs(entityStore)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
 const language = ref<string | undefined>()
@@ -143,14 +177,19 @@ const conceptGraphs = ref<ConceptGraphObject[]>([])
 const selectedGraphs = ref<ConceptGraphObject[]>([])
 const graphPipelineInterval = ref<number>()
 const clusterPipelineInterval = ref<number>()
+const skipPresent = ref<boolean>(true)
 
 const isGraphPipelineFinished = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Successful)
 const isGraphPipelineFailed = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Failed)
+const isGraphPipelineRunning = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Running)
+const isGraphPipelineStopping = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Stopped)
 const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
 const isClusterPipelineFailed = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Failed)
+const isClusterPipelineRunning = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Running)
 
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
+const graphPipelineStatusDetails = computed(() => statusDetailsToString(graphPipeline.value?.steps))
 
 const graphColumns = computed(
   () =>
@@ -162,6 +201,26 @@ const graphColumns = computed(
     ] as QTableProps['columns']
 )
 
+const configPipelineButtonTitle = computed(
+  () => {
+    if (!language.value) return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.editing')
+    else if (!isAdmin.value) return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.editing')
+    else if (isGraphPipelineRunning.value) return t('conceptCluster.tooltips.running', {'optional': t('pipeline') + ' '}) + '. ' + t('conceptCluster.tooltips.cantEdit')
+    else return ''
+  }
+)
+
+const startPipelineButtonTitle = computed(
+  () => {
+    if (!language.value) return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.starting')
+    else if (!isAdmin.value) return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.starting')
+    else if (isGraphPipelineRunning.value || isGraphPipelineStopping.value) return t('conceptCluster.tooltips.running', {'optional': t('pipeline') + ' '}) + '/' + t('conceptCluster.tooltips.stopped', {'optional': ''}) + '. ' + t('conceptCluster.tooltips.cantStart')
+    else return ''
+  }
+)
+
+const pipelineJsonConfig = ref<string>('')
+
 onMounted(() => {
   loadGraphPipeline()
 })
@@ -171,8 +230,21 @@ onUnmounted(() => {
   window.clearInterval(clusterPipelineInterval.value)
 })
 
+//ToDo: maybe don't erase config on language switch when a manual save was already commited?
+watch(language, () => {pipelineJsonConfig.value = ''})
+
 function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
+}
+
+function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
+  let returnString = 'Unfinished steps: '
+  steps
+    ?.filter((step: ConceptGraphPipelineStatus) => {return step.status != ConceptGraphPipelineStatusEnum.Finished})
+    .forEach((step: ConceptGraphPipelineStatus) => {
+      returnString += '\"' + step.name + '\", '
+    })
+  return returnString.slice(0, returnString.length - 2)
 }
 
 function loadGraphPipeline() {
@@ -191,7 +263,7 @@ function loadGraphPipeline() {
       graphPipeline.value = r.data
     })
     .then(() => {
-      if (graphPipeline.value?.status === PipelineResponseStatus.Running)
+      if (graphPipeline.value?.status === PipelineResponseStatus.Running || graphPipeline.value?.status === PipelineResponseStatus.Stopped)
         graphPipelineInterval.value = window.setTimeout(loadGraphPipeline, 5000)
     })
     .catch((e: Error) => {
@@ -246,6 +318,17 @@ function confirmStartPipeline() {
   })
 }
 
+function confirmStopPipeline() {
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('conceptCluster.confirmStop')
+    }
+  }).onOk(() => {
+    stopPipeline().catch((e: Error) => renderError(e))
+  })
+}
+
 function confirmDeletePipeline() {
   $q.dialog({
     component: Dialog,
@@ -280,17 +363,32 @@ function confirmPublishClusters() {
 }
 
 async function startPipeline() {
-  return conceptPipelineApi
-    ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
-    .then(loadGraphPipeline)
+  if (pipelineJsonConfig.value != '') {
+    let jsonBody = (`{"name": "${props.dataSource?.id}", "language": "${language.value}", "return_statistics": "false",
+     "skip_present": "${skipPresent.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`)
+    return conceptPipelineApi
+      ?.startConceptGraphPipelineWithJson(jsonBody)
+      .then(loadGraphPipeline)
+  } else {
+    return conceptPipelineApi
+      ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
+      .then(loadGraphPipeline)
+  }
 }
 
 async function deletePipeline() {
+  //ToDo: reload concept clusters in DocumentSearchForm when pipeline is deleted
   window.clearInterval(graphPipelineInterval.value)
   graphPipelineInterval.value = undefined
   return conceptPipelineApi
     ?.deleteConceptPipelineById(props.dataSource.id)
     .then(() => (graphPipeline.value = undefined))
+}
+
+async function stopPipeline() {
+  return conceptPipelineApi
+    ?.stopConceptGraphPipeline(props.dataSource.id)
+    .then(() => Notify.create({ 'message': 'Stopping Pipeline', 'type': 'warning' }))
 }
 
 function getSelectedRowsString() {
@@ -344,6 +442,27 @@ function loadConceptGraphs() {
     })
     .then(loadClusterPipeline)
     .catch((e: Error) => renderError(e))
+}
+
+function configurePipeline() {
+  // pipelineId only gets submitted to 'configure dialog' (and therefore a configuration for it is loaded)
+  // when the relevant 'graphPipeline' is finished, else a language default configuration is loaded
+  let pipelineIdSubmit = undefined
+  //ToDo: config of an unfinished pipeline is not loaded with this setup
+  if (isGraphPipelineFinished.value) pipelineIdSubmit = graphPipeline.value?.pipelineId
+  //ToDo: pipelineJsonConfig is not persisted between closing/opening ConceptClusterDialog
+  $q.dialog({
+    component: PipelineConfigForm,
+    componentProps: {
+      pipelineId: pipelineIdSubmit,
+      savedConfig: pipelineJsonConfig.value,
+      language: language.value
+    },
+  }).onOk((jsonConfig: string) => {
+    pipelineJsonConfig.value = jsonConfig
+  }).onCancel(() => {
+    //ToDo: need something here to be done on Cancel?
+  })
 }
 
 interface ConceptGraphObject {
