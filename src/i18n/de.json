@@ -543,9 +543,10 @@
     "confirmStart": "Durch das Starten der Vorverarbeitungspipeline werden alle vorhandenen Konzeptcluster für diese Datenquelle gelöscht. Möchten Sie fortfahren?",
     "confirmDelete": "Möchten Sie diese Pipeline und alle aus dieser Datenquelle abgeleiteten Konzeptcluster wirklich löschen?",
     "confirmPublish": "Durch die Veröffentlichung der ausgewählten Konzept-Cluster werden alle zuvor veröffentlichten Cluster entfernt. Möchten Sie fortfahren?",
-    "configurationGetError": "Konnte keine entsprechende Kopnfiguration finden.\nFür eine Dokumentation, wie eine eigene geschrieben werden kann, bitte bei `concept-graphs-api` nachschauen.\nAndernfalls werden Standard-Werte verwendet.",
+    "configurationGetError": "Konnte keine entsprechende Kopnfiguration finden: Für eine Dokumentation, wie eine eigene geschrieben werden kann, bitte bei `concept-graphs-api` (https://github.com/Onto-Med/concept-graphs/blob/67a8f9b44029a5dfa7d5a5b4fa4f19263336a426/README.md) nachschauen.\nAndernfalls werden Standard-Werte verwendet.",
     "configurationGetSavedWarning": "Lade die Konfiguration der letzten Bearbeitung.",
     "configurationGetDefaultWarning": "Benutze Standard-Konfiguration ({lang}).",
+    "configurationGetCurrentPipelineWarning": "Lade Konfiguration mit der die aktuelle Pipeline gestartet wurde.",
     "confirmStop": "Wollen Sie die Prozessierung wirklich stoppen? Wenn ja, können Sie die erfolgreich durchgeführten Schritte später überspringen.",
     "skipPresent": "Überspringen von vorhandenden erfolgreichen Prozessierungs-Schritten?",
     "tooltips": {

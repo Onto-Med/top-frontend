@@ -377,6 +377,7 @@ async function startPipeline() {
 }
 
 async function deletePipeline() {
+  //ToDo: reload concept clusters in DocumentSearchForm when pipeline is deleted
   window.clearInterval(graphPipelineInterval.value)
   graphPipelineInterval.value = undefined
   return conceptPipelineApi
@@ -384,12 +385,9 @@ async function deletePipeline() {
     .then(() => (graphPipeline.value = undefined))
 }
 
-// eslint-disable-next-line @typescript-eslint/require-await
 async function stopPipeline() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
   return conceptPipelineApi
     ?.stopConceptGraphPipeline(props.dataSource.id)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     .then(() => Notify.create({ 'message': 'Stopping Pipeline', 'type': 'warning' }))
 }
 

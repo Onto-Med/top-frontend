@@ -15,8 +15,9 @@
                 <q-btn flat round dense icon="download" :title="t('downloadConfig')" @click="downloadConfig" />
               </q-toolbar-title>
               <div class="q-gutter-sm">
-                <q-btn flat round dense icon="done" @click="saveConfig" />
-                <q-btn flat round dense icon="close" @click="closeConfig"/>
+                <q-btn :title="t('save')" flat round dense icon="done" @click="saveConfig" />
+                <q-btn v-if="mayResetConfig && !reset" :title="t('reset')" flat round dense icon="refresh" @click="resetConfig" />
+                <q-btn :title="t('close')" flat round dense icon="close" @click="closeConfig"/>
               </div>
             </q-toolbar>
           </q-page-sticky>
@@ -27,7 +28,7 @@
 
 <script setup lang="ts">
 import JsonEditorVue from 'json-editor-vue'
-import { inject, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ConceptPipelineApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
@@ -39,7 +40,7 @@ const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const { t } = useI18n()
 const jsonConfig = ref<JsonConfigObject>( {
   jsonString: '',
-  jsonError: t('conceptCluster.configurationGetError'),
+  jsonError: { 'error': t('conceptCluster.configurationGetError') },
   successful: false
 })
 const props = defineProps({
@@ -56,28 +57,38 @@ const props = defineProps({
     default: 'en'
   }
 })
-
-onMounted(() => {
-  loadConfig()
+const reset = ref(false)
+const mayResetConfig = computed(() => {
+  return ((props.pipelineId != undefined) && props.savedConfig)
 })
 
-function loadConfig() {
+onMounted(() => {
+  loadConfig(false)
+})
+
+function loadConfig(reset: boolean) {
   let defaultConfig = props.pipelineId === undefined
   conceptPipelineApi?.getConceptGraphPipelineConfiguration(props.pipelineId, props.language)
     .then((r) => {
-      //ToDo: should be ResponseEntity<String> but is parsed (automatically?) as Object/JSON?
       if (!r.data || r.data.length === 0) {
         jsonConfig.value.jsonString = jsonConfig.value.jsonError
         jsonConfig.value.successful = false
       } else {
-        if (defaultConfig && !(props.savedConfig != '')) Notify.create(
-          { 'message': t('conceptCluster.configurationGetDefaultWarning',
-          { lang: t(props.language) }) , 'type': 'warning' }
-        )
+        if (defaultConfig && !(props.savedConfig != '')) {
+          Notify.create({
+              'message': t('conceptCluster.configurationGetDefaultWarning', { lang: t(props.language) }),
+              'type': 'warning'
+            })
+        } else if (!defaultConfig && (props.savedConfig == '' || reset)) {
+          Notify.create({
+            'message': t('conceptCluster.configurationGetCurrentPipelineWarning'),
+            'type': 'warning'
+          })
+        }
         jsonConfig.value.jsonString = r.data
         jsonConfig.value.successful = true
       }
-      if (props.savedConfig != '') {
+      if (props.savedConfig != '' && !reset) {
         Notify.create({ 'message': t('conceptCluster.configurationGetSavedWarning'), 'type': 'warning' })
         jsonConfig.value.jsonString = props.savedConfig
         jsonConfig.value.successful = true
@@ -95,7 +106,7 @@ function saveConfig() {
   if (!jsonConfig.value.successful) {
     jsonConfig.value.jsonString = ''
   }
-  onDialogOK(jsonConfig.value)
+  onDialogOK(jsonConfig.value.jsonString)
 }
 
 function closeConfig() {
@@ -108,9 +119,14 @@ function downloadConfig() {
   Notify.create({ 'message': 'Not yet implemented.', 'type': 'negative' })
 }
 
+function resetConfig() {
+  reset.value = true
+  loadConfig(true)
+}
+
 interface JsonConfigObject {
-  jsonString: string,
-  jsonError: string,
+  jsonString: string|object,
+  jsonError: object,
   successful: boolean
 }
 </script>

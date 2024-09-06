@@ -543,9 +543,10 @@
     "confirmStart": "Starting the pre-processing pipeline will delete any existing concept clusters for this data source. Do you want to continue?",
     "confirmDelete": "Do you really want to delete this pipeline and all the concept clusters derived from this data source?",
     "confirmPublish": "Publishing the selected concept clusters will remove all previously published clusters. Do you want to continue?",
-    "configurationGetError": "Couldn't find configuration.\nPlease refer to the `concept-graphs-api` documentation on how to write your own.\nElse default values will be used.",
+    "configurationGetError": "Couldn't find configuration: Please refer to the `concept-graphs-api` documentation (https://github.com/Onto-Med/concept-graphs/blob/67a8f9b44029a5dfa7d5a5b4fa4f19263336a426/README.md) on how to write your own.\nElse default values will be used.",
     "configurationGetSavedWarning": "Using saved configuration from last edit.",
     "configurationGetDefaultWarning": "Showing default configuration file ({lang}).",
+    "configurationGetCurrentPipelineWarning": "Showing configuration the pipeline was run with.",
     "confirmStop": "Do you really want to stop the pipeline? If so, you can skip the steps that were already successfully done later.",
     "skipPresent": "Skip already successfully run steps?",
     "tooltips": {
