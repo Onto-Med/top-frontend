@@ -25,7 +25,7 @@
               removeable
               @remove-clicked="removeSuperEntity(index)"
               @entity-set="setSuperEntity(index, $event)"
-              @entity-clicked="routeToEntity(superEntity).then(() => onDialogHide())"
+              @entity-clicked="routeToEntity({ repository: entity.repository, ...superEntity }).then(() => onDialogHide())"
             />
           </q-item>
           <q-item>
