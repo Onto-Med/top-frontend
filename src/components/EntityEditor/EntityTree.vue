@@ -122,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
@@ -361,10 +361,7 @@ async function onLazyLoad({ node, done, fail }: LazyLoadDetails) {
 
 async function handleSearch(entity?: Entity) {
   if (!entity) return
-  await entityStore.loadEntity(entity.id).then((e) => {
-    emit('update:selected', e)
-    void nextTick(() => expand(entity))
-  })
+  await entityStore.loadEntity(entity.id).then((e) => emit('update:selected', e))
 }
 
 async function handleDelete(entity: Entity, cascade?: boolean) {
