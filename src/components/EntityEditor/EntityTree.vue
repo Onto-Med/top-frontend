@@ -181,6 +181,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  autoExpand: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity'])
@@ -232,6 +236,7 @@ watch(
 )
 
 function expand(entity: Entity | undefined): void {
+  if (!props.autoExpand) return
   if (!entity || !entity.id || !tree.value?.getNodeByKey(entity.id)) return
   if (!tree.value?.isExpanded(entity.id)) tree.value?.setExpanded(entity.id, true)
 
