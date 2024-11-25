@@ -170,6 +170,10 @@ const props = defineProps({
   importable: {
     type: Boolean,
     default: true
+  },
+  autoExpand: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -222,6 +226,7 @@ watch(
 )
 
 function expand(entity: Entity | undefined): void {
+  if (!props.autoExpand) return
   if (!entity || !entity.id || !tree.value?.getNodeByKey(entity.id)) return
   if (!tree.value?.isExpanded(entity.id)) tree.value?.setExpanded(entity.id, true)
 
