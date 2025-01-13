@@ -576,5 +576,25 @@
   "node": "Knoten|Knoten",
   "edge": "Kante|Kanten",
   "quoteThing": "\"{thing}\"",
-  "phrase": "Term|Terme"
+  "phrase": "Term|Terme",
+  "uploadDataSource": "Alternativ können Sie eine Datei hochladen, um eine Datenquelle für Testzwecke zu erstellen.",
+  "create": "Erstellen",
+  "upload": "Hochladen",
+  "file": "Datei|Dateien",
+  "type": "Typ|Typen",
+  "dataSourceFileTypes": {
+    "csv_encounter": "CSV (Kontakt)",
+    "csv_subject": "CSV (Subjekt)",
+    "csv_subject_resource": "CSV (Subjekt-Ressource)",
+    "fhir": "HL7 FHIR"
+  },
+  "dataSourceFileTypeDescriptions": {
+    "csv_encounter": "Tabellenkopfzeile: encounterId;subjectId;type;startDateTime;endDateTime",
+    "csv_subject": "Tabellenkopfzeile: subjectId;birthDate;sex",
+    "csv_subject_resource": "Tabellenkopfzeile: subjectResourceId;encounterId;subjectId;codeSystem;code;dateTime;startDateTime;endDateTime;unit;numberValue;textValue;booleanValue;dateTimeValue\nEs muss jeweils nur eine der value-Spalten entsprechend des Datentyps befüllt sein.",
+    "fhir": "Ein HL7 FHIR Bundle bestehend aus Patienten-, Encounter- und Observation-Ressourcen."
+  },
+  "startedThing": "{thing} wurde gestarted.",
+  "dataSourceId": "Datenquellen-ID|Datenquellen-IDs",
+  "finishedThing": "{thing} abgeschlossen."
 }

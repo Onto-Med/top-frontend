@@ -38,12 +38,50 @@
               type="submit"
               icon="add"
               color="primary"
-              :disabled="loading"
+              :disabled="!dataSource || loading"
               :label="t('add')"
               @click="addDataSource()"
             />
           </template>
         </q-select>
+      </q-card-section>
+
+      <q-card-section>
+        <q-expansion-item
+          dense
+          dense-toggle
+          expand-separator
+          :label="t('uploadDataSource')"
+          header-class="q-px-none"
+        >
+          <div class="row q-gutter-sm">
+            <q-input v-model="dataSourceId" :label="t('dataSourceId')" class="col" />
+            <enum-select
+              v-model:selected="dataSourceFileType"
+              i18n-prefix="dataSourceFileType"
+              :enum="DataSourceFileType"
+              :label="t('type')"
+              show-tooltip
+              class="col"
+            />
+          </div>
+          <q-file
+            v-model="dataSourceFile"
+            :label="t('selectThing', { thing: t('file') })"
+            accept=".csv,.json,.rdf,.xml,.yaml,.yml"
+          >
+            <template #after>
+              <q-btn
+                type="submit"
+                icon="file_upload"
+                color="primary"
+                :disabled="!dataSourceFileType || !dataSourceFile || loading"
+                :label="t('upload')"
+                @click="uploadDataSource()"
+              />
+            </template>
+          </q-file>
+        </q-expansion-item>
       </q-card-section>
 
       <q-separator size="3px" />
@@ -104,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { DataSource, Organisation } from '@onto-med/top-api'
+import { DataSource, DataSourceFileType, Organisation } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { QDialog, QTableColumn, useQuasar } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
@@ -114,6 +152,7 @@ import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dialog from 'src/components/Dialog.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import EnumSelect from 'src/components/EnumSelect.vue'
 
 const props = defineProps({
   organisation: {
@@ -141,6 +180,9 @@ const initialPagination = {
   page: 1,
   rowsPerPage: 10
 }
+const dataSourceId = ref<string>()
+const dataSourceFileType = ref<DataSourceFileType>()
+const dataSourceFile = ref<File>()
 
 const columns = computed(() => {
   return [
@@ -201,6 +243,15 @@ async function addDataSource() {
       notify(t('thingAdded', { thing: t('dataSource') }), 'positive')
       resetDataSource()
     })
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+}
+
+function uploadDataSource() {
+  if (!queryApi || !isAuthenticated.value || !dataSourceId.value || !dataSourceFileType.value || !dataSourceFile.value) return
+
+  queryApi.uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value)
+    .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
 }
