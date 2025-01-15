@@ -29,6 +29,16 @@
                 <div class="items-center">
                   <q-icon :name="queryIcon(scope.opt.queryType)" size="xs" />
                   {{ scope.opt.title || scope.opt.id }}
+                  <q-btn
+                    v-if="scope.opt.local"
+                    icon="delete"
+                    color="red"
+                    size="sm"
+                    class="float-right"
+                    dense
+                    :title="t('deleteThing', { thing: t('dataSource') })"
+                    @click.stop="deleteDataSource(scope.opt)"
+                  />
                 </div>
               </q-item-section>
             </q-item>
@@ -47,13 +57,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-expansion-item
-          dense
-          dense-toggle
-          expand-separator
-          :label="t('uploadDataSource')"
-          header-class="q-px-none"
-        >
+        <q-expansion-item dense dense-toggle expand-separator :label="t('uploadDataSource')" header-class="q-px-none">
           <div class="row q-gutter-sm">
             <q-input v-model="dataSourceId" :label="t('dataSourceId')" class="col" />
             <enum-select
@@ -124,7 +128,7 @@
                   icon="remove"
                   color="red"
                   :title="t('remove')"
-                  @click="deleteDataSource(rowProps.row)"
+                  @click="removeDataSource(rowProps.row)"
                 />
               </q-td>
             </q-tr>
@@ -193,21 +197,20 @@ const columns = computed(() => {
 })
 
 onMounted(async () => {
-  await reloadOrganisationDataSources()
-    .then(reloadAvailableDataSources())
+  await reloadOrganisationDataSources().then(reloadAvailableDataSources)
 })
 
 function hide() {
   dialog.value?.hide()
 }
 
-function reloadAvailableDataSources() {
-  return queryApi?.getDataSources()
-    .then((r) => (availableDataSources.value = r.data))
+async function reloadAvailableDataSources() {
+  if (!queryApi) return Promise.reject()
+  return queryApi.getDataSources().then((r) => (availableDataSources.value = r.data))
 }
 
-function reloadOrganisationDataSources() {
-  if (loading.value || !queryApi) return
+async function reloadOrganisationDataSources() {
+  if (loading.value || !queryApi) return Promise.reject()
   loading.value = true
 
   return queryApi
@@ -253,9 +256,11 @@ async function addDataSource() {
 }
 
 function uploadDataSource() {
-  if (!queryApi || !isAuthenticated.value || !dataSourceId.value || !dataSourceFileType.value || !dataSourceFile.value) return
+  if (!queryApi || !isAuthenticated.value || !dataSourceId.value || !dataSourceFileType.value || !dataSourceFile.value)
+    return
 
-  queryApi.uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value)
+  queryApi
+    .uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value)
     .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
     .then(reloadAvailableDataSources)
     .catch((e: Error) => renderError(e))
@@ -268,6 +273,22 @@ function deleteDataSource(dataSource: DataSource) {
     component: Dialog,
     componentProps: {
       message: t('confirmDeleteDataSource')
+    }
+  }).onOk(() => {
+    queryApi
+      .deleteDataSource(dataSource.id)
+      .then(() => notify(t('thingDeleted', { thing: t('dataSource') }), 'positive'))
+      .then(reloadAvailableDataSources)
+      .catch((e: Error) => renderError(e))
+  })
+}
+
+function removeDataSource(dataSource: DataSource) {
+  if (!queryApi || !isAuthenticated.value) return
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('confirmRemoveDataSource')
     }
   }).onOk(() => {
     loading.value = true

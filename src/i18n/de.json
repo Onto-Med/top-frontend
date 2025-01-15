@@ -484,6 +484,7 @@
   "andMore": "und nichts weiteres|und ein weiteres|und {n} weitere",
   "thingAdded": "{thing} wurde hinzugefügt",
   "confirmDeleteDataSource": "Möchten Sie diese Datenquelle wirklich löschen?",
+  "confirmRemoveDataSource": "Möchten Sie diese Datenquelle wirklich entfernen?",
   "thingRemoved": "{thing} wurde entfernt",
   "suitableFor": "Verwendbar für",
   "manageDataSourceDescription": "Wählen Sie eine Datenquelle aus, die Sie dieser Organisation zur Verfügung stellen möchten. Alle Nutzer mit Schreibberechtigung können diese Quelle abfragen.",
