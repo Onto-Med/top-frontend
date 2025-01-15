@@ -110,7 +110,7 @@
               :disabled="loading"
               :label="t('reload')"
               icon="refresh"
-              @click="reloadDataSources()"
+              @click="reloadOrganisationDataSources()"
             />
           </template>
           <template #body="rowProps">
@@ -193,19 +193,24 @@ const columns = computed(() => {
 })
 
 onMounted(async () => {
-  await reloadDataSources()
-  await queryApi?.getDataSources().then((r) => (availableDataSources.value = r.data))
+  await reloadOrganisationDataSources()
+    .then(reloadAvailableDataSources())
 })
 
 function hide() {
   dialog.value?.hide()
 }
 
-async function reloadDataSources() {
+function reloadAvailableDataSources() {
+  return queryApi?.getDataSources()
+    .then((r) => (availableDataSources.value = r.data))
+}
+
+function reloadOrganisationDataSources() {
   if (loading.value || !queryApi) return
   loading.value = true
 
-  await queryApi
+  return queryApi
     .getOrganisationDataSources(props.organisation.id)
     .then((r) => {
       dataSources.value = r.data
@@ -252,6 +257,7 @@ function uploadDataSource() {
 
   queryApi.uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value)
     .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
+    .then(reloadAvailableDataSources)
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
 }
