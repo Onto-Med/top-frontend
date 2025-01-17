@@ -65,14 +65,15 @@
               i18n-prefix="dataSourceFileType"
               :enum="DataSourceFileType"
               :label="t('type')"
-              show-tooltip
               class="col"
             />
           </div>
+          <p v-show="dataSourceFileHint" class="text-caption text-break text-grey q-mt-md q-mb-none">{{ dataSourceFileHint }}</p>
           <q-file
             v-model="dataSourceFile"
             :label="t('selectThing', { thing: t('file') })"
             accept=".csv,.json,.rdf,.xml,.yaml,.yml"
+            :disable="!dataSourceFileType"
           >
             <template #after>
               <q-btn
@@ -166,7 +167,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['hide', 'ok'])
 
-const { t } = useI18n()
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
 const { notify, renderError } = useNotify()
 const $q = useQuasar()
 const dialog = ref<QDialog | undefined>(undefined)
@@ -194,6 +196,11 @@ const columns = computed(() => {
     { name: 'queryType', label: t('suitableFor'), align: 'left', sortable: true, required: true },
     { name: 'actions', align: 'right', sortable: false }
   ] as QTableColumn[]
+})
+
+const dataSourceFileHint = computed(() => {
+  const key = `dataSourceFileTypeDescriptions.${dataSourceFileType.value}`
+  return te(key) ? t(key) : undefined
 })
 
 onMounted(async () => {
@@ -306,3 +313,7 @@ function removeDataSource(dataSource: DataSource) {
   })
 }
 </script>
+<style lang="sass" scoped>
+.text-break
+  word-wrap: break-word
+</style>
