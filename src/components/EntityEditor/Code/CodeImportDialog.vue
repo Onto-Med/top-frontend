@@ -156,20 +156,13 @@ const columns = computed(() => [
     label: t('code'),
     field: (row: Code) => row.code,
     sortable: true
-  },
-  {
-    name: 'scope',
-    required: false,
-    label: t('codeScope.title'),
-    field: (row: Code) => row.scope,
-    sortable: true
   }
 ])
 
 const tableRows = computed(() => codes.value.filter((_row, index) => !hasHeader.value || index !== 0))
 
 function codeKey(code: Code) {
-  return `${code.codeSystem.uri}#${code.code} - ${code.scope}`
+  return `${code.codeSystem.uri}#${code.code}`
 }
 
 function loadCodes() {

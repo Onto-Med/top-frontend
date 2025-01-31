@@ -14,6 +14,16 @@
             <span v-if="local.createdAt">({{ d(local.createdAt, 'long') }})</span>
           </small>
           <small v-else class="text-accent">{{ t('notSavedYet') }}</small>
+          <q-btn
+            v-if="!isNew"
+            flat
+            dense
+            icon="content_copy"
+            size="sm"
+            class="q-ml-xs"
+            :title="t('copyToClipboard')"
+            @click="copyToClipboard(local.id)"
+          />
         </q-toolbar-title>
         <q-btn
           v-if="isOtherVersion"

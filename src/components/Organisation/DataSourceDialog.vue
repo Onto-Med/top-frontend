@@ -29,6 +29,16 @@
                 <div class="items-center">
                   <q-icon :name="queryIcon(scope.opt.queryType)" size="xs" />
                   {{ scope.opt.title || scope.opt.id }}
+                  <q-btn
+                    v-if="scope.opt.local"
+                    icon="delete"
+                    color="red"
+                    size="sm"
+                    class="float-right"
+                    dense
+                    :title="t('deleteThing', { thing: t('dataSource') })"
+                    @click.stop="deleteDataSource(scope.opt)"
+                  />
                 </div>
               </q-item-section>
             </q-item>
@@ -38,12 +48,53 @@
               type="submit"
               icon="add"
               color="primary"
-              :disabled="loading"
+              :disabled="!dataSource || loading"
               :label="t('add')"
               @click="addDataSource()"
             />
           </template>
         </q-select>
+      </q-card-section>
+
+      <q-card-section>
+        <q-expansion-item dense dense-toggle expand-separator :label="t('uploadDataSource')" header-class="q-px-none">
+          <div class="row q-gutter-sm">
+            <q-input v-model="dataSourceId" :label="t('dataSourceId')" class="col" />
+            <enum-select
+              v-model:selected="dataSourceFileType"
+              i18n-prefix="dataSourceFileType"
+              :enum="DataSourceFileType"
+              :label="t('type')"
+              class="col"
+            />
+          </div>
+          <p v-show="dataSourceFileHint" class="text-caption text-break text-grey q-mt-md q-mb-none">
+            {{ dataSourceFileHint }}
+          </p>
+          <q-checkbox
+            v-show="dataSourceFileType == DataSourceFileType.Fhir"
+            v-model="mergeEncounters"
+            size="sm"
+            :label="t('mergeEncounters')"
+          />
+          <q-file
+            v-model="dataSourceFile"
+            :label="t('selectThing', { thing: t('file') })"
+            accept=".csv,.json,.rdf,.xml,.yaml,.yml"
+            :disable="!dataSourceFileType"
+          >
+            <template #after>
+              <q-btn
+                type="submit"
+                icon="file_upload"
+                color="primary"
+                :disabled="!dataSourceFileType || !dataSourceFile || loading"
+                :label="t('upload')"
+                @click="uploadDataSource()"
+              />
+            </template>
+          </q-file>
+        </q-expansion-item>
       </q-card-section>
 
       <q-separator size="3px" />
@@ -72,7 +123,7 @@
               :disabled="loading"
               :label="t('reload')"
               icon="refresh"
-              @click="reloadDataSources()"
+              @click="reloadOrganisationDataSources()"
             />
           </template>
           <template #body="rowProps">
@@ -86,7 +137,7 @@
                   icon="remove"
                   color="red"
                   :title="t('remove')"
-                  @click="deleteDataSource(rowProps.row)"
+                  @click="removeDataSource(rowProps.row)"
                 />
               </q-td>
             </q-tr>
@@ -104,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { DataSource, Organisation } from '@onto-med/top-api'
+import { DataSource, DataSourceFileType, Organisation } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { QDialog, QTableColumn, useQuasar } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
@@ -114,6 +165,7 @@ import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dialog from 'src/components/Dialog.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import EnumSelect from 'src/components/EnumSelect.vue'
 
 const props = defineProps({
   organisation: {
@@ -123,7 +175,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['hide', 'ok'])
 
-const { t } = useI18n()
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
 const { notify, renderError } = useNotify()
 const $q = useQuasar()
 const dialog = ref<QDialog | undefined>(undefined)
@@ -141,6 +194,10 @@ const initialPagination = {
   page: 1,
   rowsPerPage: 10
 }
+const dataSourceId = ref<string>()
+const dataSourceFileType = ref<DataSourceFileType>()
+const dataSourceFile = ref<File>()
+const mergeEncounters = ref(false)
 
 const columns = computed(() => {
   return [
@@ -150,20 +207,36 @@ const columns = computed(() => {
   ] as QTableColumn[]
 })
 
+const dataSourceFileHint = computed(() => {
+  const key = `dataSourceFileTypeDescriptions.${dataSourceFileType.value}`
+  return te(key) ? t(key) : undefined
+})
+
+const dataSourceConfig = computed(() => {
+  if (dataSourceFileType.value == DataSourceFileType.Fhir && mergeEncounters.value != undefined) {
+    return `mergeEncounters=${mergeEncounters.value}`
+  }
+  return undefined
+})
+
 onMounted(async () => {
-  await reloadDataSources()
-  await queryApi?.getDataSources().then((r) => (availableDataSources.value = r.data))
+  await reloadOrganisationDataSources().then(reloadAvailableDataSources)
 })
 
 function hide() {
   dialog.value?.hide()
 }
 
-async function reloadDataSources() {
-  if (loading.value || !queryApi) return
+async function reloadAvailableDataSources() {
+  if (!queryApi) return Promise.reject()
+  return queryApi.getDataSources().then((r) => (availableDataSources.value = r.data))
+}
+
+async function reloadOrganisationDataSources() {
+  if (loading.value || !queryApi) return Promise.reject()
   loading.value = true
 
-  await queryApi
+  return queryApi
     .getOrganisationDataSources(props.organisation.id)
     .then((r) => {
       dataSources.value = r.data
@@ -205,12 +278,40 @@ async function addDataSource() {
     .finally(() => (loading.value = false))
 }
 
+function uploadDataSource() {
+  if (!queryApi || !isAuthenticated.value || !dataSourceId.value || !dataSourceFileType.value || !dataSourceFile.value)
+    return
+
+  queryApi
+    .uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value, dataSourceConfig.value)
+    .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
+    .then(reloadAvailableDataSources)
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+}
+
 function deleteDataSource(dataSource: DataSource) {
   if (!queryApi || !isAuthenticated.value) return
   $q.dialog({
     component: Dialog,
     componentProps: {
       message: t('confirmDeleteDataSource')
+    }
+  }).onOk(() => {
+    queryApi
+      .deleteDataSource(dataSource.id)
+      .then(() => notify(t('thingDeleted', { thing: t('dataSource') }), 'positive'))
+      .then(reloadAvailableDataSources)
+      .catch((e: Error) => renderError(e))
+  })
+}
+
+function removeDataSource(dataSource: DataSource) {
+  if (!queryApi || !isAuthenticated.value) return
+  $q.dialog({
+    component: Dialog,
+    componentProps: {
+      message: t('confirmRemoveDataSource')
     }
   }).onOk(() => {
     loading.value = true
@@ -228,3 +329,7 @@ function deleteDataSource(dataSource: DataSource) {
   })
 }
 </script>
+<style lang="sass" scoped>
+.text-break
+  word-wrap: break-word
+</style>
