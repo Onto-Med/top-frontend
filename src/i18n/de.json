@@ -597,5 +597,6 @@
   },
   "startedThing": "{thing} wurde gestarted.",
   "dataSourceId": "Datenquellen-ID|Datenquellen-IDs",
-  "finishedThing": "{thing} abgeschlossen."
+  "finishedThing": "{thing} abgeschlossen.",
+  "mergeEncounters": "Encounter-Ressourcen zusammenführen"
 }

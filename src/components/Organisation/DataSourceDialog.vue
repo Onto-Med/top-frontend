@@ -68,7 +68,15 @@
               class="col"
             />
           </div>
-          <p v-show="dataSourceFileHint" class="text-caption text-break text-grey q-mt-md q-mb-none">{{ dataSourceFileHint }}</p>
+          <p v-show="dataSourceFileHint" class="text-caption text-break text-grey q-mt-md q-mb-none">
+            {{ dataSourceFileHint }}
+          </p>
+          <q-checkbox
+            v-show="dataSourceFileType == DataSourceFileType.Fhir"
+            v-model="mergeEncounters"
+            size="sm"
+            :label="t('mergeEncounters')"
+          />
           <q-file
             v-model="dataSourceFile"
             :label="t('selectThing', { thing: t('file') })"
@@ -189,6 +197,7 @@ const initialPagination = {
 const dataSourceId = ref<string>()
 const dataSourceFileType = ref<DataSourceFileType>()
 const dataSourceFile = ref<File>()
+const mergeEncounters = ref(false)
 
 const columns = computed(() => {
   return [
@@ -201,6 +210,13 @@ const columns = computed(() => {
 const dataSourceFileHint = computed(() => {
   const key = `dataSourceFileTypeDescriptions.${dataSourceFileType.value}`
   return te(key) ? t(key) : undefined
+})
+
+const dataSourceConfig = computed(() => {
+  if (dataSourceFileType.value == DataSourceFileType.Fhir && mergeEncounters.value != undefined) {
+    return `mergeEncounters=${mergeEncounters.value}`
+  }
+  return undefined
 })
 
 onMounted(async () => {
@@ -267,7 +283,7 @@ function uploadDataSource() {
     return
 
   queryApi
-    .uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value)
+    .uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value, dataSourceConfig.value)
     .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
     .then(reloadAvailableDataSources)
     .catch((e: Error) => renderError(e))
