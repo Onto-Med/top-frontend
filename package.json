@@ -24,7 +24,7 @@
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "^2.4.0",
     "@lhncbc/ucum-lhc": "6.0.2",
-    "@onto-med/top-api": "^0.11.1-bf7c671",
+    "@onto-med/top-api": "^0.11.1",
     "@quasar/extras": "^1.16.12",
     "@types/papaparse": "^5.3.14",
     "@zip.js/zip.js": "^2.7.34",
