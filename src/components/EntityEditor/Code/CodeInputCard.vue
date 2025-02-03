@@ -149,7 +149,7 @@ function codeEquals(code1?: Code, code2?: Code) {
 
 function addEntries(entries?: CodeWithScope[]) {
   if (!entries) return Promise.resolve([false])
-  if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
+  if (!codeApi) return Promise.reject({ message: t('errorLoadingData', {type: 'Code'}) })
 
   const newModelValue = props.modelValue.slice()
   return Promise.all(entries.map(async({code: code, scope: scope}) => {

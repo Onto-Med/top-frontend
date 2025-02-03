@@ -579,6 +579,7 @@
   "edge": "Kante|Kanten",
   "quoteThing": "\"{thing}\"",
   "phrase": "Term|Terme",
+  "errorLoadingData": "Die {type}-Daten konnten nicht vom Server geladen werden.",
   "uploadDataSource": "Alternativ können Sie eine Datei hochladen, um eine Datenquelle für Testzwecke zu erstellen.",
   "create": "Erstellen",
   "upload": "Hochladen",
