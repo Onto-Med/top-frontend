@@ -51,18 +51,13 @@
         <q-list dense separator>
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
-              <q-tree
-                dense
-                :nodes="[entry]"
-                node-key="uri"
-                children-key="children"
-              >
+              <q-tree dense :nodes="[entry]" node-key="uri" children-key="children">
                 <template #default-header="prop">
                   <a
-                      :href="prop.node.uri"
-                      target="_blank"
-                      class="code-link"
-                      :title="prop.node.uri ? t('showThing', { thing: t('code') }) : ''"
+                    :href="prop.node.uri"
+                    target="_blank"
+                    class="code-link"
+                    :title="prop.node.uri ? t('showThing', { thing: t('code') }) : ''"
                   >
                     {{
                       prop.node.codeSystem?.shortName ||
@@ -78,15 +73,15 @@
                       {{ prop.node.code }}
                     </span>
                   </a>
-                  <q-space/>
+                  <q-space />
                   <q-btn
-                      dense
-                      color="red"
-                      icon="remove"
-                      :disable="readonly"
-                      :title="t('remove')"
-                      size="sm"
-                      @click="removeEntry(prop.node)"
+                    dense
+                    color="red"
+                    icon="remove"
+                    :disable="readonly"
+                    :title="t('remove')"
+                    size="sm"
+                    @click="removeEntry(prop.node)"
                   />
                 </template>
               </q-tree>
@@ -110,7 +105,7 @@ import useNotify from 'src/mixins/useNotify'
 import CodeImportDialog from './CodeImportDialog.vue'
 
 interface CodeWithScope {
-  code: Code,
+  code: Code
   scope: CodeScope
 }
 
@@ -140,27 +135,27 @@ const disabledCodes = computed(() => {
 
 function codeEquals(code1?: Code, code2?: Code) {
   if (!code1 || !code2) return false
-  return (
-    code1.codeSystem.uri == code2.codeSystem.uri &&
-    code1.code == code2.code
-  )
+  return code1.codeSystem.uri == code2.codeSystem.uri && code1.code == code2.code
 }
 
 function addEntries(entries?: CodeWithScope[]) {
   if (!entries) return Promise.resolve([false])
-  if (!codeApi) return Promise.reject({ message: t('errorLoadingData', {type: 'Code'}) })
+  if (!codeApi) return Promise.reject({ message: t('errorLoadingData', { type: 'Code' }) })
 
   const newModelValue = props.modelValue.slice()
-  return Promise.all(entries.map(async({code: code, scope: scope}) => {
-    if (newModelValue.some((c) => codeEquals(c, code))) return false
-    if(scope == CodeScope.Self) {
-      newModelValue.push(code)
-    } else {
-      await codeApi?.getCode(encodeURIComponent(code.uri!), code?.codeSystem?.externalId || '', scope)
-      .then((r) => newModelValue.push(r.data))
-    }
-    return true
-  })).then((r) => {
+  return Promise.all(
+    entries.map(async ({ code: code, scope: scope }) => {
+      if (newModelValue.some((c) => codeEquals(c, code))) return false
+      if (scope == CodeScope.Self) {
+        newModelValue.push(code)
+      } else {
+        await codeApi
+          ?.getCode(encodeURIComponent(code.uri!), code?.codeSystem?.externalId || '', scope)
+          .then((r) => newModelValue.push(r.data))
+      }
+      return true
+    })
+  ).then((r) => {
     emit('update:modelValue', newModelValue)
     return r
   })
@@ -172,7 +167,7 @@ function removeEntry(codeToRemove: Code) {
     newModelValue.splice(newModelValue.indexOf(codeToRemove), 1)
   } else {
     for (const code of newModelValue) {
-      removeNestedSubNode(code, codeToRemove);
+      removeNestedSubNode(code, codeToRemove)
     }
   }
   emit('update:modelValue', newModelValue)
@@ -191,11 +186,19 @@ function showImportDialog() {
   $q.dialog({
     component: CodeImportDialog
   }).onOk((codes: Code[]) => {
-      addEntries(codes.map((code) => {return {code: code, scope: CodeScope.Self}})).then((r) => {
-      const accepted = r.filter((e) => !!e).length
-      notify(t('codeImport.imported', accepted), 'positive')
-      emit('update:expanded', true)
-    }).catch((e: Error) => {notify(t('codeImport.failed') + ` (${e.message})`)})
+    addEntries(
+      codes.map((code) => {
+        return { code: code, scope: CodeScope.Self }
+      })
+    )
+      .then((r) => {
+        const accepted = r.filter((e) => !!e).length
+        notify(t('codeImport.imported', accepted), 'positive')
+        emit('update:expanded', true)
+      })
+      .catch((e: Error) => {
+        notify(t('codeImport.failed') + ` (${e.message})`)
+      })
   })
 }
 </script>
