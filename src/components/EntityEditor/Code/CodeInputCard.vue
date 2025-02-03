@@ -42,7 +42,7 @@
         v-if="!readonly"
         :disabled-codes="disabledCodes"
         :manual-entry="showManualForm"
-        @select="addEntries([$event])"
+        @select="addEntries([$event as CodeWithScope])"
       />
     </template>
 
@@ -109,6 +109,11 @@ import { useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 import CodeImportDialog from './CodeImportDialog.vue'
 
+interface CodeWithScope {
+  code: Code,
+  scope: CodeScope
+}
+
 const props = defineProps({
   modelValue: {
     type: Array as () => Code[],
@@ -142,7 +147,7 @@ function codeEquals(code1?: Code, code2?: Code) {
   )
 }
 
-function addEntries(entries?: {code: Code, scope: CodeScope}[]) {
+async function addEntries(entries?: CodeWithScope[]) {
   if (!entries) return Promise.resolve([false])
   if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
 
@@ -189,11 +194,11 @@ function showImportDialog() {
   $q.dialog({
     component: CodeImportDialog
   }).onOk((codes: Code[]) => {
-    await addEntries(codes.map((code) => {return {code: code, scope: CodeScope.Self}})).then((r) => {
+    (async () => { await addEntries(codes.map((code) => {return {code: code, scope: CodeScope.Self}})).then((r) => {
       const accepted = r.filter((e) => !!e).length
-    notify(t('codeImport.imported', accepted), 'positive')
-    emit('update:expanded', true)
-    })
+      notify(t('codeImport.imported', accepted), 'positive')
+      emit('update:expanded', true)
+    })})
   })
 }
 </script>
