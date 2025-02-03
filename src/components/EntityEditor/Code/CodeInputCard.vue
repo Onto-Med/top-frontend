@@ -57,7 +57,7 @@
                 node-key="uri"
                 children-key="children"
               >
-                <template v-slot:default-header="prop">
+                <template #default-header="prop">
                   <a
                       :href="prop.node.uri"
                       target="_blank"
@@ -85,8 +85,8 @@
                       icon="remove"
                       :disable="readonly"
                       :title="t('remove')"
-                      @click="removeEntry(prop.node)"
                       size="75%"
+                      @click="removeEntry(prop.node)"
                   />
                 </template>
               </q-tree>
@@ -108,7 +108,6 @@ import CodeInput from './CodeInput.vue'
 import { useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 import CodeImportDialog from './CodeImportDialog.vue'
-import EnumSelect from 'src/components/EnumSelect.vue'
 
 const props = defineProps({
   modelValue: {
@@ -124,7 +123,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'update:expanded'])
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
-const { t, te } = useI18n()
+const { t } = useI18n()
 const $q = useQuasar()
 const { notify } = useNotify()
 const showManualForm = ref(false)
@@ -143,17 +142,17 @@ function codeEquals(code1?: Code, code2?: Code) {
   )
 }
 
-function addEntries(entries?: [{code?: Code, scope?: CodeScope}]) {
-  if (!entries) return [false]
+function addEntries(entries?: {code: Code, scope: CodeScope}[]) {
+  if (!entries) return Promise.resolve([false])
   if (!codeApi) return Promise.reject({ message: 'Could not load data from the server.' })
 
   const newModelValue = props.modelValue.slice()
   return Promise.all(entries.map(async({code: code, scope: scope}) => {
     if (newModelValue.some((c) => codeEquals(c, code))) return false
     if(scope == CodeScope.Self) {
-      newModelValue.push(code!)
+      newModelValue.push(code)
     } else {
-      await codeApi?.getCode(encodeURIComponent(code!.uri!), code?.codeSystem?.externalId || '', scope)
+      await codeApi?.getCode(encodeURIComponent(code.uri!), code?.codeSystem?.externalId || '', scope)
       .then((r) => {
         newModelValue.push(r.data);
       })
@@ -190,9 +189,11 @@ function showImportDialog() {
   $q.dialog({
     component: CodeImportDialog
   }).onOk((codes: Code[]) => {
-    const accepted = true // addEntries(codes.map((code) => {code: code, scope: CodeScope.Self})).filter((e) => !!e).length
+    await addEntries(codes.map((code) => {return {code: code, scope: CodeScope.Self}})).then((r) => {
+      const accepted = r.filter((e) => !!e).length
     notify(t('codeImport.imported', accepted), 'positive')
     emit('update:expanded', true)
+    })
   })
 }
 </script>

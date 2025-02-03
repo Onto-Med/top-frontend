@@ -181,17 +181,10 @@ function loadCodes() {
       codes.value = data.map((row) => ({
         codeSystem: { uri: row[0] },
         code: row[1],
-        scope: CodeScope[toCapital(row[2]) as keyof typeof CodeScope] || CodeScope.Self
       }))
     })
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
-}
-
-function toCapital(string: string) {
-  const str = string.trim()
-  if (str.length === 0) return str
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
 function onHasHeaderChanged(value?: boolean) {
