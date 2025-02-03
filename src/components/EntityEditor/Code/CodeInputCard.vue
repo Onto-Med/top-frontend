@@ -127,7 +127,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'update:expanded'])
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
 const { t } = useI18n()
 const $q = useQuasar()
 const { notify } = useNotify()
