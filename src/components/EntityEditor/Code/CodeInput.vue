@@ -26,28 +26,28 @@
         <small v-show="selection?.code">[{{ selection?.code }}]</small>
       </span>
     </template>
-    <template #option="scope">
-      <q-item v-bind="scope.itemProps" :disable="disabledCodes.some((code) => code.uri == scope.opt.uri)">
+    <template #option="codeSuggestion">
+      <q-item v-bind="codeSuggestion.itemProps" :disable="disabledCodes.some((code) => code.uri == codeSuggestion.opt.uri)">
         <q-item-section>
           <q-item-label>
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <span v-html="scope.opt.highlightLabel ? scope.opt.highlightLabel : scope.opt.label" />
-            <small v-show="scope.opt.code"> [{{ scope.opt.code }}]</small>
+            <span v-html="codeSuggestion.opt.highlightLabel ? codeSuggestion.opt.highlightLabel : codeSuggestion.opt.label" />
+            <small v-show="codeSuggestion.opt.code"> [{{ codeSuggestion.opt.code }}]</small>
           </q-item-label>
           <q-item-label caption>
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <span v-html="scope.opt.highlightSynonym ? scope.opt.highlightSynonym : scope.opt.name" />
+            <span v-html="codeSuggestion.opt.highlightSynonym ? codeSuggestion.opt.highlightSynonym : codeSuggestion.opt.name" />
           </q-item-label>
         </q-item-section>
         <q-item-section avatar>
-          <q-badge v-if="scope.opt.codeSystem" color="teal">
-            {{ scope.opt.codeSystem.shortName || scope.opt.codeSystem.externalId }}
+          <q-badge v-if="codeSuggestion.opt.codeSystem" color="teal">
+            {{ codeSuggestion.opt.codeSystem.shortName || codeSuggestion.opt.codeSystem.externalId }}
           </q-badge>
         </q-item-section>
-        <q-tooltip v-if="scope.opt.synonyms?.length" anchor="bottom middle" self="bottom start">
+        <q-tooltip v-if="codeSuggestion.opt.synonyms?.length" anchor="bottom middle" self="bottom start">
           <b>{{ t('synonym', 2) }}:</b>
           <ul class="q-pl-md q-my-none">
-            <li v-for="synonym in scope.opt.synonyms" :key="synonym">
+            <li v-for="synonym in codeSuggestion.opt.synonyms" :key="synonym">
               {{ synonym }}
             </li>
           </ul>
@@ -65,14 +65,14 @@
       <code-system-input v-model="codeSystemFilter" class="system-input" />
     </template>
     <template #after>
-      <enum-select v-if="selection" v-model:selected="selection.scope" :enum="CodeScope" i18n-prefix="codeScope" />
+      <enum-select v-if="selection" v-model:selected="codeScope" :enum="CodeScope" i18n-prefix="codeScope" clearable="false" />
       <q-btn
         v-if="!noBtn"
         color="primary"
         :icon="btnIconName"
         :label="$q.screen.gt.sm ? btnLabel || t('addThing', { thing: t('code') }) : ''"
         :disable="!isValid"
-        @click="select(selection)"
+        @click="select(selection, codeScope)"
       />
     </template>
   </q-select>
@@ -82,7 +82,7 @@
     ref="manualCodeInput"
     v-model:model-value="manualCode.code"
     :label="t('code')"
-    @keyup.enter="select(manualCode, true)"
+    @keyup.enter="select(manualCode, CodeScope.Self, true)"
   >
     <template #before>
       <q-input
@@ -97,7 +97,7 @@
         :icon="btnIconName"
         :disabled="!isValidManualCode"
         :label="$q.screen.gt.sm ? btnManualLabel || t('addManually') : ''"
-        @click="select(manualCode, true)"
+        @click="select(manualCode, CodeScope.Self, true)"
       />
     </template>
   </q-input>
@@ -150,12 +150,12 @@ const codeInput = ref<QSelect>()
 const manualCodeInput = ref<QInput>()
 const codeApi = inject(CodeApiKey)
 const codeSystemFilter = ref<CodeSystem>()
+const codeScope = ref<CodeScope>(CodeScope.Self)
 
 const selection = ref<Code>()
 const manualCode = ref<Code>({
   code: '',
-  codeSystem: { uri: '' },
-  scope: CodeScope.Self
+  codeSystem: { uri: '' }
 })
 
 const autoSuggestOptions = ref<Code[]>([])
@@ -190,16 +190,18 @@ function validateCode(code?: Code) {
   )
 }
 
-function select(entry?: Code, manual = false) {
+function select(entry?: Code, scope?: CodeScope, manual = false) {
   if (!validateCode(entry)) return
-  emit('select', entry)
+  emit('select', {
+    code: entry,
+    scope: scope
+  })
   selection.value = undefined
   if (manual) {
     if (entry)
       manualCode.value = {
         code: entry.code,
-        codeSystem: JSON.parse(JSON.stringify(entry.codeSystem)) as CodeSystem,
-        scope: CodeScope.Self
+        codeSystem: JSON.parse(JSON.stringify(entry.codeSystem)) as CodeSystem
       }
     manualCodeInput.value?.select()
   } else {

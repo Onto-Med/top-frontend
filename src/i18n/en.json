@@ -512,9 +512,9 @@
     "description": "The scope of this code."
   },
   "codeScopes": {
-    "self": "Self",
-    "leaves": "Leaves",
-    "subtree": "Subtree"
+    "SELF": "Self",
+    "LEAVES": "Leaves",
+    "SUBTREE": "Subtree"
   },
   "recordSelected": "No records selected.|One record selected.|{count} records selected.",
   "delimiter": "Delimiter|Delimiters",

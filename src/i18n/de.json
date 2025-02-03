@@ -512,9 +512,9 @@
     "description": "Der Geltungsbereich dieses Codes."
   },
   "codeScopes": {
-    "leaves": "Blätter",
-    "subtree": "Teilbaum",
-    "self": "Selbst"
+    "LEAVES": "Blätter",
+    "SUBTREE": "Teilbaum",
+    "SELF": "Selbst"
   },
   "recordSelected": "Keine Datensätze ausgewählt.|Ein Datensatz ausgewählt.|{count} Datensätze ausgewählt.",
   "delimiter": "Trennzeichen|Trennzeichen",
