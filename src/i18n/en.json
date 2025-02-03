@@ -505,7 +505,8 @@
     "fileDescription": "Select a CSV file containing codes. The file should have two or three columns, one for the code system URI, one for the code and optionally one for the scope.",
     "selectCodesToImport": "In the table below, select the codes you wish to transfer from the CSV file. You can modify the table entries as required by clicking on a row.",
     "selectFile": "Select CSV file",
-    "hasHeader": "Has header row"
+    "hasHeader": "Has header row",
+    "failed": "An error occured during the code import."
   },
   "codeScope": {
     "title": "Scope",
