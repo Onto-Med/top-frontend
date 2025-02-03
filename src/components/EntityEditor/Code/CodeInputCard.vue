@@ -177,7 +177,7 @@ function removeEntry(codeToRemove: Code) {
     }
   }
   emit('update:modelValue', newModelValue)
-};
+}
 
 function removeNestedSubNode(code: Code, codeToRemove: Code) {
   if (code.children && code.children.includes(codeToRemove)) {
