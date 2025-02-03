@@ -44,6 +44,7 @@
         :manual-entry="showManualForm"
         @select="addEntries([$event as CodeWithScope])"
       />
+      <q-inner-loading :showing="loading" />
     </template>
 
     <template #append>
@@ -133,6 +134,7 @@ const { notify } = useNotify()
 const showManualForm = ref(false)
 const showHelp = ref(false)
 const codeApi = inject(CodeApiKey)
+const loading = ref(false)
 
 const disabledCodes = computed(() => {
   return props.modelValue.filter((c1, i1) => props.modelValue.some((c2, i2) => codeEquals(c1, c2) && i1 != i2))
@@ -143,10 +145,11 @@ function codeEquals(code1?: Code, code2?: Code) {
   return code1.codeSystem.uri == code2.codeSystem.uri && code1.code == code2.code
 }
 
-function addEntries(entries?: CodeWithScope[]) {
+async function addEntries(entries?: CodeWithScope[]) {
   if (!entries) return Promise.resolve([false])
   if (!codeApi) return Promise.reject({ message: t('errorLoadingData', { type: 'Code' }) })
 
+  loading.value = true
   const newModelValue = props.modelValue.slice()
   return Promise.all(
     entries.map(async ({ code: code, scope: scope }) => {
@@ -160,10 +163,12 @@ function addEntries(entries?: CodeWithScope[]) {
       }
       return true
     })
-  ).then((r) => {
-    emit('update:modelValue', newModelValue)
-    return r
-  })
+  )
+    .then((r) => {
+      emit('update:modelValue', newModelValue)
+      return r
+    })
+    .finally(() => (loading.value = false))
 }
 
 function removeEntry(codeToRemove: Code) {
