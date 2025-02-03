@@ -85,7 +85,7 @@
                       icon="remove"
                       :disable="readonly"
                       :title="t('remove')"
-                      size="75%"
+                      size="sm"
                       @click="removeEntry(prop.node)"
                   />
                 </template>
