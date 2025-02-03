@@ -158,9 +158,7 @@ function addEntries(entries?: CodeWithScope[]) {
       newModelValue.push(code)
     } else {
       await codeApi?.getCode(encodeURIComponent(code.uri!), code?.codeSystem?.externalId || '', scope)
-      .then((r) => {
-        newModelValue.push(r.data);
-      })
+      .then((r) => newModelValue.push(r.data))
     }
     return true
   })).then((r) => {
