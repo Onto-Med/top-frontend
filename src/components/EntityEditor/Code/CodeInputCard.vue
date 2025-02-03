@@ -52,37 +52,42 @@
           <q-item v-for="(entry, index) in modelValue" :key="index">
             <q-item-section>
               <q-tree dense :nodes="[entry]" node-key="uri" children-key="children">
-                <template #default-header="prop">
-                  <a
-                    :href="prop.node.uri"
-                    target="_blank"
-                    class="code-link"
-                    :title="prop.node.uri ? t('showThing', { thing: t('code') }) : ''"
-                  >
-                    {{
-                      prop.node.codeSystem?.shortName ||
-                      prop.node.codeSystem?.externalId ||
-                      prop.node.codeSystem?.uri ||
-                      t('unknownCodeSystem')
-                    }}:
-                    <span v-if="prop.node.name">
-                      {{ prop.node.name }}
-                      <small v-show="prop.node.code">[{{ prop.node.code }}]</small>
-                    </span>
-                    <span v-else>
-                      {{ prop.node.code }}
-                    </span>
-                  </a>
+                <template #default-header="{ node }">
+                  {{
+                    node.codeSystem?.shortName ||
+                    node.codeSystem?.externalId ||
+                    node.codeSystem?.uri ||
+                    t('unknownCodeSystem')
+                  }}:&nbsp;
+                  <span v-if="node.name">
+                    {{ node.name }}
+                    <small v-show="node.code">[{{ node.code }}]</small>
+                  </span>
+                  <span v-else>
+                    {{ node.code }}
+                  </span>
                   <q-space />
-                  <q-btn
-                    dense
-                    color="red"
-                    icon="remove"
-                    :disable="readonly"
-                    :title="t('remove')"
-                    size="sm"
-                    @click="removeEntry(prop.node)"
-                  />
+                  <q-btn-group>
+                    <q-btn
+                      v-show="node.uri"
+                      dense
+                      icon="search"
+                      size="sm"
+                      :href="node.uri"
+                      target="_blank"
+                      :title="node.uri ? t('showThing', { thing: t('code') }) : ''"
+                      @click.stop
+                    />
+                    <q-btn
+                      dense
+                      color="red"
+                      icon="remove"
+                      :disable="readonly"
+                      :title="t('remove')"
+                      size="sm"
+                      @click="removeEntry(node)"
+                    />
+                  </q-btn-group>
                 </template>
               </q-tree>
             </q-item-section>
@@ -202,9 +207,3 @@ function showImportDialog() {
   })
 }
 </script>
-
-<style lang="sass" scoped>
-.code-link
-  text-decoration: none
-  color: inherit
-</style>
