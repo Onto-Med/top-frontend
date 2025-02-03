@@ -35,7 +35,7 @@ import useNotify from 'src/mixins/useNotify'
 import { ScrollDetails } from 'src/mixins/ScrollDetails'
 
 const props = defineProps<{
-  modelValue: CodeSystem
+  modelValue?: CodeSystem
   /**
    * Available options of the select field.
    * If this property is omitted, options will be loaded on demand from the backend.
