@@ -65,7 +65,13 @@
       <code-system-input v-model="codeSystemFilter" class="system-input" />
     </template>
     <template #after>
-      <enum-select v-if="selection" v-model:selected="codeScope" :enum="CodeScope" i18n-prefix="codeScope" clearable="false" />
+      <enum-select
+        v-if="selection"
+        v-model:selected="codeScope"
+        :enum="CodeScope"
+        i18n-prefix="codeScope"
+        :clearable="false"
+      />
       <q-btn
         v-if="!noBtn"
         color="primary"
