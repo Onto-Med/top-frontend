@@ -505,16 +505,17 @@
     "fileDescription": "Select a CSV file containing codes. The file should have two or three columns, one for the code system URI, one for the code and optionally one for the scope.",
     "selectCodesToImport": "In the table below, select the codes you wish to transfer from the CSV file. You can modify the table entries as required by clicking on a row.",
     "selectFile": "Select CSV file",
-    "hasHeader": "Has header row"
+    "hasHeader": "Has header row",
+    "failed": "An error occured during the code import."
   },
   "codeScope": {
     "title": "Scope",
     "description": "The scope of this code."
   },
   "codeScopes": {
-    "self": "Self",
-    "leaves": "Leaves",
-    "subtree": "Subtree"
+    "SELF": "Self",
+    "LEAVES": "Leaves",
+    "SUBTREE": "Subtree"
   },
   "recordSelected": "No records selected.|One record selected.|{count} records selected.",
   "delimiter": "Delimiter|Delimiters",
@@ -578,6 +579,7 @@
   "edge": "Edge|Edges",
   "quoteThing": "'{thing}'",
   "phrase": "Phrase|Phrases",
+  "errorLoadingData": "Could not load {type} data from the server.",
   "uploadDataSource": "Alternatively, you can upload a file to create a data source for test purposes.",
   "create": "Create",
   "upload": "Upload",

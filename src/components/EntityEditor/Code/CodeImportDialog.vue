@@ -127,11 +127,9 @@ import { parse } from 'papaparse'
 import useNotify from 'src/mixins/useNotify'
 import EnumSelect from 'src/components/EnumSelect.vue'
 
-const emit = defineEmits(['hide', 'ok'])
-
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
-const { dialogRef, onDialogHide, onDialogCancel } = useDialogPluginComponent()
+const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { renderError } = useNotify()
 const onCancelClick = onDialogCancel
 const codes = ref<Code[]>([])
@@ -181,17 +179,10 @@ function loadCodes() {
       codes.value = data.map((row) => ({
         codeSystem: { uri: row[0] },
         code: row[1],
-        scope: CodeScope[toCapital(row[2]) as keyof typeof CodeScope] || CodeScope.Self
       }))
     })
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
-}
-
-function toCapital(string: string) {
-  const str = string.trim()
-  if (str.length === 0) return str
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
 function onHasHeaderChanged(value?: boolean) {
@@ -202,7 +193,7 @@ function onHasHeaderChanged(value?: boolean) {
 
 function onOkClick() {
   if (!isValid.value) return
-  emit('ok', selection.value)
+  onDialogOK(selection.value)
   onDialogHide()
 }
 </script>
