@@ -508,7 +508,7 @@
     "hasHeader": "Hat eine Kopfzeile"
   },
   "codeScope": {
-    "title": "Geldungsbereich",
+    "title": "Geltungsbereich",
     "description": "Der Geltungsbereich dieses Codes."
   },
   "codeScopes": {
