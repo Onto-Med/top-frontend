@@ -182,8 +182,8 @@ function removeEntry(codeToRemove: Code) {
 };
 
 function removeNestedSubNode(code: Code, codeToRemove: Code) {
-  if (code.children?.includes(codeToRemove)) {
-    code.children?.splice(code.children?.indexOf(codeToRemove), 1)
+  if (code.children && code.children.includes(codeToRemove)) {
+    code.children.splice(code.children.indexOf(codeToRemove), 1)
   }
   for (const childCode of code.children || []) {
     removeNestedSubNode(childCode, codeToRemove)
