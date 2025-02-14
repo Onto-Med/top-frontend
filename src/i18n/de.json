@@ -505,16 +505,17 @@
     "fileDescription": "Wählen Sie eine CSV-Datei mit Codes aus. Die Datei sollte zwei oder drei Spalten haben, eine für die Codesystem-URI, eine für den Code und optional eine for den Geltungsbereich.",
     "selectCodesToImport": "Wählen Sie in der unten stehenden Tabelle die Codes aus, die Sie aus der CSV-Datei übernehmen möchten. Sie können die Tabelleneinträge nach Bedarf ändern, indem Sie auf eine Zeile klicken.",
     "selectFile": "CSV-Datei auswählen",
-    "hasHeader": "Hat eine Kopfzeile"
+    "hasHeader": "Hat eine Kopfzeile",
+    "failed": "Beim Code-Import ist ein Fehler aufgetreteten."
   },
   "codeScope": {
-    "title": "Geldungsbereich",
+    "title": "Geltungsbereich",
     "description": "Der Geltungsbereich dieses Codes."
   },
   "codeScopes": {
-    "leaves": "Blätter",
-    "subtree": "Teilbaum",
-    "self": "Selbst"
+    "LEAVES": "Blätter",
+    "SUBTREE": "Teilbaum",
+    "SELF": "Selbst"
   },
   "recordSelected": "Keine Datensätze ausgewählt.|Ein Datensatz ausgewählt.|{count} Datensätze ausgewählt.",
   "delimiter": "Trennzeichen|Trennzeichen",
@@ -578,6 +579,7 @@
   "edge": "Kante|Kanten",
   "quoteThing": "\"{thing}\"",
   "phrase": "Term|Terme",
+  "errorLoadingData": "Die {type}-Daten konnten nicht vom Server geladen werden.",
   "uploadDataSource": "Alternativ können Sie eine Datei hochladen, um eine Datenquelle für Testzwecke zu erstellen.",
   "create": "Erstellen",
   "upload": "Hochladen",
