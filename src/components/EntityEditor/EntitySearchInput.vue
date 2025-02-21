@@ -25,7 +25,15 @@
     >
       <template #append>
         <slot name="append">
-          <q-btn v-show="!loading" round dense flat :icon="icon" :title="t('remove')" @click="$emit('btnClicked')" />
+          <q-btn
+            v-show="!loading"
+            round
+            dense
+            flat
+            :icon="icon"
+            :title="t('remove')"
+            @click="$emit('btnClicked')"
+          />
         </slot>
       </template>
       <template #selected>
@@ -44,7 +52,10 @@
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label v-if="(!(repositoryId && organisationId) || fork) && scope.opt.repository" overline>
+            <q-item-label
+              v-if="(!(repositoryId && organisationId) || fork) && scope.opt.repository"
+              overline
+            >
               {{ scope.opt.repository.name }}
             </q-item-label>
             <q-item-label>{{ getTitle(scope.opt, true) }}</q-item-label>
@@ -101,25 +112,32 @@
 <script setup lang="ts">
 import { ref, inject, nextTick, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { EntityType, Entity, DataType, ItemType, EntityPage, ForkingInstruction } from '@onto-med/top-api'
+import {
+  EntityType,
+  Entity,
+  DataType,
+  ItemType,
+  EntityPage,
+  ForkingInstruction,
+} from '@onto-med/top-api'
 import { EntityApiKey } from 'boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { QSelect } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 import ForkCreateDialog from 'src/components/EntityEditor/Forking/ForkCreateDialog.vue'
+import { ScrollDetails } from '../models'
 
 const props = defineProps({
   label: String,
   minLength: {
     type: Number,
-    default: 2
+    default: 2,
   },
   icon: {
     type: String,
-    default: 'close'
+    default: 'close',
   },
   entityTypes: Array as () => EntityType[],
   dataType: String as () => DataType,
@@ -137,7 +155,7 @@ const props = defineProps({
   /** Whether search field supports forking from other repositories. */
   fork: Boolean,
   /** Whether fork is done by clicking a copy btn (default) or implicitly by selecting an entity. */
-  implicitFork: Boolean
+  implicitFork: Boolean,
 })
 
 const emit = defineEmits(['btnClicked', 'entitySelected', 'forkClicked'])
@@ -153,7 +171,7 @@ const select = ref(null as unknown as QSelect)
 const prevInput = ref(undefined as string | undefined)
 const nextPage = ref(2)
 const totalPages = ref(0)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { keycloak, repositoryId: currentRepositoryId } = storeToRefs(entityStore)
 const forkOrigin = ref<Entity>()
 const showForkCreateDialog = ref(false)
@@ -166,7 +184,16 @@ async function loadOptions(input: string | undefined, page = 1): Promise<EntityP
     repositoryIds = [props.repositoryId]
   }
   return entityApi
-    .getEntities(undefined, input, props.entityTypes, props.dataType, props.itemType, repositoryIds, props.fork, page)
+    .getEntities(
+      undefined,
+      input,
+      props.entityTypes,
+      props.dataType,
+      props.itemType,
+      repositoryIds,
+      props.fork,
+      page,
+    )
     .then((r) => r.data)
 }
 
@@ -245,7 +272,10 @@ function forkEntity(entity: Entity | undefined, forkingInstruction: ForkingInstr
     .then((result) => {
       forkOrigin.value = undefined
       if (result.count) {
-        notify(t('thingCreatedOrUpdated', { thing: `${result.count} ` + t('fork', result.count) }), 'positive')
+        notify(
+          t('thingCreatedOrUpdated', { thing: `${result.count} ` + t('fork', result.count) }),
+          'positive',
+        )
         if (result.entity) emit('entitySelected', result.entity)
       } else {
         notify(t('forkCouldNotBeCreated'), 'warning')

@@ -57,7 +57,13 @@
       </q-card-section>
 
       <q-card-section>
-        <q-expansion-item dense dense-toggle expand-separator :label="t('uploadDataSource')" header-class="q-px-none">
+        <q-expansion-item
+          dense
+          dense-toggle
+          expand-separator
+          :label="t('uploadDataSource')"
+          header-class="q-px-none"
+        >
           <div class="row q-gutter-sm">
             <q-input v-model="dataSourceId" :label="t('dataSourceId')" class="col" />
             <enum-select
@@ -68,7 +74,10 @@
               class="col"
             />
           </div>
-          <p v-show="dataSourceFileHint" class="text-caption text-break text-grey q-mt-md q-mb-none">
+          <p
+            v-show="dataSourceFileHint"
+            class="text-caption text-break text-grey q-mt-md q-mb-none"
+          >
             {{ dataSourceFileHint }}
           </p>
           <q-checkbox
@@ -160,7 +169,7 @@ import { storeToRefs } from 'pinia'
 import { QDialog, QTableColumn, useQuasar } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dialog from 'src/components/Dialog.vue'
@@ -170,8 +179,8 @@ import EnumSelect from 'src/components/EnumSelect.vue'
 const props = defineProps({
   organisation: {
     type: Object as () => Organisation,
-    required: true
-  }
+    required: true,
+  },
 })
 const emit = defineEmits(['hide', 'ok'])
 
@@ -185,14 +194,14 @@ const dataSources = ref<DataSource[]>([])
 const availableDataSources = ref<DataSource[]>([])
 const loading = ref(false)
 const queryApi = inject(QueryApiKey)
-const { isAuthenticated } = storeToRefs(useEntity())
+const { isAuthenticated } = storeToRefs(useEntityStore())
 const { queryIcon, paginationLabel } = useEntityFormatter()
 const filter = ref('')
 const initialPagination = {
   sortBy: 'id',
   descenting: false,
   page: 1,
-  rowsPerPage: 10
+  rowsPerPage: 10,
 }
 const dataSourceId = ref<string>()
 const dataSourceFileType = ref<DataSourceFileType>()
@@ -203,7 +212,7 @@ const columns = computed(() => {
   return [
     { name: 'id', label: t('dataSource'), align: 'left', sortable: true, required: true },
     { name: 'queryType', label: t('suitableFor'), align: 'left', sortable: true, required: true },
-    { name: 'actions', align: 'right', sortable: false }
+    { name: 'actions', align: 'right', sortable: false },
   ] as QTableColumn[]
 })
 
@@ -279,11 +288,22 @@ async function addDataSource() {
 }
 
 function uploadDataSource() {
-  if (!queryApi || !isAuthenticated.value || !dataSourceId.value || !dataSourceFileType.value || !dataSourceFile.value)
+  if (
+    !queryApi ||
+    !isAuthenticated.value ||
+    !dataSourceId.value ||
+    !dataSourceFileType.value ||
+    !dataSourceFile.value
+  )
     return
 
   queryApi
-    .uploadDataSource(dataSourceFile.value, dataSourceFileType.value, dataSourceId.value, dataSourceConfig.value)
+    .uploadDataSource(
+      dataSourceFile.value,
+      dataSourceFileType.value,
+      dataSourceId.value,
+      dataSourceConfig.value,
+    )
     .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
     .then(reloadAvailableDataSources)
     .catch((e: Error) => renderError(e))
@@ -295,8 +315,8 @@ function deleteDataSource(dataSource: DataSource) {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('confirmDeleteDataSource')
-    }
+      message: t('confirmDeleteDataSource'),
+    },
   }).onOk(() => {
     queryApi
       .deleteDataSource(dataSource.id)
@@ -311,8 +331,8 @@ function removeDataSource(dataSource: DataSource) {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('confirmRemoveDataSource')
-    }
+      message: t('confirmRemoveDataSource'),
+    },
   }).onOk(() => {
     loading.value = true
     queryApi
@@ -329,7 +349,8 @@ function removeDataSource(dataSource: DataSource) {
   })
 }
 </script>
-<style lang="sass" scoped>
-.text-break
-  word-wrap: break-word
+<style lang="scss" scoped>
+.text-break {
+  word-wrap: break-word;
+}
 </style>

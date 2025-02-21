@@ -2,7 +2,13 @@
   <q-card>
     <q-card-section class="q-pa-sm cursor-pointer" @click="$emit('update:expanded', !expanded)">
       <q-toolbar>
-        <q-btn color="grey" round flat dense :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+        <q-btn
+          color="grey"
+          round
+          flat
+          dense
+          :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+        />
         <slot name="title">
           <q-toolbar-title class="row items-center">
             <span v-if="title">{{ title }}</span>

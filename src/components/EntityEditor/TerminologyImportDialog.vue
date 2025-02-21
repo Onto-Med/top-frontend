@@ -17,11 +17,34 @@
         <div v-if="!entity" v-t="'terminologyImport.description'" class="text-italic q-pa-md" />
         <div v-else>
           <div class="row q-px-sm q-pb-sm">
-            <entity-display :entity="entity" show-descriptions show-entity-type show-synonyms class="col" />
+            <entity-display
+              :entity="entity"
+              show-descriptions
+              show-entity-type
+              show-synonyms
+              class="col"
+            />
             <div v-if="isPhenotype(entity)" class="col-4">
-              <enum-select v-model:selected="itemType" i18n-prefix="itemType" :enum="ItemType" dense required />
-              <enum-select v-model:selected="dataType" i18n-prefix="dataType" :enum="DataType" dense required />
-              <unit-input v-if="dataType === DataType.Number" v-model:model-value="unit" dense show-label />
+              <enum-select
+                v-model:selected="itemType"
+                i18n-prefix="itemType"
+                :enum="ItemType"
+                dense
+                required
+              />
+              <enum-select
+                v-model:selected="dataType"
+                i18n-prefix="dataType"
+                :enum="DataType"
+                dense
+                required
+              />
+              <unit-input
+                v-if="dataType === DataType.Number"
+                v-model:model-value="unit"
+                dense
+                show-label
+              />
             </div>
           </div>
 
@@ -77,7 +100,7 @@ import {
   NumberRestriction,
   Phenotype,
   RepositoryType,
-  SingleConcept
+  SingleConcept,
 } from '@onto-med/top-api'
 import { useDialogPluginComponent } from 'quasar'
 import { computed, ref } from 'vue'
@@ -88,16 +111,16 @@ import RangeInput from './RangeInput.vue'
 import UnitInput from '../UnitInput.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { v4 as uuidv4 } from 'uuid'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
 import EnumSelect from '../EnumSelect.vue'
 
 const props = defineProps({
   repositoryType: {
     type: String as () => RepositoryType,
-    default: RepositoryType.PhenotypeRepository
+    default: RepositoryType.PhenotypeRepository,
   },
-  superEntity: Object as () => Entity
+  superEntity: Object as () => Entity,
 })
 
 defineEmits(['hide', 'ok'])
@@ -105,7 +128,7 @@ defineEmits(['hide', 'ok'])
 const { locale, t } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { isPhenotype, isConcept, restrictionToString } = useEntityFormatter()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { notify, renderError } = useNotify()
 const onCancelClick = onDialogCancel
 const selection = ref<Code>()
@@ -134,7 +157,7 @@ function addRestriction() {
   if (!entity.value || props.repositoryType !== RepositoryType.PhenotypeRepository) return
   restrictions.value.push({
     type: (entity.value as Phenotype).dataType as DataType,
-    values: []
+    values: [],
   })
 }
 
@@ -149,9 +172,9 @@ function toEntity(code: Code) {
       titles: [
         {
           lang: locale.value,
-          text: code.name || t('unnamedConcept')
-        }
-      ]
+          text: code.name || t('unnamedConcept'),
+        },
+      ],
     } as SingleConcept
   }
   if (props.repositoryType === RepositoryType.PhenotypeRepository) {
@@ -166,10 +189,10 @@ function toEntity(code: Code) {
       titles: [
         {
           lang: locale.value,
-          text: code.name || t('unnamedPhenotype')
-        }
+          text: code.name || t('unnamedPhenotype'),
+        },
       ],
-      unit: dataType.value === DataType.Number ? unit.value : undefined
+      unit: dataType.value === DataType.Number ? unit.value : undefined,
     } as Phenotype
   }
   return undefined
@@ -189,9 +212,9 @@ function onOkClick() {
               entityType: EntityType.SingleRestriction,
               superPhenotype: entity.value,
               titles: [{ lang: locale.value, text: restrictionToString(r) }],
-              restriction: r
+              restriction: r,
             } as Phenotype)
-          })
+          }),
         )
       }
     })
@@ -203,7 +226,8 @@ function onOkClick() {
 }
 </script>
 
-<style lang="sass">
-.dialog-content
-  min-width: 30vw
+<style lang="scss">
+.dialog-content {
+  min-width: 30vw;
+}
 </style>

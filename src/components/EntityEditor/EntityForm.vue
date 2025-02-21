@@ -44,8 +44,9 @@
 
               <unit-input
                 v-if="
-                  [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(entityType) &&
-                  dataType === DataType.Number
+                  [EntityType.SinglePhenotype, EntityType.CompositePhenotype].includes(
+                    entityType,
+                  ) && dataType === DataType.Number
                 "
                 :model-value="unit"
                 :readonly="readonly"
@@ -83,7 +84,7 @@
           EntityType.CompositePhenotype,
           EntityType.CompositeRestriction,
           EntityType.SinglePhenotype,
-          EntityType.SingleRestriction
+          EntityType.SingleRestriction,
         ]"
         :exclude-function-types="['textFunction']"
         @entity-clicked="$emit('entityClicked', $event)"
@@ -107,7 +108,10 @@
       />
 
       <restriction-input
-        v-if="[EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entityType) && superPhenotype"
+        v-if="
+          [EntityType.SingleRestriction, EntityType.CompositeRestriction].includes(entityType) &&
+          superPhenotype
+        "
         :key="restrictionKey"
         v-model:expanded="showExpression"
         :model-value="restriction"
@@ -159,7 +163,7 @@ import {
   ItemType,
   LocalisableText,
   Phenotype,
-  Restriction
+  Restriction,
 } from '@onto-med/top-api'
 import LocalizedTextInput from 'src/components/EntityEditor/LocalizedTextInput.vue'
 import EnumSelect from 'src/components/EnumSelect.vue'
@@ -168,25 +172,25 @@ import ExpressionInput from 'src/components/EntityEditor/Expression/ExpressionIn
 import UnitInput from 'src/components/UnitInput.vue'
 import CodeInputCard from 'src/components/EntityEditor/Code/CodeInputCard.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 
 const props = defineProps({
   version: Number,
   entityId: {
     type: String,
-    required: true
+    required: true,
   },
   repositoryId: {
     type: String,
-    required: true
+    required: true,
   },
   organisationId: {
     type: String,
-    required: true
+    required: true,
   },
   readonly: {
     type: Boolean,
-    default: false
+    default: false,
   },
   entityType: String as PropType<EntityType>,
   dataType: String as PropType<DataType>,
@@ -194,27 +198,27 @@ const props = defineProps({
   unit: String,
   titles: {
     type: Array as () => LocalisableText[],
-    default: () => []
+    default: () => [],
   },
   synonyms: {
     type: Array as () => LocalisableText[],
-    default: () => []
+    default: () => [],
   },
   descriptions: {
     type: Array as () => LocalisableText[],
-    default: () => []
+    default: () => [],
   },
   codes: {
     type: Array as () => Code[],
-    default: () => []
+    default: () => [],
   },
   expression: Object as () => Expression,
   restriction: Object as () => Restriction,
   superConcepts: {
     type: Array as () => Concept[],
-    default: () => []
+    default: () => [],
   },
-  restrictionKey: Number
+  restrictionKey: Number,
 })
 
 defineEmits([
@@ -227,12 +231,12 @@ defineEmits([
   'update:restriction',
   'update:dataType',
   'update:titles',
-  'update:itemType'
+  'update:itemType',
 ])
 
 const { t } = useI18n()
 const { isRestricted, hasDataType, hasItemType, getTitle, routeToEntity } = useEntityFormatter()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const superPhenotype = ref(undefined as Phenotype | undefined)
 
 onMounted(async () => {

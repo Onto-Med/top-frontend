@@ -61,7 +61,12 @@
         </template>
         <template #header="headerProps">
           <q-tr :props="headerProps">
-            <q-th v-for="col in headerProps.cols" :key="col.name" :props="headerProps" class="bg-grey-1">
+            <q-th
+              v-for="col in headerProps.cols"
+              :key="col.name"
+              :props="headerProps"
+              class="bg-grey-1"
+            >
               {{ col.label }}
             </q-th>
           </q-tr>
@@ -92,7 +97,12 @@
     <q-card-section class="q-pt-none">
       <div class="row justify-end items-center">
         <b class="text-grey-8">
-          {{ t('resultCountWithTotal', { count: page?.content.length || 0, total: page?.totalElements || 0 }) }}
+          {{
+            t('resultCountWithTotal', {
+              count: page?.content.length || 0,
+              total: page?.totalElements || 0,
+            })
+          }}
         </b>
         <q-pagination
           :model-value="page?.number || 0"
@@ -121,7 +131,7 @@ const props = defineProps({
   /** Class to be used for the title. Defaults to 'text-h6'. */
   titleClass: {
     type: String,
-    default: 'text-h6'
+    default: 'text-h6',
   },
   /** The name to be used for button labels. It should be singular noun. */
   name: String,
@@ -134,12 +144,12 @@ const props = defineProps({
   /** Whether a search field is enabled */
   filterable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   /** Wrap text within table cells. */
   wrapCells: Boolean,
   /** Whether buttons and input fields should be disabled. */
-  disable: Boolean
+  disable: Boolean,
 })
 
 const emit = defineEmits(['row-clicked', 'create-clicked', 'request'])
@@ -153,7 +163,7 @@ const cols = computed(() => {
     { name: 'actions' },
     { name: 'name', field: 'name', label: t('name'), align: 'left', required: true },
     { name: 'description', field: 'description', label: t('description'), align: 'left' },
-    { name: 'updatedAt', field: 'updatedAt', label: t('updatedAt'), align: 'left' }
+    { name: 'updatedAt', field: 'updatedAt', label: t('updatedAt'), align: 'left' },
   ] as QTableProps['columns']
 })
 
@@ -181,19 +191,24 @@ function reload() {
 }
 </script>
 
-<style lang="sass">
-.sticky-header-table
-  max-height: 69vh
+<style lang="scss">
+.sticky-header-table {
+  max-height: 69vh;
 
-  .q-table__top
-    flex-wrap: nowrap
-    min-height: 64px
-  thead tr th
-    position: sticky
-    z-index: 1
-    border-top-width: 1px !important
-  thead tr:first-child th
-    top: 0
-  &.q-table--loading thead tr:last-child th
-    top: 48px
+  .q-table__top {
+    flex-wrap: nowrap;
+    min-height: 64px;
+  }
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+    border-top-width: 1px !important;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+  &.q-table--loading thead tr:last-child th {
+    top: 48px;
+  }
+}
 </style>

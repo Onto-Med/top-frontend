@@ -71,7 +71,13 @@
             <q-item-section>
               <q-item-label class="text-h6">
                 {{ t('conceptEntity') }}
-                <q-icon v-show="!entity" name="error" color="negative" class="float-right" :title="t('incomplete')" />
+                <q-icon
+                  v-show="!entity"
+                  name="error"
+                  color="negative"
+                  class="float-right"
+                  :title="t('incomplete')"
+                />
               </q-item-label>
               <q-item-label caption class="gt-sm">
                 {{ t('conceptEntitySelection') }}
@@ -123,10 +129,16 @@
 </template>
 
 <script setup lang="ts">
-import { CompositeConcept, ConceptQuery, DataSource, QueryType, SingleConcept } from '@onto-med/top-api'
+import {
+  CompositeConcept,
+  ConceptQuery,
+  DataSource,
+  QueryType,
+  SingleConcept,
+} from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -140,7 +152,7 @@ import { QueryApiKey } from 'src/boot/axios'
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
 const $q = useQuasar()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
 const { getTitle } = useEntityFormatter()
@@ -152,7 +164,9 @@ const entity = ref<SingleConcept | CompositeConcept>()
 const allString = 'all'
 const language = ref<string | undefined>(allString)
 
-const languageOptions = computed(() => languages.concat({ value: allString, label: t('allLanguages', 2) }))
+const languageOptions = computed(() =>
+  languages.concat({ value: allString, label: t('allLanguages', 2) }),
+)
 
 const treeLoading = ref(false)
 const importFile = ref(undefined as File | undefined)
@@ -164,17 +178,19 @@ const dataSources = ref([] as DataSource[])
 function prefillQuery(query: ConceptQuery, preselectedDataSource: DataSource | undefined) {
   entity.value = entityStore.getEntity(query.entityId)
   language.value = query.language
-  dataSource.value = (preselectedDataSource != undefined) ? preselectedDataSource.id : undefined
+  dataSource.value = preselectedDataSource != undefined ? preselectedDataSource.id : undefined
 }
 
-fileReader.onload = (e) => prefillQuery(JSON.parse(e.target?.result as string) as ConceptQuery, undefined)
+fileReader.onload = (e) =>
+  prefillQuery(JSON.parse(e.target?.result as string) as ConceptQuery, undefined)
 
 async function reloadEntities() {
   treeLoading.value = true
   await entityStore
     .reloadEntities()
     .then(() => {
-      if (entities.value.findIndex((e) => e.id === entity.value?.id) === -1) entity.value = undefined
+      if (entities.value.findIndex((e) => e.id === entity.value?.id) === -1)
+        entity.value = undefined
     })
     .catch((e: Error) => renderError(e))
     .finally(() => (treeLoading.value = false))
@@ -197,7 +213,7 @@ const query = computed(() => {
     dataSource: dataSource.value,
     entityId: entity.value?.id,
     language: language.value,
-    type: QueryType.Concept
+    type: QueryType.Concept,
   } as ConceptQuery
 })
 
@@ -211,7 +227,7 @@ async function reloadDataSources() {
 function exportQuery() {
   exportFile(
     new Date().toISOString() + '_documentQuery_' + (name.value || 'top_query') + '.json',
-    JSON.stringify(query.value)
+    JSON.stringify(query.value),
   )
 }
 
@@ -230,15 +246,15 @@ function onExecute() {
     'execute',
     JSON.parse(
       JSON.stringify(query.value, (key, value: string) =>
-        key === 'language' && value === allString ? undefined : value
-      )
-    ) as ConceptQuery
+        key === 'language' && value === allString ? undefined : value,
+      ),
+    ) as ConceptQuery,
   )
 }
 
-function reset(preselectedDataSource: DataSource|undefined) {
+function reset(preselectedDataSource: DataSource | undefined) {
   name.value = undefined
-  dataSource.value = (preselectedDataSource != undefined) ? preselectedDataSource.id : undefined
+  dataSource.value = preselectedDataSource != undefined ? preselectedDataSource.id : undefined
   entity.value = undefined
   language.value = allString
   reloadEntities().catch((e: Error) => renderError(e))
@@ -246,6 +262,6 @@ function reset(preselectedDataSource: DataSource|undefined) {
 
 defineExpose({
   prefillQuery,
-  reset
+  reset,
 })
 </script>

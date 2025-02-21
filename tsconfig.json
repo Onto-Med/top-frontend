@@ -1,13 +1,7 @@
 {
-  "extends": "@quasar/app-webpack/tsconfig-preset",
+  "extends": "./.quasar/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "target": "esnext",
-    "lib": [
-      "ESNext.Array",
-      "DOM",
-      "ESNext"
-    ],
-    "esModuleInterop": true
+    "lib": ["dom", "esnext", "esnext.array"],
+    "exactOptionalPropertyTypes": false
   }
 }

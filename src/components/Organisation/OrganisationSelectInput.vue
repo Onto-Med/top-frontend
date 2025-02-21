@@ -7,7 +7,9 @@
     :label="modelValue ? '' : label || t('selectThing', { thing: t('organisation') })"
     :options="options"
     :loading="loading"
-    :title="t('entitySearchInput.description', { minLength: minLength, types: t('organisation', 2) })"
+    :title="
+      t('entitySearchInput.description', { minLength: minLength, types: t('organisation', 2) })
+    "
     :virtual-scroll-item-size="60"
     @filter="filterFn"
     @virtual-scroll="onScroll"
@@ -43,16 +45,16 @@ import { nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { OrganisationApiKey } from 'src/boot/axios'
 import { Organisation, OrganisationPage } from '@onto-med/top-api'
-import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import useNotify from 'src/mixins/useNotify'
+import { ScrollDetails } from '../models'
 
 const props = defineProps({
   modelValue: Object as () => Organisation | undefined,
   label: String,
   minLength: {
     type: Number,
-    default: 2
-  }
+    default: 2,
+  },
 })
 
 defineEmits(['update:modelValue'])

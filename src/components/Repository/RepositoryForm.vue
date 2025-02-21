@@ -107,7 +107,7 @@ const isValid = computed(() => state.value.id && state.value.name && state.value
 
 watch(
   () => props.modelValue,
-  (value) => (state.value = copy(value))
+  (value) => (state.value = copy(value)),
 )
 
 function setId(id: string | number | null) {
@@ -119,8 +119,8 @@ function showDeleteDialog() {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('repositoryPage.confirmDelete')
-    }
+      message: t('repositoryPage.confirmDelete'),
+    },
   }).onOk(() => {
     emit('delete-clicked', props.modelValue)
   })

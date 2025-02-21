@@ -62,7 +62,7 @@ import { useRouter } from 'vue-router'
 const props = defineProps({
   organisationId: String,
   repositoryId: String,
-  queryId: String
+  queryId: String,
 })
 
 const { t } = useI18n()
@@ -76,7 +76,7 @@ const router = useRouter()
 
 watch(
   () => props.queryId,
-  () => loadQuery()
+  () => loadQuery(),
 )
 
 onMounted(() => {
@@ -128,10 +128,12 @@ function resetPage() {
 }
 </script>
 
-<style lang="sass" scoped>
-.document-search-title
-  min-height: 104px
-.data-source-select
-  min-width: 50px
-  max-width: 500px
+<style lang="scss" scoped>
+.document-search-title {
+  min-height: 104px;
+}
+.data-source-select {
+  min-width: 50px;
+  max-width: 500px;
+}
 </style>

@@ -11,7 +11,12 @@
 
       <q-card-section v-if="isAuthenticated">
         <user-select v-model="user" required />
-        <enum-select v-model:selected="permission" :enum="Permission" i18n-prefix="permission" required />
+        <enum-select
+          v-model:selected="permission"
+          :enum="Permission"
+          i18n-prefix="permission"
+          required
+        />
         <div>
           <q-btn
             type="submit"
@@ -21,7 +26,14 @@
             :label="t('add')"
             @click="addMembership()"
           />
-          <q-btn flat type="reset" color="primary" :disabled="loading" :label="t('reset')" @click="resetMembership()" />
+          <q-btn
+            flat
+            type="reset"
+            color="primary"
+            :disabled="loading"
+            :label="t('reset')"
+            @click="resetMembership()"
+          />
         </div>
       </q-card-section>
 
@@ -96,7 +108,7 @@ import { storeToRefs } from 'pinia'
 import { QDialog, QTableColumn, useQuasar } from 'quasar'
 import { OrganisationApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import EnumSelect from 'src/components/EnumSelect.vue'
@@ -121,7 +133,7 @@ const loading = ref(false)
 const organisationApi = inject(OrganisationApiKey)
 const user = ref<User | undefined>(undefined)
 const permission = ref<Permission>(Permission.Read)
-const { isAuthenticated } = storeToRefs(useEntity())
+const { isAuthenticated } = storeToRefs(useEntityStore())
 const filter = ref('')
 const initialPagination = { sortBy: 'name', descenting: false, page: 1, rowsPerPage: 10 }
 
@@ -129,7 +141,7 @@ const columns = computed(() => {
   return [
     { name: 'user', label: t('user'), align: 'left', sortable: true, required: true },
     { name: 'permission', label: t('permission'), align: 'left', sortable: true, required: true },
-    { name: 'actions', align: 'right', sortable: false }
+    { name: 'actions', align: 'right', sortable: false },
   ] as QTableColumn[]
 })
 
@@ -174,7 +186,7 @@ async function addMembership() {
   const membership = {
     organisation: props.organisation,
     user: user.value,
-    permission: permission.value
+    permission: permission.value,
   } as OrganisationMembership
 
   await organisationApi
@@ -198,8 +210,8 @@ function deleteMembership(membership: OrganisationMembership) {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('confirmDeleteOrganisationMembership')
-    }
+      message: t('confirmDeleteOrganisationMembership'),
+    },
   }).onOk(() => {
     loading.value = true
     organisationApi

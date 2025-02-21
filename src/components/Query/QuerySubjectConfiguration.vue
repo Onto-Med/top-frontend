@@ -33,7 +33,9 @@
             </template>
             <template #option="scope">
               <q-item v-bind="scope.itemProps">
-                {{ te('functions.' + scope.opt.id) ? t('functions.' + scope.opt.id) : scope.opt.title }}
+                {{
+                  te('functions.' + scope.opt.id) ? t('functions.' + scope.opt.id) : scope.opt.title
+                }}
               </q-item>
             </template>
           </q-select>
@@ -83,20 +85,20 @@ const props = defineProps({
     type: Object as () => DateTimeRestriction,
     default: () => {
       return { type: DataType.DateTime, values: [] }
-    }
+    },
   },
   defaultAggregationFunctionId: {
     type: String,
-    require: true
+    require: true,
   },
   aggregationFunctionOptions: {
     type: Array as () => ExpressionFunction[],
-    default: () => []
+    default: () => [],
   },
   showAggregationFunction: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:dateTimeRestriction', 'update:defaultAggregationFunctionId'])
@@ -108,41 +110,45 @@ const showDialog = ref(false)
 const minimum = computed({
   get: () => (props.dateTimeRestriction.values ? props.dateTimeRestriction.values[0] : undefined),
   set: (val) => {
-    let newModelValue = clone(props.dateTimeRestriction)
+    const newModelValue = clone(props.dateTimeRestriction)
     if (!newModelValue.values) newModelValue.values = []
     newModelValue.values[0] = val as Date
-    newModelValue.values[1] = newModelValue.values[1]
+    if (typeof newModelValue.values[1] === 'undefined')
+      // @ts-expect-error TS2322
+      newModelValue.values[1] = undefined
     emit('update:dateTimeRestriction', newModelValue)
-  }
+  },
 })
 
 const maximum = computed({
   get: () => (props.dateTimeRestriction.values ? props.dateTimeRestriction.values[1] : undefined),
   set: (val) => {
-    let newModelValue = clone(props.dateTimeRestriction)
+    const newModelValue = clone(props.dateTimeRestriction)
     if (!newModelValue.values) newModelValue.values = []
     newModelValue.values[1] = val as Date
-    newModelValue.values[0] = newModelValue.values[0]
+    if (typeof newModelValue.values[0] === 'undefined')
+      // @ts-expect-error TS2322
+      newModelValue.values[0] = undefined
     emit('update:dateTimeRestriction', newModelValue)
-  }
+  },
 })
 
 const minOperator = computed({
   get: () => props.dateTimeRestriction.minOperator,
   set: (val) => {
-    let newModelValue = clone(props.dateTimeRestriction)
+    const newModelValue = clone(props.dateTimeRestriction)
     newModelValue.minOperator = val
     emit('update:dateTimeRestriction', newModelValue)
-  }
+  },
 })
 
 const maxOperator = computed({
   get: () => props.dateTimeRestriction.maxOperator,
   set: (val) => {
-    let newModelValue = clone(props.dateTimeRestriction)
+    const newModelValue = clone(props.dateTimeRestriction)
     newModelValue.maxOperator = val
     emit('update:dateTimeRestriction', newModelValue)
-  }
+  },
 })
 
 function clone(restriction: DateTimeRestriction) {
@@ -150,18 +156,19 @@ function clone(restriction: DateTimeRestriction) {
     type: DataType.DateTime,
     minOperator: restriction.minOperator,
     maxOperator: restriction.maxOperator,
-    values: restriction.values?.slice()
+    values: restriction.values?.slice(),
   } as DateTimeRestriction
 }
 
 function clearDateTimeRestriction() {
-  let newModelValue = JSON.parse(JSON.stringify(props.dateTimeRestriction)) as DateTimeRestriction
+  const newModelValue = JSON.parse(JSON.stringify(props.dateTimeRestriction)) as DateTimeRestriction
   newModelValue.values = []
   emit('update:dateTimeRestriction', newModelValue)
 }
 </script>
 
-<style lang="sass" scoped>
-.criterion-config
-  max-width: 800px
+<style lang="scss" scoped>
+.criterion-config {
+  max-width: 800px;
+}
 </style>

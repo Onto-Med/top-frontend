@@ -11,7 +11,10 @@
 
     <div class="row justify-center q-col-gutter-md">
       <div class="col-lg-4 col-sm-6 col-12">
-        <q-card class="fit text-center cursor-pointer q-hoverable" @click="routeTo('organisations')">
+        <q-card
+          class="fit text-center cursor-pointer q-hoverable"
+          @click="routeTo('organisations')"
+        >
           <span class="q-focus-helper" />
           <q-card-section class="row justify-center items-center">
             <q-icon name="build" size="md" />
@@ -27,7 +30,11 @@
       </div>
 
       <div class="col-lg-4 col-sm-6 col-12">
-        <q-card v-ripple class="fit text-center cursor-pointer q-hoverable" @click="routeTo('queryBuilder')">
+        <q-card
+          v-ripple
+          class="fit text-center cursor-pointer q-hoverable"
+          @click="routeTo('queryBuilder')"
+        >
           <span class="q-focus-helper" />
           <q-card-section class="row justify-center items-center">
             <q-icon name="manage_search" size="lg" />
@@ -82,7 +89,7 @@ import { env } from 'src/config'
 const { t } = useI18n()
 const router = useRouter()
 const defaultApi = inject(DefaultApiKey)
-const statistic = ref(undefined as Statistic|undefined)
+const statistic = ref(undefined as Statistic | undefined)
 const productName = packageInfo.productName
 
 type statisticKey = keyof Statistic
@@ -91,21 +98,23 @@ const overviewContent = computed(() => {
   const entries = [
     { key: 'organisations', label: t('organisation', 2), icon: 'groups' },
     { key: 'repositories', label: t('repository', 2), icon: 'tab' },
-    { key: 'phenotypes', label: t('phenotype', 2), icon: 'category' }
+    { key: 'phenotypes', label: t('phenotype', 2), icon: 'category' },
   ]
-  if (env.DOCUMENTS_ENABLED) entries.push({ key: 'documents', label: t('document', 2), icon: 'article' })
+  if (env.DOCUMENTS_ENABLED)
+    entries.push({ key: 'documents', label: t('document', 2), icon: 'article' })
   return entries
 })
 
-onMounted(() => defaultApi?.getStatistics().then(r => statistic.value = r.data))
+onMounted(() => defaultApi?.getStatistics().then((r) => (statistic.value = r.data)))
 
 function routeTo(name: string) {
   void router.push({ name })
 }
 </script>
 
-<style lang="sass" scope>
-.mood-img
-  max-width: 1900px
-  align-self: center
+<style lang="scss" scope>
+.mood-img {
+  max-width: 1900px;
+  align-self: center;
+}
 </style>
