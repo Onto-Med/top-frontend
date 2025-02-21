@@ -2,7 +2,7 @@ import { defineBoot } from '#q-app/wrappers'
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js'
 import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
-import { VueKeycloakOptions } from '@dsb-norge/vue-keycloak-js/dist/types'
+import { VueKeycloakOptions } from '@dsb-norge/vue-keycloak-js'
 import { env } from 'src/config'
 
 export default defineBoot(async ({ app }) => {

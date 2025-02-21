@@ -1,4 +1,3 @@
-import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
 import {
   BooleanRestriction,
   Category,
@@ -36,6 +35,7 @@ import { AxiosResponse } from 'axios'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { ForkResult } from 'src/components/models'
+import Keycloak from 'keycloak-js'
 
 export const useEntityStore = defineStore('entity', {
   state: () => {
