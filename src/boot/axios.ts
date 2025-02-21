@@ -14,7 +14,7 @@ import {
   ConceptPipelineApi,
 } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
-import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
+import Keycloak from 'keycloak-js'
 import { env } from 'src/config'
 
 declare module '@vue/runtime-core' {
