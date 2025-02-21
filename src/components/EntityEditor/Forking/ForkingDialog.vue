@@ -25,7 +25,7 @@
 
       <q-table
         :title="t('fork', 2)"
-        :rows="forkingStats.forks"
+        :rows="forkingStats.forks || []"
         :columns="forkColumns"
         :no-data-label="t('noDataPresent')"
         row-key="id"
@@ -87,15 +87,15 @@ const forkColumns = computed(
       { name: 'organisation', label: t('organisation'), align: 'left' },
       { name: 'repository', label: t('repository'), align: 'left' },
       { name: 'userAccount', label: t('author'), align: 'left' },
-      { name: 'createdAt', label: t('createdAt') }
-    ] as QTableProps['columns']
+      { name: 'createdAt', label: t('createdAt') },
+    ] as QTableProps['columns'],
 )
 
 watch(
   () => props.show,
   (newShow: boolean) => {
     if (newShow && !forkingStats.value) void reload()
-  }
+  },
 )
 
 async function reload() {

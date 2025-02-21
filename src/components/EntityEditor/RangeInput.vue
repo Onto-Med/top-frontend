@@ -70,17 +70,22 @@ const props = defineProps({
   maxOperator: String,
   minOperators: {
     type: Array,
-    default: () => [RestrictionOperator.GreaterThanOrEqualTo, RestrictionOperator.GreaterThan]
+    default: () => [RestrictionOperator.GreaterThanOrEqualTo, RestrictionOperator.GreaterThan],
   },
   maxOperators: {
     type: Array,
-    default: () => [RestrictionOperator.LessThanOrEqualTo, RestrictionOperator.LessThan]
+    default: () => [RestrictionOperator.LessThanOrEqualTo, RestrictionOperator.LessThan],
   },
   readonly: Boolean,
-  type: String
+  type: String,
 })
 
-const emit = defineEmits(['update:minimum', 'update:maximum', 'update:minOperator', 'update:maxOperator'])
+const emit = defineEmits([
+  'update:minimum',
+  'update:maximum',
+  'update:minOperator',
+  'update:maxOperator',
+])
 
 const { t } = useI18n()
 
@@ -126,7 +131,8 @@ function updateMaximum(value?: number | string | null) {
 }
 </script>
 
-<style lang="sass" scoped>
-.operator-input
-  width: 80px
+<style lang="scss" scoped>
+.operator-input {
+  width: 80px;
+}
 </style>

@@ -25,7 +25,13 @@
                   size="sm"
                   color="positive"
                 />
-                <q-icon v-else-if="isFailed(trProps.row)" :title="t('failed')" name="bolt" size="sm" color="negative" />
+                <q-icon
+                  v-else-if="isFailed(trProps.row)"
+                  :title="t('failed')"
+                  name="bolt"
+                  size="sm"
+                  color="negative"
+                />
                 <q-icon v-else :title="t('queued')" name="pause" size="sm" color="grey" />
               </q-td>
               <q-td>{{ trProps.row.name || t('unnamedQuery') }}</q-td>
@@ -114,7 +120,7 @@ import { storeToRefs } from 'pinia'
 import { exportFile, useQuasar, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -123,17 +129,17 @@ import * as zip from '@zip.js/zip.js'
 const props = defineProps({
   page: {
     type: Object as () => QueryPage,
-    required: true
+    required: true,
   },
   loading: Boolean,
-  isConceptQuery: Boolean
+  isConceptQuery: Boolean,
 })
 
 const emit = defineEmits(['delete', 'prefill', 'request'])
 
 const { t } = useI18n()
 const queryApi = inject(QueryApiKey)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 const { organisationId, repositoryId } = storeToRefs(entityStore)
 const results = ref<QueryResult[]>([])
@@ -149,8 +155,8 @@ const cols = computed(
       { name: 'state' },
       { name: 'name', field: 'name', label: t('name'), align: 'left' },
       { name: 'result', field: 'result', label: t('result'), align: 'left' },
-      { name: 'elappsedTime', align: 'right' }
-    ] as QTableProps['columns']
+      { name: 'elappsedTime', align: 'right' },
+    ] as QTableProps['columns'],
 )
 
 onMounted(() => {
@@ -170,7 +176,13 @@ onUnmounted(() => {
 })
 
 async function loadResult(query: Query) {
-  if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
+  if (
+    props.loading ||
+    !queryApi ||
+    !organisationId.value ||
+    !repositoryId.value ||
+    getQueryResult(query)?.finishedAt
+  )
     return new Promise<void>((resolve) => resolve())
   return queryApi.getQueryById(organisationId.value, repositoryId.value, query.id).then((r) => {
     if (!r.data.result) return
@@ -198,14 +210,17 @@ function routeToDocumentView(query: Query) {
       params: {
         organisationId: organisationId.value,
         repositoryId: repositoryId.value,
-        queryId: query.id
-      }
+        queryId: query.id,
+      },
     })
 }
 
 async function download(query: Query) {
-  if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return Promise.reject()
-  return queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, { responseType: 'blob' })
+  if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value)
+    return Promise.reject()
+  return queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, {
+    responseType: 'blob',
+  })
 }
 
 function isRunning(query: Query): boolean {
@@ -223,7 +238,9 @@ function isFailed(query: Query): boolean {
 function getEllapsedTime(query: Query): string | undefined {
   const result = getQueryResult(query)
   if (!result) return undefined
-  const finishedAt = result.finishedAt ? new Date(result.finishedAt).getTime() : new Date().getTime()
+  const finishedAt = result.finishedAt
+    ? new Date(result.finishedAt).getTime()
+    : new Date().getTime()
   return new Date(finishedAt - new Date(result.createdAt).getTime()).toISOString().slice(11, 19)
 }
 
@@ -236,7 +253,7 @@ function getResult(query: Query): number | string | undefined {
 function exportToFile(query: Query) {
   download(query).then(
     (r) => exportFile(query.id + '.zip', r.data as Blob),
-    () => {}
+    () => {},
   )
 }
 
@@ -252,9 +269,9 @@ function showGrid(query: Query) {
         component: GridDialog,
         componentProps: {
           entries: entries,
-          query
-        }
-      })
+          query,
+        },
+      }),
     )
     .catch((e: Error) => renderError(e))
 }

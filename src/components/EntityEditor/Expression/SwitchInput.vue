@@ -1,75 +1,77 @@
 <template>
   <table>
-    <tr>
-      <td colspan="2" class="q-pb-md">
-        <q-btn
-          icon="add"
-          color="primary"
-          class="q-mr-md"
-          :label="t('addThing', { thing: t('mapping') })"
-          @click="addMapping()"
-        />
-      </td>
+    <tbody>
+      <tr>
+        <td colspan="2" class="q-pb-md">
+          <q-btn
+            icon="add"
+            color="primary"
+            class="q-mr-md"
+            :label="t('addThing', { thing: t('mapping') })"
+            @click="addMapping()"
+          />
+        </td>
 
-      <td class="q-pb-md">
-        <q-input
-          :model-value="defaultValue"
-          :label="t('defaultValue')"
-          :hint="t('defaultValueHint')"
-          :readonly="readonly"
-          type="number"
-          debounce="500"
-          @update:model-value="setDefaultValue($event as number | undefined)"
-        />
-      </td>
-    </tr>
+        <td class="q-pb-md">
+          <q-input
+            :model-value="defaultValue"
+            :label="t('defaultValue')"
+            :hint="t('defaultValueHint')"
+            :readonly="readonly"
+            type="number"
+            debounce="500"
+            @update:model-value="setDefaultValue($event as number | undefined)"
+          />
+        </td>
+      </tr>
 
-    <tr v-for="(mapping, index) in mappings" :key="index">
-      <td>
-        <entity-chip
-          :entity-id="mapping.entityId"
-          :organisation-id="organisationId"
-          :repository-id="repositoryId"
-          :disable="readonly"
-          :entity-types="entityTypes"
-          :label="t('selectThing', { thing: t('phenotype') }) + '...'"
-          changeable
-          @entity-clicked="$emit('entityClicked', $event)"
-          @entity-set="setMappingEntity(index, $event?.id)"
-        />
-      </td>
-      <td>
-        <q-icon
-          v-if="!mapping.entityId || !mapping.value"
-          :title="t('invalid', { thing: t('mapping') })"
-          color="negative"
-          name="dangerous"
-          size="sm"
-        />
-        <q-icon v-else name="arrow_right_alt" size="md" />
-      </td>
-      <td>
-        <q-input
-          :model-value="mapping.value"
-          :label="t('score')"
-          :disable="readonly"
-          dense
-          type="number"
-          debounce="500"
-          @update:model-value="setMappingValue(index, $event as number | undefined)"
-        />
-      </td>
-      <td>
-        <q-btn
-          dense
-          color="red"
-          icon="remove"
-          :disable="readonly"
-          :title="t('remove')"
-          @click="removeMappingByIndex(index)"
-        />
-      </td>
-    </tr>
+      <tr v-for="(mapping, index) in mappings" :key="index">
+        <td>
+          <entity-chip
+            :entity-id="mapping.entityId"
+            :organisation-id="organisationId"
+            :repository-id="repositoryId"
+            :disable="readonly"
+            :entity-types="entityTypes"
+            :label="t('selectThing', { thing: t('phenotype') }) + '...'"
+            changeable
+            @entity-clicked="$emit('entityClicked', $event)"
+            @entity-set="setMappingEntity(index, $event?.id)"
+          />
+        </td>
+        <td>
+          <q-icon
+            v-if="!mapping.entityId || !mapping.value"
+            :title="t('invalid', { thing: t('mapping') })"
+            color="negative"
+            name="dangerous"
+            size="sm"
+          />
+          <q-icon v-else name="arrow_right_alt" size="md" />
+        </td>
+        <td>
+          <q-input
+            :model-value="mapping.value"
+            :label="t('score')"
+            :disable="readonly"
+            dense
+            type="number"
+            debounce="500"
+            @update:model-value="setMappingValue(index, $event as number | undefined)"
+          />
+        </td>
+        <td>
+          <q-btn
+            dense
+            color="red"
+            icon="remove"
+            :disable="readonly"
+            :title="t('remove')"
+            @click="removeMappingByIndex(index)"
+          />
+        </td>
+      </tr>
+    </tbody>
   </table>
 </template>
 
@@ -79,7 +81,7 @@ import { DataType, EntityType, Expression, NumberValue } from '@onto-med/top-api
 import { useI18n } from 'vue-i18n'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 
 const props = defineProps({
   modelValue: {
@@ -87,30 +89,32 @@ const props = defineProps({
     default: () => {
       return {
         function: 'switch',
-        arguments: []
+        arguments: [],
       }
-    }
+    },
   },
   expanded: Boolean,
   readonly: Boolean,
-  showHelp: Boolean
+  showHelp: Boolean,
 })
 
 const emit = defineEmits(['update:modelValue', 'entityClicked'])
 
 const { t } = useI18n()
-const { organisationId, repositoryId } = storeToRefs(useEntity())
+const { organisationId, repositoryId } = storeToRefs(useEntityStore())
 const entityTypes = [
   EntityType.SinglePhenotype,
   EntityType.SingleRestriction,
   EntityType.CompositePhenotype,
-  EntityType.CompositeRestriction
+  EntityType.CompositeRestriction,
 ]
 
-const hasDefaultValue = computed(() => props.modelValue.arguments && props.modelValue.arguments.length % 2 !== 0)
+const hasDefaultValue = computed(
+  () => props.modelValue.arguments && props.modelValue.arguments.length % 2 !== 0,
+)
 const defaultValue = computed(() => {
   if (props.modelValue.arguments && hasDefaultValue.value) {
-    const values = props.modelValue.arguments[props.modelValue.arguments.length - 1].values
+    const values = props.modelValue.arguments[props.modelValue.arguments.length - 1]?.values
     if (values && values.length) return (values[0] as NumberValue).value
   }
   return undefined
@@ -121,10 +125,10 @@ const mappings = computed(() => {
     .slice(0, props.modelValue.arguments.length - (hasDefaultValue.value ? 1 : 0))
     .reduce((prev, val, i, array) => {
       if (i % 2 === 0) {
-        const values = array[i + 1].values
+        const values = array[i + 1]?.values
         prev.push({
           entityId: val.entityId,
-          value: values && values.length ? (values[0] as NumberValue).value : undefined
+          value: values && values.length ? (values[0] as NumberValue).value : undefined,
         })
       }
       return prev
@@ -138,7 +142,7 @@ function clone<T>(obj: T): T {
 function buildValueConstant(value?: number) {
   return {
     functionId: 'value',
-    values: [{ dataType: DataType.Number, value: value } as NumberValue]
+    values: [{ dataType: DataType.Number, value: value } as NumberValue],
   } as Expression
 }
 

@@ -16,7 +16,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   color: 'grey',
-  size: 'sm'
+  size: 'sm',
 })
 
 const { t } = useI18n()

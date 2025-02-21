@@ -3,7 +3,9 @@
     <q-list
       v-if="
         createable &&
-        (!entity || (entity.createdAt && [EntityType.Category, EntityType.SingleConcept].includes(entity.entityType)))
+        (!entity ||
+          (entity.createdAt &&
+            [EntityType.Category, EntityType.SingleConcept].includes(entity.entityType)))
       "
       dense
     >
@@ -20,7 +22,9 @@
     <q-list v-else-if="entity && createable && entity.createdAt" dense>
       <template v-for="entry in entries" :key="entry.phenotype">
         <q-item
-          v-if="entity.entityType === entry.phenotype && allowedEntityTypes.includes(entry.restriction)"
+          v-if="
+            entity.entityType === entry.phenotype && allowedEntityTypes.includes(entry.restriction)
+          "
           v-close-popup
           clickable
           @click="emitCreateEntity(entry.restriction, entity?.id)"
@@ -48,7 +52,9 @@
     <q-list
       v-if="
         importable &&
-        (!entity || (entity.createdAt && [EntityType.Category, EntityType.SingleConcept].includes(entity.entityType)))
+        (!entity ||
+          (entity.createdAt &&
+            [EntityType.Category, EntityType.SingleConcept].includes(entity.entityType)))
       "
       dense
     >
@@ -74,30 +80,30 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityMoveDialog from './EntityMoveDialog.vue'
 import TerminologyImportDialog from './TerminologyImportDialog.vue'
 import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 
 const props = defineProps({
   entity: Object as () => Entity,
   allowedEntityTypes: {
     type: Array as () => EntityType[],
-    default: () => Object.values(EntityType)
+    default: () => Object.values(EntityType),
   },
   deletable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   duplicatable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   importable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   createable: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 })
 
 const emit = defineEmits(['createEntityClicked', 'deleteEntityClicked', 'duplicateEntityClicked'])
@@ -105,11 +111,11 @@ const emit = defineEmits(['createEntityClicked', 'deleteEntityClicked', 'duplica
 const { t } = useI18n()
 const $q = useQuasar()
 const { isCategory, isRestricted } = useEntityFormatter()
-const { repository } = storeToRefs(useEntity())
+const { repository } = storeToRefs(useEntityStore())
 
 const entries = [
   { phenotype: EntityType.SinglePhenotype, restriction: EntityType.SingleRestriction },
-  { phenotype: EntityType.CompositePhenotype, restriction: EntityType.CompositeRestriction }
+  { phenotype: EntityType.CompositePhenotype, restriction: EntityType.CompositeRestriction },
 ]
 
 const abstractEntityTypes = computed(() =>
@@ -118,8 +124,8 @@ const abstractEntityTypes = computed(() =>
     EntityType.SinglePhenotype,
     EntityType.CompositePhenotype,
     EntityType.SingleConcept,
-    EntityType.CompositeConcept
-  ].filter((e) => props.allowedEntityTypes.includes(e))
+    EntityType.CompositeConcept,
+  ].filter((e) => props.allowedEntityTypes.includes(e)),
 )
 
 function showDeleteDialog() {
@@ -129,8 +135,8 @@ function showDeleteDialog() {
     componentProps: {
       message: t('entityEditor.delete.confirm'),
       checkbox: isCategory(props.entity),
-      checkboxLabel: t('entityEditor.delete.cascade')
-    }
+      checkboxLabel: t('entityEditor.delete.cascade'),
+    },
   }).onOk((cascade) => {
     emit('deleteEntityClicked', props.entity, cascade)
   })
@@ -140,7 +146,7 @@ function showMoveDialog() {
   if (!props.entity) return
   $q.dialog({
     component: EntityMoveDialog,
-    componentProps: { entity: props.entity }
+    componentProps: { entity: props.entity },
   })
 }
 
@@ -149,8 +155,8 @@ function showTerminologyImportDialog() {
     component: TerminologyImportDialog,
     componentProps: {
       repositoryType: repository.value?.repositoryType,
-      superEntity: props.entity
-    }
+      superEntity: props.entity,
+    },
   })
 }
 

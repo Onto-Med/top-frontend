@@ -25,7 +25,7 @@
               removeable
               @remove-clicked="removeSuperEntity(index)"
               @entity-set="setSuperEntity(index, $event)"
-              @entity-clicked="routeToEntity({ repository: entity.repository, ...superEntity }).then(() => onDialogHide())"
+              @entity-clicked="routeToSuperEntity(superEntity)"
             />
           </q-item>
           <q-item>
@@ -56,7 +56,7 @@ import { Category, Concept, Entity, EntityType } from '@onto-med/top-api'
 import { useDialogPluginComponent } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import EntityChip from './EntityChip.vue'
@@ -65,24 +65,27 @@ import useNotify from 'src/mixins/useNotify'
 const props = defineProps({
   entity: {
     type: Object as () => Entity,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const { t } = useI18n()
 const { notify, renderError } = useNotify()
 const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } = useDialogPluginComponent()
-const { getTitle, isCategory, isConcept, isPhenotype, isRestricted, routeToEntity } = useEntityFormatter()
+const { getTitle, isCategory, isConcept, isPhenotype, isRestricted, routeToEntity } =
+  useEntityFormatter()
 const onCancelClick = onDialogCancel
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { organisationId, repositoryId } = storeToRefs(entityStore)
 const superEntities = ref<(Category | Concept | undefined)[]>([])
 
 const allowedEntityTypes = computed(() =>
-  isConcept(props.entity) ? [EntityType.SingleConcept] : [EntityType.Category]
+  isConcept(props.entity) ? [EntityType.SingleConcept] : [EntityType.Category],
 )
 const label = computed(() => (isConcept(props.entity) ? t('concept', 2) : t('category', 2)))
-const superEntitiesLabel = computed(() => (isConcept(props.entity) ? t('superConcept', 2) : t('superCategory', 2)))
+const superEntitiesLabel = computed(() =>
+  isConcept(props.entity) ? t('superConcept', 2) : t('superCategory', 2),
+)
 
 onMounted(() => {
   if ((isCategory(props.entity) || isPhenotype(props.entity)) && props.entity.superCategories)
@@ -114,9 +117,17 @@ function setSuperEntity(index: number, superEntity: Category | Concept) {
 function removeSuperEntity(index: number) {
   superEntities.value.splice(index, 1)
 }
+
+function routeToSuperEntity(superEntity?: Entity) {
+  if (!superEntity) return
+  routeToEntity({ repository: props.entity.repository, ...superEntity })
+    .then(() => onDialogHide())
+    .catch(() => {})
+}
 </script>
 
-<style lang="sass">
-.dialog-content
-  min-width: 30vw
+<style lang="scss">
+.dialog-content {
+  min-width: 30vw;
+}
 </style>

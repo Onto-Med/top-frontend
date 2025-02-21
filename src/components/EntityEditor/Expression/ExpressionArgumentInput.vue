@@ -27,7 +27,11 @@
       </entity-chip>
       <slot name="append" />
     </div>
-    <div v-else-if="(modelValue?.values && modelValue?.values.length) || modelValue?.constantId || isConstant">
+    <div
+      v-else-if="
+        (modelValue?.values && modelValue?.values.length) || modelValue?.constantId || isConstant
+      "
+    >
       <expression-value-input
         :value="modelValue.values && modelValue?.values.length ? modelValue.values[0] : undefined"
         :constant-id="modelValue.constantId"
@@ -45,16 +49,29 @@
     </div>
     <template v-else>
       <div v-if="prefix">
-        <span :class="{ hover: hover }" class="clickable" @mouseover="hover = true" @mouseleave="hover = false">
+        <span
+          :class="{ hover: hover }"
+          class="clickable"
+          @mouseover="hover = true"
+          @mouseleave="hover = false"
+        >
           {{ expand ? '&nbsp;'.repeat(indentLevel * indent) : ''
           }}<!--
-          --><b v-if="fun" :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
+          --><b v-if="fun" :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{
+            functionTitle
+          }}</b>
           <span v-else>[{{ t('selectThing', { thing: t('function') }) }}]</span>
           <span v-show="argumentCount">(</span>
         </span>
         <slot v-if="!argumentCount" name="append" />
       </div>
-      <div v-else class="clickable" :class="{ hover: hover }" @mouseover="hover = true" @mouseleave="hover = false">
+      <div
+        v-else
+        class="clickable"
+        :class="{ hover: hover }"
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+      >
         {{ expand ? '&nbsp;'.repeat(indentLevel * indent) : '' }}(
       </div>
 
@@ -70,7 +87,9 @@
             <span>
               {{ expand ? '&nbsp;'.repeat((indentLevel + 1) * indent) : '&nbsp;'
               }}<!--
-              --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b
+              --><b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{
+                functionTitle
+              }}</b
               ><!--
               -->{{ !expand ? '&nbsp;' : '' }}
             </span>
@@ -98,7 +117,8 @@
                 @mouseover="hover = true"
                 @mouseleave="hover = false"
                 @click.stop
-              >,{{ !expand ? '&nbsp;' : '' }}</span>
+                >,{{ !expand ? '&nbsp;' : '' }}</span
+              >
             </template>
           </expression-argument-input>
         </template>
@@ -126,7 +146,9 @@
         >
           <span>{{ expand ? '&nbsp;'.repeat(indentLevel * indent) : '' }})</span>
           <template v-if="postfix">
-            <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{ functionTitle }}</b>
+            <b :title="t('rightClickShowDoc')" @click.right="showFunctionDoc()">{{
+              functionTitle
+            }}</b>
           </template>
         </div>
         <slot v-if="postfix || argumentCount" name="append" />
@@ -149,11 +171,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Entity, EntityType, Expression, ExpressionFunction, NotationEnum, Value } from '@onto-med/top-api'
+import {
+  Entity,
+  EntityType,
+  Expression,
+  ExpressionFunction,
+  NotationEnum,
+  Value,
+} from '@onto-med/top-api'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import ExpressionContextMenu from 'src/components/EntityEditor/Expression/ExpressionContextMenu.vue'
 import ExpressionValueInput from 'src/components/EntityEditor/Expression/ExpressionValueInput.vue'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import useNotify from 'src/mixins/useNotify'
 import { env, noDocFunctionTypes } from 'src/config'
@@ -161,18 +190,18 @@ import { env, noDocFunctionTypes } from 'src/config'
 const props = defineProps({
   modelValue: {
     type: Object as () => Expression,
-    default: () => ({})
+    default: () => ({}),
   },
   readonly: Boolean,
   root: Boolean,
   expand: Boolean,
   indent: {
     type: Number,
-    default: 2
+    default: 2,
   },
   indentLevel: {
     type: Number,
-    default: 0
+    default: 0,
   },
   organisationId: String,
   repositoryId: String,
@@ -180,7 +209,7 @@ const props = defineProps({
   includeFunctionTypes: Array as () => string[],
   excludeFunctionTypes: Array as () => string[],
   excludeFunctions: Array as () => string[],
-  simpleConstants: Boolean
+  simpleConstants: Boolean,
 })
 
 const emit = defineEmits(['update:modelValue', 'entityClicked'])
@@ -190,7 +219,7 @@ const { t, te } = useI18n()
 const flash = ref(false)
 const isEntity = ref(false)
 const isConstant = ref(false)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 const { functions } = storeToRefs(entityStore)
 const hover = ref(false)
@@ -204,7 +233,7 @@ const fun = computed(() => {
   return {
     id: props.modelValue.functionId,
     title: t('invalid').toUpperCase(),
-    notation: NotationEnum.Prefix
+    notation: NotationEnum.Prefix,
   } as ExpressionFunction
 })
 
@@ -212,7 +241,9 @@ const argumentCount = computed(() => countArguments(props.modelValue, fun.value)
 
 const showMoreBtn = computed(
   () =>
-    !props.readonly && fun.value && (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber)
+    !props.readonly &&
+    fun.value &&
+    (!fun.value.maxArgumentNumber || argumentCount.value < fun.value.maxArgumentNumber),
 )
 
 const baseDocUrl = computed(() => {
@@ -226,7 +257,8 @@ const functionTitle = computed(() => {
 })
 
 const functionDocUrl = computed(() => {
-  if (!baseDocUrl.value || !fun.value?.type || noDocFunctionTypes.includes(fun.value.type)) return undefined
+  if (!baseDocUrl.value || !fun.value?.type || noDocFunctionTypes.includes(fun.value.type))
+    return undefined
   return `${baseDocUrl.value}/${fun.value.type || ''}/${fun.value.id}.html`
 })
 
@@ -317,7 +349,7 @@ function setConstantId(constantId: string | undefined): void {
 
 function enclose(): void {
   const newModelValue = {
-    arguments: [JSON.parse(JSON.stringify(props.modelValue))]
+    arguments: [JSON.parse(JSON.stringify(props.modelValue))],
   } as Expression
   isEntity.value = false
   isConstant.value = false
@@ -335,35 +367,45 @@ function showFunctionDoc() {
 }
 </script>
 
-<style lang="sass" scoped>
-.hover
-  color: var(--q-primary)
-  font-weight: 900
+<style lang="scss" scoped>
+.hover {
+  color: var(--q-primary);
+  font-weight: 900;
+}
 
-.clickable
-  display: inline
-  &:hover
-    cursor: pointer
-    @extend .hover
+.clickable {
+  display: inline;
+  &:hover {
+    cursor: pointer;
+    @extend .hover;
+  }
+}
 
-.d-inline
-  display: inline
+.d-inline {
+  display: inline;
+}
 
-.expression-input .entity-search-input-field
-  width: 200px
-  margin: 4px
-  display: inline
-  vertical-align: middle
-  .q-field__inner, .q-field__control
-    min-height: 2em !important
-    height: 2em !important
-  .q-field__native
-    padding: 0 0 !important
-    min-height: 2em !important
-    height: 2em !important
-  .q-field__append
-    height: 1em
-  .q-btn
-    min-height: 1em !important
-    min-width: 1em !important
+.expression-input .entity-search-input-field {
+  width: 200px;
+  margin: 4px;
+  display: inline;
+  vertical-align: middle;
+  .q-field__inner,
+  .q-field__control {
+    min-height: 2em !important;
+    height: 2em !important;
+  }
+  .q-field__native {
+    padding: 0 0 !important;
+    min-height: 2em !important;
+    height: 2em !important;
+  }
+  .q-field__append {
+    height: 1em;
+  }
+  .q-btn {
+    min-height: 1em !important;
+    min-width: 1em !important;
+  }
+}
 </style>

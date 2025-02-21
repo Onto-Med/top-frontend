@@ -48,7 +48,7 @@ const { t, te } = useI18n()
 
 const localSelected = computed({
   get: () => props.selected as T,
-  set: (value: T) => emit('update:selected', value)
+  set: (value: T) => emit('update:selected', value),
 })
 
 const localLabel = computed(() =>
@@ -58,7 +58,7 @@ const localLabel = computed(() =>
       ? t(`${props.i18nPrefix}.title`)
       : te(props.i18nPrefix)
         ? t(props.i18nPrefix)
-        : undefined
+        : undefined,
 )
 
 const localDescription = computed(() => {
@@ -79,15 +79,15 @@ const localOptions = computed(() =>
         return {
           label: t(labelKey),
           value: d,
-          title: te(descriptionKey) ? t(descriptionKey) : ''
+          title: te(descriptionKey) ? t(descriptionKey) : '',
         }
       } else {
         return {
           label: te(d) ? t(d) : d,
-          value: d
+          value: d,
         }
       }
     })
-    .sort((a, b) => a.label.localeCompare(b.label))
+    .sort((a, b) => a.label.localeCompare(b.label)),
 )
 </script>
