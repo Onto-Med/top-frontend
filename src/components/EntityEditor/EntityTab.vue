@@ -145,7 +145,11 @@
         @restore="$emit('restoreVersion', $event)"
       />
 
-      <forking-dialog v-model:show="showForking" :entity="entity" @entity-clicked="$emit('entityClicked', $event)" />
+      <forking-dialog
+        v-model:show="showForking"
+        :entity="entity"
+        @entity-clicked="$emit('entityClicked', $event)"
+      />
     </div>
 
     <entity-form
@@ -224,7 +228,7 @@ import EntityForm from 'src/components/EntityEditor/EntityForm.vue'
 import Dialog from 'src/components/Dialog.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useRouter } from 'vue-router'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { EntityApiKey } from 'src/boot/axios'
 import { copyToClipboard, useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
@@ -232,38 +236,46 @@ import useNotify from 'src/mixins/useNotify'
 const props = defineProps({
   entity: {
     type: Object as () => Category | Phenotype | Concept,
-    required: true
+    required: true,
   },
   version: Number,
   repositoryId: {
     type: String,
-    required: true
+    required: true,
   },
   organisationId: {
     type: String,
-    required: true
+    required: true,
   },
   hotkeysEnabled: {
     type: Boolean,
-    default: true
+    default: true,
   },
   isOpen: {
     type: Boolean,
-    default: false
+    default: false,
   },
   dirty: Boolean,
-  readonly: Boolean
+  readonly: Boolean,
 })
 
-const emit = defineEmits(['entityClicked', 'update:entity', 'restoreVersion', 'changeVersion', 'save', 'reset'])
+const emit = defineEmits([
+  'entityClicked',
+  'update:entity',
+  'restoreVersion',
+  'changeVersion',
+  'save',
+  'reset',
+])
 
 const { t, d } = useI18n()
-const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType, isConcept } = useEntityFormatter()
+const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType, isConcept } =
+  useEntityFormatter()
 const { notify, renderError } = useNotify()
 const router = useRouter()
 const local = ref(clone(props.entity))
 const entityApi = inject(EntityApiKey)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const showJson = ref(false)
 const loading = ref(false)
 const showVersionHistory = ref(false)
@@ -277,15 +289,18 @@ const isOtherVersion = computed(() => local.value.version != props.entity.versio
 const isForking = true
 
 const isValid = computed((): boolean => {
-  var result = true
+  let result = true
 
   result &&=
     local.value.titles != undefined &&
     local.value.titles.length > 0 &&
     local.value.titles.filter((t) => !t.lang || !t.text).length === 0
   result &&=
-    local.value.descriptions == undefined || local.value.descriptions.filter((d) => !d.lang || !d.text).length === 0
-  result &&= local.value.synonyms == undefined || local.value.synonyms.filter((s) => !s.lang || !s.text).length === 0
+    local.value.descriptions == undefined ||
+    local.value.descriptions.filter((d) => !d.lang || !d.text).length === 0
+  result &&=
+    local.value.synonyms == undefined ||
+    local.value.synonyms.filter((s) => !s.lang || !s.text).length === 0
 
   result &&= !hasItemType(props.entity) || !!(local.value as Phenotype).itemType
   result &&= !hasDataType(props.entity) || !!(local.value as Phenotype).dataType
@@ -300,12 +315,13 @@ watch(
   (value: Category | Phenotype | Concept) => {
     local.value = clone(value)
   },
-  { deep: true }
+  { deep: true },
 )
 
 onMounted(() => {
   document.addEventListener('keydown', keylistener)
-  if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version) return
+  if (!entityApi || !props.entity.id || !props.version || props.entity.version === props.version)
+    return
   loading.value = true
   entityApi
     .getEntityById(props.organisationId, props.repositoryId, props.entity.id, props.version)
@@ -326,8 +342,12 @@ function prefillFromVersion(entity: Category | Phenotype): void {
   restrictionKey.value++
   void router.replace({
     name: 'editor',
-    params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repositoryId, entityId: entity.id },
-    query: { version: entity.version }
+    params: {
+      organisationId: entityStore.organisationId,
+      repositoryId: entityStore.repositoryId,
+      entityId: entity.id,
+    },
+    query: { version: entity.version },
   })
   emit('changeVersion', entity.version)
 }
@@ -335,7 +355,11 @@ function prefillFromVersion(entity: Category | Phenotype): void {
 function save() {
   if (isNew.value || props.dirty) {
     if (isValid.value) {
-      if (isPhenotype(local.value) && local.value.expression?.functionId === 'switch' && hasDataType(local.value))
+      if (
+        isPhenotype(local.value) &&
+        local.value.expression?.functionId === 'switch' &&
+        hasDataType(local.value)
+      )
         local.value.dataType = DataType.Number
       emit('save')
       versionHistoryDialogKey.value++
@@ -366,21 +390,24 @@ function showClearDialog() {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('confirmDiscardChanges')
-    }
+      message: t('confirmDiscardChanges'),
+    },
   }).onOk(() => reset())
 }
 </script>
 
-<style lang="sass">
-.entity-tab-content
-  height: 100%
+<style lang="scss">
+.entity-tab-content {
+  height: 100%;
+}
 </style>
 
-<style lang="sass" scoped>
-.entity-tab-header
-  width: 100%
-.json-section
-  height: 60vh
-  width: 100%
+<style lang="scss" scoped>
+.entity-tab-header {
+  width: 100%;
+}
+.json-section {
+  height: 60vh;
+  width: 100%;
+}
 </style>

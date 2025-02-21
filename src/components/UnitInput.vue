@@ -56,7 +56,6 @@ defineEmits(['update:modelValue'])
 
 const { t } = useI18n()
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 const utils = ucumLhc.UcumLhcUtils.getInstance() as TypedUcumLhcUtils
 const options = ref(null as unknown as Array<Record<string, string>>)
 
@@ -81,14 +80,14 @@ function filterFn(val: string, update: (arg0: () => void) => void, abort: () => 
   if (result.suggestions) {
     update(
       () =>
-        (options.value = (result.suggestions as Array<Record<string, unknown>>)
-          .flatMap((s) => s.units as Array<string[]>)
-          .map((u: string[]) => {
-            return { value: u[0], label: u[1] }
-          }))
+        (options.value = (result.suggestions as { units: Array<string[]> }[])
+          .flatMap((s) => s.units)
+          .map((u) => {
+            return { value: u[0] || '', label: u[1] || '' }
+          })),
     )
   } else if (result.unit) {
-    const unit = result.unit as Record<string, string>
+    const unit = result.unit as { code: string; name: string }
     update(() => (options.value = [{ value: unit.code, label: unit.name }]))
   } else {
     abort()

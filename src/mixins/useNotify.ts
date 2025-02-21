@@ -16,9 +16,9 @@ export default function (this: void) {
       actions: [
         {
           icon: 'close',
-          color: textColor
-        }
-      ]
+          color: textColor,
+        },
+      ],
     })
   }
 
@@ -28,12 +28,12 @@ export default function (this: void) {
     renderError: (e?: AxiosError | Error): void => {
       if (!e) return
       let message = e.message
-      if (e.hasOwnProperty('response')) {
+      if (Object.prototype.hasOwnProperty.call(e, 'response')) {
         const response = (e as AxiosError).response
         if (response)
-          message = (response.data as ErrorResponse).message || (`Status Code: ${response.status}`)
+          message = (response.data as ErrorResponse).message || `Status Code: ${response.status}`
       }
       notify(message)
-    }
+    },
   }
 }

@@ -30,9 +30,9 @@
 import { computed, nextTick, ref } from 'vue'
 import { CodeSystem, CodeSystemPage } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
-import { ScrollDetails } from 'src/mixins/ScrollDetails'
+import { ScrollDetails } from './models'
 
 const props = defineProps<{
   modelValue?: CodeSystem
@@ -47,7 +47,7 @@ const props = defineProps<{
 defineEmits(['update:modelValue'])
 
 const { t } = useI18n()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 
 const loadedOptions = ref<CodeSystem[]>([])
@@ -66,7 +66,7 @@ async function loadOptions(input?: string, page = 1): Promise<CodeSystemPage> {
         number: 1,
         totalPages: 1,
         size: props.options?.length,
-        totalElements: props.options?.length
+        totalElements: props.options?.length,
       } as CodeSystemPage
     })
   }
@@ -89,7 +89,13 @@ function onFilter(input: string, update: (callBackFn: () => void) => void) {
 
 function onScroll({ to, direction, ref }: ScrollDetails) {
   const lastIndex = loadedOptions.value.length - 1
-  if (loading.value || nextPage.value > totalPages.value || to !== lastIndex || direction === 'decrease') return
+  if (
+    loading.value ||
+    nextPage.value > totalPages.value ||
+    to !== lastIndex ||
+    direction === 'decrease'
+  )
+    return
   loading.value = true
   loadOptions(prevInput.value, nextPage.value)
     .then((page) => {

@@ -17,20 +17,20 @@
 defineProps({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   caption: {
     type: String,
-    default: ''
+    default: '',
   },
   routeName: {
     type: String,
-    default: 'root'
+    default: 'root',
   },
   icon: {
     type: String,
-    default: ''
+    default: '',
   },
-  exact: Boolean
+  exact: Boolean,
 })
 </script>

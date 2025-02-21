@@ -10,26 +10,26 @@
     <template #default>
       <div v-for="(entry, index) in modelValue" :key="index" class="row">
         <q-input
-          :model-value="modelValue[index].text"
+          :model-value="modelValue[index]?.text"
           :type="textArea ? 'textarea' : 'text'"
           :rows="rows"
           :cols="cols"
           :readonly="readonly"
-          :error="!modelValue[index].text"
-          :autofocus="autofocus || !modelValue[index].text"
+          :error="!modelValue[index]?.text"
+          :autofocus="autofocus || !modelValue[index]?.text"
           debounce="200"
           class="col q-pb-none"
-          @update:model-value="updateEntryByIndex(index, $event, modelValue[index].lang)"
+          @update:model-value="updateEntryByIndex(index, $event, modelValue[index]?.lang)"
         >
           <template #before>
             <q-select
-              :model-value="modelValue[index].lang"
+              :model-value="modelValue[index]?.lang"
               :options="supportedLangs"
               :readonly="readonly"
-              :error="!modelValue[index].lang"
+              :error="!modelValue[index]?.lang"
               hide-bottom-space
               class="lang-input"
-              @update:model-value="updateEntryByIndex(index, modelValue[index].text, $event)"
+              @update:model-value="updateEntryByIndex(index, modelValue[index]?.text, $event)"
             />
           </template>
           <template #after>
@@ -74,7 +74,7 @@ import { LocalisableText } from '@onto-med/top-api'
 const props = defineProps({
   modelValue: {
     type: Array as () => Array<LocalisableText>,
-    default: () => []
+    default: () => [],
   },
   helpText: String,
   unique: Boolean,
@@ -85,12 +85,12 @@ const props = defineProps({
   label: String,
   supportedLangs: {
     type: Array as () => string[],
-    default: () => ['de', 'en']
+    default: () => ['de', 'en'],
   },
   expanded: Boolean,
   readonly: Boolean,
   required: Boolean,
-  autofocus: Boolean
+  autofocus: Boolean,
 })
 
 const emit = defineEmits(['update:modelValue', 'update:expanded', 'update:showHelp'])
@@ -115,30 +115,33 @@ const hasError = computed(
   () =>
     (props.required && empty.value) ||
     (props.unique && duplicatedLangs.value.length > 0) ||
-    (props.modelValue && props.modelValue?.findIndex((x) => !x.lang || !x.text) !== -1)
+    (props.modelValue && props.modelValue?.findIndex((x) => !x.lang || !x.text) !== -1),
 )
 
 function removeEntryByIndex(index: number) {
-  let newModelValue = props.modelValue.slice()
+  const newModelValue = props.modelValue.slice()
   newModelValue.splice(index, 1)
   emit('update:modelValue', newModelValue)
 }
 
 function updateEntryByIndex(index: number, text?: string | number | null, lang?: string) {
-  let newModelValue = props.modelValue.slice()
-  newModelValue[index].text = text as string
-  newModelValue[index].lang = lang as string
+  const newModelValue = props.modelValue.slice()
+  if (newModelValue[index] !== undefined) {
+    newModelValue[index].text = text as string
+    newModelValue[index].lang = lang as string
+  }
   emit('update:modelValue', newModelValue)
 }
 
 function addEntry() {
-  let newModelValue = props.modelValue.slice()
+  const newModelValue = props.modelValue.slice()
   newModelValue.push({ lang: unusedSupportedLangs.value[0] as string } as LocalisableText)
   emit('update:modelValue', newModelValue)
 }
 </script>
 
-<style lang="sass" scoped>
-.lang-input
-  width: 60px
+<style lang="scss" scoped>
+.lang-input {
+  width: 60px;
+}
 </style>

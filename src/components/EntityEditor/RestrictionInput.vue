@@ -22,7 +22,10 @@
         />
 
         <q-input
-          v-if="state.quantifier && [Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier)"
+          v-if="
+            state.quantifier &&
+            [Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier)
+          "
           v-model="state.cardinality"
           type="number"
           :readonly="readonly"
@@ -41,11 +44,12 @@
             :disable="readonly"
             :options="[
               { label: t('valueRange'), value: true },
-              { label: t('enumeration'), value: false }
+              { label: t('enumeration'), value: false },
             ]"
             @update:model-value="handleHasRangeChanged"
           />
 
+          <!-- @vue-expect-error TS2322 TS18048 -->
           <range-input
             v-if="hasRange"
             v-model:minimum="state.values[0]"
@@ -59,6 +63,7 @@
           />
 
           <div v-for="(_, index) in state.values" v-else :key="index" class="row">
+            <!-- @vue-expect-error TS2322 TS18048 -->
             <q-input v-model="state.values[index]" outlined :readonly="readonly" :type="inputType">
               <template #after>
                 <q-btn
@@ -99,7 +104,7 @@ import {
   Quantifier,
   Restriction,
   RestrictionOperator,
-  StringRestriction
+  StringRestriction,
 } from '@onto-med/top-api'
 import { ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -111,7 +116,7 @@ const props = defineProps({
     type: Object as () => Restriction,
     default: () => {
       return {}
-    }
+    },
   },
   name: String,
   label: String,
@@ -119,7 +124,7 @@ const props = defineProps({
   operators: Array,
   quantifiers: Array,
   expanded: Boolean,
-  readonly: Boolean
+  readonly: Boolean,
 })
 
 const emit = defineEmits(['update:modelValue', 'update:expanded'])
@@ -130,26 +135,27 @@ const state = reactive(
     | NumberRestriction
     | StringRestriction
     | BooleanRestriction
-    | DateTimeRestriction
+    | DateTimeRestriction,
 )
 const canHaveRange = computed(() => [DataType.Number, DataType.DateTime].includes(state.type))
 const showHelp = ref(false)
 const hasRange = ref(
   canHaveRange.value &&
     ((props.modelValue as NumberRestriction | DateTimeRestriction).minOperator !== undefined ||
-      (props.modelValue as NumberRestriction | DateTimeRestriction).maxOperator !== undefined)
+      (props.modelValue as NumberRestriction | DateTimeRestriction).maxOperator !== undefined),
 )
 
 const defaultQuantifiers = computed(() =>
   Object.values(Quantifier).map((d) => {
     return { label: t('quantifierType.' + d), value: d }
-  })
+  }),
 )
 
 const isValid = computed(
   () =>
     state.quantifier &&
-    (![Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier) || state.cardinality !== undefined)
+    (![Quantifier.Exact, Quantifier.Min, Quantifier.Max].includes(state.quantifier) ||
+      state.cardinality !== undefined),
 )
 
 const inputType = computed(() => {
@@ -178,7 +184,7 @@ if (!state.quantifier) {
 watch(
   () => state,
   () => emit('update:modelValue', state),
-  { deep: true }
+  { deep: true },
 )
 
 function handleHasRangeChanged(newValue: boolean) {

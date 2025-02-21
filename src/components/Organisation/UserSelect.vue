@@ -44,15 +44,15 @@ import { nextTick, ref, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { UserApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { ScrollDetails } from 'src/mixins/ScrollDetails'
+import { ScrollDetails } from '../models'
 
 const props = defineProps({
   modelValue: Object as () => User | undefined,
   label: String,
   minLength: {
     type: Number,
-    default: 2
-  }
+    default: 2,
+  },
 })
 
 defineEmits(['update:model-value'])

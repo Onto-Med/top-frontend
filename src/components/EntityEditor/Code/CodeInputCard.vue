@@ -118,12 +118,12 @@ interface CodeWithScope {
 const props = defineProps({
   modelValue: {
     type: Array as () => Code[],
-    default: () => []
+    default: () => [],
   },
   expanded: Boolean,
   readonly: Boolean,
   /** Display a warning if modelValue Array is empty. */
-  warningIfEmpty: Boolean
+  warningIfEmpty: Boolean,
 })
 
 const emit = defineEmits(['update:modelValue', 'update:expanded'])
@@ -137,7 +137,9 @@ const codeApi = inject(CodeApiKey)
 const loading = ref(false)
 
 const disabledCodes = computed(() => {
-  return props.modelValue.filter((c1, i1) => props.modelValue.some((c2, i2) => codeEquals(c1, c2) && i1 != i2))
+  return props.modelValue.filter((c1, i1) =>
+    props.modelValue.some((c2, i2) => codeEquals(c1, c2) && i1 != i2),
+  )
 })
 
 function codeEquals(code1?: Code, code2?: Code) {
@@ -162,7 +164,7 @@ async function addEntries(entries?: CodeWithScope[]) {
           .then((r) => newModelValue.push(r.data))
       }
       return true
-    })
+    }),
   )
     .then((r) => {
       emit('update:modelValue', newModelValue)
@@ -172,7 +174,7 @@ async function addEntries(entries?: CodeWithScope[]) {
 }
 
 function removeEntry(codeToRemove: Code) {
-  let newModelValue = props.modelValue.slice()
+  const newModelValue = props.modelValue.slice()
   if (newModelValue.includes(codeToRemove)) {
     newModelValue.splice(newModelValue.indexOf(codeToRemove), 1)
   } else {
@@ -194,12 +196,12 @@ function removeNestedSubNode(code: Code, codeToRemove: Code) {
 
 function showImportDialog() {
   $q.dialog({
-    component: CodeImportDialog
+    component: CodeImportDialog,
   }).onOk((codes: Code[]) => {
     addEntries(
       codes.map((code) => {
         return { code: code, scope: CodeScope.Self }
-      })
+      }),
     )
       .then((r) => {
         const accepted = r.filter((e) => !!e).length

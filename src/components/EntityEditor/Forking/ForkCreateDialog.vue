@@ -23,7 +23,12 @@
           </template>
         </i18n-t>
 
-        <i18n-t v-if="origin && isRestricted(origin)" keypath="superEntityIsForkedToo" tag="p" scope="global">
+        <i18n-t
+          v-if="origin && isRestricted(origin)"
+          keypath="superEntityIsForkedToo"
+          tag="p"
+          scope="global"
+        >
           <template #superEntity>
             <b>{{ getTitle(origin.superPhenotype) }}</b>
           </template>
@@ -32,10 +37,16 @@
         {{ t('pleaseModifySettings') }}:
         <q-list dense>
           <q-item v-show="!origin || !isRestricted(origin)">
-            <q-checkbox v-model="cascade" :label="t('includeThing', { thing: t('restriction', 2) })" />
+            <q-checkbox
+              v-model="cascade"
+              :label="t('includeThing', { thing: t('restriction', 2) })"
+            />
           </q-item>
           <q-item>
-            <q-checkbox v-model="update" :label="t('updateExistingThing', { thing: t('entity', 2) })" />
+            <q-checkbox
+              v-model="update"
+              :label="t('updateExistingThing', { thing: t('entity', 2) })"
+            />
           </q-item>
         </q-list>
       </q-card-section>
@@ -60,7 +71,7 @@ import { ref } from 'vue'
 import { Entity, ForkingInstruction } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useI18n } from 'vue-i18n'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 
 defineProps<{
@@ -72,7 +83,7 @@ const emit = defineEmits(['update:show', 'createFork'])
 
 const { t } = useI18n()
 const { getTitle, isRestricted } = useEntityFormatter()
-const { repository } = storeToRefs(useEntity())
+const { repository } = storeToRefs(useEntityStore())
 const cascade = ref(false)
 const update = ref(false)
 
@@ -84,7 +95,7 @@ function reset() {
 function handleCreateFork() {
   emit('createFork', {
     cascade: cascade.value,
-    update: update.value
+    update: update.value,
   } as ForkingInstruction)
   reset()
 }

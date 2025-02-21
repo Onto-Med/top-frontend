@@ -13,7 +13,12 @@
           <q-tr :props="headerProps">
             <q-th class="bg-grey-1" auto-width />
             <q-th class="bg-grey-1"> # </q-th>
-            <q-th v-for="col in headerProps.cols" :key="col.name" :props="headerProps" class="bg-grey-1">
+            <q-th
+              v-for="col in headerProps.cols"
+              :key="col.name"
+              :props="headerProps"
+              class="bg-grey-1"
+            >
               {{ col.label }}
             </q-th>
           </q-tr>
@@ -40,7 +45,9 @@
                 :title="t('deleteThing', { thing: t('version') })"
                 @click.stop="deleteVersion(bodyProps.row)"
               />
-              <b v-else-if="currentVersion && bodyProps.row.version === currentVersion"> {{ t('current') }}: </b>
+              <b v-else-if="currentVersion && bodyProps.row.version === currentVersion">
+                {{ t('current') }}:
+              </b>
             </q-td>
             <q-td>{{ bodyProps.row.version }}</q-td>
             <q-td>{{ getTitle(bodyProps.row) }}</q-td>
@@ -68,7 +75,7 @@ import { EntityApiKey } from 'src/boot/axios'
 import { Entity } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import useNotify from 'src/mixins/useNotify'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { QTableProps } from 'quasar'
 
 const props = defineProps<{
@@ -85,7 +92,7 @@ const emit = defineEmits(['restore', 'update:show', 'prefill', 'deleted'])
 
 const { t, d } = useI18n()
 const entityApi = inject(EntityApiKey)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { getTitle } = useEntityFormatter()
 const { notify, renderError } = useNotify()
 const versions = ref<Entity[]>([])
@@ -96,15 +103,15 @@ const columns = computed(
     [
       { name: 'title', label: t('title'), align: 'left' },
       { name: 'userAccount', label: t('author'), align: 'left' },
-      { name: 'timestamp', label: t('timestamp') }
-    ] as QTableProps['columns']
+      { name: 'timestamp', label: t('timestamp') },
+    ] as QTableProps['columns'],
 )
 
 watch(
   () => props.show,
   (newShow: boolean) => {
     if (newShow && !versions.value.length) void reload()
-  }
+  },
 )
 
 async function reload() {
@@ -130,16 +137,20 @@ function deleteVersion(version: Entity) {
 }
 </script>
 
-<style lang="sass" scoped>
-.sticky-header-table
-  max-height: 80%
+<style lang="scss" scoped>
+.sticky-header-table {
+  max-height: 80%;
 
-  thead tr th
-    position: sticky
-    z-index: 1
-    border-top-width: 1px !important
-  thead tr:first-child th
-    top: 0
-  &.q-table--loading thead tr:last-child th
-    top: 48px
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+    border-top-width: 1px !important;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+  &.q-table--loading thead tr:last-child th {
+    top: 48px;
+  }
+}
 </style>

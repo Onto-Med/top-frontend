@@ -83,7 +83,11 @@
           </template>
           <template #body-cell-scope="props">
             <q-td key="code" :props="props">
-              {{ te('codeScopes.' + props.row.scope) ? t('codeScopes.' + props.row.scope) : props.row.scope }}
+              {{
+                te('codeScopes.' + props.row.scope)
+                  ? t('codeScopes.' + props.row.scope)
+                  : props.row.scope
+              }}
               <q-popup-edit
                 v-slot="scope"
                 v-model="props.row.scope"
@@ -146,18 +150,20 @@ const columns = computed(() => [
     required: true,
     label: t('codeSystem'),
     field: (row: Code) => row.codeSystem.uri,
-    sortable: true
+    sortable: true,
   },
   {
     name: 'code',
     required: true,
     label: t('code'),
     field: (row: Code) => row.code,
-    sortable: true
-  }
+    sortable: true,
+  },
 ])
 
-const tableRows = computed(() => codes.value.filter((_row, index) => !hasHeader.value || index !== 0))
+const tableRows = computed(() =>
+  codes.value.filter((_row, index) => !hasHeader.value || index !== 0),
+)
 
 function codeKey(code: Code) {
   return `${code.codeSystem.uri}#${code.code}`
@@ -174,11 +180,11 @@ function loadCodes() {
     .text()
     .then((content) => {
       const data = parse(content, {
-        skipEmptyLines: true
+        skipEmptyLines: true,
       }).data as Array<Array<string>>
       codes.value = data.map((row) => ({
-        codeSystem: { uri: row[0] },
-        code: row[1],
+        codeSystem: { uri: row[0] || '' },
+        code: row[1] || '',
       }))
     })
     .catch((e: Error) => renderError(e))
@@ -186,7 +192,7 @@ function loadCodes() {
 }
 
 function onHasHeaderChanged(value?: boolean) {
-  if (!value || codes.value.length == 0) return
+  if (!value || codes.value[0] === undefined) return
   const key = codeKey(codes.value[0])
   selection.value = selection.value.filter((s) => codeKey(s) !== key)
 }
@@ -198,19 +204,24 @@ function onOkClick() {
 }
 </script>
 
-<style lang="sass">
-.dialog-content
-  min-width: 30vw
+<style lang="scss">
+.dialog-content {
+  min-width: 30vw;
+}
 
-.codes-table
-  max-height: 65vh
-  thead tr th
-    position: sticky
-    z-index: 1
-    border-top-width: 1px !important
-    background: #e0e0e0 !important
-  thead tr:first-child th
-    top: 0
-  &.q-table--loading thead tr:last-child th
-    top: 48px
+.codes-table {
+  max-height: 65vh;
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+    border-top-width: 1px !important;
+    background: #e0e0e0 !important;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+  &.q-table--loading thead tr:last-child th {
+    top: 48px;
+  }
+}
 </style>
