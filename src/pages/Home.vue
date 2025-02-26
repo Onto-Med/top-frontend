@@ -85,11 +85,13 @@ import { useI18n } from 'vue-i18n'
 import packageInfo from '../../package.json'
 import { useRouter } from 'vue-router'
 import { env } from 'src/config'
+import useNotify from 'src/mixins/useNotify'
 
 const { t } = useI18n()
 const router = useRouter()
+const { renderError } = useNotify()
 const defaultApi = inject(DefaultApiKey)
-const statistic = ref(undefined as Statistic | undefined)
+const statistic = ref<Statistic>()
 const productName = packageInfo.productName
 
 type statisticKey = keyof Statistic
@@ -105,14 +107,19 @@ const overviewContent = computed(() => {
   return entries
 })
 
-onMounted(() => defaultApi?.getStatistics().then((r) => (statistic.value = r.data)))
+onMounted(() => {
+  defaultApi
+    ?.getStatistics()
+    .then((r) => (statistic.value = r.data))
+    .catch(() => renderError({ message: t('errorLoadingData') } as Error))
+})
 
 function routeTo(name: string) {
   void router.push({ name })
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .mood-img {
   max-width: 1900px;
   align-self: center;
