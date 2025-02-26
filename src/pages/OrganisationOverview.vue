@@ -30,7 +30,7 @@
       v-model="organisation"
       v-model:show="showForm"
       :loading="saving"
-      @update:model-value="saveOrganisation($event)"
+      @update:model-value="saveOrganisation"
     />
   </q-page>
 </template>
@@ -74,11 +74,11 @@ onMounted(async () => {
   await reload()
 })
 
-function newOrganisation() {
-  return { id: (uuidv4 as () => string)() } as Organisation
+function newOrganisation(): Organisation {
+  return { id: uuidv4() } as Organisation
 }
 
-async function reload(filter: string | undefined = undefined, page = 1) {
+async function reload(filter: string | undefined = undefined, page = 1): Promise<void> {
   if (!organisationApi) return
   loading.value = true
   await organisationApi

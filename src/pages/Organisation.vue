@@ -21,18 +21,18 @@
                       {{ t('edit') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-close-popup clickable @click="showMembershipDialog()">
+                  <q-item v-close-popup clickable @click="showMembershipDialog">
                     <q-item-section>
                       {{ t('permission', 2) }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-if="isAdmin" v-close-popup clickable @click="showDataSourceDialog()">
+                  <q-item v-if="isAdmin" v-close-popup clickable @click="showDataSourceDialog">
                     <q-item-section>
                       {{ t('dataSource', 2) }}
                     </q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item v-close-popup clickable @click="deleteOrganisation()">
+                  <q-item v-close-popup clickable @click="deleteOrganisation">
                     <q-item-section>
                       {{ t('delete') }}
                     </q-item-section>
@@ -58,7 +58,7 @@
       :page="repositories"
       :loading="loading"
       :create="write"
-      @row-clicked="routeToEditor($event)"
+      @row-clicked="routeToEditor"
       @create-clicked="((repository = newRepository()), (showRepositoryForm = true))"
       @request="reload"
     >
@@ -97,15 +97,15 @@
       v-model="repository"
       v-model:show="showRepositoryForm"
       :loading="savingRepository"
-      @update:model-value="saveRepository($event)"
-      @delete-clicked="deleteRepository($event)"
+      @update:model-value="saveRepository"
+      @delete-clicked="deleteRepository"
     />
 
     <organisation-form
       v-model="organisation"
       v-model:show="showOrganisationForm"
       :loading="saving"
-      @update:model-value="updateOrganisation($event)"
+      @update:model-value="updateOrganisation"
     />
   </q-page>
   <q-page v-else>
@@ -168,10 +168,10 @@ onMounted(async () => {
 })
 
 function newRepository() {
-  return { id: (uuidv4 as () => string)(), primary: false } as Repository
+  return { id: uuidv4(), primary: false } as Repository
 }
 
-async function reload(filter: string | undefined = undefined, page = 1) {
+async function reload(filter?: string, page = 1) {
   if (!repositoryApi || !organisation.value) return
   loading.value = true
   await repositoryApi
