@@ -2,13 +2,13 @@
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="dialog-content">
       <q-card-section>
-        <div v-t="'codeImport.title'" class="text-h6" />
+        <div class="text-h6">{{ t('codeImport.title') }}</div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section>
-        <p v-t="'codeImport.fileDescription'" class="q-mb-none" />
+        <p class="q-mb-none">{{ t('codeImport.fileDescription') }}</p>
         <q-file
           v-model="csvFile"
           :label="t('codeImport.selectFile') + '...'"
@@ -35,7 +35,7 @@
       <q-separator v-show="codes.length > 0" />
 
       <q-card-section v-show="codes.length > 0" class="q-pa-none">
-        <p v-t="'codeImport.selectCodesToImport'" class="q-px-md q-pt-sm q-mb-none" />
+        <p class="q-px-md q-pt-sm q-mb-none">{{ t('codeImport.selectCodesToImport') }}</p>
         <q-table
           v-model:selected="selection"
           flat

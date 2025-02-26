@@ -48,8 +48,8 @@
             <q-toggle v-model="state.primary" />
           </q-item-section>
           <q-item-section>
-            <q-item-label v-t="'primary'" />
-            <q-item-label v-t="'primaryRepositoryDescription'" caption />
+            <q-item-label>{{ t('primary') }}</q-item-label>
+            <q-item-label caption>{{ t('primaryRepositoryDescription') }}</q-item-label>
           </q-item-section>
         </q-item>
 

@@ -25,7 +25,7 @@
       </template>
       <template #no-option>
         <q-item>
-          <q-item-section v-t="'inputRequired'" class="text-italic text-grey" />
+          <q-item-section class="text-italic text-grey">{{ t('inputRequired') }}</q-item-section>
         </q-item>
       </template>
       <template #after>

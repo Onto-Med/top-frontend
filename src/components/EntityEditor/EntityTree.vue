@@ -88,7 +88,9 @@
             >
               {{ getTitle(node) }}
             </div>
-            <q-badge v-show="!node.createdAt" v-t="'new'" color="accent" class="q-ml-sm" />
+            <q-badge v-show="!node.createdAt" color="accent" class="q-ml-sm">{{
+              t('new')
+            }}</q-badge>
             <entity-tree-context-menu
               v-if="showContextMenu"
               :allowed-entity-types="allowedEntityTypes"

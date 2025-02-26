@@ -9,7 +9,7 @@
 
       <div>
         <q-card-section>
-          <p v-t="'importDescription'" />
+          <p>{{ t('importDescription') }}</p>
 
           <q-select
             v-model="importConverter"
@@ -45,7 +45,7 @@
         <q-separator />
 
         <q-card-section>
-          <p v-t="'exportDescription'" />
+          <p>{{ t('exportDescription') }}</p>
 
           <q-select
             v-model="exportConverter"

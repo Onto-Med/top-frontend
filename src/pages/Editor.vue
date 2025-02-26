@@ -93,13 +93,13 @@
               <q-menu context-menu>
                 <q-list>
                   <q-item v-close-popup dense clickable @click="closeTab(undefined)">
-                    <q-item-section v-t="'closeAll'" />
+                    <q-item-section>{{ t('closeAll') }}</q-item-section>
                   </q-item>
                   <q-item v-close-popup dense clickable @click="closeOtherTabs(tab)">
-                    <q-item-section v-t="'closeOthers'" />
+                    <q-item-section>{{ t('closeOthers') }}</q-item-section>
                   </q-item>
                   <q-item v-close-popup dense clickable @click="closeSavedTabs()">
-                    <q-item-section v-t="'closeSaved'" />
+                    <q-item-section>{{ t('closeSaved') }}</q-item-section>
                   </q-item>
                 </q-list>
               </q-menu>
@@ -147,7 +147,7 @@
 
             <div class="col-6 column justify-center items-center q-gutter-md">
               <q-icon name="hub" size="xl" />
-              <p v-t="'entityEditor.emptyTab.tab.description'" />
+              <p>{{ t('entityEditor.emptyTab.tab.description') }}</p>
             </div>
           </div>
         </div>

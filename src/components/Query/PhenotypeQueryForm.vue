@@ -19,7 +19,7 @@
     <q-separator vertical class="gt-xs" />
 
     <div class="col-12 col-sm q-pa-md">
-      <p v-t="'queryImportDescription'" />
+      <p>{{ t('queryImportDescription') }}</p>
       <q-file v-model="importFile" :label="t('queryImportFile')" accept=".json">
         <template #prepend>
           <q-icon name="attach_file" />
@@ -117,9 +117,9 @@
                   <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
                     <q-separator class="col" />
                     <small
-                      v-t="'and'"
                       class="col-grow q-px-md text-grey text-uppercase non-selectable and-separator"
-                    />
+                      >{{ t('and') }}</small
+                    >
                     <q-separator class="col" />
                   </div>
                 </template>
@@ -191,8 +191,8 @@
     />
     <div v-if="!(configurationComplete && querySubjectPresent)" class="text-warning text-subtitle2">
       <q-icon name="warning" />
-      <span v-if="!configurationComplete" v-t="'queryDataSourceIsRequired'" />
-      <span v-else-if="!querySubjectPresent" v-t="'querySubjectIsRequired'" />
+      <span v-if="!configurationComplete">{{ t('queryDataSourceIsRequired') }}</span>
+      <span v-else-if="!querySubjectPresent">{{ t('querySubjectIsRequired') }}</span>
     </div>
     <q-space />
     <q-btn

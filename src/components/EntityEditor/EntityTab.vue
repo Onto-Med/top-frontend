@@ -105,7 +105,7 @@
       <q-dialog v-model="showJson">
         <q-card class="full-width">
           <q-card-section>
-            <div v-t="'entityEditor.rawDialog.content'" class="text-h6" />
+            <div class="text-h6">{{ t('entityEditor.rawDialog.content') }}</div>
           </q-card-section>
 
           <q-separator />

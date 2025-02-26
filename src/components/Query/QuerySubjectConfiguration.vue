@@ -14,7 +14,7 @@
         <q-separator />
 
         <q-card-section v-if="showAggregationFunction">
-          <small v-t="'aggregationFunctionDescription'" />
+          <small>{{ t('aggregationFunctionDescription') }}</small>
           <q-select
             :model-value="defaultAggregationFunctionId"
             :options="aggregationFunctionOptions"
@@ -44,7 +44,7 @@
         <q-separator />
 
         <q-card-section>
-          <div v-t="'dateTimeRestrictionDescription'" />
+          <div>{{ t('dateTimeRestrictionDescription') }}</div>
           <div class="row q-mt-sm">
             <range-input
               v-model:minimum="minimum"

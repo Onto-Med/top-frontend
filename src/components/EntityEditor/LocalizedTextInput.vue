@@ -46,7 +46,7 @@
       </div>
     </template>
     <template #error>
-      <div v-show="required && empty" v-t="'mandatoryListField'" class="text-negative" />
+      <div v-show="required && empty" class="text-negative">{{ t('mandatoryListField') }}</div>
       <div v-show="unique && duplicatedLangs.length > 0" class="text-negative">
         {{ t('oneThingPerThing', { thing1: name || t('entry'), thing2: t('language') }) }}
       </div>

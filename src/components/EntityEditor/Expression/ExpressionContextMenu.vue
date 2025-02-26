@@ -65,13 +65,13 @@
       </q-item>
       <q-separator v-if="value" />
       <q-item v-if="enclosable" clickable @click="onEnclose">
-        <q-item-section v-t="'encloseWithExpression'" />
+        <q-item-section>{{ t('encloseWithExpression') }}</q-item-section>
       </q-item>
       <q-item v-if="value && !changing" clickable @click="showChangeOptions()">
-        <q-item-section v-t="'change'" />
+        <q-item-section>{{ t('change') }}</q-item-section>
       </q-item>
       <q-item v-if="removable" clickable @click="onRemove">
-        <q-item-section v-t="'remove'" />
+        <q-item-section>{{ t('remove') }}</q-item-section>
       </q-item>
     </q-list>
   </q-menu>

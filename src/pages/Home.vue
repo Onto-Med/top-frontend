@@ -5,7 +5,7 @@
     </div>
 
     <div class="text-center">
-      <p v-t="{ path: 'greeting', args: { productName } }" class="text-h4" />
+      <p class="text-h4">{{ t('greeting', { productName }) }}</p>
       <p>{{ t('appDescription') }}</p>
     </div>
 

@@ -41,7 +41,7 @@
             clickable
             @click="$emit('removeClicked')"
           >
-            <q-item-section v-t="'remove'" />
+            <q-item-section>{{ t('remove') }}</q-item-section>
           </q-item>
         </q-list>
       </q-popup-edit>
@@ -92,7 +92,7 @@
             clickable
             @click="$emit('removeClicked')"
           >
-            <q-item-section v-t="'remove'" />
+            <q-item-section>{{ t('remove') }}</q-item-section>
           </q-item>
         </q-list>
       </q-popup-edit>
@@ -114,12 +114,12 @@
     <q-menu>
       <q-list dense>
         <q-item v-close-popup clickable @click="$emit('entityClicked', state?.id)">
-          <q-item-section v-t="'show'" />
+          <q-item-section>{{ t('show') }}</q-item-section>
         </q-item>
         <q-separator />
         <slot name="additionalOptions" />
         <q-item v-if="changeable && state" v-close-popup clickable @click="setEntity(undefined)">
-          <q-item-section v-t="'change'" />
+          <q-item-section>{{ t('change') }}</q-item-section>
         </q-item>
         <q-item
           v-if="!disable && removeable"
@@ -127,7 +127,7 @@
           clickable
           @click="$emit('removeClicked')"
         >
-          <q-item-section v-t="'remove'" />
+          <q-item-section>{{ t('remove') }}</q-item-section>
         </q-item>
       </q-list>
     </q-menu>

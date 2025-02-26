@@ -70,13 +70,13 @@
       </q-item>
       <q-separator v-if="baseDocUrl && defaultConstant" />
       <q-item clickable @click="$emit('enclose')">
-        <q-item-section v-t="'encloseWithExpression'" />
+        <q-item-section>{{ t('encloseWithExpression') }}</q-item-section>
       </q-item>
       <q-item v-show="isValueSet" clickable @click="$emit('update:value', undefined)">
-        <q-item-section v-t="'change'" />
+        <q-item-section>{{ t('change') }}</q-item-section>
       </q-item>
       <q-item v-close-popup clickable @click="$emit('remove')">
-        <q-item-section v-t="'remove'" />
+        <q-item-section>{{ t('remove') }}</q-item-section>
       </q-item>
     </q-list>
   </q-popup-edit>

@@ -10,7 +10,7 @@
       <q-separator />
 
       <q-card-section>
-        <p v-t="'manageDataSourceDescription'" />
+        <p>{{ t('manageDataSourceDescription') }}</p>
         <q-select
           v-model="dataSource"
           :options="availableDataSources"

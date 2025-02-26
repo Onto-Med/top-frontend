@@ -58,11 +58,9 @@
       <q-separator />
 
       <div>
-        <div
-          v-if="!options || !options.length"
-          v-t="'entitySearchDescription'"
-          class="self-center text-italic ellipsis q-pa-sm"
-        />
+        <div v-if="!options || !options.length" class="self-center text-italic ellipsis q-pa-sm">
+          {{ t('entitySearchDescription') }}
+        </div>
 
         <q-virtual-scroll
           v-else

@@ -1,14 +1,15 @@
 <template>
   <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
     <q-card v-if="forkingStats">
-      <q-card-section v-t="'forkingState'" class="text-h6" />
+      <q-card-section class="text-h6">{{ t('forkingState') }}</q-card-section>
 
       <template v-if="forkingStats.origin">
         <q-separator />
 
         <q-card-section>
-          <div v-t="'entityIsForkDescription'" />
-          <span v-t="'origin'" />:
+          <div>{{ t('entityIsForkDescription') }}</div>
+          <span>{{ t('origin') }}</span
+          >:
           <q-btn
             flat
             dense

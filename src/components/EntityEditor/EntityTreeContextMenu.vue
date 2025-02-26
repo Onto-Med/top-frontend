@@ -59,12 +59,12 @@
       dense
     >
       <q-item v-close-popup clickable @click="showTerminologyImportDialog">
-        <q-item-section v-t="'terminologyImport.title'" />
+        <q-item-section>{{ t('terminologyImport.title') }}</q-item-section>
       </q-item>
     </q-list>
     <q-list v-if="deletable && entity" dense>
       <q-item v-close-popup clickable @click="showDeleteDialog">
-        <q-item-section v-t="'delete'" />
+        <q-item-section>{{ t('delete') }}</q-item-section>
       </q-item>
     </q-list>
   </q-menu>

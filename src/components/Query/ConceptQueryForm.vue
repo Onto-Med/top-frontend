@@ -27,7 +27,7 @@
     <q-separator vertical class="gt-xs" />
 
     <div class="col-12 col-sm q-pa-md">
-      <p v-t="'queryImportDescription'" />
+      <p>{{ t('queryImportDescription') }}</p>
       <q-file v-model="importFile" :label="t('queryImportFile')" accept=".json">
         <template #prepend>
           <q-icon name="attach_file" />
