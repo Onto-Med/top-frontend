@@ -192,7 +192,7 @@ const props = defineProps<{
   dataSource?: DataSource
   query?: Query
   documentFilter?: Array<string>
-  documentQueryOffsets?: { [key: string]: string[] }
+  documentQueryOffsets?: { [key: string]: string[]; }
 }>()
 
 const emit = defineEmits(['clearQuery'])
