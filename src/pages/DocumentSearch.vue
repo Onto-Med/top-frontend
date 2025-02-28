@@ -42,6 +42,7 @@
           :query="query"
           :data-source="dataSource"
           :document-filter="documentIds"
+          :document-query-offsets="documentOffsets"
           class="cluster-form"
           @clear-query="resetPage()"
         />
@@ -72,6 +73,7 @@ const dataSources = ref<DataSource[]>([])
 const queryApi = inject(QueryApiKey)
 const query = ref<Query>()
 const documentIds = ref<Array<string>>()
+const documentOffsets = ref<{ [key: string]: string[]; }>()
 const router = useRouter()
 
 watch(
@@ -88,7 +90,12 @@ function setUpSQResults() {
   if (!props.organisationId || !props.repositoryId || !props.queryId) return
   queryApi
     ?.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
-    .then((r) => (documentIds.value = r.data))
+    .then((r) => {
+      for(let id in r.data){
+        documentIds.value?.push(id)
+      }
+      documentOffsets.value = r.data
+    })
     .catch((e: Error) => renderError(e))
 
   if (!query.value) return
@@ -124,6 +131,7 @@ function loadQuery() {
 function resetPage() {
   query.value = undefined
   documentIds.value = []
+  documentOffsets.value = undefined
   void router.push({ name: 'documentSearch' })
 }
 </script>

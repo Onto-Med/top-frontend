@@ -185,6 +185,7 @@ const props = defineProps<{
   dataSource?: DataSource
   query?: Query
   documentFilter?: Array<string>
+  documentQueryOffsets?: { [key: string]: string[]; }
 }>()
 
 const emit = defineEmits(['clearQuery'])
@@ -402,6 +403,7 @@ async function checkPipeline() {
 
 async function chooseDocument(document: Document) {
   if (document.id == null) return
+  let offsets = props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
   if (!props.dataSource) return Promise.reject()
   const conceptIds = new Array<string>()
   for (const c of selectedConcepts.value) {
@@ -416,7 +418,7 @@ async function chooseDocument(document: Document) {
       )
   }
   await documentApi
-    ?.getSingleDocumentById(document.id, props.dataSource.id, conceptIds, undefined)
+    ?.getSingleDocumentById(document.id, props.dataSource.id, conceptIds, offsets)
     .then((r) => {
       $q.dialog({
         component: DocumentDetailsDialog,
