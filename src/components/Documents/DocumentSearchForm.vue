@@ -415,8 +415,7 @@ async function checkPipeline() {
 
 async function chooseDocument(document: Document) {
   if (document.id == null) return
-  const offsets =
-    props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
+  let offsets = props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
   if (!props.dataSource) return Promise.reject()
   const conceptIds = new Array<string>()
   for (const c of selectedConcepts.value) {
