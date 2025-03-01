@@ -363,6 +363,7 @@ function confirmPublishClusters() {
 }
 
 async function startPipeline() {
+  //ToDo: pipeline response is not transmitted upwards from so that it's not obvious what's happening if something fails.
   if (pipelineJsonConfig.value != '') {
     let jsonBody = (`{"name": "${props.dataSource?.id}", "language": "${language.value}", "return_statistics": "false",
      "skip_present": "${skipPresent.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`)
