@@ -14,69 +14,74 @@ import {
   QueryType,
   Repository,
   RepositoryType,
-  RestrictionOperator
+  RestrictionOperator,
 } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 export default function (this: void) {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { locale, t, te } = useI18n()
-  const entityStore = useEntity()
+  const entityStore = useEntityStore()
   const router = useRouter()
 
   const getLocalizedPropertyValues = (entity: Entity, property: keyof Entity): string[] => {
     const lang = locale.value.split('-')[0]
     if (entity[property]) {
       const results = (entity[property] as LocalisableText[])
-        .filter(d => d.lang === lang && d.text.length > 0)
-        .map(d => d.text)
+        .filter((d) => d.lang === lang && d.text.length > 0)
+        .map((d) => d.text)
       if (results) return results
     }
     return []
   }
 
   /**
-     * Returns a Boolean, indicating if the provided entity is a phenotype.
-     * @param entity the entity
-     * @returns true if entity is a phenotype
-     */
+   * Returns a Boolean, indicating if the provided entity is a phenotype.
+   * @param entity the entity
+   * @returns true if entity is a phenotype
+   */
   const isPhenotype = (entity?: Entity): entity is Phenotype => {
-    return entity !== undefined
-      && [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(entity.entityType)
+    return (
+      entity !== undefined &&
+      [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(entity.entityType)
+    )
   }
 
   const isCategory = (entity?: Entity): entity is Category => {
-    return entity !== undefined
-      && entity.entityType === EntityType.Category
+    return entity !== undefined && entity.entityType === EntityType.Category
   }
 
   const isConcept = (entity?: Entity): entity is Concept => {
-    return entity !== undefined
-      && [EntityType.CompositeConcept, EntityType.SingleConcept].includes(entity.entityType)
-  }
-
-  /**
-     * Returns a Boolean, indicating if the provided entity is restricted.
-     * @param entity the entity
-     * @returns true if entity is restricted
-     */
-  const isRestricted = (entity: Entity | EntityType): entity is Phenotype => {
-    return [EntityType.CompositeRestriction, EntityType.SingleRestriction].includes(
-      entity.hasOwnProperty('id') ? (entity as Entity).entityType : (entity as EntityType)
+    return (
+      entity !== undefined &&
+      [EntityType.CompositeConcept, EntityType.SingleConcept].includes(entity.entityType)
     )
   }
 
   /**
-     * Get a title for the provided entity. The resulting title is derived from the titles field.
-     * A title, were lang matches the currently selected language for i18n, is priortized.
-     * If the entity has no titles, 'unnamed entity' is returned.
-     * @param entity the entity
-     * @param prefix add title of super phenotype as prefix
-     * @param unit add unit as suffix
-     * @returns the title
-     */
+   * Returns a Boolean, indicating if the provided entity is restricted.
+   * @param entity the entity
+   * @returns true if entity is restricted
+   */
+  const isRestricted = (entity: Entity | EntityType): entity is Phenotype => {
+    return [EntityType.CompositeRestriction, EntityType.SingleRestriction].includes(
+      Object.prototype.hasOwnProperty.call(entity, 'id')
+        ? (entity as Entity).entityType
+        : (entity as EntityType),
+    )
+  }
+
+  /**
+   * Get a title for the provided entity. The resulting title is derived from the titles field.
+   * A title, were lang matches the currently selected language for i18n, is priortized.
+   * If the entity has no titles, 'unnamed entity' is returned.
+   * @param entity the entity
+   * @param prefix add title of super phenotype as prefix
+   * @param unit add unit as suffix
+   * @returns the title
+   */
   const getTitle = (entity?: Entity, prefix?: boolean, unit?: boolean): string => {
     if (!entity) return t('unnamedEntity')
     const lang = locale.value.split('-')[0]
@@ -89,34 +94,33 @@ export default function (this: void) {
     }
 
     if (entity.titles) {
-      const result = entity.titles.filter(t => t.lang === lang).shift()
+      const result = entity.titles.filter((t) => t.lang === lang).shift()
       if (result && result.text) title = result.text
       else if (entity.titles[0] && entity.titles[0].text) title = entity.titles[0].text
     }
 
     if (!title) {
-      if (isCategory(entity))
-        title = t('unnamedCategory')
-      else if (isPhenotype(entity))
-        title = t('unnamedPhenotype')
-      else if (isRestricted(entity))
-        title = t('unnamedRestriction')
-      else if (isConcept(entity))
-        title = t('unnamedConcept')
+      if (isCategory(entity)) title = t('unnamedCategory')
+      else if (isPhenotype(entity)) title = t('unnamedPhenotype')
+      else if (isRestricted(entity)) title = t('unnamedRestriction')
+      else if (isConcept(entity)) title = t('unnamedConcept')
     }
 
-    if (unit && isPhenotype(entity) && entity.unit)
-      title += ' [' + entity.unit + ']'
+    if (unit && isPhenotype(entity) && entity.unit) title += ' [' + entity.unit + ']'
 
     return superPhenotypePrefix + title
   }
 
   const invertOperator = (operator: RestrictionOperator): RestrictionOperator => {
     switch (operator) {
-      case RestrictionOperator.GreaterThan: return RestrictionOperator.LessThan
-      case RestrictionOperator.GreaterThanOrEqualTo: return RestrictionOperator.LessThanOrEqualTo
-      case RestrictionOperator.LessThan: return RestrictionOperator.GreaterThan
-      case RestrictionOperator.LessThanOrEqualTo: return RestrictionOperator.GreaterThanOrEqualTo
+      case RestrictionOperator.GreaterThan:
+        return RestrictionOperator.LessThan
+      case RestrictionOperator.GreaterThanOrEqualTo:
+        return RestrictionOperator.LessThanOrEqualTo
+      case RestrictionOperator.LessThan:
+        return RestrictionOperator.GreaterThan
+      case RestrictionOperator.LessThanOrEqualTo:
+        return RestrictionOperator.GreaterThanOrEqualTo
     }
   }
 
@@ -129,13 +133,17 @@ export default function (this: void) {
 
     hasDataType: (entity: Entity | EntityType) => {
       return [EntityType.CompositePhenotype, EntityType.SinglePhenotype].includes(
-        entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
+        Object.prototype.hasOwnProperty.call(entity, 'id')
+          ? (entity as Entity).entityType
+          : (entity as EntityType),
       )
     },
 
     hasItemType: (entity: Entity | EntityType) => {
       return [EntityType.SinglePhenotype].includes(
-        entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity as EntityType
+        Object.prototype.hasOwnProperty.call(entity, 'id')
+          ? (entity as Entity).entityType
+          : (entity as EntityType),
       )
     },
 
@@ -146,9 +154,17 @@ export default function (this: void) {
      * @returns Material icon name as string
      */
     getIcon(this: void, entity: Entity): string {
-      if ([EntityType.CompositePhenotype, EntityType.CompositeRestriction, EntityType.CompositeConcept].includes(entity.entityType)) {
+      if (
+        [
+          EntityType.CompositePhenotype,
+          EntityType.CompositeRestriction,
+          EntityType.CompositeConcept,
+        ].includes(entity.entityType)
+      ) {
         return 'apps'
-      } else if ([EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(entity.entityType)) {
+      } else if (
+        [EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(entity.entityType)
+      ) {
         switch ((entity as Phenotype).dataType) {
           case DataType.Number:
             return 'pin'
@@ -176,7 +192,7 @@ export default function (this: void) {
       const result = t(entity.entityType)
       if ([EntityType.SinglePhenotype, EntityType.SingleRestriction].includes(entity.entityType)) {
         const dataType = (entity as Phenotype).dataType
-        result + (dataType ? ': ' + t(dataType.valueOf()) : '')
+        return result + (dataType ? ': ' + t(dataType.valueOf()) : '')
       }
       return result
     },
@@ -200,7 +216,9 @@ export default function (this: void) {
     },
 
     hasExpression(this: void, entity: Entity | EntityType): entity is Phenotype {
-      const entityType = (entity.hasOwnProperty('id') ? (entity as Entity).entityType : entity) as EntityType
+      const entityType = (
+        Object.prototype.hasOwnProperty.call(entity, 'id') ? (entity as Entity).entityType : entity
+      ) as EntityType
       return [EntityType.CompositePhenotype, EntityType.CompositeConcept].includes(entityType)
     },
 
@@ -208,7 +226,7 @@ export default function (this: void) {
       return [
         EntityType.SinglePhenotype,
         EntityType.CompositeRestriction,
-        EntityType.SingleRestriction
+        EntityType.SingleRestriction,
       ]
     },
 
@@ -238,38 +256,44 @@ export default function (this: void) {
         EntityType.CompositePhenotype,
         EntityType.SinglePhenotype,
         EntityType.SingleRestriction,
-        EntityType.CompositeRestriction
+        EntityType.CompositeRestriction,
       ]
     },
 
     repositoryIcon: (repository: Repository | RepositoryType) => {
-      const type = repository.hasOwnProperty('id') ? (repository as Repository).repositoryType : repository as RepositoryType
+      const type = Object.prototype.hasOwnProperty.call(repository, 'id')
+        ? (repository as Repository).repositoryType
+        : (repository as RepositoryType)
       if (type === RepositoryType.ConceptRepository) return 'article'
       if (type === RepositoryType.PhenotypeRepository) return 'category'
       return 'tab'
     },
 
     queryIcon: (query: Query | QueryType) => {
-      const type = query.hasOwnProperty('id') ? (query as Query).type : query as QueryType
+      const type = Object.prototype.hasOwnProperty.call(query, 'id')
+        ? (query as Query).type
+        : (query as QueryType)
       if (type === QueryType.Concept) return 'article'
       if (type === QueryType.Phenotype) return 'category'
       return 'question_mark'
     },
 
     requiresAggregationFunction: (entity: Entity) => {
-      return [EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(entity.entityType)
+      return [EntityType.CompositePhenotype, EntityType.CompositeRestriction].includes(
+        entity.entityType,
+      )
     },
 
     permissionTitle: (permission?: Permission) => {
       if (!permission) return t('permission', 0)
-      return te('permissions.' + permission)
-        ? t('permissions.' + permission)
-        : permission
+      return te('permissions.' + permission) ? t('permissions.' + permission) : permission
     },
 
     canRead: (organisation?: Organisation) => {
       if (!organisation?.permission) return false
-      return [Permission.Manage, Permission.Write, Permission.Read].includes(organisation.permission)
+      return [Permission.Manage, Permission.Write, Permission.Read].includes(
+        organisation.permission,
+      )
     },
 
     canWrite: (organisation?: Organisation) => {
@@ -290,19 +314,19 @@ export default function (this: void) {
       const params = {
         organisationId: entity.repository.organisation.id,
         repositoryId: entity.repository.id,
-        entityId: entity.id
+        entityId: entity.id,
       }
       if (push) {
         return router.push({
           name: 'editor',
-          params
+          params,
         })
       } else {
         return router.replace({
           name: 'editor',
-          params
+          params,
         })
       }
-    }
+    },
   }
 }

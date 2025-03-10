@@ -106,7 +106,14 @@
         </div>
         <q-space />
         <q-separator vertical />
-        <q-btn :disable="!dataSource" flat no-caps no-wrap class="q-py-none" @click="routeToDocumentQuery">
+        <q-btn
+          :disable="!dataSource"
+          flat
+          no-caps
+          no-wrap
+          class="q-py-none"
+          @click="routeToDocumentQuery"
+        >
           <q-icon name="manage_search" />
           <div class="q-pl-sm gt-xs ellipsis">{{ t('buildQuery') }}</div>
         </q-btn>
@@ -165,27 +172,27 @@ import {
   DocumentGatheringMode,
   DocumentPage,
   PipelineResponseStatus,
-  Query
+  Query,
 } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
 import { QTableProps, useQuasar } from 'quasar'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
 import { useRouter } from 'vue-router'
 
 interface ConceptColor {
-  'background-color': string
-  color: string
+  'background-color'?: string
+  color?: string
 }
 
 const props = defineProps<{
   dataSource?: DataSource
   query?: Query
   documentFilter?: Array<string>
-  documentQueryOffsets?: { [key: string]: string[]; }
+  documentQueryOffsets?: { [key: string]: string[] }
 }>()
 
 const emit = defineEmits(['clearQuery'])
@@ -197,7 +204,7 @@ const router = useRouter()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { isAdmin } = storeToRefs(entityStore)
 const documents = ref<DocumentPage>()
 const document_ = ref<Document>()
@@ -235,7 +242,7 @@ const distinctColors = [
   '#00ff7f',
   '#ff1493',
   '#696969',
-  '#d3d3d3'
+  '#d3d3d3',
 ]
 const distinctColorsFont = [
   '#ffffff',
@@ -267,10 +274,10 @@ const distinctColorsFont = [
   '#000000',
   '#000000',
   '#ffffff',
-  '#000000'
+  '#000000',
 ]
 const conceptColors: ConceptColor[] = []
-const selectedColors = ref<ConceptColor[]>([])
+const selectedColors = ref<(ConceptColor | undefined)[]>([])
 const conceptMode = ref(DocumentGatheringMode.Exclusive)
 const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
@@ -280,31 +287,31 @@ const cols = computed(
     [
       { name: 'actions' },
       { name: 'name', field: 'name', label: t('name'), align: 'left' },
-      { name: 'text', field: 'text', label: t('content'), align: 'left' }
-    ] as QTableProps['columns']
+      { name: 'text', field: 'text', label: t('content'), align: 'left' },
+    ] as QTableProps['columns'],
 )
 
 const conceptModeOptions = computed(() => [
   {
     label: t('exclusive'),
     value: 'exclusive',
-    icon: 'mdi-circle'
+    icon: 'mdi-circle',
   },
   {
     label: t('union'),
     value: 'union',
-    icon: 'mdi-set-all'
+    icon: 'mdi-set-all',
   },
   {
     label: t('intersection'),
     value: 'intersection',
-    icon: 'mdi-set-center'
-  }
+    icon: 'mdi-set-center',
+  },
 ])
 
 const mostImportantNodesOptions = computed(() => [
   { label: t('yes'), value: true },
-  { label: t('no'), value: false }
+  { label: t('no'), value: false },
 ])
 
 const loading = computed(() => conceptsLoading.value || documentsLoading.value)
@@ -314,11 +321,11 @@ onMounted(() =>
     .loadUser()
     .then(reloadConcepts)
     .then(() => reloadDocuments())
-    .catch((e: Error) => renderError(e))
+    .catch((e: Error) => renderError(e)),
 )
 
 watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () =>
-  reloadDocuments().catch((e: Error) => renderError(e))
+  reloadDocuments().catch((e: Error) => renderError(e)),
 )
 watch(
   () => props.dataSource,
@@ -327,12 +334,13 @@ watch(
     reloadConcepts()
       .then(() => reloadDocuments())
       .catch((e: Error) => renderError(e))
-  }
+  },
 )
 
 async function reloadConcepts() {
   if (!props.dataSource) concepts.value.length = 0
-  if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value) return Promise.reject()
+  if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value)
+    return Promise.reject()
   conceptsLoading.value = true
   return checkPipeline()
     .then(() => conceptApi.getConceptClusters(undefined, undefined, false, props.dataSource?.id))
@@ -341,12 +349,12 @@ async function reloadConcepts() {
       concepts.value.forEach((_, index) => {
         conceptColors.push({
           'background-color': distinctColors[index],
-          color: distinctColorsFont[index]
+          color: distinctColorsFont[index],
         })
       })
       selectedColors.value = new Array(concepts.value.length).fill({
         'background-color': '',
-        color: ''
+        color: '',
       }) as ConceptColor[]
       selectedConcepts.value = []
     })
@@ -355,10 +363,13 @@ async function reloadConcepts() {
 
 async function reloadDocuments(name?: string, page = 1) {
   if (!props.dataSource) documents.value = undefined
-  if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource) return Promise.reject()
+  if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource)
+    return Promise.reject()
   documents.value = undefined
   document_.value = undefined
-  const conceptClusterIds = selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => !!id)
+  const conceptClusterIds = selectedConcepts.value
+    .map((c) => concepts.value[c]?.id)
+    .filter((id) => id !== undefined)
   documentsLoading.value = true
   return documentApi
     .getDocuments(
@@ -370,7 +381,7 @@ async function reloadDocuments(name?: string, page = 1) {
       undefined,
       conceptMode.value,
       mostImportantNodes.value,
-      page
+      page,
     )
     .then((r) => (documents.value = r.data))
     .finally(() => (documentsLoading.value = false))
@@ -379,7 +390,8 @@ async function reloadDocuments(name?: string, page = 1) {
 function setConceptMode(newMode = DocumentGatheringMode.Exclusive) {
   if (newMode === conceptMode.value) return
   conceptMode.value = newMode
-  if (selectedConcepts.value.length > 1 && newMode === DocumentGatheringMode.Exclusive) prepareSelectedConcepts()
+  if (selectedConcepts.value.length > 1 && newMode === DocumentGatheringMode.Exclusive)
+    prepareSelectedConcepts()
 }
 
 function prepareSelectedConcepts() {
@@ -388,7 +400,7 @@ function prepareSelectedConcepts() {
   }
   selectedColors.value.fill({
     'background-color': '',
-    color: ''
+    color: '',
   })
   selectedConcepts.value.forEach((idx) => (selectedColors.value[idx] = conceptColors[idx]))
 }
@@ -403,18 +415,19 @@ async function checkPipeline() {
 
 async function chooseDocument(document: Document) {
   if (document.id == null) return
-  let offsets = props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
+  const offsets =
+    props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
   if (!props.dataSource) return Promise.reject()
   const conceptIds = new Array<string>()
   for (const c of selectedConcepts.value) {
     if (c != undefined)
       conceptIds.push(
         '$color::' +
-          conceptColors[c]['background-color'] +
+          conceptColors[c]?.['background-color'] +
           '|' +
-          conceptColors[c]['color'] +
+          conceptColors[c]?.['color'] +
           '::color$' +
-          concepts.value[c].id
+          concepts.value[c]?.id,
       )
   }
   await documentApi
@@ -423,8 +436,8 @@ async function chooseDocument(document: Document) {
       $q.dialog({
         component: DocumentDetailsDialog,
         componentProps: {
-          document: r.data
-        }
+          document: r.data,
+        },
       })
     })
     .catch((e: Error) => renderError(e))
@@ -436,8 +449,8 @@ function showRegenerateDialog() {
     component: ConceptClusterDialog,
     componentProps: {
       dataSource: props.dataSource,
-      conceptCluster: concepts.value
-    }
+      conceptCluster: concepts.value,
+    },
   }).onOk(() => {
     reloadConcepts().catch((e: Error) => renderError(e))
   })
@@ -447,14 +460,15 @@ function routeToDocumentQuery() {
   void router.push({
     name: 'queryBuilder',
     params: { organisationId: undefined, repositoryId: undefined, queryId: undefined },
-    query: { dataSourceId: props.dataSource?.id }
+    query: { dataSourceId: props.dataSource?.id },
   })
 }
 </script>
 
-<style lang="sass">
-.document-item
-  font-size: 18px
-  color: #696969
-  font-weight: bold
+<style lang="scss">
+.document-item {
+  font-size: 18px;
+  color: #696969;
+  font-weight: bold;
+}
 </style>

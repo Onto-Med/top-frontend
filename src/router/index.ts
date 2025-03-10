@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios'
-import { route } from 'quasar/wrappers'
+import { defineRouter } from '#q-app/wrappers'
 import useNotify from 'src/mixins/useNotify'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import {
   createMemoryHistory,
   createRouter,
@@ -18,10 +18,12 @@ import routes from './routes'
  * async/await or return a Promise which resolves
  * with the Router instance.
  */
-export default route(function (/* { store, ssrContext } */) {
+export default defineRouter(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
-    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
+    : process.env.VUE_ROUTER_MODE === 'history'
+      ? createWebHistory
+      : createWebHashHistory
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -30,13 +32,11 @@ export default route(function (/* { store, ssrContext } */) {
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
-    history: createHistory(
-      process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE
-    ),
+    history: createHistory(process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE),
   })
 
   Router.beforeEach(async (to) => {
-    const entityStore = useEntity()
+    const entityStore = useEntityStore()
     const { renderError } = useNotify()
 
     if (to.meta.disabled) {
@@ -46,7 +46,8 @@ export default route(function (/* { store, ssrContext } */) {
       if (entityStore.keycloak && !entityStore.keycloak.authenticated)
         return await entityStore.keycloak.login()
     }
-    await entityStore.setOrganisationById(to.params.organisationId as string | undefined)
+    await entityStore
+      .setOrganisationById(to.params.organisationId as string | undefined)
       .catch((e: AxiosError) => {
         renderError(e)
         void Router.push({ name: 'organisations' })
@@ -54,7 +55,10 @@ export default route(function (/* { store, ssrContext } */) {
       .then(() => entityStore.setRepositoryById(to.params.repositoryId as string | undefined))
       .catch((e: AxiosError) => {
         renderError(e)
-        void Router.push({ name: 'showOrganisation', params: { organisationId: to.params.organisationId } })
+        void Router.push({
+          name: 'showOrganisation',
+          params: { organisationId: to.params.organisationId },
+        })
       })
   })
 

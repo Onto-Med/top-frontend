@@ -12,8 +12,8 @@ const routes: RouteRecordRaw[] = [
         path: '/',
         component: () => import('pages/Home.vue'),
         meta: {
-          allowAnonymous: true
-        }
+          allowAnonymous: true,
+        },
       },
       {
         name: 'queryBuilder',
@@ -26,59 +26,59 @@ const routes: RouteRecordRaw[] = [
             queryId: params.queryId,
             dataSourceId: query.dataSourceId,
           }
-        }
+        },
       },
       {
         name: 'editor',
         path: '/:organisationId/:repositoryId/:entityId?',
-        props: route => {
+        props: (route) => {
           const version = Number.parseInt(route.query.version as string, 10)
           return { entityId: route.params.entityId, version: version }
         },
         component: () => import('pages/Editor.vue'),
         meta: {
-          allowAnonymous: true
-        }
+          allowAnonymous: true,
+        },
       },
       {
         name: 'organisations',
         path: '/organisation',
         component: () => import('pages/OrganisationOverview.vue'),
         meta: {
-          allowAnonymous: true
-        }
+          allowAnonymous: true,
+        },
       },
       {
         name: 'showOrganisation',
         path: '/:organisationId',
         component: () => import('pages/Organisation.vue'),
         meta: {
-          allowAnonymous: true
-        }
+          allowAnonymous: true,
+        },
       },
       {
         name: 'documentSearchByQuery',
         path: '/document/query/:organisationId/:repositoryId/:queryId',
         component: () => import('pages/DocumentSearch.vue'),
         meta: {
-          disabled: !env.DOCUMENTS_ENABLED
+          disabled: !env.DOCUMENTS_ENABLED,
         },
         props: ({ params }) => {
           return {
             organisationId: params.organisationId,
             repositoryId: params.repositoryId,
-            queryId: params.queryId
+            queryId: params.queryId,
           }
-        }
+        },
       },
       {
         name: 'documentSearch',
         path: '/document',
         component: () => import('pages/DocumentSearch.vue'),
         meta: {
-          disabled: !env.DOCUMENTS_ENABLED
-        }
-      }
+          disabled: !env.DOCUMENTS_ENABLED,
+        },
+      },
     ],
   },
 
@@ -88,8 +88,8 @@ const routes: RouteRecordRaw[] = [
     path: '/:catchAll(.*)*',
     component: () => import('pages/Error404.vue'),
     meta: {
-      allowAnonymous: true
-    }
+      allowAnonymous: true,
+    },
   },
 ]
 

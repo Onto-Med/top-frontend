@@ -3,7 +3,9 @@
     <q-card class="content">
       <q-card-section class="row items-center q-gutter-sm">
         <div class="col text-h6">
-          {{ t('pipelineManagementOfDataSource', { dataSource: dataSource.title || dataSource.id }) }}
+          {{
+            t('pipelineManagementOfDataSource', { dataSource: dataSource.title || dataSource.id })
+          }}
         </div>
         <q-btn v-close-popup icon="close" flat round dense />
       </q-card-section>
@@ -18,9 +20,15 @@
             </p>
             <p class="text-subtitle1">
               <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
-                <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
-                <q-icon v-else-if="isGraphPipelineFailed" :title="graphPipelineStatusDetails" size="xs" name="help" color="red" />
-                <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
+              <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
+              <q-icon
+                v-else-if="isGraphPipelineFailed"
+                :title="graphPipelineStatusDetails"
+                size="xs"
+                name="help"
+                color="red"
+              />
+              <q-icon v-else-if="isGraphPipelineFinished" name="check" color="positive" />
             </p>
             <q-checkbox
               v-model="skipPresent"
@@ -119,7 +127,13 @@
                   color="primary"
                   @click="conceptGraphStep"
                 />
-                <q-btn flat :label="t('back')" color="primary" class="q-ml-sm" @click="stepper?.previous()" />
+                <q-btn
+                  flat
+                  :label="t('back')"
+                  color="primary"
+                  class="q-ml-sm"
+                  @click="stepper?.previous()"
+                />
               </div>
             </q-stepper-navigation>
           </template>
@@ -138,7 +152,7 @@ import {
   ConceptGraphPipelineStatusEnum,
   DataSource,
   PipelineResponse,
-  PipelineResponseStatus
+  PipelineResponseStatus,
 } from '@onto-med/top-api'
 import { Notify, QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
@@ -148,16 +162,16 @@ import { languages } from 'src/config'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
 import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import PipelineConfigForm from 'components/Documents/PipelineConfigForm.vue'
-import {AxiosResponse} from 'axios';
+import { AxiosResponse } from 'axios'
 
 const props = defineProps({
   dataSource: {
     type: Object as () => DataSource,
-    required: true
+    required: true,
   },
-  conceptCluster: Array as () => ConceptCluster[]
+  conceptCluster: Array as () => ConceptCluster[],
 })
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -165,7 +179,7 @@ const { t, te } = useI18n()
 const { dialogRef, onDialogHide } = useDialogPluginComponent()
 const { renderError, notify } = useNotify()
 const $q = useQuasar()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { isAdmin } = storeToRefs(entityStore)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
 const conceptClusterApi = inject(ConceptClusterApiKey)
@@ -180,13 +194,27 @@ const graphPipelineInterval = ref<number>()
 const clusterPipelineInterval = ref<number>()
 const skipPresent = ref<boolean>(true)
 
-const isGraphPipelineFinished = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Successful)
-const isGraphPipelineFailed = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Failed)
-const isGraphPipelineRunning = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Running)
-const isGraphPipelineStopping = computed(() => graphPipeline.value?.status === PipelineResponseStatus.Stopped)
-const isClusterPipelineFinished = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Successful)
-const isClusterPipelineFailed = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Failed)
-const isClusterPipelineRunning = computed(() => clusterPipeline.value?.status === PipelineResponseStatus.Running)
+const isGraphPipelineFinished = computed(
+  () => graphPipeline.value?.status === PipelineResponseStatus.Successful,
+)
+const isGraphPipelineFailed = computed(
+  () => graphPipeline.value?.status === PipelineResponseStatus.Failed,
+)
+const isGraphPipelineRunning = computed(
+  () => graphPipeline.value?.status === PipelineResponseStatus.Running,
+)
+const isGraphPipelineStopping = computed(
+  () => graphPipeline.value?.status === PipelineResponseStatus.Stopped,
+)
+const isClusterPipelineFinished = computed(
+  () => clusterPipeline.value?.status === PipelineResponseStatus.Successful,
+)
+const isClusterPipelineFailed = computed(
+  () => clusterPipeline.value?.status === PipelineResponseStatus.Failed,
+)
+const isClusterPipelineRunning = computed(
+  () => clusterPipeline.value?.status === PipelineResponseStatus.Running,
+)
 
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
@@ -198,27 +226,39 @@ const graphColumns = computed(
       { name: 'phrases', field: 'phrases', label: t('phrase', 2), align: 'left', sortable: false },
       { name: 'nodes', field: 'nodes', label: t('node', 2), align: 'left', sortable: true },
       { name: 'edges', field: 'edges', label: t('edge', 2), align: 'left', sortable: true },
-      { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true }
-    ] as QTableProps['columns']
+      { name: 'id', field: 'id', required: true, label: t('id'), align: 'left', sortable: true },
+    ] as QTableProps['columns'],
 )
 
-const configPipelineButtonTitle = computed(
-  () => {
-    if (!language.value) return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.editing')
-    else if (!isAdmin.value) return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.editing')
-    else if (isGraphPipelineRunning.value) return t('conceptCluster.tooltips.running', {'optional': t('pipeline') + ' '}) + '. ' + t('conceptCluster.tooltips.cantEdit')
-    else return ''
-  }
-)
+const configPipelineButtonTitle = computed(() => {
+  if (!language.value)
+    return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.editing')
+  else if (!isAdmin.value)
+    return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.editing')
+  else if (isGraphPipelineRunning.value)
+    return (
+      t('conceptCluster.tooltips.running', { optional: t('pipeline') + ' ' }) +
+      '. ' +
+      t('conceptCluster.tooltips.cantEdit')
+    )
+  else return ''
+})
 
-const startPipelineButtonTitle = computed(
-  () => {
-    if (!language.value) return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.starting')
-    else if (!isAdmin.value) return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.starting')
-    else if (isGraphPipelineRunning.value || isGraphPipelineStopping.value) return t('conceptCluster.tooltips.running', {'optional': t('pipeline') + ' '}) + '/' + t('conceptCluster.tooltips.stopped', {'optional': ''}) + '. ' + t('conceptCluster.tooltips.cantStart')
-    else return ''
-  }
-)
+const startPipelineButtonTitle = computed(() => {
+  if (!language.value)
+    return t('conceptCluster.tooltips.noLanguage') + ' ' + t('conceptCluster.tooltips.starting')
+  else if (!isAdmin.value)
+    return t('conceptCluster.tooltips.onlyAdmins') + ' ' + t('conceptCluster.tooltips.starting')
+  else if (isGraphPipelineRunning.value || isGraphPipelineStopping.value)
+    return (
+      t('conceptCluster.tooltips.running', { optional: t('pipeline') + ' ' }) +
+      '/' +
+      t('conceptCluster.tooltips.stopped', { optional: '' }) +
+      '. ' +
+      t('conceptCluster.tooltips.cantStart')
+    )
+  else return ''
+})
 
 const pipelineJsonConfig = ref<string>('')
 
@@ -232,7 +272,9 @@ onUnmounted(() => {
 })
 
 //ToDo: maybe don't erase config on language switch when a manual save was already commited?
-watch(language, () => {pipelineJsonConfig.value = ''})
+watch(language, () => {
+  pipelineJsonConfig.value = ''
+})
 
 function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
@@ -241,9 +283,11 @@ function statusToString(status?: PipelineResponseStatus) {
 function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
   let returnString = 'Unfinished steps: '
   steps
-    ?.filter((step: ConceptGraphPipelineStatus) => {return step.status != ConceptGraphPipelineStatusEnum.Finished})
+    ?.filter((step: ConceptGraphPipelineStatus) => {
+      return step.status != ConceptGraphPipelineStatusEnum.Finished
+    })
     .forEach((step: ConceptGraphPipelineStatus) => {
-      returnString += '\"' + step.name + '\", '
+      returnString += '"' + step.name + '", '
     })
   return returnString.slice(0, returnString.length - 2)
 }
@@ -264,14 +308,17 @@ function loadGraphPipeline() {
       graphPipeline.value = r.data
     })
     .then(() => {
-      if (graphPipeline.value?.status === PipelineResponseStatus.Running || graphPipeline.value?.status === PipelineResponseStatus.Stopped)
+      if (
+        graphPipeline.value?.status === PipelineResponseStatus.Running ||
+        graphPipeline.value?.status === PipelineResponseStatus.Stopped
+      )
         graphPipelineInterval.value = window.setTimeout(loadGraphPipeline, 5000)
     })
     .catch((e: Error) => {
       graphPipelineInterval.value = undefined
       graphPipeline.value = {
         pipelineId: props.dataSource?.id,
-        status: PipelineResponseStatus.Failed
+        status: PipelineResponseStatus.Failed,
       }
       renderError(e)
     })
@@ -300,7 +347,7 @@ function loadClusterPipeline() {
       clusterPipelineInterval.value = undefined
       clusterPipeline.value = {
         pipelineId: props.dataSource?.id,
-        status: PipelineResponseStatus.Failed
+        status: PipelineResponseStatus.Failed,
       }
       renderError(e)
     })
@@ -310,8 +357,8 @@ function confirmStartPipeline() {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('conceptCluster.confirmStart')
-    }
+      message: t('conceptCluster.confirmStart'),
+    },
   }).onOk(() => {
     deletePipeline()
       .then(startPipeline)
@@ -323,8 +370,8 @@ function confirmStopPipeline() {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('conceptCluster.confirmStop')
-    }
+      message: t('conceptCluster.confirmStop'),
+    },
   }).onOk(() => {
     stopPipeline().catch((e: Error) => renderError(e))
   })
@@ -334,8 +381,8 @@ function confirmDeletePipeline() {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('conceptCluster.confirmDelete')
-    }
+      message: t('conceptCluster.confirmDelete'),
+    },
   }).onOk(() => {
     deletePipeline().catch((e: Error) => renderError(e))
   })
@@ -345,8 +392,8 @@ function confirmPublishClusters() {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('conceptCluster.confirmPublish')
-    }
+      message: t('conceptCluster.confirmPublish'),
+    },
   }).onOk(() => {
     conceptClusterApi
       ?.deleteConceptClustersForPipelineId(props.dataSource.id)
@@ -354,10 +401,10 @@ function confirmPublishClusters() {
         conceptClusterApi
           ?.createConceptClustersForPipelineId(
             props.dataSource.id,
-            selectedGraphs.value.map((c) => c.id)
+            selectedGraphs.value.map((c) => c.id),
           )
           .then(loadClusterPipeline)
-          .catch((e: Error) => renderError(e))
+          .catch((e: Error) => renderError(e)),
       )
       .catch((e: Error) => renderError(e))
   })
@@ -365,15 +412,21 @@ function confirmPublishClusters() {
 
 async function startPipeline() {
   if (pipelineJsonConfig.value != '') {
-    let jsonBody = (`{"name": "${props.dataSource?.id}", "language": "${language.value}", "return_statistics": "false",
-     "skip_present": "${skipPresent.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`)
+    const jsonBody = `{"name": "${props.dataSource?.id}", "language": "${language.value}", "return_statistics": "false",
+     "skip_present": "${skipPresent.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`
     return conceptPipelineApi
       ?.startConceptGraphPipelineWithJson(jsonBody)
       .then(pipelineResponseCheck)
       .then(loadGraphPipeline)
   } else {
     return conceptPipelineApi
-      ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
+      ?.startConceptGraphPipeline(
+        props.dataSource.id,
+        props.dataSource.id,
+        undefined,
+        undefined,
+        language.value,
+      )
       .then(pipelineResponseCheck)
       .then(loadGraphPipeline)
   }
@@ -381,7 +434,12 @@ async function startPipeline() {
 
 function pipelineResponseCheck(r: AxiosResponse<PipelineResponse>) {
   if (r.data.status == PipelineResponseStatus.Failed) {
-    notify(r.data.response != undefined ? r.data.response : 'No specific response given, but it seems to have failed. Please consult the backend logs.', 'negative')
+    notify(
+      r.data.response != undefined
+        ? r.data.response
+        : 'No specific response given, but it seems to have failed. Please consult the backend logs.',
+      'negative',
+    )
   }
 }
 
@@ -397,7 +455,7 @@ async function deletePipeline() {
 async function stopPipeline() {
   return conceptPipelineApi
     ?.stopConceptGraphPipeline(props.dataSource.id)
-    .then(() => Notify.create({ 'message': 'Stopping Pipeline', 'type': 'warning' }))
+    .then(() => Notify.create({ message: 'Stopping Pipeline', type: 'warning' }))
 }
 
 function getSelectedRowsString() {
@@ -419,7 +477,7 @@ function loadConceptGraphs() {
     ?.getConceptGraphStatistics(props.dataSource.id)
     .then(async (r) => {
       for (const id in r.data) {
-        let labels = await conceptPipelineApi
+        const labels = await conceptPipelineApi
           .getConceptGraph(props.dataSource.id, id)
           .then((r) => {
             if (!r.data.nodes) return []
@@ -437,11 +495,11 @@ function loadConceptGraphs() {
             renderError(e)
             return []
           })
-        let graph = {
+        const graph = {
           id: id,
-          nodes: r.data[id].nodes,
-          edges: r.data[id].edges,
-          phrases: labels.join(' | ')
+          nodes: r.data[id]?.nodes,
+          edges: r.data[id]?.edges,
+          phrases: labels.join(' | '),
         } as ConceptGraphObject
         conceptGraphs.value.push(graph)
         if (props.conceptCluster?.some((c) => c.id === id)) {
@@ -465,13 +523,15 @@ function configurePipeline() {
     componentProps: {
       pipelineId: pipelineIdSubmit,
       savedConfig: pipelineJsonConfig.value,
-      language: language.value
+      language: language.value,
     },
-  }).onOk((jsonConfig: string) => {
-    pipelineJsonConfig.value = jsonConfig
-  }).onCancel(() => {
-    //ToDo: need something here to be done on Cancel?
   })
+    .onOk((jsonConfig: string) => {
+      pipelineJsonConfig.value = jsonConfig
+    })
+    .onCancel(() => {
+      //ToDo: need something here to be done on Cancel?
+    })
 }
 
 interface ConceptGraphObject {

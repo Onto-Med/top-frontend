@@ -16,11 +16,11 @@ if (env.SYSTEM_NOTICE) {
         {
           icon: 'close',
           color: 'white',
-          handler () {
+          handler() {
             LocalStorage.set('seenSystemNotice', noticeHashCode)
-          }
-        }
-      ]
+          },
+        },
+      ],
     })
   }
 }
@@ -34,10 +34,10 @@ if (env.GDPR_NOTICE && Cookies.has('gdpr') !== true) {
       label: computed(() => t('accept')) as unknown as string,
       color: 'yellow',
       noDismiss: false,
-      handler () {
+      handler() {
         Cookies.set('gdpr', 'true', { expires: 5 * 365 })
-      }
-    }
+      },
+    },
   ]
 
   if (policyUrl) {
@@ -45,19 +45,21 @@ if (env.GDPR_NOTICE && Cookies.has('gdpr') !== true) {
       label: computed(() => t('learnMore')) as unknown as string,
       color: 'grey',
       noDismiss: true,
-      handler () {
+      handler() {
         openURL(policyUrl)
-      }
+      },
     })
   }
 
   Notify.create({
-    message: computed(() => t('gdprNotice', { productName: packageInfo.productName })) as unknown as string,
+    message: computed(() =>
+      t('gdprNotice', { productName: packageInfo.productName }),
+    ) as unknown as string,
     multiLine: true,
     classes: 'gdpr-notice',
     timeout: 0,
     position: 'bottom-right',
-    actions
+    actions,
   })
 }
 
@@ -66,13 +68,14 @@ if (env.GDPR_NOTICE && Cookies.has('gdpr') !== true) {
  * @param  {String} str The string to hash.
  * @return {Number} A 32bit integer.
  */
-function hashCode (str: string): number {
-  let hash = 0, i;
-  if (str.length === 0) return hash;
+function hashCode(str: string): number {
+  let hash = 0,
+    i
+  if (str.length === 0) return hash
   for (i = 0; i < str.length; i++) {
-    const chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
+    const chr = str.charCodeAt(i)
+    hash = (hash << 5) - hash + chr
+    hash |= 0
   }
-  return hash;
+  return hash
 }

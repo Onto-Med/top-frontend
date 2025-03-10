@@ -63,7 +63,7 @@ import { useRouter } from 'vue-router'
 const props = defineProps({
   organisationId: String,
   repositoryId: String,
-  queryId: String
+  queryId: String,
 })
 
 const { t } = useI18n()
@@ -73,12 +73,12 @@ const dataSources = ref<DataSource[]>([])
 const queryApi = inject(QueryApiKey)
 const query = ref<Query>()
 const documentIds = ref<Array<string>>()
-const documentOffsets = ref<{ [key: string]: string[]; }>()
+const documentOffsets = ref<{ [key: string]: string[] }>()
 const router = useRouter()
 
 watch(
   () => props.queryId,
-  () => loadQuery()
+  () => loadQuery(),
 )
 
 onMounted(() => {
@@ -91,7 +91,7 @@ function setUpSQResults() {
   queryApi
     ?.getQueryResultIds(props.organisationId, props.repositoryId, props.queryId)
     .then((r) => {
-      for(let id in r.data){
+      for (const id of Object.keys(r.data)) {
         documentIds.value?.push(id)
       }
       documentOffsets.value = r.data
@@ -136,10 +136,12 @@ function resetPage() {
 }
 </script>
 
-<style lang="sass" scoped>
-.document-search-title
-  min-height: 104px
-.data-source-select
-  min-width: 50px
-  max-width: 500px
+<style lang="scss" scoped>
+.document-search-title {
+  min-height: 104px;
+}
+.data-source-select {
+  min-width: 50px;
+  max-width: 500px;
+}
 </style>

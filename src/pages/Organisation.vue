@@ -21,18 +21,18 @@
                       {{ t('edit') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-close-popup clickable @click="showMembershipDialog()">
+                  <q-item v-close-popup clickable @click="showMembershipDialog">
                     <q-item-section>
                       {{ t('permission', 2) }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-if="isAdmin" v-close-popup clickable @click="showDataSourceDialog()">
+                  <q-item v-if="isAdmin" v-close-popup clickable @click="showDataSourceDialog">
                     <q-item-section>
                       {{ t('dataSource', 2) }}
                     </q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item v-close-popup clickable @click="deleteOrganisation()">
+                  <q-item v-close-popup clickable @click="deleteOrganisation">
                     <q-item-section>
                       {{ t('delete') }}
                     </q-item-section>
@@ -58,8 +58,8 @@
       :page="repositories"
       :loading="loading"
       :create="write"
-      @row-clicked="routeToEditor($event)"
-      @create-clicked="repository = newRepository(); showRepositoryForm = true"
+      @row-clicked="routeToEditor"
+      @create-clicked="((repository = newRepository()), (showRepositoryForm = true))"
       @request="reload"
     >
       <template #actions="{ row }">
@@ -70,7 +70,7 @@
           dense
           icon="edit"
           :title="t('editThing', { thing: t('repository') })"
-          @click.stop="repository = row; showRepositoryForm = true"
+          @click.stop="((repository = row), (showRepositoryForm = true))"
         />
         <q-icon
           :name="repositoryIcon(row)"
@@ -97,15 +97,15 @@
       v-model="repository"
       v-model:show="showRepositoryForm"
       :loading="savingRepository"
-      @update:model-value="saveRepository($event)"
-      @delete-clicked="deleteRepository($event)"
+      @update:model-value="saveRepository"
+      @delete-clicked="deleteRepository"
     />
 
     <organisation-form
       v-model="organisation"
       v-model:show="showOrganisationForm"
       :loading="saving"
-      @update:model-value="updateOrganisation($event)"
+      @update:model-value="updateOrganisation"
     />
   </q-page>
   <q-page v-else>
@@ -131,7 +131,7 @@ import { AxiosResponse } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { useQuasar } from 'quasar'
 
 const { t, d } = useI18n()
@@ -146,7 +146,7 @@ const saving = ref(false)
 const savingRepository = ref(false)
 const organisationApi = inject(OrganisationApiKey)
 const repositoryApi = inject(RepositoryApiKey)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { organisation } = storeToRefs(entityStore)
 const repositories = ref<RepositoryPage>({
   content: [],
@@ -154,7 +154,7 @@ const repositories = ref<RepositoryPage>({
   size: 0,
   totalElements: 0,
   totalPages: 0,
-  type: 'repository'
+  type: 'repository',
 })
 const repository = ref(newRepository())
 const { isAuthenticated, isAdmin } = storeToRefs(entityStore)
@@ -164,32 +164,34 @@ const write = computed(() => isAuthenticated.value && canWrite(organisation.valu
 const manage = computed(() => isAuthenticated.value && canManage(organisation.value))
 
 onMounted(async () => {
-  await entityStore.loadUser()
-    .then(() => reload())
+  await entityStore.loadUser().then(() => reload())
 })
 
 function newRepository() {
-  return { id: (uuidv4 as () => string)(), primary: false } as Repository
+  return { id: uuidv4(), primary: false } as Repository
 }
 
-async function reload(filter: string|undefined = undefined, page = 1) {
+async function reload(filter?: string, page = 1) {
   if (!repositoryApi || !organisation.value) return
   loading.value = true
-  await repositoryApi.getRepositoriesByOrganisationId(organisation.value.id, undefined, filter, undefined, page)
-    .then(r => repositories.value = r.data)
+  await repositoryApi
+    .getRepositoriesByOrganisationId(organisation.value.id, undefined, filter, undefined, page)
+    .then((r) => (repositories.value = r.data))
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 
 function routeToEditor(repository: Repository) {
   if (!organisation.value) return
-  void router.push({ name: 'editor', params: { organisationId: organisation.value.id, repositoryId: repository.id } })
+  void router.push({
+    name: 'editor',
+    params: { organisationId: organisation.value.id, repositoryId: repository.id },
+  })
 }
 
 function updateRow(repository: Repository) {
   const index = repositories.value.content.findIndex((r) => r.id === repository.id)
-  if (index !== -1)
-    repositories.value.content[index] = repository
+  if (index !== -1) repositories.value.content[index] = repository
 }
 
 function removeRow(repository: Repository) {
@@ -204,31 +206,33 @@ async function updateOrganisation(newData: Organisation) {
   if (!organisationApi || !organisation.value) return
   saving.value = true
 
-  await organisationApi.updateOrganisationById(organisation.value.id, newData)
-    .then(r => {
+  await organisationApi
+    .updateOrganisationById(organisation.value.id, newData)
+    .then((r) => {
       showOrganisationForm.value = false
       notify(t('thingSaved', { thing: t('organisation') }), 'positive')
       organisation.value = r.data
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => saving.value = false)
+    .finally(() => (saving.value = false))
 }
 
 function deleteOrganisation() {
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('organisationPage.confirmDelete')
-    }
+      message: t('organisationPage.confirmDelete'),
+    },
   }).onOk(() => {
     if (!organisationApi || !organisation.value) return
-    void organisationApi.deleteOrganisationById(organisation.value.id)
+    void organisationApi
+      .deleteOrganisationById(organisation.value.id)
       .then(() => {
         notify(t('thingDeleted', { thing: t('organisation') }), 'positive')
         void router.push({ name: 'organisations' })
       })
       .catch((e: Error) => renderError(e))
-      .finally(() => saving.value = false)
+      .finally(() => (saving.value = false))
   })
 }
 
@@ -244,41 +248,40 @@ async function saveRepository(repository: Repository) {
   }
 
   await promise
-    .then(r => {
+    .then((r) => {
       showRepositoryForm.value = false
       notify(t('thingSaved', { thing: t('repository') }), 'positive')
       return r.data
     })
-    .then(newRepository => {
-      if (repository.createdAt)
-        updateRow(newRepository)
-      else
-        routeToEditor(newRepository)
+    .then((newRepository) => {
+      if (repository.createdAt) updateRow(newRepository)
+      else routeToEditor(newRepository)
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => savingRepository.value = false)
+    .finally(() => (savingRepository.value = false))
 }
 
 async function deleteRepository(repository: Repository) {
   if (!organisationApi || !organisation.value) return
   savingRepository.value = true
 
-  await repositoryApi?.deleteRepositoryById(repository.id, organisation.value.id)
+  await repositoryApi
+    ?.deleteRepositoryById(repository.id, organisation.value.id)
     .then(() => {
       showRepositoryForm.value = false
       notify(t('thingDeleted', { thing: t('repository') }), 'positive')
       removeRow(repository)
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => savingRepository.value = false)
+    .finally(() => (savingRepository.value = false))
 }
 
 function showMembershipDialog() {
   $q.dialog({
     component: MembershipDialog,
     componentProps: {
-      organisation: organisation.value
-    }
+      organisation: organisation.value,
+    },
   })
 }
 
@@ -286,8 +289,8 @@ function showDataSourceDialog() {
   $q.dialog({
     component: DataSourceDialog,
     componentProps: {
-      organisation: organisation.value
-    }
+      organisation: organisation.value,
+    },
   })
 }
 </script>

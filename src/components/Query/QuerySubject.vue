@@ -86,7 +86,9 @@
           :show-aggregation-function="isAggregationRequired"
           :aggregation-function-options="aggregationFunctionOptions"
           @update:date-time-restriction="$emit('update:dateTimeRestriction', $event)"
-          @update:default-aggregation-function-id="$emit('update:defaultAggregationFunctionId', $event)"
+          @update:default-aggregation-function-id="
+            $emit('update:defaultAggregationFunctionId', $event)
+          "
         />
         <q-btn dense icon="remove" :title="t('remove')" @click="$emit('remove')" />
       </q-btn-group>
@@ -99,23 +101,23 @@ import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import QuerySubjectConfiguration from './QuerySubjectConfiguration.vue'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { DateTimeRestriction, Entity, ExpressionFunction } from '@onto-med/top-api'
 
 const props = defineProps({
   dateTimeRestriction: {
-    type: Object as () => DateTimeRestriction
+    type: Object as () => DateTimeRestriction,
   },
   defaultAggregationFunctionId: {
     type: String,
-    require: true
+    require: true,
   },
   aggregationFunctionOptions: {
-    type: Array as () => ExpressionFunction[]
+    type: Array as () => ExpressionFunction[],
   },
   subjectId: {
     type: String,
-    required: true
+    required: true,
   },
   sortable: Boolean,
   upDisabled: Boolean,
@@ -123,8 +125,8 @@ const props = defineProps({
   excludable: Boolean,
   inclusion: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 })
 
 defineEmits([
@@ -133,31 +135,40 @@ defineEmits([
   'remove',
   'update:dateTimeRestriction',
   'update:defaultAggregationFunctionId',
-  'update:inclusion'
+  'update:inclusion',
 ])
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, d, te } = useI18n()
-const entityStore = useEntity()
-const { getSynonyms, hasItemType, isRestricted, getIcon, getIconTooltip, getTitle, requiresAggregationFunction } =
-  useEntityFormatter()
+const entityStore = useEntityStore()
+const {
+  getSynonyms,
+  hasItemType,
+  isRestricted,
+  getIcon,
+  getIconTooltip,
+  getTitle,
+  requiresAggregationFunction,
+} = useEntityFormatter()
 const subject = ref<Entity>()
 
 watch(
   () => props.subjectId,
-  (val) => loadEntity(val)
+  (val) => loadEntity(val),
 )
 
 function loadEntity(subjectId: string) {
   entityStore.loadEntity(subjectId).then(
     (e) => (subject.value = e),
-    () => {}
+    () => {},
   )
 }
 
 onBeforeMount(() => loadEntity(props.subjectId))
 
-const isAggregationRequired = computed(() => (subject.value ? requiresAggregationFunction(subject.value) : false))
+const isAggregationRequired = computed(() =>
+  subject.value ? requiresAggregationFunction(subject.value) : false,
+)
 
 const dateTimeRestrictionValues = computed(() => {
   if (

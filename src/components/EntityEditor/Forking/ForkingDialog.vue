@@ -1,14 +1,15 @@
 <template>
   <q-dialog :model-value="show" @update:model-value="$emit('update:show', $event)">
     <q-card v-if="forkingStats">
-      <q-card-section v-t="'forkingState'" class="text-h6" />
+      <q-card-section class="text-h6">{{ t('forkingState') }}</q-card-section>
 
       <template v-if="forkingStats.origin">
         <q-separator />
 
         <q-card-section>
-          <div v-t="'entityIsForkDescription'" />
-          <span v-t="'origin'" />:
+          <div>{{ t('entityIsForkDescription') }}</div>
+          <span>{{ t('origin') }}</span
+          >:
           <q-btn
             flat
             dense
@@ -25,7 +26,7 @@
 
       <q-table
         :title="t('fork', 2)"
-        :rows="forkingStats.forks"
+        :rows="forkingStats.forks || []"
         :columns="forkColumns"
         :no-data-label="t('noDataPresent')"
         row-key="id"
@@ -87,15 +88,15 @@ const forkColumns = computed(
       { name: 'organisation', label: t('organisation'), align: 'left' },
       { name: 'repository', label: t('repository'), align: 'left' },
       { name: 'userAccount', label: t('author'), align: 'left' },
-      { name: 'createdAt', label: t('createdAt') }
-    ] as QTableProps['columns']
+      { name: 'createdAt', label: t('createdAt') },
+    ] as QTableProps['columns'],
 )
 
 watch(
   () => props.show,
   (newShow: boolean) => {
     if (newShow && !forkingStats.value) void reload()
-  }
+  },
 )
 
 async function reload() {

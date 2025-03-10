@@ -1,8 +1,20 @@
-import { boot } from 'quasar/wrappers'
+import { defineBoot } from '#q-app/wrappers'
 import axios, { AxiosInstance, AxiosStatic } from 'axios'
-import { DocumentApi, PhraseApi, ConceptclusterApi, DefaultApi, EntityApi, OrganisationApi, QueryApi, RepositoryApi, UserApi, CodeApi, ConceptPipelineApi } from '@onto-med/top-api'
+import {
+  DocumentApi,
+  PhraseApi,
+  ConceptclusterApi,
+  DefaultApi,
+  EntityApi,
+  OrganisationApi,
+  QueryApi,
+  RepositoryApi,
+  UserApi,
+  CodeApi,
+  ConceptPipelineApi,
+} from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
-import { Keycloak } from '@dsb-norge/vue-keycloak-js/dist/types'
+import Keycloak from 'keycloak-js'
 import { env } from 'src/config'
 
 declare module '@vue/runtime-core' {
@@ -24,31 +36,37 @@ export const ConceptPipelineApiKey: InjectionKey<ConceptPipelineApi> = Symbol('c
 export const UserApiKey: InjectionKey<UserApi> = Symbol('userApi')
 export const CodeApiKey: InjectionKey<CodeApi> = Symbol('codeApi')
 
-export default boot(({ app }) => {
-  const axiosInstance = axios.create({
-    baseURL: env.API_URL
-  })
-  axiosInstance.interceptors.request.use(config => {
-    const keycloak = app.config.globalProperties.$keycloak as Keycloak
-    if (keycloak && keycloak.token)
-      (config.headers as Record<string, unknown>).Authorization = `Bearer ${keycloak.token}`
-    return config
-  }, error => {
-    return Promise.reject(error)
-  })
+const api = axios.create({
+  baseURL: env.API_URL,
+})
 
-  app.config.globalProperties.$axios = axiosInstance
+export default defineBoot(({ app }) => {
+  api.interceptors.request.use(
+    (config) => {
+      const keycloak = app.config.globalProperties.$keycloak as Keycloak
+      if (keycloak && keycloak.token)
+        (config.headers as Record<string, unknown>).Authorization = `Bearer ${keycloak.token}`
+      return config
+    },
+    (error) => {
+      return Promise.reject(error)
+    },
+  )
+
+  app.config.globalProperties.$axios = api
 
   app.provide(AxiosKey, axios)
-  app.provide(DefaultApiKey, new DefaultApi(undefined, '', axiosInstance))
-  app.provide(EntityApiKey, new EntityApi(undefined, '', axiosInstance))
-  app.provide(OrganisationApiKey, new OrganisationApi(undefined, '', axiosInstance))
-  app.provide(RepositoryApiKey, new RepositoryApi(undefined, '', axiosInstance))
-  app.provide(QueryApiKey, new QueryApi(undefined, '', axiosInstance))
-  app.provide(DocumentApiKey, new DocumentApi(undefined, '', axiosInstance))
-  app.provide(PhraseApiKey, new PhraseApi(undefined, '', axiosInstance))
-  app.provide(ConceptClusterApiKey, new ConceptclusterApi(undefined, '', axiosInstance))
-  app.provide(ConceptPipelineApiKey, new ConceptPipelineApi(undefined, '', axiosInstance))
-  app.provide(UserApiKey, new UserApi(undefined, '', axiosInstance))
-  app.provide(CodeApiKey, new CodeApi(undefined, '', axiosInstance))
+  app.provide(DefaultApiKey, new DefaultApi(undefined, '', api))
+  app.provide(EntityApiKey, new EntityApi(undefined, '', api))
+  app.provide(OrganisationApiKey, new OrganisationApi(undefined, '', api))
+  app.provide(RepositoryApiKey, new RepositoryApi(undefined, '', api))
+  app.provide(QueryApiKey, new QueryApi(undefined, '', api))
+  app.provide(DocumentApiKey, new DocumentApi(undefined, '', api))
+  app.provide(PhraseApiKey, new PhraseApi(undefined, '', api))
+  app.provide(ConceptClusterApiKey, new ConceptclusterApi(undefined, '', api))
+  app.provide(ConceptPipelineApiKey, new ConceptPipelineApi(undefined, '', api))
+  app.provide(UserApiKey, new UserApi(undefined, '', api))
+  app.provide(CodeApiKey, new CodeApi(undefined, '', api))
 })
+
+export { api }
