@@ -150,6 +150,7 @@ import Dialog from '../Dialog.vue'
 import { storeToRefs } from 'pinia'
 import { useEntity } from 'src/pinia/entity'
 import PipelineConfigForm from 'components/Documents/PipelineConfigForm.vue'
+import {AxiosResponse} from 'axios';
 
 const props = defineProps({
   dataSource: {
@@ -162,7 +163,7 @@ const props = defineProps({
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
 const { dialogRef, onDialogHide } = useDialogPluginComponent()
-const { renderError } = useNotify()
+const { renderError, notify } = useNotify()
 const $q = useQuasar()
 const entityStore = useEntity()
 const { isAdmin } = storeToRefs(entityStore)
@@ -368,11 +369,19 @@ async function startPipeline() {
      "skip_present": "${skipPresent.value}", "config": ${JSON.stringify(pipelineJsonConfig.value)}}`)
     return conceptPipelineApi
       ?.startConceptGraphPipelineWithJson(jsonBody)
+      .then(pipelineResponseCheck)
       .then(loadGraphPipeline)
   } else {
     return conceptPipelineApi
       ?.startConceptGraphPipeline(props.dataSource.id, props.dataSource.id, undefined, undefined, language.value)
+      .then(pipelineResponseCheck)
       .then(loadGraphPipeline)
+  }
+}
+
+function pipelineResponseCheck(r: AxiosResponse<PipelineResponse>) {
+  if (r.data.status == PipelineResponseStatus.Failed) {
+    notify(r.data.response != undefined ? r.data.response : 'No specific response given, but it seems to have failed. Please consult the backend logs.', 'negative')
   }
 }
 
