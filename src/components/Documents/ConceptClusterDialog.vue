@@ -108,7 +108,27 @@
               wrap-cells
               row-key="id"
               selection="multiple"
-            />
+            >
+              <template #body="innerProps">
+                <q-tr :props="innerProps">
+                  <q-td auto-width>
+                    <q-checkbox v-model="innerProps.selected"></q-checkbox>
+                  </q-td>
+                  <q-td key="phrases" :props="innerProps">
+                    <q-chip clickable @click="showPhrases(innerProps.row.id)">{{ innerProps.row.phrases }}</q-chip>
+                  </q-td>
+                  <q-td key="nodes" :props="innerProps">
+                    {{ innerProps.row.nodes }}
+                  </q-td>
+                  <q-td key="edges" :props="innerProps">
+                    {{ innerProps.row.edges }}
+                  </q-td>
+                  <q-td key="id" :props="innerProps">
+                    {{ innerProps.row.id }}
+                  </q-td>
+                </q-tr>
+              </template>
+            </q-table>
           </q-step>
           <template #navigation>
             <q-separator />
@@ -165,6 +185,7 @@ import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
 import PipelineConfigForm from 'components/Documents/PipelineConfigForm.vue'
 import { AxiosResponse } from 'axios'
+import PhraseDialog from 'components/Documents/PhraseDialog.vue'
 
 const props = defineProps({
   dataSource: {
@@ -531,6 +552,19 @@ function configurePipeline() {
     })
     .onCancel(() => {
       //ToDo: need something here to be done on Cancel?
+    })
+}
+
+async function showPhrases(id: string) {
+  await conceptPipelineApi
+    ?.getConceptGraph(props.dataSource.id, id)
+    .then((r) => {
+      $q.dialog({
+        component: PhraseDialog,
+        componentProps: {
+          phrases: r.data.nodes
+        }
+      })
     })
 }
 
