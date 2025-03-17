@@ -601,5 +601,14 @@
   "dataSourceId": "Datenquellen-ID|Datenquellen-IDs",
   "finishedThing": "{thing} abgeschlossen.",
   "mergeEncounters": "Encounter-Ressourcen zusammenführen",
-  "testThing": "{thing} testen"
+  "testThing": "{thing} testen",
+  "test": "Test|Tests",
+  "testDescription": "Bitte wählen Sie eine Datenquelle mit den erwarteten Ergebnissen, um dieses Repositorium zu testen. Die erwarteten Werte werden mit den tatsächlichen abgeleiteten Werten verglichen und die Testergebnisse werden unten aufgeführt.",
+  "testReport": "Testbericht | Testberichte",
+  "copyThing": "{thing} kopieren",
+  "expected": "Erwartet",
+  "actual": "Tatsächlich",
+  "encounter": "Begegnung|Begegnungen",
+  "subject": "Subjekt|Subjekte",
+  "failedCount": "{failed} von {total} fehlgeschlagen"
 }
