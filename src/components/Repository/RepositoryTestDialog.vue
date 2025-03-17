@@ -53,6 +53,7 @@
             :rows="testReports || []"
             :columns="testReportColumns"
             :no-data-label="t('noDataPresent')"
+            hide-pagination
             row-key="id"
             class="test-report-table"
             dense
