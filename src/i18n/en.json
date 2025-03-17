@@ -600,5 +600,6 @@
   "startedThing": "{thing} started.",
   "dataSourceId": "Data source ID|Data source IDs",
   "finishedThing": "Finished {thing}.",
-  "mergeEncounters": "Merge encounter resources"
+  "mergeEncounters": "Merge encounter resources",
+  "testThing": "Test {thing}"
 }
