@@ -57,7 +57,8 @@
         "mutantdino.resourcemonitor",
         "Gruntfuggly.todo-tree",
         "waderyan.gitblame",
-        "fill-labs.dependi"
+        "fill-labs.dependi",
+        "YoavBls.pretty-ts-errors"
       ]
     }
   }

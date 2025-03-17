@@ -601,5 +601,14 @@
   "dataSourceId": "Data source ID|Data source IDs",
   "finishedThing": "Finished {thing}.",
   "mergeEncounters": "Merge encounter resources",
-  "testThing": "Test {thing}"
+  "testThing": "Test {thing}",
+  "test": "Test|Tests",
+  "testDescription": "Please select a data source with expected results to test this repository. The expected values will be compared to the actual derived values and the test results will be listed below.",
+  "testReport": "Test report|Test reports",
+  "copyThing": "Copy {thing}",
+  "expected": "Expected",
+  "actual": "Actual",
+  "encounter": "Encounter|Encounters",
+  "subject": "Subject|Subjects",
+  "failedCount": "{failed} of {total} failed"
 }
