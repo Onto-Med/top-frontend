@@ -536,6 +536,7 @@
   "fileToDisplay": "File to display|Files to display",
   "definition": "Definition|Definitions",
   "conceptCluster": {
+    "unfinishedSteps": "Unfinished steps",
     "noConceptsAvailable": "No concepts are currently available. They may need to be generated from a text corpus first. Please use the button above to start the generation process.",
     "selectConceptsDescription": "On the right-hand side of the page, please specify the concepts you would like to use to search for documents.",
     "regenerate": "Regenerate",
