@@ -302,7 +302,7 @@ function statusToString(status?: PipelineResponseStatus) {
 }
 
 function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
-  let returnString = 'Unfinished steps: '
+  let returnString = t('conceptCluster.unfinishedSteps') + ': '
   steps
     ?.filter((step: ConceptGraphPipelineStatus) => {
       return step.status != ConceptGraphPipelineStatusEnum.Finished
@@ -381,9 +381,13 @@ function confirmStartPipeline() {
       message: t('conceptCluster.confirmStart'),
     },
   }).onOk(() => {
-    deletePipeline()
-      .then(startPipeline)
-      .catch((e: Error) => renderError(e))
+    if (graphPipeline.value?.steps?.length != undefined
+      && graphPipeline.value?.steps.length < 4
+      && !skipPresent.value) {
+      deletePipeline()
+        .then(startPipeline)
+        .catch((e: Error) => renderError(e))
+    } else { startPipeline().catch((e: Error) => renderError(e)) }
   })
 }
 
