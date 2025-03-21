@@ -610,5 +610,6 @@
   "actual": "Tatsächlich",
   "encounter": "Begegnung|Begegnungen",
   "subject": "Subjekt|Subjekte",
-  "failedCount": "{failed} von {total} fehlgeschlagen"
+  "failedCount": "{failed} von {total} fehlgeschlagen",
+  "passed": "Bestanden"
 }

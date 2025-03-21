@@ -610,5 +610,6 @@
   "actual": "Actual",
   "encounter": "Encounter|Encounters",
   "subject": "Subject|Subjects",
-  "failedCount": "{failed} of {total} failed"
+  "failedCount": "{failed} of {total} failed",
+  "passed": "Passed"
 }

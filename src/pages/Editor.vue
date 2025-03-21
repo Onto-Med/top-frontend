@@ -24,7 +24,11 @@
               <q-btn dense :title="t('importAndExport')" @click="showExportDialog = true">
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
-              <q-btn dense :title="t('testThing', { thing: t('repository') })" @click="showTestDialog()">
+              <q-btn
+                dense
+                :title="t('testThing', { thing: t('repository') })"
+                @click="showTestDialog()"
+              >
                 <q-icon name="rule" />
               </q-btn>
               <q-btn
