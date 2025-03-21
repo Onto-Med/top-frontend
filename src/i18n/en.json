@@ -587,12 +587,14 @@
   "type": "Type|Types",
   "dataSourceFileTypes": {
     "csv_encounter": "CSV (encounter)",
+    "csv_expected_result": "CSV (expected result)",
     "csv_subject": "CSV (subject)",
     "csv_subject_resource": "CSV (subject resource)",
     "fhir": "HL7 FHIR"
   },
   "dataSourceFileTypeDescriptions": {
     "csv_encounter": "Table header row: encounterId;subjectId;type;startDateTime;endDateTime",
+    "csv_expected_result": "Table header row: expectedResultId;subjectId;encounterId;phenotypeId;numberValue;textValue;booleanValue;dateTimeValue",
     "csv_subject": "Table header row: subjectId;birthDate;sex",
     "csv_subject_resource": "Table header row: subjectResourceId;encounterId;subjectId;codeSystem;code;dateTime;startDateTime;endDateTime;unit;numberValue;textValue;booleanValue;dateTimeValue\nOnly one of the value columns needs to be filled according to the data type.",
     "fhir": "An HL7 FHIR bundle consisting of patient, encounter and observation resources."
