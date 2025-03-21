@@ -48,16 +48,15 @@
         "Vue.volar",
         "hollowtree.vue-snippets",
         "dariofuzinato.vue-peek",
-        "mhutchie.git-graph",
         "HookyQR.minify",
         "lokalise.i18n-ally",
         "esbenp.prettier-vscode",
         "formulahendry.auto-rename-tag",
         "sdras.vue-vscode-snippets",
-        "mutantdino.resourcemonitor",
         "Gruntfuggly.todo-tree",
         "waderyan.gitblame",
-        "fill-labs.dependi"
+        "fill-labs.dependi",
+        "YoavBls.pretty-ts-errors"
       ]
     }
   }
