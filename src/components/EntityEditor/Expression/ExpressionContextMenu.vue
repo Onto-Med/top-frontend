@@ -65,13 +65,13 @@
       </q-item>
       <q-separator v-if="value" />
       <q-item v-if="enclosable" clickable @click="onEnclose">
-        <q-item-section v-t="'encloseWithExpression'" />
+        <q-item-section>{{ t('encloseWithExpression') }}</q-item-section>
       </q-item>
       <q-item v-if="value && !changing" clickable @click="showChangeOptions()">
-        <q-item-section v-t="'change'" />
+        <q-item-section>{{ t('change') }}</q-item-section>
       </q-item>
       <q-item v-if="removable" clickable @click="onRemove">
-        <q-item-section v-t="'remove'" />
+        <q-item-section>{{ t('remove') }}</q-item-section>
       </q-item>
     </q-list>
   </q-menu>
@@ -83,7 +83,7 @@ import { storeToRefs } from 'pinia'
 import { QMenu } from 'quasar'
 import { env, noDocFunctionTypes } from 'src/config'
 import useNotify from 'src/mixins/useNotify'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -91,21 +91,21 @@ const props = defineProps({
   value: Object as () => ExpressionFunction,
   enclosable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   removable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   includeFunctionTypes: Array as () => string[],
   excludeFunctionTypes: Array as () => string[],
-  excludeFunctions: Array as () => string[]
+  excludeFunctions: Array as () => string[],
 })
 const emit = defineEmits(['enclose', 'remove', 'select'])
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 const { functions } = storeToRefs(entityStore)
 const menu = ref<QMenu>()
@@ -120,7 +120,7 @@ const functionTypes = computed(() => {
       const x = type || 'none'
       return {
         label: te('functionType.' + x) ? t('functionType.' + x) : x,
-        value: x
+        value: x,
       }
     })
 })
@@ -132,7 +132,7 @@ onMounted(() => {
 const filteredFunctionTypes = computed(() =>
   !filter.value || filter.value.length === 0
     ? functionTypes.value
-    : functionTypes.value?.filter((t) => filter.value?.includes(t.value))
+    : functionTypes.value?.filter((t) => filter.value?.includes(t.value)),
 )
 
 const functionGroups = computed(
@@ -142,13 +142,13 @@ const functionGroups = computed(
       .reduce(
         (map, f) => {
           const t = f.type || 'none'
-          var entry = map.get(t)
+          const entry = map.get(t)
           if (entry) entry.push(f)
           else map.set(t, [f])
           return map
         },
-        new Map() as Map<string, ExpressionFunction[]>
-      ) || new Map()
+        new Map() as Map<string, ExpressionFunction[]>,
+      ) || new Map(),
 )
 
 const changing = ref(false)
@@ -200,9 +200,11 @@ function onSelect(fun: ExpressionFunction) {
 }
 </script>
 
-<style lang="sass" scoped>
-.scroll
-  max-height: 300px
-.q-list.row
-  max-width: 300px
+<style lang="scss" scoped>
+.scroll {
+  max-height: 300px;
+}
+.q-list.row {
+  max-width: 300px;
+}
 </style>

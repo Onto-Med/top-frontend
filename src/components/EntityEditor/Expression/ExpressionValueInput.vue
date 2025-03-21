@@ -1,7 +1,11 @@
 <template>
   <div class="clickable">
     <span v-show="expand">{{ '&nbsp;'.repeat(indentLevel * indent) }}</span>
-    <span v-if="defaultConstant" :title="t('rightClickShowDoc')" @click.right="showConstantDoc(defaultConstant)">
+    <span
+      v-if="defaultConstant"
+      :title="t('rightClickShowDoc')"
+      @click.right="showConstantDoc(defaultConstant)"
+    >
       {{ defaultConstant.title || defaultConstant.id }}
     </span>
     <span v-else-if="value">
@@ -22,7 +26,14 @@
     @update:model-value="setValue($event)"
   >
     <div v-show="!isValueSet">
-      <q-input v-model="scope.value" :type="toInputType(dataType)" dense autofocus @keyup.enter="scope.set">
+      <!-- @vue-expect-error TS2322 -->
+      <q-input
+        v-model="scope.value"
+        :type="toInputType(dataType)"
+        dense
+        autofocus
+        @keyup.enter="scope.set"
+      >
         <template #before>
           <q-btn flat dense :icon="dataTypeIcon" :title="dataType" @click="toggleDataType" />
         </template>
@@ -59,47 +70,55 @@
       </q-item>
       <q-separator v-if="baseDocUrl && defaultConstant" />
       <q-item clickable @click="$emit('enclose')">
-        <q-item-section v-t="'encloseWithExpression'" />
+        <q-item-section>{{ t('encloseWithExpression') }}</q-item-section>
       </q-item>
       <q-item v-show="isValueSet" clickable @click="$emit('update:value', undefined)">
-        <q-item-section v-t="'change'" />
+        <q-item-section>{{ t('change') }}</q-item-section>
       </q-item>
       <q-item v-close-popup clickable @click="$emit('remove')">
-        <q-item-section v-t="'remove'" />
+        <q-item-section>{{ t('remove') }}</q-item-section>
       </q-item>
     </q-list>
   </q-popup-edit>
 </template>
 
 <script setup lang="ts">
-import { BooleanValue, Constant, DataType, DateTimeValue, NumberValue, StringValue, Value } from '@onto-med/top-api'
+import {
+  BooleanValue,
+  Constant,
+  DataType,
+  DateTimeValue,
+  NumberValue,
+  StringValue,
+  Value,
+} from '@onto-med/top-api'
 import { QPopupEdit } from 'quasar'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { env } from 'src/config'
 
 const props = defineProps({
-  value: Object as () => Value | undefined,
+  value: Object as () => BooleanValue | DateTimeValue | NumberValue | StringValue | undefined,
   constantId: String,
   readonly: Boolean,
   expand: Boolean,
   indentLevel: {
     type: Number,
-    default: 0
+    default: 0,
   },
   indent: {
     type: Number,
-    default: 2
+    default: 2,
   },
-  simpleConstant: Boolean
+  simpleConstant: Boolean,
 })
 
 const emit = defineEmits(['update:value', 'update:constantId', 'enclose', 'remove'])
 
 const { t } = useI18n()
 const popup = ref(null as unknown as QPopupEdit)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const constants = ref(undefined as Constant[] | undefined)
 const dataType = ref(DataType.Number)
 const isValueSet = computed(() => props.value || defaultConstant.value)
@@ -127,7 +146,10 @@ const dataTypeIcon = computed(() => {
   return 'question_mark'
 })
 
-function toValue(value: string | number | Date | boolean | undefined, dataType: DataType): Value | undefined {
+function toValue(
+  value: string | number | Date | boolean | undefined,
+  dataType: DataType,
+): Value | undefined {
   if (dataType === DataType.String) return { value: value, dataType: dataType } as StringValue
   if (dataType === DataType.Number) return { value: value, dataType: dataType } as NumberValue
   if (dataType === DataType.DateTime) return { value: value, dataType: dataType } as DateTimeValue
@@ -155,14 +177,17 @@ function showConstantDoc(constant: Constant) {
 }
 </script>
 
-<style lang="sass" scoped>
-.hover
-  color: var(--q-primary)
-  font-weight: 900
+<style lang="scss" scoped>
+.hover {
+  color: var(--q-primary);
+  font-weight: 900;
+}
 
-.clickable
-  display: inline
-  &:hover
-    cursor: pointer
-    @extend .hover
+.clickable {
+  display: inline;
+  &:hover {
+    cursor: pointer;
+    @extend .hover;
+  }
+}
 </style>

@@ -34,7 +34,10 @@
 
         <q-input v-model="state.description" type="textarea" :label="t('description')" />
 
-        <organisation-select-input v-model="state.superOrganisation" :label="t('superOrganisation')" />
+        <organisation-select-input
+          v-model="state.superOrganisation"
+          :label="t('superOrganisation')"
+        />
       </q-card-section>
 
       <q-card-actions align="right">
@@ -77,7 +80,7 @@ const isValid = computed(() => state.value.name && state.value.id)
 
 watch(
   () => props.modelValue,
-  (value) => (state.value = copy(value))
+  (value) => (state.value = copy(value)),
 )
 
 function setId(id: string | number | null) {

@@ -1,18 +1,19 @@
 <template>
   <q-layout view="hHh Lpr fFf" :class="{ 'bg-grey-1': !isDarkModeActive }" aria-disabled="true">
-    <q-header elevated :class="{ 'bg-white text-grey-8': !isDarkModeActive, 'bg-dark text-grey-2': isDarkModeActive }" class="q-py-xs" height-hint="58">
+    <q-header
+      elevated
+      :class="{
+        'bg-white text-grey-8': !isDarkModeActive,
+        'bg-dark text-grey-2': isDarkModeActive,
+      }"
+      class="q-py-xs"
+      height-hint="58"
+    >
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-avatar>
-          <img src="images/logo.svg">
+          <img src="/images/logo.svg" />
         </q-avatar>
         <q-toolbar-title to="/" shrink class="text-weight-bold gt-xs">
           <router-link class="brand-link" to="/">
@@ -44,12 +45,7 @@
 
         <div v-if="keycloak">
           <q-btn v-if="keycloak.authenticated" flat dense round class="q-ml-sm">
-            <q-avatar
-              :title="t('account')"
-              color="primary"
-              text-color="white"
-              size="md"
-            >
+            <q-avatar :title="t('account')" color="primary" text-color="white" size="md">
               {{ username ? username.substring(0, 1) : '' }}
             </q-avatar>
 
@@ -111,7 +107,9 @@
     >
       <q-scroll-area class="fit">
         <q-list padding class="q-mb-sm">
-          <NavbarLink v-bind="{ title: t('home'), icon: 'house', routeName: 'home', exact: true }" />
+          <NavbarLink
+            v-bind="{ title: t('home'), icon: 'house', routeName: 'home', exact: true }"
+          />
 
           <q-expansion-item
             clickable
@@ -143,7 +141,7 @@
           </q-expansion-item>
 
           <NavbarLink
-            v-for="link in links.filter(l => !l.isHidden)"
+            v-for="link in links.filter((l) => !l.isHidden)"
             :key="link.title"
             v-bind="link"
           />
@@ -158,7 +156,7 @@
                 dense
                 no-caps
                 size="sm"
-                :icon="fabGithub"
+                icon="code"
                 :href="repositoryUrl"
                 target="_blank"
                 :label="t('sourceCode')"
@@ -169,7 +167,7 @@
                 dense
                 no-caps
                 size="sm"
-                :icon="fasBook"
+                icon="book"
                 :href="documentationUrl"
                 target="_blank"
                 :label="t('documentation')"
@@ -179,7 +177,7 @@
         </q-list>
 
         <div v-show="leftDrawerOpen" class="version-box q-px-md text-caption text-grey">
-          {{ t('frontend') }}: v{{ version }}<br>
+          {{ t('frontend') }}: v{{ version }}<br />
           {{ t('backend') }}: {{ backendDetails ? 'v' + backendDetails.version : t('unavailable') }}
         </div>
       </q-scroll-area>
@@ -194,21 +192,18 @@
           </div>
           <q-btn icon="refresh" :label="t('tryAgain')" @click="performPing()" />
         </div>
-        <q-inner-loading :showing="loading"/>
+        <q-inner-loading :showing="loading" />
       </q-scroll-area>
     </q-page-container>
 
-    <q-ajax-bar
-      position="top"
-      color="primary"
-    />
+    <q-ajax-bar position="top" color="primary" />
   </q-layout>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import NavbarLink from 'src/components/NavbarLink.vue'
 import LanguageSwitch from 'src/components/LanguageSwitch.vue'
 import FancyEntitySearch from 'src/components/EntityEditor/FancyEntitySearch.vue'
@@ -216,9 +211,8 @@ import packageInfo from '../../package.json'
 import { ref, computed, watch } from 'vue'
 import { AppDescription } from '@onto-med/top-api'
 import { QMenu, useQuasar } from 'quasar'
-import { fasBook, fabGithub } from '@quasar/extras/fontawesome-v5'
 import { storeToRefs } from 'pinia'
-import { env} from 'src/config'
+import { env } from 'src/config'
 import { inject } from 'vue'
 import { DefaultApiKey } from 'src/boot/axios'
 import { onMounted } from 'vue'
@@ -226,12 +220,12 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 const { t } = useI18n()
 const router = useRouter()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const $q = useQuasar()
 const { routeToEntity } = useEntityFormatter()
 const leftDrawerOpen = ref<boolean>(!($q.localStorage.getItem('minimiseDrawer') as boolean))
 const { keycloak, organisation } = storeToRefs(entityStore)
-const drawer = ref(undefined as QMenu|undefined)
+const drawer = ref(undefined as QMenu | undefined)
 const version = packageInfo.version
 const defaultApi = inject(DefaultApiKey)
 const loading = ref(false)
@@ -244,8 +238,8 @@ const links = computed(() => {
       icon: 'manage_search',
       caption: t('navbar.query.caption'),
       routeName: 'queryBuilder',
-      isHidden: keycloak.value && !keycloak.value.authenticated
-    }
+      isHidden: keycloak.value && !keycloak.value.authenticated,
+    },
   ]
   if (env.DOCUMENTS_ENABLED) {
     links.push({
@@ -253,7 +247,7 @@ const links = computed(() => {
       icon: 'article',
       caption: t('documentSearch.short'),
       routeName: 'documentSearch',
-      isHidden: keycloak.value && !keycloak.value.authenticated
+      isHidden: keycloak.value && !keycloak.value.authenticated,
     })
   }
   return links
@@ -265,62 +259,65 @@ const isDarkModeActive = computed(() => $q.dark.isActive)
 const productName = packageInfo.productName
 const documentationUrl = packageInfo.homepage
 const repositoryUrl = packageInfo.repository
-  ? (packageInfo.repository as Record<string, unknown>).url as string
+  ? ((packageInfo.repository as Record<string, unknown>).url as string)
   : undefined
 const editAccountUrl = computed(() => keycloak.value?.createAccountUrl())
 
-
 const smallScreen = computed(() => $q.screen.lt.md)
-const username = computed(() =>
-  (keycloak.value?.tokenParsed?.name || keycloak.value?.tokenParsed?.preferred_username) as string | undefined
+const username = computed(
+  () =>
+    (keycloak.value?.tokenParsed?.name || keycloak.value?.tokenParsed?.preferred_username) as
+      | string
+      | undefined,
 )
 
 const repositoryId = computed(() => {
   const route = router.currentRoute.value
   if (!route || route.name !== 'editor') return undefined
-  return route.params.repositoryId as string|undefined
+  return route.params.repositoryId as string | undefined
 })
 
 onMounted(() => performPing())
 
-watch(
-  leftDrawerOpen,
-  (newVal) => $q.localStorage.set('minimiseDrawer', !newVal)
-)
+watch(leftDrawerOpen, (newVal) => $q.localStorage.set('minimiseDrawer', !newVal))
 
 function performPing() {
   if (loading.value) return
   loading.value = true
-  defaultApi?.ping()
-    .then(r => backendDetails.value = r.data)
+  defaultApi
+    ?.ping()
+    .then((r) => (backendDetails.value = r.data))
     .catch(() => {})
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 
 function toggleLeftDrawer() {
-  if (($q.platform.is.mobile || $q.screen.lt.md) && drawer.value)
-    drawer.value.show()
-  else
-    leftDrawerOpen.value = !leftDrawerOpen.value
+  if (($q.platform.is.mobile || $q.screen.lt.md) && drawer.value) drawer.value.show()
+  else leftDrawerOpen.value = !leftDrawerOpen.value
 }
 </script>
 
-<style lang="sass" scoped>
-.toolbar-input-container
-  min-width: 100px
-  width: 40%
-.brand-link
-  text-decoration: none
-  color: inherit
-.main-content
-  height: calc(100vh - 58px)
+<style lang="scss" scoped>
+.toolbar-input-container {
+  min-width: 100px;
+  width: 40%;
+}
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+.main-content {
+  height: calc(100vh - 58px);
+}
 
-.version-box
-  position: absolute
-  bottom: 0
+.version-box {
+  position: absolute;
+  bottom: 0;
+}
 </style>
 
-<style lang="sass">
-.main-content > .q-scrollarea__container > .q-scrollarea__content
-  width: 100%
+<style lang="scss">
+.main-content > .q-scrollarea__container > .q-scrollarea__content {
+  width: 100%;
+}
 </style>

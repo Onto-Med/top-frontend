@@ -2,10 +2,8 @@
   <q-chip v-if="loading" :dense="dense" :square="dense" :label="t('loading') + '...'" />
 
   <template v-else-if="!state">
-    <span
-      v-if="dense"
-      class="dense-chip"
-    >[{{ label }}]<!--
+    <span v-if="dense" class="dense-chip"
+      >[{{ label }}]<!--
       --><q-popup-edit ref="popup" :model-value="null" :cover="false" class="q-pa-none">
         <entity-search-input
           v-if="!disable"
@@ -37,8 +35,13 @@
         <q-separator v-if="includePrimary" />
         <q-list dense>
           <slot name="additionalOptions" />
-          <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
-            <q-item-section v-t="'remove'" />
+          <q-item
+            v-if="!disable && removeable"
+            v-close-popup
+            clickable
+            @click="$emit('removeClicked')"
+          >
+            <q-item-section>{{ t('remove') }}</q-item-section>
           </q-item>
         </q-list>
       </q-popup-edit>
@@ -83,8 +86,13 @@
           </q-item>
           <q-separator v-if="includePrimary" />
           <slot name="additionalOptions" />
-          <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
-            <q-item-section v-t="'remove'" />
+          <q-item
+            v-if="!disable && removeable"
+            v-close-popup
+            clickable
+            @click="$emit('removeClicked')"
+          >
+            <q-item-section>{{ t('remove') }}</q-item-section>
           </q-item>
         </q-list>
       </q-popup-edit>
@@ -106,15 +114,20 @@
     <q-menu>
       <q-list dense>
         <q-item v-close-popup clickable @click="$emit('entityClicked', state?.id)">
-          <q-item-section v-t="'show'" />
+          <q-item-section>{{ t('show') }}</q-item-section>
         </q-item>
         <q-separator />
         <slot name="additionalOptions" />
         <q-item v-if="changeable && state" v-close-popup clickable @click="setEntity(undefined)">
-          <q-item-section v-t="'change'" />
+          <q-item-section>{{ t('change') }}</q-item-section>
         </q-item>
-        <q-item v-if="!disable && removeable" v-close-popup clickable @click="$emit('removeClicked')">
-          <q-item-section v-t="'remove'" />
+        <q-item
+          v-if="!disable && removeable"
+          v-close-popup
+          clickable
+          @click="$emit('removeClicked')"
+        >
+          <q-item-section>{{ t('remove') }}</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
@@ -125,7 +138,7 @@
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DataType, Entity, EntityType } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
 import { QPopupEdit } from 'quasar'
@@ -152,7 +165,7 @@ const { t } = useI18n()
 const { renderError } = useNotify()
 const popup = ref(null as unknown as QPopupEdit)
 const loading = ref(false)
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { getIcon, getTitle, getDescriptions, isRestricted } = useEntityFormatter()
 const state = ref(undefined as unknown as Entity | undefined)
 
@@ -167,7 +180,7 @@ watch(
   () => props.entityId,
   (newVal, oldVal) => {
     if (newVal !== oldVal) reload()
-  }
+  },
 )
 
 function reload() {
@@ -194,14 +207,17 @@ function setEntity(entity: Entity | undefined) {
 }
 </script>
 
-<style lang="sass" scoped>
-.hover
-  color: var(--q-primary)
-  font-weight: 900
+<style lang="scss" scoped>
+.hover {
+  color: var(--q-primary);
+  font-weight: 900;
+}
 
-.dense-chip
-  margin: 0
-  &:hover
-    cursor: pointer
-    @extend .hover
+.dense-chip {
+  margin: 0;
+  &:hover {
+    cursor: pointer;
+    @extend .hover;
+  }
+}
 </style>

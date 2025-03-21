@@ -88,7 +88,9 @@
             >
               {{ getTitle(node) }}
             </div>
-            <q-badge v-show="!node.createdAt" v-t="'new'" color="accent" class="q-ml-sm" />
+            <q-badge v-show="!node.createdAt" color="accent" class="q-ml-sm">{{
+              t('new')
+            }}</q-badge>
             <entity-tree-context-menu
               v-if="showContextMenu"
               :allowed-entity-types="allowedEntityTypes"
@@ -126,8 +128,16 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityTreeContextMenu from 'src/components/EntityEditor/EntityTreeContextMenu.vue'
 import EnumSelect from 'src/components/EnumSelect.vue'
 import EntitySearchInput from 'src/components/EntityEditor/EntitySearchInput.vue'
-import { Category, Concept, DataType, Entity, EntityType, ItemType, SingleConcept } from '@onto-med/top-api'
-import { useEntity } from 'src/pinia/entity'
+import {
+  Category,
+  Concept,
+  DataType,
+  Entity,
+  EntityType,
+  ItemType,
+  SingleConcept,
+} from '@onto-med/top-api'
+import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import useNotify from 'src/mixins/useNotify'
 import { QTree } from 'quasar'
@@ -137,40 +147,40 @@ const props = defineProps({
   selected: Object as () => Entity,
   loading: {
     type: Boolean,
-    default: false
+    default: false,
   },
   showContextMenu: {
     type: Boolean,
-    default: false
+    default: false,
   },
   excludeTypeIfEmpty: {
     type: Array as () => EntityType[],
-    default: () => []
+    default: () => [],
   },
   allowedEntityTypes: {
     type: Array as () => EntityType[],
-    default: () => Object.values(EntityType)
+    default: () => Object.values(EntityType),
   },
   isConceptRepository: {
     type: Boolean,
-    default: false
+    default: false,
   },
   createable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   deletable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   duplicatable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   importable: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 })
 
 const emit = defineEmits(['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity'])
@@ -178,7 +188,7 @@ const emit = defineEmits(['update:selected', 'deleteEntity', 'createEntity', 'du
 const { t } = useI18n()
 const { getIcon, getIconTooltip, getTitle, getDescriptions, isPhenotype, isRestricted, isConcept } =
   useEntityFormatter()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 const { organisationId, repositoryId } = storeToRefs(entityStore)
 const tree = ref<QTree>()
@@ -218,7 +228,7 @@ const treeNodes = computed((): TreeNode[] => {
 
 watch(
   () => props.selected,
-  (entity: Entity | undefined) => expand(entity)
+  (entity: Entity | undefined) => expand(entity),
 )
 
 function expand(entity: Entity | undefined): void {
@@ -227,8 +237,13 @@ function expand(entity: Entity | undefined): void {
 
   if (isRestricted(entity)) expand(props.nodes?.find((n) => n.id === entity.superPhenotype?.id))
   else if (props.isConceptRepository)
-    (entity as Concept).superConcepts?.forEach((c) => expand(props.nodes?.find((n) => n.id === c.id)))
-  else (entity as Category).superCategories?.forEach((c) => expand(props.nodes?.find((n) => n.id === c.id)))
+    (entity as Concept).superConcepts?.forEach((c) =>
+      expand(props.nodes?.find((n) => n.id === c.id)),
+    )
+  else
+    (entity as Category).superCategories?.forEach((c) =>
+      expand(props.nodes?.find((n) => n.id === c.id)),
+    )
 }
 
 function removeEmptyNodes(nodes: TreeNode[], types: EntityType[]): TreeNode[] {
@@ -245,7 +260,9 @@ function toTree(list: Entity[], excludeTypeIfEmpty: EntityType[] = []): TreeNode
   const map: Map<string, TreeNode> = new Map<string, TreeNode>()
   const treeNodes: TreeNode[] = []
 
-  list.filter((e) => e.id).forEach((e) => map.set(e.id as string, { ...e, children: [], lazy: true } as TreeNode))
+  list
+    .filter((e) => e.id)
+    .forEach((e) => map.set(e.id as string, { ...e, children: [], lazy: true } as TreeNode))
 
   list
     .filter((e) => e.id)
@@ -267,7 +284,8 @@ function toTree(list: Entity[], excludeTypeIfEmpty: EntityType[] = []): TreeNode
 
       if (
         !e.version ||
-        ((isPhenotype(e) || ((e as Category).subCategories && (e as Category).subCategories?.length === 0)) &&
+        ((isPhenotype(e) ||
+          ((e as Category).subCategories && (e as Category).subCategories?.length === 0)) &&
           (e as Category).phenotypes &&
           (e as Category).phenotypes?.length === 0) ||
         (isConcept(e) &&
@@ -308,7 +326,9 @@ function toTree(list: Entity[], excludeTypeIfEmpty: EntityType[] = []): TreeNode
       }
     })
 
-  return excludeTypeIfEmpty.length !== 0 ? removeEmptyNodes(treeNodes, excludeTypeIfEmpty) : treeNodes
+  return excludeTypeIfEmpty.length !== 0
+    ? removeEmptyNodes(treeNodes, excludeTypeIfEmpty)
+    : treeNodes
 }
 
 function handleEntityDuplication(entity: Entity) {
@@ -367,10 +387,12 @@ interface LazyLoadDetails {
 }
 </script>
 
-<style lang="sass">
-.q-splitter__separator-area
-  left: 0px !important
-.filter-menu
-  min-width: 300px
-  max-width: 300px
+<style lang="scss">
+.q-splitter__separator-area {
+  left: 0px !important;
+}
+.filter-menu {
+  min-width: 300px;
+  max-width: 300px;
+}
 </style>

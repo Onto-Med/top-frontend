@@ -7,8 +7,18 @@
           <span v-if="repository">
             {{ t('for') }}:
             <q-breadcrumbs class="inline-block">
-              <q-breadcrumbs-el :label="organisation?.name" :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }" />
-              <q-breadcrumbs-el class="text-primary" :label="repository.name" :to="{ name: 'editor', params: { organisationId: organisation?.id, repositoryId: repository.id } }" />
+              <q-breadcrumbs-el
+                :label="organisation?.name"
+                :to="{ name: 'showOrganisation', params: { organisationId: organisation?.id } }"
+              />
+              <q-breadcrumbs-el
+                class="text-primary"
+                :label="repository.name"
+                :to="{
+                  name: 'editor',
+                  params: { organisationId: organisation?.id, repositoryId: repository.id },
+                }"
+              />
             </q-breadcrumbs>
           </span>
         </div>
@@ -37,16 +47,8 @@
 
       <q-separator />
 
-      <concept-query-form
-        v-if="isConceptQuery"
-        ref="conceptQueryForm"
-        @execute="execute"
-      />
-      <phenotype-query-form
-        v-if="isPhenotypeQuery"
-        ref="phenotypeQueryForm"
-        @execute="execute"
-      />
+      <concept-query-form v-if="isConceptQuery" ref="conceptQueryForm" @execute="execute" />
+      <phenotype-query-form v-if="isPhenotypeQuery" ref="phenotypeQueryForm" @execute="execute" />
     </q-card>
 
     <q-drawer
@@ -104,32 +106,32 @@ import {
   QueryPage,
   QueryType,
   Repository,
-  RepositoryType
+  RepositoryType,
 } from '@onto-med/top-api'
-import {storeToRefs} from 'pinia'
-import {useEntity} from 'src/pinia/entity'
+import { storeToRefs } from 'pinia'
+import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
-import {computed, inject, onMounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
-import {v4 as uuidv4} from 'uuid'
-import {QueryApiKey} from 'src/boot/axios'
-import {QScrollArea, useQuasar} from 'quasar'
+import { computed, inject, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { v4 as uuidv4 } from 'uuid'
+import { QueryApiKey } from 'src/boot/axios'
+import { QScrollArea, useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import Dialog from 'src/components/Dialog.vue'
 import ConceptQueryForm from 'src/components/Query/ConceptQueryForm.vue'
 import PhenotypeQueryForm from 'src/components/Query/PhenotypeQueryForm.vue'
 import EnumSelect from 'src/components/EnumSelect.vue'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   queryId: String,
-  dataSourceId: String
+  dataSourceId: String,
 })
 const { t } = useI18n()
 const $q = useQuasar()
 const router = useRouter()
-const entityStore = useEntity()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 const { repository, organisation } = storeToRefs(entityStore)
 const queryApi = inject(QueryApiKey)
@@ -139,7 +141,7 @@ const queryPage = ref<QueryPage>({
   size: 0,
   totalElements: 0,
   totalPages: 0,
-  type: 'query'
+  type: 'query',
 })
 const repositoryTypeFilter = ref<RepositoryType>()
 const conceptQueryForm = ref<InstanceType<typeof ConceptQueryForm>>()
@@ -151,40 +153,43 @@ const resultsDrawer = ref(true)
 const preSelectedDataSource = ref<DataSource>()
 
 const drawerWidth = computed(() => {
-  return $q.screen.width / ($q.screen.width >= 1000  ? 2 : 1.2)
+  return $q.screen.width / ($q.screen.width >= 1000 ? 2 : 1.2)
 })
 
-async function loadQueryPage (page: number) {
+async function loadQueryPage(page: number) {
   if (queryApi && organisation.value && repository.value)
-    await queryApi.getQueries(organisation.value.id, repository.value.id, page)
-      .then(r => queryPage.value = r.data)
+    await queryApi
+      .getQueries(organisation.value.id, repository.value.id, page)
+      .then((r) => (queryPage.value = r.data))
       .catch((e: Error) => renderError(e))
 }
 
 onMounted(() => {
   if (props.queryId && organisation.value && repository.value)
-    queryApi?.getQueryById(organisation.value.id, repository.value.id, props.queryId)
-      .then(r => prefillQuery(r.data))
+    queryApi
+      ?.getQueryById(organisation.value.id, repository.value.id, props.queryId)
+      .then((r) => prefillQuery(r.data))
       .catch((e: Error) => renderError(e))
   void loadQueryPage(1)
 })
 
-function reset (repository?: Repository) {
+function reset(repository?: Repository) {
   entityStore
     .setRepository(repository)
     .then(() => {
       if (isConceptQuery.value) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         conceptQueryForm.value?.reset(preSelectedDataSource.value)
       } else if (isPhenotypeQuery.value) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         phenotypeQueryForm.value?.reset()
       }
     })
     .then(() => {
       void router.replace({
         name: 'queryBuilder',
-        params: { organisationId: entityStore.organisationId, repositoryId: entityStore.repository?.id }
+        params: {
+          organisationId: entityStore.organisationId,
+          repositoryId: entityStore.repository?.id,
+        },
       })
     })
     .then(() => loadQueryPage(1))
@@ -192,43 +197,45 @@ function reset (repository?: Repository) {
 }
 
 const isPhenotypeQuery = computed(
-  () => repository.value?.repositoryType === RepositoryType.PhenotypeRepository
+  () => repository.value?.repositoryType === RepositoryType.PhenotypeRepository,
 )
 const isConceptQuery = computed(
-  () => repository.value?.repositoryType === RepositoryType.ConceptRepository
+  () => repository.value?.repositoryType === RepositoryType.ConceptRepository,
 )
 
-function execute (query: Query) {
+function execute(query: Query) {
   if (!queryApi || !organisation.value || !repository.value) return
   query.id = (uuidv4 as () => string)()
 
-  queryApi.enqueueQuery(organisation.value.id, repository.value.id, query)
+  queryApi
+    .enqueueQuery(organisation.value.id, repository.value.id, query)
     .then(() => {
       queryPage.value.content.unshift(query)
       queryPage.value.totalElements++
       resultsScrollArea.value?.setScrollPosition('vertical', 0)
       minifyResults.value = false
     })
-    .then(
-      () => router.replace({
+    .then(() =>
+      router.replace({
         name: 'queryBuilder',
         params: {
           organisationId: entityStore.organisationId,
           repositoryId: entityStore.repository?.id,
-          queryId: query.id
-        }
-      })
+          queryId: query.id,
+        },
+      }),
     )
     .catch((e: Error) => renderError(e))
 }
 
-function deleteQuery (query: PhenotypeQuery) {
+function deleteQuery(query: PhenotypeQuery) {
   if (!queryApi || !organisation.value || !repository.value) return
 
-  queryApi?.deleteQuery(organisation.value.id, repository.value.id, query.id)
+  queryApi
+    ?.deleteQuery(organisation.value.id, repository.value.id, query.id)
     .catch((e: Error) => renderError(e))
     .finally(() => {
-      const index = queryPage.value.content.findIndex(q => q.id === query.id)
+      const index = queryPage.value.content.findIndex((q) => q.id === query.id)
       if (index !== -1) {
         queryPage.value.content.splice(index, 1)
         queryPage.value.totalElements--
@@ -236,29 +243,31 @@ function deleteQuery (query: PhenotypeQuery) {
     })
 }
 
-function prefillQuery (query?: Query) {
+function prefillQuery(query?: Query) {
   void router.replace({
     name: 'queryBuilder',
-    params: { organisationId: organisation.value?.id, repositoryId: repository.value?.id, queryId: query?.id }
+    params: {
+      organisationId: organisation.value?.id,
+      repositoryId: repository.value?.id,
+      queryId: query?.id,
+    },
   })
   if (!query) return
   if (isConceptQuery.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     conceptQueryForm.value?.prefillQuery(query as ConceptQuery, preSelectedDataSource.value)
   } else if (isPhenotypeQuery.value) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     phenotypeQueryForm.value?.prefillQuery(query)
   }
   minifyResults.value = true
 }
 
-function setRepository (repo?: Repository) {
+function setRepository(repo?: Repository) {
   if (repository.value && repo !== repository.value) {
     $q.dialog({
       component: Dialog,
       componentProps: {
-        message: t('confirmClearQuery')
-      }
+        message: t('confirmClearQuery'),
+      },
     }).onOk(() => reset(repo))
   } else {
     reset(repo)
@@ -270,13 +279,18 @@ function setPreselectedDataSource(repo?: Repository) {
   const ds = Array<DataSource>()
   if (props.dataSourceId) {
     if (repo?.organisation)
-      queryApi?.getOrganisationDataSources(repo.organisation.id)
-        .then(r => r.data.filter(function (dataSource) {
-          return dataSource.id === props.dataSourceId
-        }).forEach(d => ds.push(d)))
+      queryApi
+        ?.getOrganisationDataSources(repo.organisation.id)
+        .then((r) =>
+          r.data
+            .filter(function (dataSource) {
+              return dataSource.id === props.dataSourceId
+            })
+            .forEach((d) => ds.push(d)),
+        )
         .then(() => {
           if (ds.length != 0) {
-            if (ds[0].queryType === QueryType.Concept) {
+            if (ds[0]?.queryType === QueryType.Concept) {
               repositoryTypeFilter.value = RepositoryType.ConceptRepository
             }
             preSelectedDataSource.value = ds[0]
@@ -284,23 +298,29 @@ function setPreselectedDataSource(repo?: Repository) {
             if (props.dataSourceId)
               $q.notify({
                 type: 'warning',
-                message: 'The preselected datasource "' + props.dataSourceId + '" doesn\'t seem to be configured for the organisation "' + repo.organisation?.id + '".',
-                timeout: 5000
+                message:
+                  'The preselected datasource "' +
+                  props.dataSourceId +
+                  '" doesn\'t seem to be configured for the organisation "' +
+                  repo.organisation?.id +
+                  '".',
+                timeout: 5000,
               })
           }
         })
         .catch((e: Error) => renderError(e))
   }
 }
-
 </script>
 
-<style lang="sass" scoped>
-.drawer-icon
-  top: 30px
-  left: -17px
+<style lang="scss" scoped>
+.drawer-icon {
+  top: 30px;
+  left: -17px;
+}
 </style>
-<style lang="sass">
-.q-drawer.q-drawer--right
-  top: 0px !important
+<style lang="scss">
+.q-drawer.q-drawer--right {
+  top: 0px !important;
+}
 </style>

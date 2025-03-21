@@ -29,22 +29,22 @@ const props = defineProps({
   message: String,
   icon: {
     type: Boolean,
-    default: true
+    default: true,
   },
   iconName: {
     type: String,
-    default: 'warning_amber'
+    default: 'warning_amber',
   },
   iconColor: {
     type: String,
-    default: 'warning'
+    default: 'warning',
   },
   iconTextColor: {
     type: String,
-    default: 'white'
+    default: 'white',
   },
   checkbox: Boolean,
-  checkboxLabel: String
+  checkboxLabel: String,
 })
 
 defineEmits(['hide', 'ok'])

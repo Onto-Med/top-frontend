@@ -33,23 +33,26 @@ defineProps<{
 const { dialogRef } = useDialogPluginComponent()
 </script>
 
-<style scoped lang="sass">
-.content
-  width: 750px
-  max-width: 80vw
-.highlighted-text
-  height: 85vh
-  width: 100%
-  pre
-    font-family: inherit
-    text-wrap: wrap
-    word-wrap: break-word
-    white-space: pre-wrap
-    white-space: -moz-pre-wrap
-    white-space: -pre-wrap
-    white-space: -o-pre-wrap
+<style scoped lang="scss">
+.content {
+  width: 750px;
+  max-width: 80vw;
+}
+.highlighted-text {
+  height: 85vh;
+  width: 100% pre {
+    font-family: inherit;
+    text-wrap: wrap;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+  }
+}
 </style>
-<style lang="sass">
-.highlighted-text .q-scrollarea__content
-  width: 100% !important
+<style lang="scss">
+.highlighted-text .q-scrollarea__content {
+  width: 100% !important;
+}
 </style>

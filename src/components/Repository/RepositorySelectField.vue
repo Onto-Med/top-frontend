@@ -56,16 +56,16 @@ import useNotify from 'src/mixins/useNotify'
 import { RepositoryApiKey } from 'boot/axios'
 import { AxiosResponse } from 'axios'
 import { Permission, Repository, RepositoryPage, RepositoryType } from '@onto-med/top-api'
-import { ScrollDetails } from 'src/mixins/ScrollDetails'
 import { storeToRefs } from 'pinia'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
+import { ScrollDetails } from '../models'
 
 const props = defineProps({
   modelValue: [Object as () => Repository],
   label: String,
   minLength: {
     type: Number,
-    default: 0
+    default: 0,
   },
   showDetails: Boolean,
   rounded: Boolean,
@@ -77,7 +77,7 @@ const props = defineProps({
   /** Restrict the result set by repositoryType. */
   repositoryType: String as () => RepositoryType,
   /** Disable results that do not have one of the specified permissions. */
-  permissions: Array as () => Permission[]
+  permissions: Array as () => Permission[],
 })
 
 defineEmits(['update:modelValue'])
@@ -85,7 +85,7 @@ defineEmits(['update:modelValue'])
 const { t } = useI18n()
 const repositoryApi = inject(RepositoryApiKey)
 const { renderError } = useNotify()
-const { keycloak } = storeToRefs(useEntity())
+const { keycloak } = storeToRefs(useEntityStore())
 const options = ref([] as Repository[])
 const loading = ref(false)
 const prevInput = ref(undefined as string | undefined)
@@ -101,7 +101,7 @@ async function loadOptions(input: string | undefined, page = 1): Promise<Reposit
       undefined,
       input,
       props.repositoryType,
-      page
+      page,
     )
   } else {
     promise = repositoryApi.getRepositories(undefined, input, undefined, props.repositoryType, page)

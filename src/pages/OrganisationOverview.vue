@@ -18,7 +18,7 @@
       :loading="loading"
       :create="isAuthenticated"
       @row-clicked="routeToOrganisation($event)"
-      @create-clicked="organisation = newOrganisation(); showForm = true"
+      @create-clicked="((organisation = newOrganisation()), (showForm = true))"
       @request="reload"
     >
       <template v-if="isAuthenticated" #actions="{ row }">
@@ -30,7 +30,7 @@
       v-model="organisation"
       v-model:show="showForm"
       :loading="saving"
-      @update:model-value="saveOrganisation($event)"
+      @update:model-value="saveOrganisation"
     />
   </q-page>
 </template>
@@ -46,7 +46,7 @@ import TableWithActions from 'src/components/TableWithActions.vue'
 import OrganisationForm from 'src/components/Organisation/OrganisationForm.vue'
 import PermissionIcon from 'src/components/PermissionIcon.vue'
 import { v4 as uuidv4 } from 'uuid'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import packageInfo from '../../package.json'
 
@@ -63,28 +63,29 @@ const organisations = ref<OrganisationPage>({
   size: 0,
   totalElements: 0,
   totalPages: 0,
-  type: 'organisation'
+  type: 'organisation',
 })
 
 const organisation = ref(newOrganisation())
-const { isAuthenticated } = storeToRefs(useEntity())
+const { isAuthenticated } = storeToRefs(useEntityStore())
 const productName = packageInfo.productName
 
 onMounted(async () => {
   await reload()
 })
 
-function newOrganisation() {
-  return { id: (uuidv4 as () => string)() } as Organisation
+function newOrganisation(): Organisation {
+  return { id: uuidv4() } as Organisation
 }
 
-async function reload(filter: string|undefined = undefined, page = 1) {
+async function reload(filter: string | undefined = undefined, page = 1): Promise<void> {
   if (!organisationApi) return
   loading.value = true
-  await organisationApi.getOrganisations(undefined, filter, page)
-    .then(r => organisations.value = r.data)
+  await organisationApi
+    .getOrganisations(undefined, filter, page)
+    .then((r) => (organisations.value = r.data))
     .catch((e: Error) => renderError(e))
-    .finally(() => loading.value = false)
+    .finally(() => (loading.value = false))
 }
 
 function routeToOrganisation(organisation: Organisation) {
@@ -95,16 +96,17 @@ async function saveOrganisation(organisation: Organisation) {
   if (!organisationApi) return
   saving.value = true
 
-  await organisationApi.createOrganisation(organisation)
-    .then(r => {
+  await organisationApi
+    .createOrganisation(organisation)
+    .then((r) => {
       showForm.value = false
       notify(t('thingSaved', { thing: t('organisation') }), 'positive')
       return r.data
     })
-    .then(newOrganisation => {
+    .then((newOrganisation) => {
       routeToOrganisation(newOrganisation)
     })
     .catch((e: Error) => renderError(e))
-    .finally(() => saving.value = false)
+    .finally(() => (saving.value = false))
 }
 </script>

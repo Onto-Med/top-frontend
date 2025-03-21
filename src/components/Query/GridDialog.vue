@@ -61,23 +61,21 @@ const entry = ref<string>()
 const defaultColDef = {
   editable: false,
   sortable: true,
-  filter: 'agNumberColumnFilter'
+  filter: 'agNumberColumnFilter',
 }
 const columnTypes = {
   idColumn: { filter: 'agTextColumnFilter' },
   dateColumn: {
     filter: 'agDateColumnFilter',
-    cellDataType: 'dateString'
-  }
+    cellDataType: 'dateString',
+  },
 }
 
 const entryOptions = computed(() => props.entries.map((e) => e.filename))
 
-const isEmpty = computed(() => rows.value.length == 0)
-
 const colDefs = computed(() => {
-  if (isEmpty.value) return []
-  const keys = Object.keys(rows.value[0])
+  const row = rows.value[0]
+  const keys = row ? Object.keys(row) : []
   return keys.map((key) => colDef(key))
 })
 
@@ -97,7 +95,7 @@ function colDef(fieldName: string) {
   }
   return {
     field: fieldName,
-    type
+    type,
   }
 }
 
@@ -107,16 +105,16 @@ function loadEntry() {
   csv?.getData!(writer)
     .then(
       (data) =>
-        (rows.value = Papa.parse(data, { header: true, delimiter: ';', skipEmptyLines: true }).data as Array<
-          Array<string>
-        >)
+        (rows.value = Papa.parse(data, { header: true, delimiter: ';', skipEmptyLines: true })
+          .data as Array<Array<string>>),
     )
     .catch((e: Error) => renderError(e))
 }
 </script>
 
-<style lang="sass" scoped>
-.ag-theme-quartz
-  width: 100%
-  height: calc(100vh - 203px)
+<style lang="scss" scoped>
+.ag-theme-quartz {
+  width: 100%;
+  height: calc(100vh - 203px);
+}
 </style>

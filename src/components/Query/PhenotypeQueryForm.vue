@@ -19,7 +19,7 @@
     <q-separator vertical class="gt-xs" />
 
     <div class="col-12 col-sm q-pa-md">
-      <p v-t="'queryImportDescription'" />
+      <p>{{ t('queryImportDescription') }}</p>
       <q-file v-model="importFile" :label="t('queryImportFile')" accept=".json">
         <template #prepend>
           <q-icon name="attach_file" />
@@ -64,7 +64,9 @@
                 :disable="isPhenotype(props.entity) && props.entity.dataType !== DataType.Boolean"
                 @click="addCriterion(props.entity)"
               >
-                <q-item-section>{{ t('addAsThing', { thing: t('eligibilityCriterion') }) }}</q-item-section>
+                <q-item-section>{{
+                  t('addAsThing', { thing: t('eligibilityCriterion') })
+                }}</q-item-section>
               </q-item>
 
               <q-separator />
@@ -114,7 +116,10 @@
                   />
                   <div v-show="index < query.criteria.length - 1" class="row no-wrap items-center">
                     <q-separator class="col" />
-                    <small v-t="'and'" class="col-grow q-px-md text-grey text-uppercase non-selectable and-separator" />
+                    <small
+                      class="col-grow q-px-md text-grey text-uppercase non-selectable and-separator"
+                      >{{ t('and') }}</small
+                    >
                     <q-separator class="col" />
                   </div>
                 </template>
@@ -186,8 +191,8 @@
     />
     <div v-if="!(configurationComplete && querySubjectPresent)" class="text-warning text-subtitle2">
       <q-icon name="warning" />
-      <span v-if="!configurationComplete" v-t="'queryDataSourceIsRequired'" />
-      <span v-else-if="!querySubjectPresent" v-t="'querySubjectIsRequired'" />
+      <span v-if="!configurationComplete">{{ t('queryDataSourceIsRequired') }}</span>
+      <span v-else-if="!querySubjectPresent">{{ t('querySubjectIsRequired') }}</span>
     </div>
     <q-space />
     <q-btn
@@ -208,13 +213,13 @@ import {
   Phenotype,
   PhenotypeQuery,
   QueryType,
-  TypeEnum
+  TypeEnum,
 } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import QuerySubject from 'src/components/Query/QuerySubject.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { useEntity } from 'src/pinia/entity'
+import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -225,8 +230,15 @@ import { QueryApiKey } from 'src/boot/axios'
 const emit = defineEmits(['execute'])
 const { t } = useI18n()
 const $q = useQuasar()
-const { getTitle, isCategory, isPhenotype, isRestricted, requiresAggregationFunction, routeToEntity } = useEntityFormatter()
-const entityStore = useEntity()
+const {
+  getTitle,
+  isCategory,
+  isPhenotype,
+  isRestricted,
+  requiresAggregationFunction,
+  routeToEntity,
+} = useEntityFormatter()
+const entityStore = useEntityStore()
 const { renderError } = useNotify()
 const { entities, repository, organisation } = storeToRefs(entityStore)
 const queryApi = inject(QueryApiKey)
@@ -237,7 +249,7 @@ const emptyQuery = () => {
     dataSource: undefined as string | undefined,
     criteria: [],
     projection: [],
-    type: QueryType.Phenotype
+    type: QueryType.Phenotype,
   } as PhenotypeQuery
 }
 
@@ -262,8 +274,8 @@ const reloadEntities = async () => {
     .then(
       () =>
         (query.value.criteria = query.value.criteria?.filter(
-          (c) => entities.value.findIndex((e) => e.id === c.subjectId) !== -1
-        ))
+          (c) => entities.value.findIndex((e) => e.id === c.subjectId) !== -1,
+        )),
     )
     .catch((e: Error) => renderError(e))
     .finally(() => (treeLoading.value = false))
@@ -288,7 +300,7 @@ const configurationComplete = computed(() => query.value.dataSource)
 const querySubjectPresent = computed(
   () =>
     (query.value.criteria && query.value.criteria.length > 0) ||
-    (query.value.projection && query.value.projection.length > 0)
+    (query.value.projection && query.value.projection.length > 0),
 )
 
 async function reloadDataSources() {
@@ -305,7 +317,7 @@ function addCriterion(subject: Phenotype) {
     defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
     inclusion: true,
     subjectId: subject.id as string,
-    type: TypeEnum.QueryCriterion
+    type: TypeEnum.QueryCriterion,
   })
 }
 
@@ -315,17 +327,21 @@ function addSelection(subject: Phenotype) {
   query.value.projection.push({
     subjectId: subject.id as string,
     defaultAggregationFunctionId: requiresAggregationFunction(subject) ? 'Last' : undefined,
-    type: TypeEnum.ProjectionEntry
+    type: TypeEnum.ProjectionEntry,
   })
 }
 
 function moveSelectEntry(oldIndex: number, newIndex: number) {
   if (!query.value.projection || newIndex < 0 || newIndex >= query.value.projection.length) return
-  query.value.projection.splice(newIndex, 0, query.value.projection.splice(oldIndex, 1)[0])
+  const moved = query.value.projection.splice(oldIndex, 1)[0]
+  if (moved) query.value.projection.splice(newIndex, 0, moved)
 }
 
 function exportQuery() {
-  exportFile(new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json', JSON.stringify(query.value))
+  exportFile(
+    new Date().toISOString() + '_' + (query.value.name || 'top_query') + '.json',
+    JSON.stringify(query.value),
+  )
 }
 
 function importQuery() {
@@ -341,7 +357,7 @@ function onExecute() {
         t('filterBy') +
         ': ' +
         "'" +
-        getTitle(entityStore.getEntity(query.value.criteria[0].subjectId)) +
+        getTitle(entityStore.getEntity(query.value.criteria[0]?.subjectId)) +
         "'" +
         (query.value.criteria.length > 1 ? ' ' + t('andMore', query.value.criteria.length - 1) : '')
     } else if (query.value.projection?.length) {
@@ -349,9 +365,11 @@ function onExecute() {
         t('output') +
         ': ' +
         "'" +
-        getTitle(entityStore.getEntity(query.value.projection[0].subjectId)) +
+        getTitle(entityStore.getEntity(query.value.projection[0]?.subjectId)) +
         "'" +
-        (query.value.projection.length > 1 ? ' ' + t('andMore', query.value.projection.length - 1) : '')
+        (query.value.projection.length > 1
+          ? ' ' + t('andMore', query.value.projection.length - 1)
+          : '')
     }
   }
   emit('execute', JSON.parse(JSON.stringify(query.value)) as PhenotypeQuery)
@@ -364,12 +382,13 @@ function reset() {
 
 defineExpose({
   prefillQuery,
-  reset
+  reset,
 })
 </script>
 
-<style lang="sass">
-.and-separator
-  height: 0px
-  margin-top: -16px
+<style lang="scss">
+.and-separator {
+  height: 0px;
+  margin-top: -16px;
+}
 </style>
