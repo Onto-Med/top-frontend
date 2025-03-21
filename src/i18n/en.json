@@ -587,12 +587,14 @@
   "type": "Type|Types",
   "dataSourceFileTypes": {
     "csv_encounter": "CSV (encounter)",
+    "csv_expected_result": "CSV (expected result)",
     "csv_subject": "CSV (subject)",
     "csv_subject_resource": "CSV (subject resource)",
     "fhir": "HL7 FHIR"
   },
   "dataSourceFileTypeDescriptions": {
     "csv_encounter": "Table header row: encounterId;subjectId;type;startDateTime;endDateTime",
+    "csv_expected_result": "Table header row: expectedResultId;subjectId;encounterId;phenotypeId;numberValue;textValue;booleanValue;dateTimeValue",
     "csv_subject": "Table header row: subjectId;birthDate;sex",
     "csv_subject_resource": "Table header row: subjectResourceId;encounterId;subjectId;codeSystem;code;dateTime;startDateTime;endDateTime;unit;numberValue;textValue;booleanValue;dateTimeValue\nOnly one of the value columns needs to be filled according to the data type.",
     "fhir": "An HL7 FHIR bundle consisting of patient, encounter and observation resources."
@@ -600,5 +602,16 @@
   "startedThing": "{thing} started.",
   "dataSourceId": "Data source ID|Data source IDs",
   "finishedThing": "Finished {thing}.",
-  "mergeEncounters": "Merge encounter resources"
+  "mergeEncounters": "Merge encounter resources",
+  "testThing": "Test {thing}",
+  "test": "Test|Tests",
+  "testDescription": "Please select a data source with expected results to test this repository. The expected values will be compared to the actual derived values and the test results will be listed below.",
+  "testReport": "Test report|Test reports",
+  "copyThing": "Copy {thing}",
+  "expected": "Expected",
+  "actual": "Actual",
+  "encounter": "Encounter|Encounters",
+  "subject": "Subject|Subjects",
+  "failedCount": "{failed} of {total} failed",
+  "passed": "Passed"
 }
