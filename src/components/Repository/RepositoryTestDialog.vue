@@ -70,7 +70,12 @@
             </template>
             <template #body-cell-entityId="props">
               <q-td :props="props">
-                <entity-chip :entity-id="props.row.entityId" dense />
+                <entity-chip
+                  :entity-id="props.row.entityId"
+                  :label="props.row.entityId"
+                  disable
+                  dense
+                />
               </q-td>
             </template>
           </q-table>
