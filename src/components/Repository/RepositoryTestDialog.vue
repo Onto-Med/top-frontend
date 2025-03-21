@@ -45,7 +45,7 @@
         <q-card-section class="q-pa-none">
           <div class="text-h6 q-px-md q-pt-md">
             {{ t('testReport', 2) }}
-            <small v-if="testReports" :class="{ 'text-grey': !failed, 'text-negative': failed }"
+            <small v-if="testReports" :class="{ 'text-positive': !failed, 'text-negative': failed }"
               >({{ t('failedCount', { failed, total }) }})</small
             >
           </div>
