@@ -587,12 +587,14 @@
   "type": "Typ|Typen",
   "dataSourceFileTypes": {
     "csv_encounter": "CSV (Kontakt)",
+    "csv_expected_result": "CSV (Erwartetes Ergebnis)",
     "csv_subject": "CSV (Subjekt)",
     "csv_subject_resource": "CSV (Subjekt-Ressource)",
     "fhir": "HL7 FHIR"
   },
   "dataSourceFileTypeDescriptions": {
     "csv_encounter": "Tabellenkopfzeile: encounterId;subjectId;type;startDateTime;endDateTime",
+    "csv_expected_result": "Tabellenkopfzeile: expectedResultId;subjectId;encounterId;phenotypeId;numberValue;textValue;booleanValue;dateTimeValue",
     "csv_subject": "Tabellenkopfzeile: subjectId;birthDate;sex",
     "csv_subject_resource": "Tabellenkopfzeile: subjectResourceId;encounterId;subjectId;codeSystem;code;dateTime;startDateTime;endDateTime;unit;numberValue;textValue;booleanValue;dateTimeValue\nEs muss jeweils nur eine der value-Spalten entsprechend des Datentyps befüllt sein.",
     "fhir": "Ein HL7 FHIR Bundle bestehend aus Patienten-, Encounter- und Observation-Ressourcen."
@@ -600,5 +602,16 @@
   "startedThing": "{thing} wurde gestarted.",
   "dataSourceId": "Datenquellen-ID|Datenquellen-IDs",
   "finishedThing": "{thing} abgeschlossen.",
-  "mergeEncounters": "Encounter-Ressourcen zusammenführen"
+  "mergeEncounters": "Encounter-Ressourcen zusammenführen",
+  "testThing": "{thing} testen",
+  "test": "Test|Tests",
+  "testDescription": "Bitte wählen Sie eine Datenquelle mit den erwarteten Ergebnissen, um dieses Repositorium zu testen. Die erwarteten Werte werden mit den tatsächlichen abgeleiteten Werten verglichen und die Testergebnisse werden unten aufgeführt.",
+  "testReport": "Testbericht | Testberichte",
+  "copyThing": "{thing} kopieren",
+  "expected": "Erwartet",
+  "actual": "Tatsächlich",
+  "encounter": "Begegnung|Begegnungen",
+  "subject": "Subjekt|Subjekte",
+  "failedCount": "{failed} von {total} fehlgeschlagen",
+  "passed": "Bestanden"
 }

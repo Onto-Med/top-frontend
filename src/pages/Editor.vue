@@ -20,12 +20,20 @@
               {{ repository.name || repository.id }}
             </div>
 
-            <q-btn-group dense flat class="gt-xs">
-              <q-btn :title="t('importAndExport')" @click="showExportDialog = true">
+            <q-btn-group flat class="gt-xs">
+              <q-btn dense :title="t('importAndExport')" @click="showExportDialog = true">
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
               <q-btn
+                dense
+                :title="t('testThing', { thing: t('repository') })"
+                @click="showTestDialog()"
+              >
+                <q-icon name="rule" />
+              </q-btn>
+              <q-btn
                 v-if="writable"
+                dense
                 :icon="isConceptRepository ? 'find_in_page' : 'manage_search'"
                 :title="t('buildQuery')"
                 :to="{
@@ -166,6 +174,7 @@ import { useI18n } from 'vue-i18n'
 import EntityTab from 'src/components/EntityEditor/EntityTab.vue'
 import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
+import RepositoryTestDialog from 'src/components/Repository/RepositoryTestDialog.vue'
 import {
   Category,
   Entity,
@@ -518,6 +527,12 @@ async function confirmCloseUnsavedTabs(tab?: EditorTab) {
       .onOk(() => resolve())
       .onCancel(() => reject())
       .onDismiss(() => reject())
+  })
+}
+
+function showTestDialog() {
+  $q.dialog({
+    component: RepositoryTestDialog,
   })
 }
 </script>
