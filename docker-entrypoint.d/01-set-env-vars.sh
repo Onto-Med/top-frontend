@@ -1,21 +1,21 @@
 if [[ ! -z "${OAUTH2_ENABLED}" ]]
 then
-    sed -i "s|OAUTH2_ENABLED\\:!1|OAUTH2_ENABLED:${OAUTH2_ENABLED}|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_ENABLED\\:!1|OAUTH2_ENABLED:${OAUTH2_ENABLED}|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${API_URL}" ]]
 then
-    sed -i "s|API_URL\\:\"http\\://127\\.0\\.0\\.1\\:8080\"|API_URL:'${API_URL}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|API_URL\\:\"http\\://127\\.0\\.0\\.1\\:8080\"|API_URL:'${API_URL}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${OAUTH2_URL}" ]]
 then
-    sed -i "s|OAUTH2_URL\\:\"http\\://127\\.0\\.0\\.1\\:8081\"|OAUTH2_URL:'${OAUTH2_URL}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_URL\\:\"http\\://127\\.0\\.0\\.1\\:8081\"|OAUTH2_URL:'${OAUTH2_URL}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${OAUTH2_REALM}" ]]
 then
-    sed -i "s|OAUTH2_REALM\\:\"top-realm\"|OAUTH2_REALM:'${OAUTH2_REALM}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_REALM\\:\"top-realm\"|OAUTH2_REALM:'${OAUTH2_REALM}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${OAUTH2_CLIENT_ID}" ]]
