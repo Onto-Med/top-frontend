@@ -1,14 +1,13 @@
-FROM node:alpine as build-stage
+FROM node:alpine AS build-stage
 WORKDIR /app
 RUN npm i -g @quasar/cli
 ARG NPM_AUTH_TOKEN
 ENV NPM_AUTH_TOKEN=$NPM_AUTH_TOKEN
-COPY package.json package-lock.json .npmrc ./
-RUN npm install
 COPY . .
+RUN npm install
 RUN quasar build
 
-FROM nginx:alpine as production-stage
+FROM nginx:alpine AS production-stage
 COPY --from=build-stage /app/dist/spa /opt/top-frontend
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker-entrypoint.d/* /docker-entrypoint.d/
