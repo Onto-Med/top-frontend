@@ -20,30 +20,30 @@ fi
 
 if [[ ! -z "${OAUTH2_CLIENT_ID}" ]]
 then
-    sed -i "s|OAUTH2_CLIENT_ID\\:\"top-frontend\"|OAUTH2_CLIENT_ID:'${OAUTH2_CLIENT_ID}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|OAUTH2_CLIENT_ID\\:\"top-frontend\"|OAUTH2_CLIENT_ID:'${OAUTH2_CLIENT_ID}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${GDPR_NOTICE}" ]]
 then
-    sed -i "s|GDPR_NOTICE\\:!1|GDPR_NOTICE:${GDPR_NOTICE}|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|GDPR_NOTICE\\:!1|GDPR_NOTICE:${GDPR_NOTICE}|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${GDPR_POLICY_URL}" ]]
 then
-    sed -i "s|GDPR_POLICY_URL\\:void 0|GDPR_POLICY_URL:'${GDPR_POLICY_URL}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|GDPR_POLICY_URL\\:void 0|GDPR_POLICY_URL:'${GDPR_POLICY_URL}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${SYSTEM_NOTICE}" ]]
 then
-    sed -i "s|SYSTEM_NOTICE\\:void 0|SYSTEM_NOTICE:'${SYSTEM_NOTICE}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|SYSTEM_NOTICE\\:void 0|SYSTEM_NOTICE:'${SYSTEM_NOTICE}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${DOCUMENTS_ENABLED}" ]]
 then
-    sed -i "s|DOCUMENTS_ENABLED\\:!1|DOCUMENTS_ENABLED:${DOCUMENTS_ENABLED}|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|DOCUMENTS_ENABLED\\:!1|DOCUMENTS_ENABLED:${DOCUMENTS_ENABLED}|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}" ]]
 then
-    sed -i "s|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL\\:\"https\\://onto-med\\.github\\.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner\"|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL:'${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}'|g" /usr/share/nginx/html/js/app.*.js
+    sed -i "s|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL\\:\"https\\://onto-med\\.github\\.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner\"|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL:'${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}'|g" /usr/share/nginx/html/assets/*.js
 fi
