@@ -53,6 +53,7 @@
             :rows="testReports || []"
             :columns="testReportColumns"
             :no-data-label="t('noDataPresent')"
+            :rows-per-page-options="[0]"
             hide-pagination
             row-key="id"
             class="test-report-table"
