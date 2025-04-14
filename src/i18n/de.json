@@ -259,7 +259,8 @@
     "delete": {
       "confirm": "Möchten Sie die Entität wirklich unwiderruflich löschen? Alle gespeicherten Versionen und Restriktionen werden ebenfalls gelöscht.",
       "cascade": "Enthaltene Entitäten ebenfalls löschen."
-    }
+    },
+    "title": "Entitätseditor"
   },
   "organisationPage": {
     "description": "Der Inhalt des {productName} ist nach Organisationen gegliedert. Bündeln Sie Modelle in einer Organisation, wenn Sie möchten, dass sie die gleichen Zugriffsrechte haben. Sie können andere Benutzer zu Ihren Organisationen einladen, indem Sie ihnen Lese-, Schreib- oder Verwaltungsrechte erteilen. Alle verfügbaren Organisationen sind unten aufgeführt. Die Symbole auf der linken Seite zeigen Ihre Zugangsrechte an.",
@@ -448,7 +449,8 @@
   "for": "für",
   "repositoryContainingModel": "Modell enthaltendes Repositorium",
   "queryBuilder": {
-    "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um die Auswahlkriterien und Ausgabe festzulegen."
+    "description": "Sie müssen zunächst das Phänotypmodell auswählen, das Sie verwenden möchten, und eine Datenquelle, für die Sie die Abfrage ausführen möchten. Anschließend können Sie den Modellinhalt verwenden, um die Auswahlkriterien und Ausgabe festzulegen.",
+    "title": "Query Builder"
   },
   "confirmClearQuery": "Wenn Sie zu einem anderen Repositorium wechseln, geht Ihre aktuelle Abfrage verloren. Sind Sie sicher?",
   "repeatThing": "{thing} wiederholen",
@@ -613,5 +615,6 @@
   "encounter": "Begegnung|Begegnungen",
   "subject": "Subjekt|Subjekte",
   "passedCount": "{passed} von {total} bestanden",
-  "passed": "Bestanden"
+  "passed": "Bestanden",
+  "appKeywords": "Dokumentsuche, Phänotyp-Algorithmus, Phänotypdefinition, Phänotypbibliothek, Phänotypisierung, Terminologie"
 }

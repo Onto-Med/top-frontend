@@ -59,6 +59,7 @@ import { DataSource, Query, QueryType } from '@onto-med/top-api'
 import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
+import { useMeta } from 'quasar'
 
 const props = defineProps({
   organisationId: String,
@@ -75,6 +76,8 @@ const query = ref<Query>()
 const documentIds = ref<Array<string>>()
 const documentOffsets = ref<{ [key: string]: string[] }>()
 const router = useRouter()
+
+useMeta({ title: t('documentSearch.title') })
 
 watch(
   () => props.queryId,

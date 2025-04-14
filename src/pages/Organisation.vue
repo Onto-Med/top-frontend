@@ -132,7 +132,7 @@ import { v4 as uuidv4 } from 'uuid'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
-import { useQuasar } from 'quasar'
+import { useMeta, useQuasar } from 'quasar'
 
 const { t, d } = useI18n()
 const $q = useQuasar()
@@ -162,6 +162,10 @@ const { isAuthenticated, isAdmin } = storeToRefs(entityStore)
 const read = computed(() => isAuthenticated.value && canRead(organisation.value))
 const write = computed(() => isAuthenticated.value && canWrite(organisation.value))
 const manage = computed(() => isAuthenticated.value && canManage(organisation.value))
+
+useMeta(() => ({
+  title: organisation.value ? organisation.value.name : t('organisation'),
+}))
 
 onMounted(async () => {
   await entityStore.loadUser().then(() => reload())
