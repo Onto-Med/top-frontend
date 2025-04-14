@@ -46,7 +46,7 @@
           <div class="text-h6 q-px-md q-pt-md">
             {{ t('testReport', 2) }}
             <small v-if="testReports" :class="{ 'text-positive': !failed, 'text-negative': failed }"
-              >({{ t('failedCount', { failed, total }) }})</small
+              >({{ t('passedCount', { passed, total }) }})</small
             >
           </div>
           <q-table
@@ -131,6 +131,7 @@ const testIsReady = computed(
 
 const total = computed(() => testReports.value?.length)
 const failed = computed(() => testReports.value?.filter((r) => !r.passed).length)
+const passed = computed(() => testReports.value?.filter((r) => r.passed).length)
 
 const testReportColumns = computed(
   () =>
