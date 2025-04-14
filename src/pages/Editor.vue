@@ -186,7 +186,7 @@ import {
 } from '@onto-med/top-api'
 import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { useQuasar } from 'quasar'
+import { useMeta, useQuasar } from 'quasar'
 import Dialog from 'src/components/Dialog.vue'
 
 interface EditorTab {
@@ -244,6 +244,16 @@ const isConceptRepository = computed(
 )
 
 const hasUnsavedTabs = computed(() => tabs.value.some((t) => t.dirty || !t.state.version))
+
+const title = computed(
+  () =>
+    (selected.value ? getTitle(selected.value, true) + ' - ' : '') +
+    (repository.value?.name || t('repository')) +
+    ' - ' +
+    (organisation.value?.name || t('organisation')),
+)
+
+useMeta(() => ({ title: title.value }))
 
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)

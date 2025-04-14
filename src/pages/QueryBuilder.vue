@@ -115,7 +115,7 @@ import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { v4 as uuidv4 } from 'uuid'
 import { QueryApiKey } from 'src/boot/axios'
-import { QScrollArea, useQuasar } from 'quasar'
+import { QScrollArea, useMeta, useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import Dialog from 'src/components/Dialog.vue'
@@ -163,6 +163,10 @@ async function loadQueryPage(page: number) {
       .then((r) => (queryPage.value = r.data))
       .catch((e: Error) => renderError(e))
 }
+
+useMeta(() => ({
+  title: t('queryBuilder.title'),
+}))
 
 onMounted(() => {
   if (props.queryId && organisation.value && repository.value)

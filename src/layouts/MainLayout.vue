@@ -210,15 +210,17 @@ import FancyEntitySearch from 'src/components/EntityEditor/FancyEntitySearch.vue
 import packageInfo from '../../package.json'
 import { ref, computed, watch } from 'vue'
 import { AppDescription } from '@onto-med/top-api'
-import { QMenu, useQuasar } from 'quasar'
+import { QMenu, useMeta, useQuasar } from 'quasar'
 import { storeToRefs } from 'pinia'
 import { env } from 'src/config'
 import { inject } from 'vue'
 import { DefaultApiKey } from 'src/boot/axios'
 import { onMounted } from 'vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
+import { MetaOptions } from 'quasar/dist/types/meta.js'
 
-const { t } = useI18n()
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
 const router = useRouter()
 const entityStore = useEntityStore()
 const $q = useQuasar()
@@ -276,6 +278,26 @@ const repositoryId = computed(() => {
   if (!route || route.name !== 'editor') return undefined
   return route.params.repositoryId as string | undefined
 })
+
+const routeName = computed(() => router.currentRoute.value?.name?.toString())
+
+const metaData = () =>
+  ({
+    title: !!routeName.value && te(routeName.value) ? t(routeName.value) : undefined,
+    titleTemplate: (title: string) => `${title} - ${productName}`,
+    meta: [
+      {
+        name: 'description',
+        content: t('appDescription'),
+      },
+      {
+        name: 'keywords',
+        content: t('appKeywords'),
+      },
+    ],
+  }) as unknown as MetaOptions
+
+useMeta(metaData)
 
 onMounted(() => performPing())
 

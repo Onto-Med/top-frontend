@@ -49,6 +49,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import packageInfo from '../../package.json'
+import { useMeta } from 'quasar'
+import { MetaOptions } from 'quasar/dist/types/meta.js'
 
 const { t } = useI18n()
 const { notify, renderError } = useNotify()
@@ -69,6 +71,19 @@ const organisations = ref<OrganisationPage>({
 const organisation = ref(newOrganisation())
 const { isAuthenticated } = storeToRefs(useEntityStore())
 const productName = packageInfo.productName
+
+useMeta(
+  () =>
+    ({
+      title: t('organisation', 2),
+      meta: [
+        {
+          name: 'description',
+          content: t('organisationPage.description', { productName }),
+        },
+      ],
+    }) as unknown as MetaOptions,
+)
 
 onMounted(async () => {
   await reload()
