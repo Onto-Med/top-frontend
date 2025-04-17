@@ -34,7 +34,7 @@ const selectedPhrases = ref<ConceptGraphNodes[] | undefined>(props.phrases?.toSo
 }))
 
 function removePhrase(phrase: ConceptGraphNodes): void {
-  let idx = selectedPhrases.value?.indexOf(phrase)
+  const idx = selectedPhrases.value?.indexOf(phrase)
   if (idx !== undefined && idx !== -1) {
     selectedPhrases.value?.splice(idx, 1)
   }
