@@ -191,9 +191,9 @@ const testIsReady = computed(
   () => !!organisation.value && !!repository.value && !!selectedDataSourceId.value,
 )
 
-const total = computed(() => testReports.value?.length)
-const failed = computed(() => testReports.value?.filter((r) => !r.passed).length)
-const passed = computed(() => testReports.value?.filter((r) => r.passed).length)
+const total = computed(() => testReports.value?.filter((r) => r.passed !== undefined).length)
+const failed = computed(() => testReports.value?.filter((r) => r.passed === false).length)
+const passed = computed(() => testReports.value?.filter((r) => r.passed === true).length)
 
 const dataSourceConfig = computed(() => {
   if (dataSourceFileType.value == DataSourceFileType.Fhir && mergeEncounters.value != undefined) {
