@@ -128,6 +128,7 @@
                   :label="props.row.entityId"
                   disable
                   dense
+                  @entity-clicked="showEntity($event)"
                 />
               </q-td>
             </template>
@@ -181,7 +182,7 @@ const dataSourceId = ref<string>()
 const dataSourceFileType = ref<DataSourceFileType>()
 const dataSourceFile = ref<File>()
 const mergeEncounters = ref(false)
-const { canWrite } = useEntityFormatter()
+const { canWrite, routeToEntity } = useEntityFormatter()
 
 const uploadPossible = computed(() => canWrite(organisation.value))
 
@@ -304,6 +305,18 @@ function uploadDataSource() {
     .then(() => (selectedDataSourceId.value = dataSourceId.value))
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
+}
+
+function showEntity(entityId: string) {
+  if (entityId) {
+    entityStore
+      .loadEntity(entityId)
+      .then(async (entity) => {
+        if (!entity) return
+        await routeToEntity(entity)
+      })
+      .catch(() => {})
+  }
 }
 </script>
 
