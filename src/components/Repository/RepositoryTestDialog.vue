@@ -114,6 +114,7 @@
             <template v-slot:body-cell-passed="props">
               <q-td :props="props" :title="props.row.passed ? t('passed') : t('failed')">
                 <q-icon
+                  v-if="props.row.passed !== undefined"
                   :name="props.row.passed ? 'check_circle' : 'dangerous'"
                   :color="props.row.passed ? 'positive' : 'negative'"
                   size="xs"
