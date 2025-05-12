@@ -40,7 +40,7 @@
           </q-select>
         </q-card-section>
 
-        <q-card-section>
+        <q-card-section v-if="uploadPossible">
           <q-expansion-item
             dense
             dense-toggle
@@ -163,6 +163,7 @@ import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import EntityChip from '../EntityEditor/EntityChip.vue'
 import EnumSelect from 'src/components/EnumSelect.vue'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
@@ -179,6 +180,9 @@ const dataSourceId = ref<string>()
 const dataSourceFileType = ref<DataSourceFileType>()
 const dataSourceFile = ref<File>()
 const mergeEncounters = ref(false)
+const { canWrite } = useEntityFormatter()
+
+const uploadPossible = computed(() => canWrite(organisation.value))
 
 const testReportString = computed(() => JSON.stringify(testReports.value))
 
@@ -296,7 +300,7 @@ function uploadDataSource() {
     )
     .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
     .then(reloadDataSources)
-    .then(() => selectedDataSourceId.value = dataSourceId.value)
+    .then(() => (selectedDataSourceId.value = dataSourceId.value))
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
 }
