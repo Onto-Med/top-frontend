@@ -133,7 +133,7 @@ const { isPhenotype, isConcept, restrictionToString } = useEntityFormatter()
 const entityStore = useEntityStore()
 const { notify, renderError } = useNotify()
 const onCancelClick = onDialogCancel
-const selection = ref<Code>()
+const selection = ref<{ code: Code }>()
 const withRestrictions = ref(false)
 const restrictions = ref<NumberRestriction[]>([])
 const itemType = ref<ItemType>()
@@ -141,7 +141,7 @@ const dataType = ref<DataType>()
 const unit = ref<string>()
 
 const entity = computed(() => {
-  if (selection.value) return toEntity(selection.value)
+  if (selection.value) return toEntity(selection.value?.code)
   return undefined
 })
 
@@ -163,7 +163,8 @@ function addRestriction() {
   })
 }
 
-function toEntity(code: Code) {
+function toEntity(code?: Code) {
+  if (!code) return undefined
   if (props.repositoryType === RepositoryType.ConceptRepository) {
     return {
       codes: [code],
