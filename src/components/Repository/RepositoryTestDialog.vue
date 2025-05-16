@@ -20,7 +20,7 @@
           <p>{{ t('testDescription') }}</p>
 
           <q-select
-            v-model="dataSourceId"
+            v-model="selectedDataSourceId"
             filled
             :options="dataSources"
             :label="t('dataSource')"
@@ -38,6 +38,57 @@
               />
             </template>
           </q-select>
+        </q-card-section>
+
+        <q-card-section v-if="uploadPossible">
+          <q-expansion-item
+            dense
+            dense-toggle
+            expand-separator
+            :label="t('uploadDataSource')"
+            header-class="q-px-none"
+          >
+            <p>{{ t('uploadDataSourceDescription') }}</p>
+            <div class="row q-gutter-sm">
+              <q-input v-model="dataSourceId" :label="t('dataSourceId')" class="col" />
+              <enum-select
+                v-model:selected="dataSourceFileType"
+                i18n-prefix="dataSourceFileType"
+                :enum="DataSourceFileType"
+                :label="t('type')"
+                class="col"
+              />
+            </div>
+            <p
+              v-show="dataSourceFileHint"
+              class="text-caption text-break text-grey q-mt-md q-mb-none"
+            >
+              {{ dataSourceFileHint }}
+            </p>
+            <q-checkbox
+              v-show="dataSourceFileType == DataSourceFileType.Fhir"
+              v-model="mergeEncounters"
+              size="sm"
+              :label="t('mergeEncounters')"
+            />
+            <q-file
+              v-model="dataSourceFile"
+              :label="t('selectThing', { thing: t('file') })"
+              accept=".csv,.json,.rdf,.xml,.yaml,.yml"
+              :disable="!dataSourceFileType"
+            >
+              <template #after>
+                <q-btn
+                  type="submit"
+                  icon="file_upload"
+                  color="primary"
+                  :disabled="!dataSourceFileType || !dataSourceFile || loading"
+                  :label="t('upload')"
+                  @click="uploadDataSource()"
+                />
+              </template>
+            </q-file>
+          </q-expansion-item>
         </q-card-section>
 
         <q-separator />
@@ -63,6 +114,7 @@
             <template v-slot:body-cell-passed="props">
               <q-td :props="props" :title="props.row.passed ? t('passed') : t('failed')">
                 <q-icon
+                  v-if="props.row.passed !== undefined"
                   :name="props.row.passed ? 'check_circle' : 'dangerous'"
                   :color="props.row.passed ? 'positive' : 'negative'"
                   size="xs"
@@ -76,6 +128,7 @@
                   :label="props.row.entityId"
                   disable
                   dense
+                  @entity-clicked="showEntity($event)"
                 />
               </q-td>
             </template>
@@ -105,33 +158,55 @@
 import { ref, inject, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { QueryApiKey, RepositoryApiKey } from 'src/boot/axios'
-import { DataSource, TestReport } from '@onto-med/top-api'
+import { DataSource, DataSourceFileType, TestReport } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import { copyToClipboard, QTableProps } from 'quasar'
 import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import EntityChip from '../EntityEditor/EntityChip.vue'
+import EnumSelect from 'src/components/EnumSelect.vue'
+import useEntityFormatter from 'src/mixins/useEntityFormatter'
 
-const { t } = useI18n()
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { t, te } = useI18n()
 const repositoryApi = inject(RepositoryApiKey)
 const queryApi = inject(QueryApiKey)
 const entityStore = useEntityStore()
-const { organisation, repository } = storeToRefs(entityStore)
+const { isAuthenticated, organisation, repository } = storeToRefs(entityStore)
 const { notify, renderError } = useNotify()
 const loading = ref(false)
-const dataSourceId = ref<string>()
+const selectedDataSourceId = ref<string>()
 const testReports = ref<TestReport[]>()
 const dataSources = ref<DataSource[]>([])
+const dataSourceId = ref<string>()
+const dataSourceFileType = ref<DataSourceFileType>()
+const dataSourceFile = ref<File>()
+const mergeEncounters = ref(false)
+const { canWrite, routeToEntity } = useEntityFormatter()
+
+const uploadPossible = computed(() => canWrite(organisation.value))
 
 const testReportString = computed(() => JSON.stringify(testReports.value))
 
 const testIsReady = computed(
-  () => !!organisation.value && !!repository.value && !!dataSourceId.value,
+  () => !!organisation.value && !!repository.value && !!selectedDataSourceId.value,
 )
 
-const total = computed(() => testReports.value?.length)
-const failed = computed(() => testReports.value?.filter((r) => !r.passed).length)
-const passed = computed(() => testReports.value?.filter((r) => r.passed).length)
+const total = computed(() => testReports.value?.filter((r) => r.passed !== undefined).length)
+const failed = computed(() => testReports.value?.filter((r) => r.passed === false).length)
+const passed = computed(() => testReports.value?.filter((r) => r.passed === true).length)
+
+const dataSourceConfig = computed(() => {
+  if (dataSourceFileType.value == DataSourceFileType.Fhir && mergeEncounters.value != undefined) {
+    return `mergeEncounters=${mergeEncounters.value}`
+  }
+  return undefined
+})
+
+const dataSourceFileHint = computed(() => {
+  const key = `dataSourceFileTypeDescriptions.${dataSourceFileType.value}`
+  return te(key) ? t(key) : undefined
+})
 
 const testReportColumns = computed(
   () =>
@@ -151,14 +226,14 @@ const testReportColumns = computed(
         name: 'expected',
         label: t('expected'),
         align: 'right',
-        field: (row) => row.expected.value,
+        field: (row) => row.expected?.value,
         sortable: true,
       },
       {
         name: 'actual',
         label: t('actual'),
         align: 'right',
-        field: (row) => row.actual.value,
+        field: (row) => row.actual?.value,
         sortable: true,
       },
     ] as QTableProps['columns'],
@@ -172,13 +247,13 @@ async function test() {
     !repositoryApi ||
     !organisation.value ||
     !repository.value ||
-    !dataSourceId.value
+    !selectedDataSourceId.value
   )
     return
   loading.value = true
 
   await repositoryApi
-    .testRepository(organisation.value.id, repository.value.id, dataSourceId.value)
+    .testRepository(organisation.value.id, repository.value.id, selectedDataSourceId.value)
     .then((r) => {
       testReports.value = r.data
     })
@@ -204,6 +279,44 @@ async function reloadDataSources() {
     })
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
+}
+
+function uploadDataSource() {
+  if (
+    !queryApi ||
+    !isAuthenticated.value ||
+    !organisation.value ||
+    !dataSourceId.value ||
+    !dataSourceFileType.value ||
+    !dataSourceFile.value
+  )
+    return
+
+  queryApi
+    .uploadDataSource(
+      organisation.value.id,
+      dataSourceFile.value,
+      dataSourceFileType.value,
+      dataSourceId.value,
+      dataSourceConfig.value,
+    )
+    .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
+    .then(reloadDataSources)
+    .then(() => (selectedDataSourceId.value = dataSourceId.value))
+    .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
+}
+
+function showEntity(entityId: string) {
+  if (entityId) {
+    entityStore
+      .loadEntity(entityId)
+      .then(async (entity) => {
+        if (!entity) return
+        await routeToEntity(entity)
+      })
+      .catch(() => {})
+  }
 }
 </script>
 

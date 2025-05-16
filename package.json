@@ -1,6 +1,6 @@
 {
   "name": "top-frontend",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "An app for ontological modelling and managing of phenotypes.",
   "productName": "TOP Framework",
   "repository": {
@@ -9,6 +9,7 @@
   },
   "homepage": "https://onto-med.github.io/top-deployment/",
   "author": "Christoph Beger <ChristophB@users.noreply.github.com>",
+  "type": "module",
   "private": true,
   "scripts": {
     "lint": "eslint -c ./eslint.config.js --cache --cache-location node_modules/.cache/eslint/.eslintcache \"./src*/**/*.{ts,js,cjs,mjs,vue,scss}\"",

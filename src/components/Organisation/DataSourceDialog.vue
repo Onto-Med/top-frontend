@@ -56,56 +56,6 @@
         </q-select>
       </q-card-section>
 
-      <q-card-section>
-        <q-expansion-item
-          dense
-          dense-toggle
-          expand-separator
-          :label="t('uploadDataSource')"
-          header-class="q-px-none"
-        >
-          <div class="row q-gutter-sm">
-            <q-input v-model="dataSourceId" :label="t('dataSourceId')" class="col" />
-            <enum-select
-              v-model:selected="dataSourceFileType"
-              i18n-prefix="dataSourceFileType"
-              :enum="DataSourceFileType"
-              :label="t('type')"
-              class="col"
-            />
-          </div>
-          <p
-            v-show="dataSourceFileHint"
-            class="text-caption text-break text-grey q-mt-md q-mb-none"
-          >
-            {{ dataSourceFileHint }}
-          </p>
-          <q-checkbox
-            v-show="dataSourceFileType == DataSourceFileType.Fhir"
-            v-model="mergeEncounters"
-            size="sm"
-            :label="t('mergeEncounters')"
-          />
-          <q-file
-            v-model="dataSourceFile"
-            :label="t('selectThing', { thing: t('file') })"
-            accept=".csv,.json,.rdf,.xml,.yaml,.yml"
-            :disable="!dataSourceFileType"
-          >
-            <template #after>
-              <q-btn
-                type="submit"
-                icon="file_upload"
-                color="primary"
-                :disabled="!dataSourceFileType || !dataSourceFile || loading"
-                :label="t('upload')"
-                @click="uploadDataSource()"
-              />
-            </template>
-          </q-file>
-        </q-expansion-item>
-      </q-card-section>
-
       <q-separator size="3px" />
 
       <q-card-section class="q-pa-none">
@@ -164,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { DataSource, DataSourceFileType, Organisation } from '@onto-med/top-api'
+import { DataSource, Organisation } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { QDialog, QTableColumn, useQuasar } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
@@ -174,7 +124,6 @@ import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Dialog from 'src/components/Dialog.vue'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import EnumSelect from 'src/components/EnumSelect.vue'
 
 const props = defineProps({
   organisation: {
@@ -184,8 +133,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['hide', 'ok'])
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const { t, te } = useI18n()
+const { t } = useI18n()
 const { notify, renderError } = useNotify()
 const $q = useQuasar()
 const dialog = ref<QDialog | undefined>(undefined)
@@ -203,10 +151,6 @@ const initialPagination = {
   page: 1,
   rowsPerPage: 10,
 }
-const dataSourceId = ref<string>()
-const dataSourceFileType = ref<DataSourceFileType>()
-const dataSourceFile = ref<File>()
-const mergeEncounters = ref(false)
 
 const columns = computed(() => {
   return [
@@ -214,18 +158,6 @@ const columns = computed(() => {
     { name: 'queryType', label: t('suitableFor'), align: 'left', sortable: true, required: true },
     { name: 'actions', align: 'right', sortable: false },
   ] as QTableColumn[]
-})
-
-const dataSourceFileHint = computed(() => {
-  const key = `dataSourceFileTypeDescriptions.${dataSourceFileType.value}`
-  return te(key) ? t(key) : undefined
-})
-
-const dataSourceConfig = computed(() => {
-  if (dataSourceFileType.value == DataSourceFileType.Fhir && mergeEncounters.value != undefined) {
-    return `mergeEncounters=${mergeEncounters.value}`
-  }
-  return undefined
 })
 
 onMounted(async () => {
@@ -283,29 +215,6 @@ async function addDataSource() {
       notify(t('thingAdded', { thing: t('dataSource') }), 'positive')
       resetDataSource()
     })
-    .catch((e: Error) => renderError(e))
-    .finally(() => (loading.value = false))
-}
-
-function uploadDataSource() {
-  if (
-    !queryApi ||
-    !isAuthenticated.value ||
-    !dataSourceId.value ||
-    !dataSourceFileType.value ||
-    !dataSourceFile.value
-  )
-    return
-
-  queryApi
-    .uploadDataSource(
-      dataSourceFile.value,
-      dataSourceFileType.value,
-      dataSourceId.value,
-      dataSourceConfig.value,
-    )
-    .then(() => notify(t('finishedThing', { thing: t('upload') }), 'positive'))
-    .then(reloadAvailableDataSources)
     .catch((e: Error) => renderError(e))
     .finally(() => (loading.value = false))
 }
