@@ -25,7 +25,7 @@
                 <q-icon name="sync_alt" class="rotate-90" />
               </q-btn>
               <q-btn
-                v-if="!isConceptRepository"
+                v-if="writable && !isConceptRepository"
                 dense
                 :title="t('testThing', { thing: t('repository') })"
                 @click="showTestDialog()"
