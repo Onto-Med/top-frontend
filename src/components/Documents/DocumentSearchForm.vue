@@ -332,8 +332,9 @@ watch(
   () => {
     concepts.value.length = 0
     reloadConcepts()
-      .then(() => reloadDocuments())
+      // .then(() => reloadDocuments()) //Todo: this doesn't work here; don't really know why. Therefore, I put it outside of the "then" clause
       .catch((e: Error) => renderError(e))
+    reloadDocuments().catch((e: Error) => renderError(e))
   },
 )
 
@@ -415,7 +416,7 @@ async function checkPipeline() {
 
 async function chooseDocument(document: Document) {
   if (document.id == null) return
-  let offsets = props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
+  const offsets = props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
   if (!props.dataSource) return Promise.reject()
   const conceptIds = new Array<string>()
   for (const c of selectedConcepts.value) {
