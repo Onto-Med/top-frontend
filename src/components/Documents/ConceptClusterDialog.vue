@@ -1,6 +1,6 @@
 <template>
   <q-dialog ref="dialogRef">
-    <q-card class="content">
+    <q-card class="content" style="min-width: 600px; max-width: min-content">
       <q-card-section class="row items-center q-gutter-sm">
         <div class="col text-h6">
           {{
@@ -115,7 +115,9 @@
                     <q-checkbox v-model="innerProps.selected"></q-checkbox>
                   </q-td>
                   <q-td key="phrases" :props="innerProps">
-                    <q-chip clickable @click="showPhrases(innerProps.row.id)">{{ innerProps.row.phrases }}</q-chip>
+                    <q-chip clickable @click="showPhrases(innerProps.row.id)">{{
+                      innerProps.row.phrases
+                    }}</q-chip>
                   </q-td>
                   <q-td key="nodes" :props="innerProps">
                     {{ innerProps.row.nodes }}
@@ -172,7 +174,7 @@ import {
   ConceptGraphPipelineStatusEnum,
   DataSource,
   PipelineResponse,
-  PipelineResponseStatus,
+  PipelineResponseStatus
 } from '@onto-med/top-api'
 import { Notify, QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
@@ -305,7 +307,7 @@ function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
   let returnString = t('conceptCluster.unfinishedSteps') + ': '
   steps
     ?.filter((step: ConceptGraphPipelineStatus) => {
-      return step.status != ConceptGraphPipelineStatusEnum.Finished
+      return !Array.of(ConceptGraphPipelineStatusEnum.Finished, ConceptGraphPipelineStatusEnum.Stopped).some(stat => stat === step.status)
     })
     .forEach((step: ConceptGraphPipelineStatus) => {
       returnString += '"' + step.name + '", '
@@ -346,9 +348,11 @@ function loadGraphPipeline() {
 }
 
 function loadClusterPipeline() {
+  console.log("Load Cluster Pipeline")
   conceptClusterApi
     ?.getConceptClusterProcess(props.dataSource?.id)
     .then((r) => {
+      console.log(r.data)
       if (
         !r.data.pipelineId ||
         r.data.status == PipelineResponseStatus.Successful ||
@@ -527,7 +531,7 @@ function loadConceptGraphs() {
           phrases: labels.join(' | '),
         } as ConceptGraphObject
         conceptGraphs.value.push(graph)
-        if (props.conceptCluster?.some((c) => c.id === id)) {
+        if (props.conceptCluster?.some((c) => c.id === id) && !selectedGraphs.value.some((e) => e.id === id)) {
           selectedGraphs.value.push(graph)
         }
       }
