@@ -19,7 +19,7 @@
               <small>{{ t('conceptCluster.preProcessingDescription') }}</small>
             </p>
             <p class="text-subtitle1">
-              <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
+              <b>{{ t('status') }}:</b> {{ graphPipelineStatus }} {{ graphStatusDetailsTrack }}
               <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
               <q-icon
                 v-else-if="isGraphPipelineFailed"
@@ -174,7 +174,7 @@ import {
   ConceptGraphPipelineStatusEnum,
   DataSource,
   PipelineResponse,
-  PipelineResponseStatus
+  PipelineResponseStatus,
 } from '@onto-med/top-api'
 import { Notify, QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
@@ -196,11 +196,11 @@ const props = defineProps({
   },
   conceptCluster: {
     type: Array as () => ConceptCluster[],
-    required: true
+    required: true,
   },
   configJsonMap: {
     type: Map<string, Map<string, string>>,
-    required: true
+    required: true,
   },
 })
 
@@ -249,6 +249,7 @@ const isClusterPipelineRunning = computed(
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
 const graphPipelineStatusDetails = computed(() => statusDetailsToString(graphPipeline.value?.steps))
+const graphStatusDetailsTrack = computed(() => statusDetailsAsCount(graphPipeline.value?.steps))
 
 const graphColumns = computed(
   () =>
@@ -331,14 +332,15 @@ function populateConfigMap() {
       langConfigs.set(lang.value, '')
     }
     configs?.set(process, langConfigs)
-  }
-  else {
+  } else {
     const langConfigs = configs?.get(process)
     const missingLangs = Array<string>()
-    languages.filter((lang) => {
-      return !langConfigs?.has(lang.value)
-    }).forEach((lang) => missingLangs.push(lang.value))
-    missingLangs.forEach(l => langConfigs?.set(l, ''))
+    languages
+      .filter((lang) => {
+        return !langConfigs?.has(lang.value)
+      })
+      .forEach((lang) => missingLangs.push(lang.value))
+    missingLangs.forEach((l) => langConfigs?.set(l, ''))
   }
 }
 
@@ -350,12 +352,37 @@ function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
   let returnString = t('conceptCluster.unfinishedSteps') + ': '
   steps
     ?.filter((step: ConceptGraphPipelineStatus) => {
-      return !Array.of(ConceptGraphPipelineStatusEnum.Finished, ConceptGraphPipelineStatusEnum.Stopped).some(stat => stat === step.status)
+      return !Array.of(
+        ConceptGraphPipelineStatusEnum.Finished,
+        ConceptGraphPipelineStatusEnum.Stopped,
+      ).some((stat) => stat === step.status)
     })
     .forEach((step: ConceptGraphPipelineStatus) => {
       returnString += '"' + step.name + '", '
     })
   return returnString.slice(0, returnString.length - 2)
+}
+
+function statusDetailsAsCount(steps?: ConceptGraphPipelineStatus[]) {
+  let rank
+  const rankTotal = steps === undefined ? "-" : steps.length.toString()
+  if (isGraphPipelineFinished.value) {
+    return "(" + rankTotal + "/" + rankTotal + ")"
+  } else if (isGraphPipelineFailed.value) {
+    rank = steps?.findLast((step: ConceptGraphPipelineStatus) => step.status === ConceptGraphPipelineStatusEnum.Finished,
+    )?.rank
+  } else {
+    rank = steps?.find(
+      (step: ConceptGraphPipelineStatus) => step.status === ConceptGraphPipelineStatusEnum.Running,
+    )?.rank
+  }
+  return (
+    '(' +
+    (rank === undefined ? '-' : rank.toString()) +
+    '/' +
+    rankTotal +
+    ')'
+  )
 }
 
 function loadGraphPipeline() {
@@ -391,7 +418,7 @@ function loadGraphPipeline() {
 }
 
 function loadClusterPipeline() {
-  console.log("Load Cluster Pipeline")
+  console.log('Load Cluster Pipeline')
   conceptClusterApi
     ?.getConceptClusterProcess(props.dataSource?.id)
     .then((r) => {
@@ -428,13 +455,17 @@ function confirmStartPipeline() {
       message: t('conceptCluster.confirmStart'),
     },
   }).onOk(() => {
-    if (graphPipeline.value?.steps?.length != undefined
-      && graphPipeline.value?.steps.length < 4
-      && !skipPresent.value) {
+    if (
+      graphPipeline.value?.steps?.length != undefined &&
+      graphPipeline.value?.steps.length < 4 &&
+      !skipPresent.value
+    ) {
       deletePipeline()
         .then(startPipeline)
         .catch((e: Error) => renderError(e))
-    } else { startPipeline().catch((e: Error) => renderError(e)) }
+    } else {
+      startPipeline().catch((e: Error) => renderError(e))
+    }
   })
 }
 
@@ -576,7 +607,10 @@ function loadConceptGraphs() {
           phrases: labels.join(' | '),
         } as ConceptGraphObject
         conceptGraphs.value.push(graph)
-        if (props.conceptCluster?.some((c) => c.id === id) && !selectedGraphs.value.some((e) => e.id === id)) {
+        if (
+          props.conceptCluster?.some((c) => c.id === id) &&
+          !selectedGraphs.value.some((e) => e.id === id)
+        ) {
           selectedGraphs.value.push(graph)
         }
       }
@@ -609,16 +643,14 @@ function configurePipeline() {
 }
 
 async function showPhrases(id: string) {
-  await conceptPipelineApi
-    ?.getConceptGraph(props.dataSource.id, id)
-    .then((r) => {
-      $q.dialog({
-        component: PhraseDialog,
-        componentProps: {
-          phrases: r.data.nodes
-        }
-      })
+  await conceptPipelineApi?.getConceptGraph(props.dataSource.id, id).then((r) => {
+    $q.dialog({
+      component: PhraseDialog,
+      componentProps: {
+        phrases: r.data.nodes,
+      },
     })
+  })
 }
 
 interface ConceptGraphObject {
