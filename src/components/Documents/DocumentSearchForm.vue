@@ -316,6 +316,8 @@ const mostImportantNodesOptions = computed(() => [
 
 const loading = computed(() => conceptsLoading.value || documentsLoading.value)
 
+const pipelineConfigMap = ref<Map<string, Map<string, string>>>(new Map<string, Map<string, string>>())
+
 onMounted(() =>
   entityStore
     .loadUser()
@@ -450,6 +452,7 @@ function showRegenerateDialog() {
     componentProps: {
       dataSource: props.dataSource,
       conceptCluster: concepts.value,
+      configJsonMap: pipelineConfigMap.value,
     },
   }).onOk(() => {
     reloadConcepts().catch((e: Error) => renderError(e))
