@@ -194,7 +194,14 @@ const props = defineProps({
     type: Object as () => DataSource,
     required: true,
   },
-  conceptCluster: Array as () => ConceptCluster[],
+  conceptCluster: {
+    type: Array as () => ConceptCluster[],
+    required: true
+  },
+  configJsonMap: {
+    type: Map<string, Map<string, string>>,
+    required: true
+  },
 })
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -287,6 +294,7 @@ const pipelineJsonConfig = ref<string>('')
 
 onMounted(() => {
   loadGraphPipeline()
+  populateConfigMap()
 })
 
 onUnmounted(() => {
@@ -294,10 +302,45 @@ onUnmounted(() => {
   window.clearInterval(clusterPipelineInterval.value)
 })
 
-//ToDo: maybe don't erase config on language switch when a manual save was already commited?
 watch(language, () => {
-  pipelineJsonConfig.value = ''
+  pipelineJsonConfig.value = language.value != undefined ? getConfig(language.value) : ''
 })
+
+function getConfig(lang: string): string {
+  const process = props.dataSource.id
+  const configs = props.configJsonMap
+  if (configs === undefined || process === undefined) return ''
+  if (configs.has(process)) {
+    if (configs.get(process) === undefined) return ''
+    return configs.get(process)!.has(lang) ? configs.get(process)!.get(lang)! : ''
+  }
+  return ''
+}
+
+function clearConfig(process: string) {
+  const configs = props.configJsonMap
+  if (configs?.has(process)) configs.delete(process)
+}
+
+function populateConfigMap() {
+  const process = props.dataSource.id
+  const configs = props.configJsonMap
+  if (!configs?.has(process)) {
+    const langConfigs = new Map<string, string>()
+    for (const lang of languages) {
+      langConfigs.set(lang.value, '')
+    }
+    configs?.set(process, langConfigs)
+  }
+  else {
+    const langConfigs = configs?.get(process)
+    const missingLangs = Array<string>()
+    languages.filter((lang) => {
+      return !langConfigs?.has(lang.value)
+    }).forEach((lang) => missingLangs.push(lang.value))
+    missingLangs.forEach(l => langConfigs?.set(l, ''))
+  }
+}
 
 function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
@@ -448,6 +491,7 @@ async function startPipeline() {
       .then(pipelineResponseCheck)
       .then(loadGraphPipeline)
   } else {
+    // ToDo: warning for this! as it calls a sup-par endpoint -> or might be better to reroute it to call with json by loading defaults
     return conceptPipelineApi
       ?.startConceptGraphPipeline(
         props.dataSource.id,
@@ -476,6 +520,7 @@ async function deletePipeline() {
   //ToDo: reload concept clusters in DocumentSearchForm when pipeline is deleted
   window.clearInterval(graphPipelineInterval.value)
   graphPipelineInterval.value = undefined
+  clearConfig(props.dataSource.id)
   return conceptPipelineApi
     ?.deleteConceptPipelineById(props.dataSource.id)
     .then(() => (graphPipeline.value = undefined))
@@ -543,10 +588,9 @@ function loadConceptGraphs() {
 function configurePipeline() {
   // pipelineId only gets submitted to 'configure dialog' (and therefore a configuration for it is loaded)
   // when the relevant 'graphPipeline' is finished, else a language default configuration is loaded
+  //ToDo: can't reset config to some default when pipeline didn't finish
   let pipelineIdSubmit = undefined
-  //ToDo: config of an unfinished pipeline is not loaded with this setup
   if (isGraphPipelineFinished.value) pipelineIdSubmit = graphPipeline.value?.pipelineId
-  //ToDo: pipelineJsonConfig is not persisted between closing/opening ConceptClusterDialog
   $q.dialog({
     component: PipelineConfigForm,
     componentProps: {
@@ -557,6 +601,7 @@ function configurePipeline() {
   })
     .onOk((jsonConfig: string) => {
       pipelineJsonConfig.value = jsonConfig
+      props.configJsonMap.get(props.dataSource.id)!.set(language.value!, jsonConfig)
     })
     .onCancel(() => {
       //ToDo: need something here to be done on Cancel?
