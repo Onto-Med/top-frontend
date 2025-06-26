@@ -172,11 +172,13 @@ import {
   ConceptGraphPipeline,
   ConceptGraphPipelineStatus,
   ConceptGraphPipelineStatusEnum,
+  ConceptGraphPipelineStepsEnum,
+  ConceptClusterCreationDef,
   DataSource,
   PipelineResponse,
   PipelineResponseStatus,
 } from '@onto-med/top-api'
-import { Notify, QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
+import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -292,6 +294,9 @@ const startPipelineButtonTitle = computed(() => {
 })
 
 const pipelineJsonConfig = ref<string>('')
+const selectedPhrases = ref<Map<string, ConceptGraphNodes[]>>(
+  new Map<string, ConceptGraphNodes[]>(),
+)
 
 onMounted(() => {
   loadGraphPipeline()
@@ -365,24 +370,29 @@ function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
 
 function statusDetailsAsCount(steps?: ConceptGraphPipelineStatus[]) {
   let rank
-  const rankTotal = steps === undefined ? "-" : steps.length.toString()
+  const rankTotal = steps === undefined ? '-' : steps.length.toString()
   if (isGraphPipelineFinished.value) {
-    return "(" + rankTotal + "/" + rankTotal + ")"
+    rank = 5
+    if (
+      steps?.findLast(
+        (step: ConceptGraphPipelineStatus) =>
+          step.status === ConceptGraphPipelineStatusEnum.Finished,
+      )?.name === ConceptGraphPipelineStepsEnum.Graph
+    )
+      rank = 4
+    return '(' + rank.toString() + '/' + rankTotal + ')'
   } else if (isGraphPipelineFailed.value) {
-    rank = steps?.findLast((step: ConceptGraphPipelineStatus) => step.status === ConceptGraphPipelineStatusEnum.Finished,
+    rank = steps?.findLast(
+      (step: ConceptGraphPipelineStatus) => step.status === ConceptGraphPipelineStatusEnum.Finished,
     )?.rank
   } else {
-    rank = steps?.find(
-      (step: ConceptGraphPipelineStatus) => step.status === ConceptGraphPipelineStatusEnum.Running,
+    rank = steps?.find((step: ConceptGraphPipelineStatus) =>
+      Array.of(ConceptGraphPipelineStatusEnum.Running, ConceptGraphPipelineStatusEnum.Stopped).some(
+        (stat) => stat === step.status,
+      ),
     )?.rank
   }
-  return (
-    '(' +
-    (rank === undefined ? '-' : rank.toString()) +
-    '/' +
-    rankTotal +
-    ')'
-  )
+  return '(' + (rank === undefined ? '-' : rank.toString()) + '/' + rankTotal + ')'
 }
 
 function loadGraphPipeline() {
@@ -418,11 +428,9 @@ function loadGraphPipeline() {
 }
 
 function loadClusterPipeline() {
-  console.log('Load Cluster Pipeline')
   conceptClusterApi
     ?.getConceptClusterProcess(props.dataSource?.id)
     .then((r) => {
-      console.log(r.data)
       if (
         !r.data.pipelineId ||
         r.data.status == PipelineResponseStatus.Successful ||
@@ -449,17 +457,20 @@ function loadClusterPipeline() {
 }
 
 function confirmStartPipeline() {
+  const deletePipe =
+    graphPipeline.value?.steps?.length != undefined &&
+    graphPipeline.value?.steps.length < 4 &&
+    !skipPresent.value
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('conceptCluster.confirmStart'),
+      message:
+        deletePipe || skipPresent.value
+          ? t('conceptCluster.confirmStartSkip', { skip: t('conceptCluster.skipPresent') })
+          : t('conceptCluster.confirmStart', { skip: t('conceptCluster.skipPresent') }),
     },
   }).onOk(() => {
-    if (
-      graphPipeline.value?.steps?.length != undefined &&
-      graphPipeline.value?.steps.length < 4 &&
-      !skipPresent.value
-    ) {
+    if (deletePipe) {
       deletePipeline()
         .then(startPipeline)
         .catch((e: Error) => renderError(e))
@@ -500,14 +511,19 @@ function confirmPublishClusters() {
   }).onOk(() => {
     conceptClusterApi
       ?.deleteConceptClustersForPipelineId(props.dataSource.id)
-      .then(() =>
-        conceptClusterApi
-          ?.createConceptClustersForPipelineId(
-            props.dataSource.id,
-            selectedGraphs.value.map((c) => c.id),
-          )
-          .then(loadClusterPipeline)
-          .catch((e: Error) => renderError(e)),
+      .then(() => {
+          const creationDef = {
+            graphIds: selectedGraphs.value.map((c) => c.id),
+            phraseExclusions: []
+          } as ConceptClusterCreationDef
+          conceptClusterApi
+            ?.createConceptClustersForPipelineId(
+              props.dataSource.id,
+              creationDef
+            )
+            .then(loadClusterPipeline)
+            .catch((e: Error) => renderError(e))
+        }
       )
       .catch((e: Error) => renderError(e))
   })
@@ -558,9 +574,8 @@ async function deletePipeline() {
 }
 
 async function stopPipeline() {
-  return conceptPipelineApi
-    ?.stopConceptGraphPipeline(props.dataSource.id)
-    .then(() => Notify.create({ message: 'Stopping Pipeline', type: 'warning' }))
+  return conceptPipelineApi?.stopConceptGraphPipeline(props.dataSource.id)
+  // .then(() => Notify.create({ message: 'Stopping Pipeline', type: 'warning' }))
 }
 
 function getSelectedRowsString() {
@@ -644,11 +659,17 @@ function configurePipeline() {
 
 async function showPhrases(id: string) {
   await conceptPipelineApi?.getConceptGraph(props.dataSource.id, id).then((r) => {
+    const hasPhrases = selectedPhrases.value.has(id)
     $q.dialog({
       component: PhraseDialog,
       componentProps: {
         phrases: r.data.nodes,
+        storedPhrases: hasPhrases? selectedPhrases.value.get(id): undefined,
       },
+    }).onOk((committedPhrases: ConceptGraphNodes[]) => {
+      if (committedPhrases != undefined) {
+        selectedPhrases.value.set(id, committedPhrases)
+      }
     })
   })
 }

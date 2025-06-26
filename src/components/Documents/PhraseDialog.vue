@@ -11,9 +11,7 @@
           @remove="removePhrase(phrase)"
         >
           {{ phrase.label }}
-          <q-tooltip :delay="500">
-            #Documents: {{ phrase.documents?.length }}
-          </q-tooltip>
+          <q-tooltip :delay="500"> #Documents: {{ phrase.documents?.length }} </q-tooltip>
         </q-chip>
       </q-card-section>
     </q-card>
@@ -21,17 +19,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { ConceptGraphNodes } from '@onto-med/top-api'
+import { useDialogPluginComponent } from 'quasar'
+const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
 const props = defineProps({
-  phrases: Array<ConceptGraphNodes>
+  phrases: Array<ConceptGraphNodes>,
+  storedPhrases: Array<ConceptGraphNodes>,
 })
-const selectedPhrases = ref<ConceptGraphNodes[] | undefined>(props.phrases?.toSorted((a, b) => {
-  if (a.documents === undefined) return 1
-  if (b.documents === undefined) return -1
-  return b.documents.length - a.documents.length
-}))
+
+const selectedPhrases = ref<ConceptGraphNodes[]>(Array.of())
+
+onMounted(() => {
+  if (props.storedPhrases === undefined || props.storedPhrases.length === 0) {
+    props.phrases
+      ?.toSorted((a, b) => {
+        if (a.documents === undefined) return 1
+        if (b.documents === undefined) return -1
+        return b.documents.length - a.documents.length
+      })
+      .forEach((phrase) => {
+        selectedPhrases.value.push(phrase)
+      })
+  } else {
+    props.storedPhrases.forEach((phrase) => selectedPhrases.value.push(phrase))
+  }
+})
+
+onBeforeUnmount(() => {
+  onDialogOK(selectedPhrases.value)
+})
 
 function removePhrase(phrase: ConceptGraphNodes): void {
   const idx = selectedPhrases.value?.indexOf(phrase)
