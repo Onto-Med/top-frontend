@@ -297,6 +297,7 @@ const pipelineJsonConfig = ref<string>('')
 const selectedPhrases = ref<Map<string, ConceptGraphNodes[]>>(
   new Map<string, ConceptGraphNodes[]>(),
 )
+const excludedPhrases = ref<Set<string>>(new Set<string>())
 
 onMounted(() => {
   loadGraphPipeline()
@@ -512,19 +513,15 @@ function confirmPublishClusters() {
     conceptClusterApi
       ?.deleteConceptClustersForPipelineId(props.dataSource.id)
       .then(() => {
-          const creationDef = {
-            graphIds: selectedGraphs.value.map((c) => c.id),
-            phraseExclusions: []
-          } as ConceptClusterCreationDef
-          conceptClusterApi
-            ?.createConceptClustersForPipelineId(
-              props.dataSource.id,
-              creationDef
-            )
-            .then(loadClusterPipeline)
-            .catch((e: Error) => renderError(e))
-        }
-      )
+        const creationDef = {
+          graphIds: selectedGraphs.value.map((c) => c.id),
+          phraseExclusions: [...excludedPhrases.value]
+        } as ConceptClusterCreationDef
+        conceptClusterApi
+          ?.createConceptClustersForPipelineId(props.dataSource.id, creationDef)
+          .then(loadClusterPipeline)
+          .catch((e: Error) => renderError(e))
+      })
       .catch((e: Error) => renderError(e))
   })
 }
@@ -664,11 +661,12 @@ async function showPhrases(id: string) {
       component: PhraseDialog,
       componentProps: {
         phrases: r.data.nodes,
-        storedPhrases: hasPhrases? selectedPhrases.value.get(id): undefined,
+        storedPhrases: hasPhrases ? selectedPhrases.value.get(id) : undefined,
       },
-    }).onOk((committedPhrases: ConceptGraphNodes[]) => {
-      if (committedPhrases != undefined) {
-        selectedPhrases.value.set(id, committedPhrases)
+    }).onOk((phrasesPayload) => {
+      if (phrasesPayload != undefined) {
+        selectedPhrases.value.set(id, phrasesPayload.committed)
+        phrasesPayload.excluded.forEach((s: string) => excludedPhrases.value.add(s))
       }
     })
   })

@@ -48,7 +48,15 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  onDialogOK(selectedPhrases.value)
+  onDialogOK(
+    {
+      // excluded: props.phrases?.filter((phrase) => selectedPhrases.value.includes(phrase)).map((phrase) => phrase.id),
+      excluded: new Set<string|undefined>(props.phrases?.map((p) => p.id)).difference(
+        new Set<string|undefined>(selectedPhrases.value.map((p) => p.id))
+      ),
+      committed: selectedPhrases.value
+    }
+  )
 })
 
 function removePhrase(phrase: ConceptGraphNodes): void {
