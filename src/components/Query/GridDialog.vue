@@ -34,9 +34,22 @@
 
 <script setup lang="ts">
 import { useDialogPluginComponent } from 'quasar'
-import 'ag-grid-community/styles/ag-grid.css' // Core CSS
-import 'ag-grid-community/styles/ag-theme-quartz.css' // Theme
-import { AgGridVue } from 'ag-grid-vue3' // Vue Grid Logic
+import {
+  ModuleRegistry,
+  TextFilterModule,
+  NumberFilterModule,
+  DateFilterModule,
+  ClientSideRowModelModule,
+} from 'ag-grid-community'
+
+ModuleRegistry.registerModules([
+  TextFilterModule,
+  NumberFilterModule,
+  DateFilterModule,
+  ClientSideRowModelModule,
+])
+
+import { AgGridVue } from 'ag-grid-vue3'
 import Papa from 'papaparse'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
