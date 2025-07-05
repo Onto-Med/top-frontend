@@ -558,6 +558,7 @@ function pipelineResponseCheck(r: AxiosResponse<PipelineResponse>) {
       'negative',
     )
   }
+  return r
 }
 
 async function deletePipeline() {
@@ -572,7 +573,6 @@ async function deletePipeline() {
 
 async function stopPipeline() {
   return conceptPipelineApi?.stopConceptGraphPipeline(props.dataSource.id)
-  // .then(() => Notify.create({ message: 'Stopping Pipeline', type: 'warning' }))
 }
 
 function getSelectedRowsString() {
