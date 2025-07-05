@@ -74,7 +74,7 @@ const dataSources = ref<DataSource[]>([])
 const queryApi = inject(QueryApiKey)
 const query = ref<Query>()
 const documentIds = ref<Array<string>>()
-const documentOffsets = ref<{ [key: string]: string[]; }>()
+const documentOffsets = ref<{ [key: string]: string[] }>()
 const router = useRouter()
 
 useMeta({ title: t('documentSearch.title') })
