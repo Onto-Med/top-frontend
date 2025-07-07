@@ -343,7 +343,6 @@ watch(
 )
 
 async function reloadConcepts() {
-  console.log('reloadConcepts')
   if (!props.dataSource) concepts.value.length = 0
   if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value)
     return Promise.reject()
