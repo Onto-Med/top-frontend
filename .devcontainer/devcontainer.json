@@ -10,9 +10,7 @@
       "nodeGypDependencies": true,
       "version": "latest"
     },
-    "ghcr.io/devcontainers-contrib/features/quasar-cli": {
-      "version": "latest"
-    }
+    "ghcr.io/devcontainers-extra/features/quasar-cli:2": {}
   },
 
   // Features to add to the dev container. More info: https://containers.dev/features.
