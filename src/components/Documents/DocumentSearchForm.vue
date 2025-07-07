@@ -334,9 +334,8 @@ watch(
   () => {
     concepts.value.length = 0
     reloadConcepts()
-      // .then(() => reloadDocuments()) //Todo: this doesn't work here; don't really know why. Therefore, I put it outside of the "then" clause
+      .then(() => reloadDocuments())
       .catch((e: Error) => renderError(e))
-    reloadDocuments().catch((e: Error) => renderError(e))
   },
 )
 
@@ -360,6 +359,7 @@ async function reloadConcepts() {
         color: '',
       }) as ConceptColor[]
       selectedConcepts.value = []
+      return Promise.resolve()
     })
     .finally(() => (conceptsLoading.value = false))
 }
