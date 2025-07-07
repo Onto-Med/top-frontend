@@ -40,7 +40,8 @@ const { dialogRef } = useDialogPluginComponent()
 }
 .highlighted-text {
   height: 85vh;
-  width: 100% pre {
+  width: 100%;
+  pre {
     font-family: inherit;
     text-wrap: wrap;
     word-wrap: break-word;
