@@ -335,7 +335,10 @@ watch(
     concepts.value.length = 0
     reloadConcepts()
       .then(() => reloadDocuments())
-      .catch((e: Error) => renderError(e))
+      .catch((e: Error) => {
+        documents.value = undefined
+        renderError(e)
+      })
   },
 )
 

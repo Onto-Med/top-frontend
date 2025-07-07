@@ -115,7 +115,10 @@
                     <q-checkbox v-model="innerProps.selected"></q-checkbox>
                   </q-td>
                   <q-td key="phrases" :props="innerProps">
-                    <q-chip clickable @click="showPhrases(innerProps.row.id)">{{
+                    <q-chip v-if="hasExcludedPhrasesForId(innerProps.row.id)" clickable color="secondary" @click="showPhrases(innerProps.row.id)">{{
+                      innerProps.row.phrases
+                    }}</q-chip>
+                    <q-chip v-else clickable @click="showPhrases(innerProps.row.id)">{{
                       innerProps.row.phrases
                     }}</q-chip>
                   </q-td>
@@ -298,6 +301,7 @@ const selectedPhrases = ref<Map<string, ConceptGraphNodes[]>>(
   new Map<string, ConceptGraphNodes[]>(),
 )
 const excludedPhrases = ref<Set<string>>(new Set<string>())
+const modifiedPhraseGroups = ref<Map<string, boolean>>(new Map<string, boolean>())
 
 onMounted(() => {
   loadGraphPipeline()
@@ -654,19 +658,29 @@ function configurePipeline() {
     })
 }
 
+function hasPhraseForId(id: string) {
+  if (selectedGraphs.value === undefined) return false
+  return selectedPhrases.value.has(id) && selectedPhrases.value.get(id)!.length > 0
+}
+
+function hasExcludedPhrasesForId(id: string) {
+  if (modifiedPhraseGroups.value != undefined && !modifiedPhraseGroups.value.has(id)) return false
+  return modifiedPhraseGroups.value.get(id)
+}
+
 async function showPhrases(id: string) {
   await conceptPipelineApi?.getConceptGraph(props.dataSource.id, id).then((r) => {
-    const hasPhrases = selectedPhrases.value.has(id)
     $q.dialog({
       component: PhraseDialog,
       componentProps: {
         phrases: r.data.nodes,
-        storedPhrases: hasPhrases ? selectedPhrases.value.get(id) : undefined,
+        storedPhrases: hasPhraseForId(id) ? selectedPhrases.value.get(id) : undefined,
       },
     }).onOk((phrasesPayload) => {
       if (phrasesPayload != undefined) {
         selectedPhrases.value.set(id, phrasesPayload.committed)
         phrasesPayload.excluded.forEach((s: string) => excludedPhrases.value.add(s))
+        if (r.data.nodes != undefined) modifiedPhraseGroups.value.set(id, r.data.nodes.length != phrasesPayload.committed.length)
       }
     })
   })
