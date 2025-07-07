@@ -295,17 +295,17 @@ const conceptModeOptions = computed(() => [
   {
     label: t('exclusive'),
     value: 'exclusive',
-    icon: 'mdi-circle',
+    icon: 'adjust',
   },
   {
     label: t('union'),
     value: 'union',
-    icon: 'mdi-set-all',
+    icon: 'join_full',
   },
   {
     label: t('intersection'),
     value: 'intersection',
-    icon: 'mdi-set-center',
+    icon: 'join_inner',
   },
 ])
 
