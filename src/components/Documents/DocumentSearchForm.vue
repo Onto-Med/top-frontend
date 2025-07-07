@@ -343,6 +343,7 @@ watch(
 )
 
 async function reloadConcepts() {
+  console.log('reloadConcepts')
   if (!props.dataSource) concepts.value.length = 0
   if (!props.dataSource || !conceptApi || !documentApi || conceptsLoading.value)
     return Promise.reject()
@@ -457,8 +458,10 @@ function showRegenerateDialog() {
       conceptCluster: concepts.value,
       configJsonMap: pipelineConfigMap.value,
     },
-  }).onOk(() => {
-    reloadConcepts().catch((e: Error) => renderError(e))
+  }).onOk((payload) => {
+    if (payload != undefined) {
+      if (payload.deletedPipeline || payload.finishedPipelineManager) reloadConcepts().catch((e: Error) => renderError(e))
+    }
   })
 }
 

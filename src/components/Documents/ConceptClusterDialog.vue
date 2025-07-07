@@ -184,7 +184,7 @@ import {
 import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
+import {computed, inject, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from 'vue'
 import { languages } from 'src/config'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
@@ -211,7 +211,7 @@ const props = defineProps({
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
-const { dialogRef, onDialogHide } = useDialogPluginComponent()
+const { dialogRef, onDialogOK } = useDialogPluginComponent()
 const { renderError, notify } = useNotify()
 const $q = useQuasar()
 const entityStore = useEntityStore()
@@ -306,6 +306,12 @@ const modifiedPhraseGroups = ref<Map<string, boolean>>(new Map<string, boolean>(
 onMounted(() => {
   loadGraphPipeline()
   populateConfigMap()
+})
+
+onBeforeUnmount(() => {
+  onDialogOK(
+    {finishedPipelineManager: false, deletedPipeline: graphPipeline.value === undefined}
+  )
 })
 
 onUnmounted(() => {
@@ -566,7 +572,6 @@ function pipelineResponseCheck(r: AxiosResponse<PipelineResponse>) {
 }
 
 async function deletePipeline() {
-  //ToDo: reload concept clusters in DocumentSearchForm when pipeline is deleted
   window.clearInterval(graphPipelineInterval.value)
   graphPipelineInterval.value = undefined
   clearConfig(props.dataSource.id)
@@ -588,7 +593,7 @@ function conceptGraphStep() {
     loadConceptGraphs()
     stepper?.value?.next()
   } else {
-    onDialogHide()
+    onDialogOK({finishedPipelineManager: true, deletedPipeline: graphPipeline.value === undefined})
   }
 }
 
