@@ -254,6 +254,16 @@ async function test() {
 
   await repositoryApi
     .testRepository(organisation.value.id, repository.value.id, selectedDataSourceId.value)
+    .then(async (r) => {
+      if (r.data) {
+        for (const report of r.data) {
+          if (report.entityId) {
+            await entityStore.loadEntity(report.entityId)
+          }
+        }
+      }
+      return r
+    })
     .then((r) => {
       testReports.value = r.data
     })
