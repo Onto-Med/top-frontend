@@ -192,7 +192,7 @@ const props = defineProps<{
   dataSource?: DataSource
   query?: Query
   documentFilter?: Array<string>
-  documentQueryOffsets?: { [key: string]: string[] }
+  documentQueryOffsets?: { [key: string]: string[]; }
 }>()
 
 const emit = defineEmits(['clearQuery'])
@@ -295,17 +295,17 @@ const conceptModeOptions = computed(() => [
   {
     label: t('exclusive'),
     value: 'exclusive',
-    icon: 'mdi-circle',
+    icon: 'adjust',
   },
   {
     label: t('union'),
     value: 'union',
-    icon: 'mdi-set-all',
+    icon: 'join_full',
   },
   {
     label: t('intersection'),
     value: 'intersection',
-    icon: 'mdi-set-center',
+    icon: 'join_inner',
   },
 ])
 
@@ -315,6 +315,8 @@ const mostImportantNodesOptions = computed(() => [
 ])
 
 const loading = computed(() => conceptsLoading.value || documentsLoading.value)
+
+const pipelineConfigMap = ref<Map<string, Map<string, string>>>(new Map<string, Map<string, string>>())
 
 onMounted(() =>
   entityStore
@@ -333,7 +335,10 @@ watch(
     concepts.value.length = 0
     reloadConcepts()
       .then(() => reloadDocuments())
-      .catch((e: Error) => renderError(e))
+      .catch((e: Error) => {
+        documents.value = undefined
+        renderError(e)
+      })
   },
 )
 
@@ -357,6 +362,7 @@ async function reloadConcepts() {
         color: '',
       }) as ConceptColor[]
       selectedConcepts.value = []
+      return Promise.resolve()
     })
     .finally(() => (conceptsLoading.value = false))
 }
@@ -415,8 +421,7 @@ async function checkPipeline() {
 
 async function chooseDocument(document: Document) {
   if (document.id == null) return
-  const offsets =
-    props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
+  const offsets = props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
   if (!props.dataSource) return Promise.reject()
   const conceptIds = new Array<string>()
   for (const c of selectedConcepts.value) {
@@ -450,9 +455,12 @@ function showRegenerateDialog() {
     componentProps: {
       dataSource: props.dataSource,
       conceptCluster: concepts.value,
+      configJsonMap: pipelineConfigMap.value,
     },
-  }).onOk(() => {
-    reloadConcepts().catch((e: Error) => renderError(e))
+  }).onOk((payload) => {
+    if (payload != undefined) {
+      if (payload.deletedPipeline || payload.finishedPipelineManager) reloadConcepts().catch((e: Error) => renderError(e))
+    }
   })
 }
 

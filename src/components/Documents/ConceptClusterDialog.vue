@@ -1,6 +1,6 @@
 <template>
   <q-dialog ref="dialogRef">
-    <q-card class="content">
+    <q-card class="content" style="min-width: 600px; max-width: min-content">
       <q-card-section class="row items-center q-gutter-sm">
         <div class="col text-h6">
           {{
@@ -19,7 +19,7 @@
               <small>{{ t('conceptCluster.preProcessingDescription') }}</small>
             </p>
             <p class="text-subtitle1">
-              <b>{{ t('status') }}:</b> {{ graphPipelineStatus }}
+              <b>{{ t('status') }}:</b> {{ graphPipelineStatus }} {{ graphStatusDetailsTrack }}
               <q-spinner v-if="graphPipelineInterval" size="xs" class="q-ml-sm" />
               <q-icon
                 v-else-if="isGraphPipelineFailed"
@@ -108,7 +108,32 @@
               wrap-cells
               row-key="id"
               selection="multiple"
-            />
+            >
+              <template #body="innerProps">
+                <q-tr :props="innerProps">
+                  <q-td auto-width>
+                    <q-checkbox v-model="innerProps.selected"></q-checkbox>
+                  </q-td>
+                  <q-td key="phrases" :props="innerProps">
+                    <q-chip v-if="hasExcludedPhrasesForId(innerProps.row.id)" clickable color="secondary" @click="showPhrases(innerProps.row.id)">{{
+                      innerProps.row.phrases
+                    }}</q-chip>
+                    <q-chip v-else clickable @click="showPhrases(innerProps.row.id)">{{
+                      innerProps.row.phrases
+                    }}</q-chip>
+                  </q-td>
+                  <q-td key="nodes" :props="innerProps">
+                    {{ innerProps.row.nodes }}
+                  </q-td>
+                  <q-td key="edges" :props="innerProps">
+                    {{ innerProps.row.edges }}
+                  </q-td>
+                  <q-td key="id" :props="innerProps">
+                    {{ innerProps.row.id }}
+                  </q-td>
+                </q-tr>
+              </template>
+            </q-table>
           </q-step>
           <template #navigation>
             <q-separator />
@@ -150,14 +175,16 @@ import {
   ConceptGraphPipeline,
   ConceptGraphPipelineStatus,
   ConceptGraphPipelineStatusEnum,
+  ConceptGraphPipelineStepsEnum,
+  ConceptClusterCreationDef,
   DataSource,
   PipelineResponse,
   PipelineResponseStatus,
 } from '@onto-med/top-api'
-import { Notify, QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
+import { QStepper, QTableProps, useDialogPluginComponent, useQuasar } from 'quasar'
 import { ConceptClusterApiKey, ConceptPipelineApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
+import {computed, inject, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from 'vue'
 import { languages } from 'src/config'
 import { useI18n } from 'vue-i18n'
 import Dialog from '../Dialog.vue'
@@ -165,18 +192,26 @@ import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
 import PipelineConfigForm from 'components/Documents/PipelineConfigForm.vue'
 import { AxiosResponse } from 'axios'
+import PhraseDialog from 'components/Documents/PhraseDialog.vue'
 
 const props = defineProps({
   dataSource: {
     type: Object as () => DataSource,
     required: true,
   },
-  conceptCluster: Array as () => ConceptCluster[],
+  conceptCluster: {
+    type: Array as () => ConceptCluster[],
+    required: true,
+  },
+  configJsonMap: {
+    type: Map<string, Map<string, string>>,
+    required: true,
+  },
 })
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
-const { dialogRef, onDialogHide } = useDialogPluginComponent()
+const { dialogRef, onDialogOK } = useDialogPluginComponent()
 const { renderError, notify } = useNotify()
 const $q = useQuasar()
 const entityStore = useEntityStore()
@@ -219,6 +254,7 @@ const isClusterPipelineRunning = computed(
 const graphPipelineStatus = computed(() => statusToString(graphPipeline.value?.status))
 const clusterPipelineStatus = computed(() => statusToString(clusterPipeline.value?.status))
 const graphPipelineStatusDetails = computed(() => statusDetailsToString(graphPipeline.value?.steps))
+const graphStatusDetailsTrack = computed(() => statusDetailsAsCount(graphPipeline.value?.steps))
 
 const graphColumns = computed(
   () =>
@@ -261,9 +297,21 @@ const startPipelineButtonTitle = computed(() => {
 })
 
 const pipelineJsonConfig = ref<string>('')
+const selectedPhrases = ref<Map<string, ConceptGraphNodes[]>>(
+  new Map<string, ConceptGraphNodes[]>(),
+)
+const excludedPhrases = ref<Set<string>>(new Set<string>())
+const modifiedPhraseGroups = ref<Map<string, boolean>>(new Map<string, boolean>())
 
 onMounted(() => {
   loadGraphPipeline()
+  populateConfigMap()
+})
+
+onBeforeUnmount(() => {
+  onDialogOK(
+    {finishedPipelineManager: false, deletedPipeline: graphPipeline.value === undefined}
+  )
 })
 
 onUnmounted(() => {
@@ -271,25 +319,91 @@ onUnmounted(() => {
   window.clearInterval(clusterPipelineInterval.value)
 })
 
-//ToDo: maybe don't erase config on language switch when a manual save was already commited?
 watch(language, () => {
-  pipelineJsonConfig.value = ''
+  pipelineJsonConfig.value = language.value != undefined ? getConfig(language.value) : ''
 })
+
+function getConfig(lang: string): string {
+  const process = props.dataSource.id
+  const configs = props.configJsonMap
+  if (configs === undefined || process === undefined) return ''
+  if (configs.has(process)) {
+    if (configs.get(process) === undefined) return ''
+    return configs.get(process)!.has(lang) ? configs.get(process)!.get(lang)! : ''
+  }
+  return ''
+}
+
+function clearConfig(process: string) {
+  const configs = props.configJsonMap
+  if (configs?.has(process)) configs.delete(process)
+}
+
+function populateConfigMap() {
+  const process = props.dataSource.id
+  const configs = props.configJsonMap
+  if (!configs?.has(process)) {
+    const langConfigs = new Map<string, string>()
+    for (const lang of languages) {
+      langConfigs.set(lang.value, '')
+    }
+    configs?.set(process, langConfigs)
+  } else {
+    const langConfigs = configs?.get(process)
+    const missingLangs = Array<string>()
+    languages
+      .filter((lang) => {
+        return !langConfigs?.has(lang.value)
+      })
+      .forEach((lang) => missingLangs.push(lang.value))
+    missingLangs.forEach((l) => langConfigs?.set(l, ''))
+  }
+}
 
 function statusToString(status?: PipelineResponseStatus) {
   return !status ? t('unavailable') : te(status) ? t(status) : status
 }
 
 function statusDetailsToString(steps?: ConceptGraphPipelineStatus[]) {
-  let returnString = 'Unfinished steps: '
+  let returnString = t('conceptCluster.unfinishedSteps') + ': '
   steps
     ?.filter((step: ConceptGraphPipelineStatus) => {
-      return step.status != ConceptGraphPipelineStatusEnum.Finished
+      return !Array.of(
+        ConceptGraphPipelineStatusEnum.Finished,
+        ConceptGraphPipelineStatusEnum.Stopped,
+      ).some((stat) => stat === step.status)
     })
     .forEach((step: ConceptGraphPipelineStatus) => {
       returnString += '"' + step.name + '", '
     })
   return returnString.slice(0, returnString.length - 2)
+}
+
+function statusDetailsAsCount(steps?: ConceptGraphPipelineStatus[]) {
+  let rank
+  const rankTotal = steps === undefined ? '-' : steps.length.toString()
+  if (isGraphPipelineFinished.value) {
+    rank = 5
+    if (
+      steps?.findLast(
+        (step: ConceptGraphPipelineStatus) =>
+          step.status === ConceptGraphPipelineStatusEnum.Finished,
+      )?.name === ConceptGraphPipelineStepsEnum.Graph
+    )
+      rank = 4
+    return '(' + rank.toString() + '/' + rankTotal + ')'
+  } else if (isGraphPipelineFailed.value) {
+    rank = steps?.findLast(
+      (step: ConceptGraphPipelineStatus) => step.status === ConceptGraphPipelineStatusEnum.Finished,
+    )?.rank
+  } else {
+    rank = steps?.find((step: ConceptGraphPipelineStatus) =>
+      Array.of(ConceptGraphPipelineStatusEnum.Running, ConceptGraphPipelineStatusEnum.Stopped).some(
+        (stat) => stat === step.status,
+      ),
+    )?.rank
+  }
+  return '(' + (rank === undefined ? '-' : rank.toString()) + '/' + rankTotal + ')'
 }
 
 function loadGraphPipeline() {
@@ -354,15 +468,26 @@ function loadClusterPipeline() {
 }
 
 function confirmStartPipeline() {
+  const deletePipe =
+    graphPipeline.value?.steps?.length != undefined &&
+    graphPipeline.value?.steps.length < 4 &&
+    !skipPresent.value
   $q.dialog({
     component: Dialog,
     componentProps: {
-      message: t('conceptCluster.confirmStart'),
+      message:
+        deletePipe || skipPresent.value
+          ? t('conceptCluster.confirmStartSkip', { skip: t('conceptCluster.skipPresent') })
+          : t('conceptCluster.confirmStart', { skip: t('conceptCluster.skipPresent') }),
     },
   }).onOk(() => {
-    deletePipeline()
-      .then(startPipeline)
-      .catch((e: Error) => renderError(e))
+    if (deletePipe) {
+      deletePipeline()
+        .then(startPipeline)
+        .catch((e: Error) => renderError(e))
+    } else {
+      startPipeline().catch((e: Error) => renderError(e))
+    }
   })
 }
 
@@ -397,15 +522,16 @@ function confirmPublishClusters() {
   }).onOk(() => {
     conceptClusterApi
       ?.deleteConceptClustersForPipelineId(props.dataSource.id)
-      .then(() =>
+      .then(() => {
+        const creationDef = {
+          graphIds: selectedGraphs.value.map((c) => c.id),
+          phraseExclusions: [...excludedPhrases.value]
+        } as ConceptClusterCreationDef
         conceptClusterApi
-          ?.createConceptClustersForPipelineId(
-            props.dataSource.id,
-            selectedGraphs.value.map((c) => c.id),
-          )
+          ?.createConceptClustersForPipelineId(props.dataSource.id, creationDef)
           .then(loadClusterPipeline)
-          .catch((e: Error) => renderError(e)),
-      )
+          .catch((e: Error) => renderError(e))
+      })
       .catch((e: Error) => renderError(e))
   })
 }
@@ -419,6 +545,7 @@ async function startPipeline() {
       .then(pipelineResponseCheck)
       .then(loadGraphPipeline)
   } else {
+    // ToDo: warning for this! as it calls a sup-par endpoint -> or might be better to reroute it to call with json by loading defaults
     return conceptPipelineApi
       ?.startConceptGraphPipeline(
         props.dataSource.id,
@@ -441,21 +568,20 @@ function pipelineResponseCheck(r: AxiosResponse<PipelineResponse>) {
       'negative',
     )
   }
+  return r
 }
 
 async function deletePipeline() {
-  //ToDo: reload concept clusters in DocumentSearchForm when pipeline is deleted
   window.clearInterval(graphPipelineInterval.value)
   graphPipelineInterval.value = undefined
+  clearConfig(props.dataSource.id)
   return conceptPipelineApi
     ?.deleteConceptPipelineById(props.dataSource.id)
     .then(() => (graphPipeline.value = undefined))
 }
 
 async function stopPipeline() {
-  return conceptPipelineApi
-    ?.stopConceptGraphPipeline(props.dataSource.id)
-    .then(() => Notify.create({ message: 'Stopping Pipeline', type: 'warning' }))
+  return conceptPipelineApi?.stopConceptGraphPipeline(props.dataSource.id)
 }
 
 function getSelectedRowsString() {
@@ -467,7 +593,7 @@ function conceptGraphStep() {
     loadConceptGraphs()
     stepper?.value?.next()
   } else {
-    onDialogHide()
+    onDialogOK({finishedPipelineManager: true, deletedPipeline: graphPipeline.value === undefined})
   }
 }
 
@@ -502,7 +628,10 @@ function loadConceptGraphs() {
           phrases: labels.join(' | '),
         } as ConceptGraphObject
         conceptGraphs.value.push(graph)
-        if (props.conceptCluster?.some((c) => c.id === id)) {
+        if (
+          props.conceptCluster?.some((c) => c.id === id) &&
+          !selectedGraphs.value.some((e) => e.id === id)
+        ) {
           selectedGraphs.value.push(graph)
         }
       }
@@ -514,10 +643,9 @@ function loadConceptGraphs() {
 function configurePipeline() {
   // pipelineId only gets submitted to 'configure dialog' (and therefore a configuration for it is loaded)
   // when the relevant 'graphPipeline' is finished, else a language default configuration is loaded
+  //ToDo: can't reset config to some default when pipeline didn't finish
   let pipelineIdSubmit = undefined
-  //ToDo: config of an unfinished pipeline is not loaded with this setup
   if (isGraphPipelineFinished.value) pipelineIdSubmit = graphPipeline.value?.pipelineId
-  //ToDo: pipelineJsonConfig is not persisted between closing/opening ConceptClusterDialog
   $q.dialog({
     component: PipelineConfigForm,
     componentProps: {
@@ -528,10 +656,39 @@ function configurePipeline() {
   })
     .onOk((jsonConfig: string) => {
       pipelineJsonConfig.value = jsonConfig
+      props.configJsonMap.get(props.dataSource.id)!.set(language.value!, jsonConfig)
     })
     .onCancel(() => {
       //ToDo: need something here to be done on Cancel?
     })
+}
+
+function hasPhraseForId(id: string) {
+  if (selectedGraphs.value === undefined) return false
+  return selectedPhrases.value.has(id) && selectedPhrases.value.get(id)!.length > 0
+}
+
+function hasExcludedPhrasesForId(id: string) {
+  if (modifiedPhraseGroups.value != undefined && !modifiedPhraseGroups.value.has(id)) return false
+  return modifiedPhraseGroups.value.get(id)
+}
+
+async function showPhrases(id: string) {
+  await conceptPipelineApi?.getConceptGraph(props.dataSource.id, id).then((r) => {
+    $q.dialog({
+      component: PhraseDialog,
+      componentProps: {
+        phrases: r.data.nodes,
+        storedPhrases: hasPhraseForId(id) ? selectedPhrases.value.get(id) : undefined,
+      },
+    }).onOk((phrasesPayload) => {
+      if (phrasesPayload != undefined) {
+        selectedPhrases.value.set(id, phrasesPayload.committed)
+        phrasesPayload.excluded.forEach((s: string) => excludedPhrases.value.add(s))
+        if (r.data.nodes != undefined) modifiedPhraseGroups.value.set(id, r.data.nodes.length != phrasesPayload.committed.length)
+      }
+    })
+  })
 }
 
 interface ConceptGraphObject {
