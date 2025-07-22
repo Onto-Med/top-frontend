@@ -68,7 +68,7 @@
             <q-avatar :icon="entry.icon" size="8rem" />
             <div class="text-h6">
               {{ entry.label }}
-              <q-badge v-if="statistic" :label="statistic[entry.key as statisticKey]" />
+              <q-badge v-if="statistic" :label="formatCountLabel(entry.key)" />
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { Statistic } from '@onto-med/top-api'
+import {DocumentCounts, Statistic} from '@onto-med/top-api'
 import { DefaultApiKey } from 'src/boot/axios'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -113,6 +113,17 @@ onMounted(() => {
     .then((r) => (statistic.value = r.data))
     .catch(() => renderError({ message: t('errorLoadingData') } as Error))
 })
+
+function formatCountLabel(key: string): string {
+  if (statistic.value === undefined) return "0"
+  const countLabel = statistic.value[key as statisticKey]
+  if (countLabel === undefined) return "0"
+  if (key === 'documents') {
+    return (countLabel as DocumentCounts).graphDB + "/" + (countLabel as DocumentCounts).documentServer
+  }
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
+  return countLabel.toString()
+}
 
 function routeTo(name: string) {
   void router.push({ name })
