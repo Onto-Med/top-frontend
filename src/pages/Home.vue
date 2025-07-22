@@ -68,7 +68,11 @@
             <q-avatar :icon="entry.icon" size="8rem" />
             <div class="text-h6">
               {{ entry.label }}
-              <q-badge v-if="statistic" :label="formatCountLabel(entry.key)" />
+              <q-badge v-if="statistic" :label="formatCountLabel(entry.key)">
+                <q-tooltip v-if="entry.key === 'documents'" :delay="500">
+                  {{ t('home_.documentCountToolTip') }}
+                </q-tooltip>
+              </q-badge>
             </div>
           </div>
         </div>
