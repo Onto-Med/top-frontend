@@ -364,6 +364,10 @@ async function reloadConcepts() {
       selectedConcepts.value = []
       return Promise.resolve()
     })
+    .catch(() => reloadDocuments().catch((e: Error) => {
+      documents.value = undefined
+      renderError(e)
+    }))
     .finally(() => (conceptsLoading.value = false))
 }
 
