@@ -1,6 +1,6 @@
 {
   "name": "top-frontend",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "description": "An app for ontological modelling and managing of phenotypes.",
   "productName": "TOP Framework",
   "repository": {
@@ -21,7 +21,7 @@
   "dependencies": {
     "@dsb-norge/vue-keycloak-js": "^3.0.2",
     "@lhncbc/ucum-lhc": "^7.1.2",
-    "@onto-med/top-api": "^0.13.2-e02ca79",
+    "@onto-med/top-api": "^0.13.2",
     "@quasar/extras": "^1.16.17",
     "@types/papaparse": "^5.3.14",
     "@zip.js/zip.js": "^2.7.60",
