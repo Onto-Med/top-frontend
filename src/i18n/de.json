@@ -435,7 +435,8 @@
     },
     "content": {
       "header": "Diese Instanz hat folgenden Inhalt:"
-    }
+    },
+    "documentCountToolTip": "Dokumente in der Graph-Datenbank / Dokumente auf dem Dokumenten-Server"
   },
   "model": "Modell|Modelle",
   "navbar": {
