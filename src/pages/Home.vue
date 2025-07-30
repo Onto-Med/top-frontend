@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import {DocumentCounts, Statistic} from '@onto-med/top-api'
+import { DocumentCounts, Statistic } from '@onto-med/top-api'
 import { DefaultApiKey } from 'src/boot/axios'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -119,11 +119,13 @@ onMounted(() => {
 })
 
 function formatCountLabel(key: string): string {
-  if (statistic.value === undefined) return "0"
+  if (statistic.value === undefined) return '0'
   const countLabel = statistic.value[key as statisticKey]
-  if (countLabel === undefined) return "0"
+  if (countLabel === undefined) return '0'
   if (key === 'documents') {
-    return (countLabel as DocumentCounts).graphDB + "/" + (countLabel as DocumentCounts).documentServer
+    return (
+      (countLabel as DocumentCounts).graphDB + '/' + (countLabel as DocumentCounts).documentServer
+    )
   }
   // eslint-disable-next-line @typescript-eslint/no-base-to-string
   return countLabel.toString()

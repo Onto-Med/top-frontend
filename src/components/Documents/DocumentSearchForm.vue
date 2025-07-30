@@ -192,7 +192,7 @@ const props = defineProps<{
   dataSource?: DataSource
   query?: Query
   documentFilter?: Array<string>
-  documentQueryOffsets?: { [key: string]: string[]; }
+  documentQueryOffsets?: { [key: string]: string[] }
 }>()
 
 const emit = defineEmits(['clearQuery'])
@@ -316,7 +316,9 @@ const mostImportantNodesOptions = computed(() => [
 
 const loading = computed(() => conceptsLoading.value || documentsLoading.value)
 
-const pipelineConfigMap = ref<Map<string, Map<string, string>>>(new Map<string, Map<string, string>>())
+const pipelineConfigMap = ref<Map<string, Map<string, string>>>(
+  new Map<string, Map<string, string>>(),
+)
 
 onMounted(() =>
   entityStore
@@ -426,7 +428,8 @@ async function checkPipeline() {
 
 async function chooseDocument(document: Document) {
   if (document.id == null) return
-  const offsets = props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
+  const offsets =
+    props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
   if (!props.dataSource) return Promise.reject()
   const conceptIds = new Array<string>()
   for (const c of selectedConcepts.value) {
@@ -464,7 +467,8 @@ function showRegenerateDialog() {
     },
   }).onOk((payload) => {
     if (payload != undefined) {
-      if (payload.deletedPipeline || payload.finishedPipelineManager) reloadConcepts().catch((e: Error) => renderError(e))
+      if (payload.deletedPipeline || payload.finishedPipelineManager)
+        reloadConcepts().catch((e: Error) => renderError(e))
     }
   })
 }
