@@ -435,7 +435,8 @@
     },
     "content": {
       "header": "This instance has the following content:"
-    }
+    },
+    "documentCountToolTip": "Documents in the Graph Database / Documents on the Document Server"
   },
   "model": "Model|Models",
   "navbar": {
