@@ -113,6 +113,7 @@
           no-caps
           no-wrap
           class="q-py-none"
+          @click="poseQuestionToRag"
         >
           <q-icon name="smart_toy" />
           <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
@@ -194,6 +195,7 @@ import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
 import { useRouter } from 'vue-router'
+import RAGQuestionDialog from 'components/Documents/RAGQuestionDialog.vue'
 
 interface ConceptColor {
   'background-color'?: string
@@ -333,6 +335,11 @@ const pipelineConfigMap = ref<Map<string, Map<string, string>>>(
   new Map<string, Map<string, string>>(),
 )
 
+const conceptClusterIds = computed(() => selectedConcepts.value
+  .map((c) => concepts.value[c]?.id)
+  .filter((id) => id !== undefined)
+)
+
 onMounted(() =>
   entityStore
     .loadUser()
@@ -393,9 +400,7 @@ async function reloadDocuments(name?: string, page = 1) {
     return Promise.reject()
   documents.value = undefined
   document_.value = undefined
-  const conceptClusterIds = selectedConcepts.value
-    .map((c) => concepts.value[c]?.id)
-    .filter((id) => id !== undefined)
+
   documentsLoading.value = true
   return documentApi
     .getDocuments(
@@ -403,7 +408,7 @@ async function reloadDocuments(name?: string, page = 1) {
       name,
       props.documentFilter,
       undefined,
-      conceptClusterIds,
+      conceptClusterIds.value,
       undefined,
       conceptMode.value,
       mostImportantNodes.value,
@@ -491,6 +496,38 @@ function routeToDocumentQuery() {
     name: 'queryBuilder',
     params: { organisationId: undefined, repositoryId: undefined, queryId: undefined },
     query: { dataSourceId: props.dataSource?.id },
+  })
+}
+
+async function poseQuestionToRag() {
+  if (!props.dataSource || !documentApi || documentsLoading.value) return
+  const documentIds = new Array<string>()
+  let page = 1
+  let breakWhile = false
+  while (!breakWhile) {
+    await documentApi
+      .getDocuments(
+        props.dataSource.id,
+        undefined,
+        props.documentFilter,
+        undefined,
+        conceptClusterIds.value,
+        undefined,
+        conceptMode.value,
+        mostImportantNodes.value,
+        page,
+      ).then((r) => {
+        r.data.content.forEach((doc) => {if (doc.id != undefined) documentIds.push(doc.id)})
+        if (page++ > r.data.totalPages) breakWhile = true
+      })
+  }
+
+  $q.dialog({
+    component: RAGQuestionDialog,
+    componentProps: {
+      documents: documentIds,
+      process: props.dataSource.id
+    },
   })
 }
 </script>

@@ -12,6 +12,7 @@ import {
   UserApi,
   CodeApi,
   ConceptPipelineApi,
+  RagApi,
 } from '@onto-med/top-api'
 import { InjectionKey } from 'vue'
 import Keycloak from 'keycloak-js'
@@ -33,6 +34,7 @@ export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 export const PhraseApiKey: InjectionKey<PhraseApi> = Symbol('phraseApi')
 export const ConceptClusterApiKey: InjectionKey<ConceptclusterApi> = Symbol('conceptClusterApi')
 export const ConceptPipelineApiKey: InjectionKey<ConceptPipelineApi> = Symbol('conceptPipelineApi')
+export const RagApiKey: InjectionKey<RagApi> = Symbol('RagApi')
 export const UserApiKey: InjectionKey<UserApi> = Symbol('userApi')
 export const CodeApiKey: InjectionKey<CodeApi> = Symbol('codeApi')
 
@@ -65,6 +67,7 @@ export default defineBoot(({ app }) => {
   app.provide(PhraseApiKey, new PhraseApi(undefined, '', api))
   app.provide(ConceptClusterApiKey, new ConceptclusterApi(undefined, '', api))
   app.provide(ConceptPipelineApiKey, new ConceptPipelineApi(undefined, '', api))
+  app.provide(RagApiKey, new RagApi(undefined, '', api))
   app.provide(UserApiKey, new UserApi(undefined, '', api))
   app.provide(CodeApiKey, new CodeApi(undefined, '', api))
 })

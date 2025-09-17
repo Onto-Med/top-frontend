@@ -568,6 +568,7 @@
     }
   },
   "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
+  "documentsForRAG": "AI search in {numberOfDocs} documents.",
   "configurationOfPipeline": "Pipeline configuration",
   "clusterReview": "Cluster review|Cluster reviews",
   "preProcessing": "Pre-processing",
@@ -621,5 +622,7 @@
   "passed": "Passed",
   "appKeywords": "document-search, phenotype algorithm, phenotype definition, phenotype library, phenotyping, terminology",
   "uploadDataSourceDescription": "Please specify a unique data source ID. Reusing an existing ID will append any uploaded data, replacing any values with matching primary keys.",
-  "useRag": "AI"
+  "useRag": "AI",
+  "question": "Question",
+  "questioning": "Questioning"
 }
