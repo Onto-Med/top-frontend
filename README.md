@@ -31,7 +31,7 @@ npm run dev
 You can specify the following environment variables via `.env` file or command line:
 
 | variable name                     | default value                                                                                  | description                                                                      |
-| --------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+|-----------------------------------| ---------------------------------------------------------------------------------------------- |----------------------------------------------------------------------------------|
 | OAUTH2_ENABLED                    | false                                                                                          | Enable or disable authentication via Keycloak                                    |
 | OAUTH2_URL                        | http://127.0.0.1:8081/                                                                         | Keycloak URL                                                                     |
 | OAUTH2_REALM                      | top-realm                                                                                      | Keycloak realm name                                                              |
@@ -41,6 +41,7 @@ You can specify the following environment variables via `.env` file or command l
 | GDPR_POLICY_URL                   |                                                                                                | Policy URL that is linked from the GDPR notice                                   |
 | SYSTEM_NOTICE                     |                                                                                                | Text that should be displayed as system notice                                   |
 | DOCUMENTS_ENABLED                 | false                                                                                          | Enable or disable document search                                                |
+| RAG_ENABLED                       | false                                                                                          | Enable or disable RAG component                                                  |
 | TOP_PHENOTYPIC_QUERY_DOC_BASE_URL | https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner | This URL is used to generate deep links to functions and constants documentation |
 
 ### Lint the files

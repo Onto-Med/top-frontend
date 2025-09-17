@@ -620,5 +620,6 @@
   "passedCount": "{passed} of {total} passed",
   "passed": "Passed",
   "appKeywords": "document-search, phenotype algorithm, phenotype definition, phenotype library, phenotyping, terminology",
-  "uploadDataSourceDescription": "Please specify a unique data source ID. Reusing an existing ID will append any uploaded data, replacing any values with matching primary keys."
+  "uploadDataSourceDescription": "Please specify a unique data source ID. Reusing an existing ID will append any uploaded data, replacing any values with matching primary keys.",
+  "useRag": "AI"
 }

@@ -620,5 +620,6 @@
   "passedCount": "{passed} von {total} bestanden",
   "passed": "Bestanden",
   "appKeywords": "Dokumentsuche, Phänotyp-Algorithmus, Phänotypdefinition, Phänotypbibliothek, Phänotypisierung, Terminologie",
-  "uploadDataSourceDescription": "Bitte geben Sie eine eindeutige Datenquellen-ID an. Die Wiederverwendung einer vorhandenen ID appendiert hochgeladene Daten und ersetzt alle Werte mit übereinstimmtendem Primärschlüssel."
+  "uploadDataSourceDescription": "Bitte geben Sie eine eindeutige Datenquellen-ID an. Die Wiederverwendung einer vorhandenen ID appendiert hochgeladene Daten und ersetzt alle Werte mit übereinstimmtendem Primärschlüssel.",
+  "useRag": "KI"
 }

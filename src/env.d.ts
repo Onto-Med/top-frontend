@@ -15,7 +15,8 @@ declare namespace NodeJS {
     GDPR_NOTICE: string
     GDPR_POLICY_URL: string | undefined
     SYSTEM_NOTICE: string | undefined
-    DOCUMENTS_ENABLED: string
+    DOCUMENTS_ENABLED: boolean
+    RAG_ENABLED: boolean
     TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: string
   }
 }

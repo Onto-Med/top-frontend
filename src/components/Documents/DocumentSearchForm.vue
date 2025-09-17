@@ -107,6 +107,18 @@
         <q-space />
         <q-separator vertical />
         <q-btn
+          v-if="withRag"
+          :disable="!dataSource"
+          flat
+          no-caps
+          no-wrap
+          class="q-py-none"
+        >
+          <q-icon name="smart_toy" />
+          <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
+        </q-btn>
+        <q-separator vertical />
+        <q-btn
           :disable="!dataSource"
           flat
           no-caps
@@ -193,6 +205,7 @@ const props = defineProps<{
   query?: Query
   documentFilter?: Array<string>
   documentQueryOffsets?: { [key: string]: string[] }
+  withRag: boolean
 }>()
 
 const emit = defineEmits(['clearQuery'])
