@@ -15,9 +15,14 @@
         <!--        v-if="ragAnswer != undefined && ragAnswer.length > 0"-->
         {{ ragAnswer }}
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 1">
+        <JsonEditorVue
+          v-model="ragAdditionalInfo"
+          v-bind="{
+            /* local props & attrs */
+          }"
+        />
         <!--        v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 0"-->
-        {{ ragAdditionalInfo }}
       </q-card-section>
       <q-card-section>
         <q-btn-group>
@@ -41,6 +46,7 @@ import { useI18n } from 'vue-i18n'
 import { inject, ref } from 'vue'
 import { RagApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
+import JsonEditorVue from 'json-editor-vue'
 
 const ragApi = inject(RagApiKey)
 const { t } = useI18n()
@@ -66,7 +72,9 @@ async function poseQuestion() {
     .poseQuestionToRAG(props.process, ragQuestion.value)
     .then((r) => {
       ragAnswer.value = r.data.answer
-      ragAdditionalInfo.value = JSON.stringify(r.data.info != undefined ? r.data.info : "", undefined, 4)
+      console.log(r.data.info)
+      ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ""
+      console.log(ragAdditionalInfo.value)
     })
     .catch((e) => renderError(e))
 }

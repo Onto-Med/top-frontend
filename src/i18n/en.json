@@ -568,7 +568,7 @@
     }
   },
   "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
-  "documentsForRAG": "AI search in {numberOfDocs} documents.",
+  "documentsForRAG": "AI search in {numberOfDocs} documents",
   "configurationOfPipeline": "Pipeline configuration",
   "clusterReview": "Cluster review|Cluster reviews",
   "preProcessing": "Pre-processing",

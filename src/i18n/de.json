@@ -569,7 +569,7 @@
   },
   "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
   "configurationOfPipeline": "Pipeline Konfiguration",
-  "documentsForRAG": "KI Suche in {numberOfDocs} Dokumenten.",
+  "documentsForRAG": "KI Suche in {numberOfDocs} Dokumenten",
   "clusterReview": "Cluster-Review|Cluster-Reviews",
   "preProcessing": "Vorverarbeitung",
   "status": "Status",
