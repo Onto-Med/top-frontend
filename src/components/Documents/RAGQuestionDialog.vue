@@ -5,11 +5,7 @@
         <div>{{ t('documentsForRAG', { numberOfDocs: props.documents?.length }) }}:</div>
       </q-card-section>
       <q-card-section>
-        <q-input
-          v-model="ragQuestion"
-          outlined
-          :label="t('question')"
-        />
+        <q-input v-model="ragQuestion" outlined :label="t('question')" />
       </q-card-section>
       <q-card-section>
         <!--        v-if="ragAnswer != undefined && ragAnswer.length > 0"-->
@@ -47,6 +43,7 @@ import { inject, ref } from 'vue'
 import { RagApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import JsonEditorVue from 'json-editor-vue'
+import { RAGFilter } from '@onto-med/top-api'
 
 const ragApi = inject(RagApiKey)
 const { t } = useI18n()
@@ -68,15 +65,33 @@ const ragAdditionalInfo = ref<string>()
 async function poseQuestion() {
   if (!ragApi || !props.process) return
   if (ragQuestion.value === undefined) return
-  await ragApi
-    .poseQuestionToRAG(props.process, ragQuestion.value)
-    .then((r) => {
-      ragAnswer.value = r.data.answer
-      console.log(r.data.info)
-      ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ""
-      console.log(ragAdditionalInfo.value)
-    })
-    .catch((e) => renderError(e))
+  if (
+    props.documents === undefined ||
+    (props.documents != undefined && props.documents.length == 0)
+  ) {
+    await ragApi
+      .poseQuestionToRAG(props.process, ragQuestion.value)
+      .then((r) => {
+        ragAnswer.value = r.data.answer
+        console.log(r.data.info)
+        ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ''
+        console.log(ragAdditionalInfo.value)
+      })
+      .catch((e) => renderError(e))
+  } else {
+    const filter = {
+      docIds: props.documents,
+    } as RAGFilter
+    await ragApi
+      .poseQuestionToRAGWithFilter(props.process, ragQuestion.value, filter)
+      .then((r) => {
+        ragAnswer.value = r.data.answer
+        console.log(r.data.info)
+        ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ''
+        console.log(ragAdditionalInfo.value)
+      })
+      .catch((e) => renderError(e))
+  }
 }
 </script>
 <style scoped lang="scss"></style>
