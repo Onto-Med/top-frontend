@@ -1,31 +1,46 @@
 <template>
   <q-dialog ref="dialogRef">
     <q-card class="content" style="min-width: 600px; max-width: min-content">
-      <q-card-section class="row q-gutter-sm">
-        <div>{{ t('documentsForRAG', { numberOfDocs: props.documents?.length }) }}:</div>
+      <q-card-section class="row items-center q-gutter-sm">
+        <div class="text-h6">
+          <q-icon name="smart_toy" />
+          {{ t('documentsForRAG', { numberOfDocs: props.documents?.length }) }}
+        </div>
+        <q-space />
+        <q-btn v-close-popup icon="close" flat round dense />
       </q-card-section>
+
+      <q-separator />
+
       <q-card-section>
-        <q-input v-model="ragQuestion" outlined :label="t('question')" />
+        <q-input
+          v-model="ragQuestion"
+          outlined
+          autofocus
+          :label="t('question')"
+          @keyup.enter="poseQuestion()"
+        >
+          <template #after>
+            <q-btn
+              round
+              dense
+              flat
+              icon="send"
+              color="primary"
+              :disable="!ragApi"
+              :title="t('startThing', { thing: t('questioning') })"
+              @click="poseQuestion()"
+            />
+          </template>
+        </q-input>
       </q-card-section>
+
       <q-card-section>
         {{ ragAnswer }}
       </q-card-section>
+
       <q-card-section v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 1">
-        <JsonEditorVue
-          v-model="ragAdditionalInfo"
-        />
-      </q-card-section>
-      <q-card-section>
-        <q-btn-group>
-          <q-btn
-            :label="t('startThing', { thing: t('questioning') })"
-            :disable="!ragApi"
-            icon="play_arrow"
-            color="secondary"
-            no-caps
-            @click="poseQuestion()"
-          />
-        </q-btn-group>
+        <JsonEditorVue v-model="ragAdditionalInfo" />
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -42,9 +57,7 @@ import { RAGFilter } from '@onto-med/top-api'
 
 const ragApi = inject(RagApiKey)
 const { t } = useI18n()
-const {
-  dialogRef,
-} = useDialogPluginComponent()
+const { dialogRef } = useDialogPluginComponent()
 
 const props = defineProps({
   documents: Array<string>,
