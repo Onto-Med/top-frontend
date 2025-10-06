@@ -43,6 +43,11 @@ then
     sed -i "s|DOCUMENTS_ENABLED\\:!1|DOCUMENTS_ENABLED:${DOCUMENTS_ENABLED}|g" /usr/share/nginx/html/assets/*.js
 fi
 
+if [[ ! -z "${RAG_ENABLED}" ]]
+then
+    sed -i "s|RAG_ENABLED\\:!1|RAG_ENABLED:${RAG_ENABLED}|g" /usr/share/nginx/html/assets/*.js
+fi
+
 if [[ ! -z "${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}" ]]
 then
     sed -i "s|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL\\:\"https\\://onto-med\\.github\\.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner\"|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL:'${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}'|g" /usr/share/nginx/html/assets/*.js
