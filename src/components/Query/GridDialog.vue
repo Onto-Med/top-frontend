@@ -54,11 +54,11 @@ import Papa from 'papaparse'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Query } from '@onto-med/top-api'
-import * as zip from '@zip.js/zip.js'
 import useNotify from 'src/mixins/useNotify'
+import { TextWriter, Entry } from '@zip.js/zip.js'
 
 const props = defineProps<{
-  entries: zip.Entry[]
+  entries: Entry[]
   query: Query
 }>()
 
@@ -114,8 +114,9 @@ function colDef(fieldName: string) {
 
 function loadEntry() {
   const csv = props.entries.filter((e) => e.filename === entry.value)[0]
-  const writer = new zip.TextWriter()
-  csv?.getData!(writer)
+  if (!csv || csv.directory) return
+  csv
+    ?.getData(new TextWriter())
     .then(
       (data) =>
         (rows.value = Papa.parse(data, { header: true, delimiter: ';', skipEmptyLines: true })

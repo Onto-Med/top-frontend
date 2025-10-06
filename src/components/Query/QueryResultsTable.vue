@@ -124,7 +124,7 @@ import { useEntityStore } from 'src/stores/entity-store'
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import * as zip from '@zip.js/zip.js'
+import { BlobReader, ZipReader } from '@zip.js/zip.js'
 
 const props = defineProps({
   page: {
@@ -261,7 +261,7 @@ function showGrid(query: Query) {
   download(query)
     .then((r) => {
       const zipBlob = r.data as Blob
-      const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
+      const zipReader = new ZipReader(new BlobReader(zipBlob))
       return zipReader.getEntries()
     })
     .then((entries) =>
