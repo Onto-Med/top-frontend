@@ -31,7 +31,7 @@ npm run dev
 You can specify the following environment variables via `.env` file or command line:
 
 | variable name                     | default value                                                                                  | description                                                                      |
-|-----------------------------------| ---------------------------------------------------------------------------------------------- |----------------------------------------------------------------------------------|
+| --------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | OAUTH2_ENABLED                    | false                                                                                          | Enable or disable authentication via Keycloak                                    |
 | OAUTH2_URL                        | http://127.0.0.1:8081/                                                                         | Keycloak URL                                                                     |
 | OAUTH2_REALM                      | top-realm                                                                                      | Keycloak realm name                                                              |

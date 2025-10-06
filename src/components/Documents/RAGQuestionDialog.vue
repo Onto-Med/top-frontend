@@ -8,17 +8,12 @@
         <q-input v-model="ragQuestion" outlined :label="t('question')" />
       </q-card-section>
       <q-card-section>
-        <!--        v-if="ragAnswer != undefined && ragAnswer.length > 0"-->
         {{ ragAnswer }}
       </q-card-section>
       <q-card-section v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 1">
         <JsonEditorVue
           v-model="ragAdditionalInfo"
-          v-bind="{
-            /* local props & attrs */
-          }"
         />
-        <!--        v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 0"-->
       </q-card-section>
       <q-card-section>
         <q-btn-group>
@@ -49,7 +44,6 @@ const ragApi = inject(RagApiKey)
 const { t } = useI18n()
 const {
   dialogRef,
-  // onDialogOK
 } = useDialogPluginComponent()
 
 const props = defineProps({
