@@ -115,7 +115,7 @@
           class="q-py-none"
           @click="poseQuestionToRag"
         >
-          <q-icon name="smart_toy" />
+          <q-icon v-bind:style="{ color: ragColor }" name="smart_toy" />
           <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
         </q-btn>
         <q-separator vertical />
@@ -177,7 +177,12 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey } from 'src/boot/axios'
+import {
+  ConceptClusterApiKey,
+  ConceptPipelineApiKey,
+  DocumentApiKey,
+  RagApiKey,
+} from 'src/boot/axios'
 import {
   ConceptCluster,
   DataSource,
@@ -219,6 +224,7 @@ const router = useRouter()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
+const ragApi = inject(RagApiKey)
 const entityStore = useEntityStore()
 const { isAdmin } = storeToRefs(entityStore)
 const documents = ref<DocumentPage>()
@@ -335,18 +341,24 @@ const pipelineConfigMap = ref<Map<string, Map<string, string>>>(
   new Map<string, Map<string, string>>(),
 )
 
-const conceptClusterIds = computed(() => selectedConcepts.value
-  .map((c) => concepts.value[c]?.id)
-  .filter((id) => id !== undefined)
+const conceptClusterIds = computed(() =>
+  selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => id !== undefined),
 )
 
-onMounted(() =>
+const ragColorInactive = '#C91400'
+const ragColorActive = 'green'
+const ragColor = ref<string>(ragColorInactive)
+const hasActiveRagComponent = ref<boolean>(false)
+
+onMounted(() => {
   entityStore
     .loadUser()
     .then(reloadConcepts)
     .then(() => reloadDocuments())
-    .catch((e: Error) => renderError(e)),
-)
+    .catch((e: Error) => renderError(e))
+
+  hasActiveRag(props.dataSource?.id)
+})
 
 watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () =>
   reloadDocuments().catch((e: Error) => renderError(e)),
@@ -361,8 +373,30 @@ watch(
         documents.value = undefined
         renderError(e)
       })
+    hasActiveRag(props.dataSource?.id)
   },
 )
+
+function switchRagIconColor() {
+  if (hasActiveRagComponent.value) {
+    ragColor.value = ragColorActive
+    return
+  }
+  ragColor.value = ragColorInactive
+}
+
+function hasActiveRag(process: string | undefined) {
+  hasActiveRagComponent.value = false
+  if (!ragApi || process === undefined) return
+  ragApi
+    .getStatusOfRAG(process)
+    .then((r) => {
+      hasActiveRagComponent.value = r.data.active != undefined ? r.data.active : false
+      console.log(hasActiveRagComponent.value)
+    })
+    .then(() => switchRagIconColor())
+    .catch((e: Error) => renderError(e))
+}
 
 async function reloadConcepts() {
   if (!props.dataSource) concepts.value.length = 0
@@ -501,6 +535,13 @@ function routeToDocumentQuery() {
 
 async function poseQuestionToRag() {
   if (!props.dataSource || !documentApi || documentsLoading.value) return
+  if (!hasActiveRagComponent.value) {
+    $q.dialog({
+      title: 'Not Supported!',
+      message: 'The RAG component is not activated or at least not for this datasource. Activating it from within the frontend ist not supported right now. Please ask your administrator to activate it.'
+    })
+    return
+  }
   const documentIds = new Array<string>()
   let page = 1
   let breakWhile = false
@@ -516,8 +557,11 @@ async function poseQuestionToRag() {
         conceptMode.value,
         mostImportantNodes.value,
         page,
-      ).then((r) => {
-        r.data.content.forEach((doc) => {if (doc.id != undefined) documentIds.push(doc.id)})
+      )
+      .then((r) => {
+        r.data.content.forEach((doc) => {
+          if (doc.id != undefined) documentIds.push(doc.id)
+        })
         if (page++ > r.data.totalPages) breakWhile = true
       })
   }
@@ -526,7 +570,7 @@ async function poseQuestionToRag() {
     component: RAGQuestionDialog,
     componentProps: {
       documents: documentIds,
-      process: props.dataSource.id
+      process: props.dataSource.id,
     },
   })
 }
