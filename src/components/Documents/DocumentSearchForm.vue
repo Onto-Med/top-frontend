@@ -537,8 +537,8 @@ async function poseQuestionToRag() {
   if (!props.dataSource || !documentApi || documentsLoading.value) return
   if (!hasActiveRagComponent.value) {
     $q.dialog({
-      title: 'Not Supported!',
-      message: 'The RAG component is not activated or at least not for this datasource. Activating it from within the frontend ist not supported right now. Please ask your administrator to activate it.'
+      title: t('ragInitNotSupportedTitle'),
+      message: t('ragInitNotSupported')
     })
     return
   }

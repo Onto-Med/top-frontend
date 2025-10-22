@@ -22,15 +22,17 @@
         >
           <template #after>
             <q-btn
+              v-if="!startedQuestioning"
               round
               dense
               flat
               icon="send"
               color="primary"
-              :disable="!ragApi"
+              :disable="!ragApi || startedQuestioning"
               :title="t('startThing', { thing: t('questioning') })"
               @click="poseQuestion()"
             />
+            <q-spinner v-if="startedQuestioning" size="xs" class="q-ml-sm" />
           </template>
         </q-input>
       </q-card-section>
@@ -54,6 +56,7 @@ import { RagApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import JsonEditorVue from 'json-editor-vue'
 import { RAGFilter } from '@onto-med/top-api'
+import { AxiosResponse } from 'axios'
 
 const ragApi = inject(RagApiKey)
 const { t } = useI18n()
@@ -68,8 +71,12 @@ const { renderError } = useNotify()
 const ragQuestion = ref<string>()
 const ragAnswer = ref<string>()
 const ragAdditionalInfo = ref<string>()
+const startedQuestioning = ref<boolean>(false)
 
 async function poseQuestion() {
+  if (startedQuestioning.value) return
+  startedQuestioning.value = true
+
   if (!ragApi || !props.process) return
   if (ragQuestion.value === undefined) return
   if (
@@ -78,27 +85,29 @@ async function poseQuestion() {
   ) {
     await ragApi
       .poseQuestionToRAG(props.process, ragQuestion.value)
-      .then((r) => {
-        ragAnswer.value = r.data.answer
-        console.log(r.data.info)
-        ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ''
-        console.log(ragAdditionalInfo.value)
-      })
+      .then((r) => assignResponseToRagAnswer(r))
       .catch((e) => renderError(e))
+      .finally(() => wrapUpQuestioning())
   } else {
     const filter = {
       docIds: props.documents,
     } as RAGFilter
     await ragApi
       .poseQuestionToRAGWithFilter(props.process, ragQuestion.value, filter)
-      .then((r) => {
-        ragAnswer.value = r.data.answer
-        console.log(r.data.info)
-        ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ''
-        console.log(ragAdditionalInfo.value)
-      })
+      .then((r) => assignResponseToRagAnswer(r))
       .catch((e) => renderError(e))
+      .finally(() => wrapUpQuestioning())
   }
+}
+
+function assignResponseToRagAnswer(r: AxiosResponse) {
+  ragAnswer.value = r.data.answer
+  console.log(JSON.parse(r.data.info))
+  ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ''
+}
+
+function wrapUpQuestioning() {
+  startedQuestioning.value = false
 }
 </script>
 <style scoped lang="scss"></style>

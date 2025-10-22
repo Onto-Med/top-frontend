@@ -624,5 +624,7 @@
   "uploadDataSourceDescription": "Please specify a unique data source ID. Reusing an existing ID will append any uploaded data, replacing any values with matching primary keys.",
   "useRag": "AI",
   "question": "Question",
-  "questioning": "Questioning"
+  "questioning": "Questioning",
+  "ragInitNotSupportedTitle": "Not Supported!",
+  "ragInitNotSupported": "The RAG component is not activated or at least not for this datasource. Activating it from within the frontend ist not supported right now. Please ask your administrator to activate it."
 }
