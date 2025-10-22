@@ -190,7 +190,7 @@ import {
   DocumentGatheringMode,
   DocumentPage,
   PipelineResponseStatus,
-  Query,
+  Query, RAGAnswer
 } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
@@ -349,6 +349,7 @@ const ragColorInactive = '#C91400'
 const ragColorActive = 'green'
 const ragColor = ref<string>(ragColorInactive)
 const hasActiveRagComponent = ref<boolean>(false)
+const ragResult = ref<RAGAnswer>()
 
 onMounted(() => {
   entityStore
@@ -571,6 +572,7 @@ async function poseQuestionToRag() {
     componentProps: {
       documents: documentIds,
       process: props.dataSource.id,
+      previousResult: ragResult,
     },
   })
 }

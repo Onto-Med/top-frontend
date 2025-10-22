@@ -41,37 +41,54 @@
         {{ ragAnswer }}
       </q-card-section>
 
-      <q-card-section v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 1">
-        <JsonEditorVue v-model="ragAdditionalInfo" />
+      <q-card-section v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 0">
+        <q-table
+          :columns="[
+            {name: 'ref', label: '#', field: 'ref', align: 'left'},
+            {name: 'name', label: documentNameStr, field: 'name', align: 'left'},
+            {name: 'id', label: documentIdStr, field: 'id', align: 'left'},
+            ]"
+          :rows="ragAdditionalInfo"
+          @row-click="showDocument"
+        />
       </q-card-section>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
-import { useDialogPluginComponent } from 'quasar'
+import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
-import { inject, ref } from 'vue'
-import { RagApiKey } from 'boot/axios'
+import { computed, inject, onMounted, PropType, ref } from 'vue'
+import { RagApiKey, DocumentApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import JsonEditorVue from 'json-editor-vue'
-import { RAGFilter } from '@onto-med/top-api'
-import { AxiosResponse } from 'axios'
+import { RAGAnswer, RAGFilter } from '@onto-med/top-api'
+import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
 
 const ragApi = inject(RagApiKey)
+const documentApi = inject(DocumentApiKey)
 const { t } = useI18n()
+const $q = useQuasar()
 const { dialogRef } = useDialogPluginComponent()
 
 const props = defineProps({
   documents: Array<string>,
   process: String,
+  previousResult: Object as PropType<RAGAnswer>
 })
 
 const { renderError } = useNotify()
 const ragQuestion = ref<string>()
 const ragAnswer = ref<string>()
-const ragAdditionalInfo = ref<string>()
+const ragAdditionalInfo = ref<DocumentReference[]>()
 const startedQuestioning = ref<boolean>(false)
+const documentNameStr = computed(() => t('document') + " " + t('name'))
+const documentIdStr = computed(() => t('document') + " Id")
+
+onMounted(() => {
+  if (props.previousResult === undefined) return
+  parseRagAnswer(props.previousResult)
+})
 
 async function poseQuestion() {
   if (startedQuestioning.value) return
@@ -85,7 +102,7 @@ async function poseQuestion() {
   ) {
     await ragApi
       .poseQuestionToRAG(props.process, ragQuestion.value)
-      .then((r) => assignResponseToRagAnswer(r))
+      .then((r) => parseRagAnswer(r.data))
       .catch((e) => renderError(e))
       .finally(() => wrapUpQuestioning())
   } else {
@@ -94,20 +111,51 @@ async function poseQuestion() {
     } as RAGFilter
     await ragApi
       .poseQuestionToRAGWithFilter(props.process, ragQuestion.value, filter)
-      .then((r) => assignResponseToRagAnswer(r))
+      .then((r) => parseRagAnswer(r.data))
       .catch((e) => renderError(e))
       .finally(() => wrapUpQuestioning())
   }
 }
 
-function assignResponseToRagAnswer(r: AxiosResponse) {
-  ragAnswer.value = r.data.answer
-  console.log(JSON.parse(r.data.info))
-  ragAdditionalInfo.value = r.data.info != undefined ? r.data.info : ''
+async function showDocument(evt: Event, row: DocumentReference) {
+  if (props.process === undefined) return
+  await documentApi
+    ?.getSingleDocumentById(row.id, props.process, [], [])
+    .then((r) => {
+      $q.dialog({
+        component: DocumentDetailsDialog,
+        componentProps: {
+          document: r.data,
+        },
+      })
+    })
+    .catch((e: Error) => renderError(e))
+}
+
+function parseRagAnswer(r: RAGAnswer) {
+  ragAnswer.value = r.answer
+  const arr: DocumentReference[] = []
+  if (r.info != undefined) {
+    Object.entries(JSON.parse(r.info)).forEach((entry) => arr.push(
+      { 'name': (entry[1] as DocumentResult).doc_name, 'id': (entry[1] as DocumentResult).doc_id, 'ref': entry[0] }
+    ))
+  }
+  ragAdditionalInfo.value = arr
 }
 
 function wrapUpQuestioning() {
   startedQuestioning.value = false
+}
+
+interface DocumentReference {
+  name: string;
+  id: string;
+  ref: string;
+}
+
+interface DocumentResult {
+  doc_id: string;
+  doc_name: string;
 }
 </script>
 <style scoped lang="scss"></style>
