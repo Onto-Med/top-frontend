@@ -115,7 +115,8 @@
           class="q-py-none"
           @click="poseQuestionToRag"
         >
-          <q-icon v-bind:style="{ color: ragColor }" name="smart_toy" />
+          <q-icon v-if="dataSource" v-bind:style="{ color: ragColor }" name="smart_toy" />
+          <q-icon v-else name="smart_toy" />
           <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
         </q-btn>
         <q-separator vertical />
@@ -350,6 +351,7 @@ const ragColorActive = 'green'
 const ragColor = ref<string>(ragColorInactive)
 const hasActiveRagComponent = ref<boolean>(false)
 const ragResult = ref<RAGAnswer>()
+const ragQuestion = ref<string>()
 
 onMounted(() => {
   entityStore
@@ -393,7 +395,6 @@ function hasActiveRag(process: string | undefined) {
     .getStatusOfRAG(process)
     .then((r) => {
       hasActiveRagComponent.value = r.data.active != undefined ? r.data.active : false
-      console.log(hasActiveRagComponent.value)
     })
     .then(() => switchRagIconColor())
     .catch((e: Error) => renderError(e))
@@ -539,7 +540,8 @@ async function poseQuestionToRag() {
   if (!hasActiveRagComponent.value) {
     $q.dialog({
       title: t('ragInitNotSupportedTitle'),
-      message: t('ragInitNotSupported')
+      message: t('ragInitNotSupported'),
+      persistent: true
     })
     return
   }
@@ -572,9 +574,22 @@ async function poseQuestionToRag() {
     componentProps: {
       documents: documentIds,
       process: props.dataSource.id,
-      previousResult: ragResult,
+      previousResult: ragResult.value,
+      previousQuestion: ragQuestion.value
     },
   })
+    .onOk((payload) => {
+      if (payload != undefined) {
+        ragResult.value = {
+          info: payload.answer != undefined? payload.answer.info : undefined,
+          answer: payload.answer != undefined? payload.answer.answer: ""
+        } as RAGAnswer
+        ragQuestion.value = payload.question
+      } else {
+        ragResult.value = undefined
+        ragQuestion.value = undefined
+      }
+    })
 }
 </script>
 

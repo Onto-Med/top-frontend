@@ -7,7 +7,7 @@
           {{ t('documentsForRAG', { numberOfDocs: props.documents?.length }) }}
         </div>
         <q-space />
-        <q-btn v-close-popup icon="close" flat round dense />
+        <q-btn icon="close" v-close-popup flat round dense @click="dismissedRag=true" />
       </q-card-section>
 
       <q-separator />
@@ -41,14 +41,14 @@
         {{ ragAnswer }}
       </q-card-section>
 
-      <q-card-section v-if="ragAdditionalInfo != undefined && ragAdditionalInfo.length > 0">
+      <q-card-section v-if="ragAdditionalInfoArr != undefined && ragAdditionalInfoArr.length > 0">
         <q-table
           :columns="[
-            {name: 'ref', label: '#', field: 'ref', align: 'left'},
-            {name: 'name', label: documentNameStr, field: 'name', align: 'left'},
-            {name: 'id', label: documentIdStr, field: 'id', align: 'left'},
-            ]"
-          :rows="ragAdditionalInfo"
+            { name: 'ref', label: '#', field: 'ref', align: 'left' },
+            { name: 'name', label: documentNameStr, field: 'name', align: 'left' },
+            { name: 'id', label: documentIdStr, field: 'id', align: 'left' },
+          ]"
+          :rows="ragAdditionalInfoArr"
           @row-click="showDocument"
         />
       </q-card-section>
@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
-import { computed, inject, onMounted, PropType, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, PropType, ref } from 'vue'
 import { RagApiKey, DocumentApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { RAGAnswer, RAGFilter } from '@onto-med/top-api'
@@ -69,25 +69,38 @@ const ragApi = inject(RagApiKey)
 const documentApi = inject(DocumentApiKey)
 const { t } = useI18n()
 const $q = useQuasar()
-const { dialogRef } = useDialogPluginComponent()
+const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
 const props = defineProps({
   documents: Array<string>,
   process: String,
-  previousResult: Object as PropType<RAGAnswer>
+  previousResult: Object as PropType<RAGAnswer>,
+  previousQuestion: String
 })
 
 const { renderError } = useNotify()
+const dismissedRag = ref<boolean>(false)
 const ragQuestion = ref<string>()
 const ragAnswer = ref<string>()
-const ragAdditionalInfo = ref<DocumentReference[]>()
+const ragAdditionalInfo = ref<string>()
+const ragAdditionalInfoArr = ref<DocumentReference[]>()
 const startedQuestioning = ref<boolean>(false)
 const documentNameStr = computed(() => t('document') + " " + t('name'))
 const documentIdStr = computed(() => t('document') + " Id")
 
 onMounted(() => {
+  ragQuestion.value = props.previousQuestion
   if (props.previousResult === undefined) return
   parseRagAnswer(props.previousResult)
+})
+
+onBeforeUnmount(() => {
+  if (!dismissedRag.value) {
+    onDialogOK({
+      answer: { answer: ragAnswer.value, info: ragAdditionalInfo.value } as RAGAnswer,
+      question: ragQuestion.value
+    })
+  } else { onDialogOK(undefined) }
 })
 
 async function poseQuestion() {
@@ -134,13 +147,14 @@ async function showDocument(evt: Event, row: DocumentReference) {
 
 function parseRagAnswer(r: RAGAnswer) {
   ragAnswer.value = r.answer
+  ragAdditionalInfo.value = r.info
   const arr: DocumentReference[] = []
   if (r.info != undefined) {
     Object.entries(JSON.parse(r.info)).forEach((entry) => arr.push(
       { 'name': (entry[1] as DocumentResult).doc_name, 'id': (entry[1] as DocumentResult).doc_id, 'ref': entry[0] }
     ))
   }
-  ragAdditionalInfo.value = arr
+  ragAdditionalInfoArr.value = arr
 }
 
 function wrapUpQuestioning() {
