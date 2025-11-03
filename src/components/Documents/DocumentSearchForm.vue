@@ -107,6 +107,20 @@
         <q-space />
         <q-separator vertical />
         <q-btn
+          v-if="withRag"
+          :disable="!dataSource"
+          flat
+          no-caps
+          no-wrap
+          class="q-py-none"
+          @click="poseQuestionToRag"
+        >
+          <q-icon v-if="dataSource" v-bind:style="{ color: ragColor }" name="smart_toy" />
+          <q-icon v-else name="smart_toy" />
+          <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
+        </q-btn>
+        <q-separator vertical />
+        <q-btn
           :disable="!dataSource"
           flat
           no-caps
@@ -164,7 +178,12 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ConceptClusterApiKey, ConceptPipelineApiKey, DocumentApiKey } from 'src/boot/axios'
+import {
+  ConceptClusterApiKey,
+  ConceptPipelineApiKey,
+  DocumentApiKey,
+  RagApiKey,
+} from 'src/boot/axios'
 import {
   ConceptCluster,
   DataSource,
@@ -172,7 +191,7 @@ import {
   DocumentGatheringMode,
   DocumentPage,
   PipelineResponseStatus,
-  Query,
+  Query, RAGAnswer
 } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
@@ -182,6 +201,7 @@ import { useEntityStore } from 'src/stores/entity-store'
 import { storeToRefs } from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
 import { useRouter } from 'vue-router'
+import RAGQuestionDialog from 'components/Documents/RAGQuestionDialog.vue'
 
 interface ConceptColor {
   'background-color'?: string
@@ -193,6 +213,7 @@ const props = defineProps<{
   query?: Query
   documentFilter?: Array<string>
   documentQueryOffsets?: { [key: string]: string[] }
+  withRag: boolean
 }>()
 
 const emit = defineEmits(['clearQuery'])
@@ -204,6 +225,7 @@ const router = useRouter()
 const documentApi = inject(DocumentApiKey)
 const conceptApi = inject(ConceptClusterApiKey)
 const conceptPipelineApi = inject(ConceptPipelineApiKey)
+const ragApi = inject(RagApiKey)
 const entityStore = useEntityStore()
 const { isAdmin } = storeToRefs(entityStore)
 const documents = ref<DocumentPage>()
@@ -320,13 +342,26 @@ const pipelineConfigMap = ref<Map<string, Map<string, string>>>(
   new Map<string, Map<string, string>>(),
 )
 
-onMounted(() =>
+const conceptClusterIds = computed(() =>
+  selectedConcepts.value.map((c) => concepts.value[c]?.id).filter((id) => id !== undefined),
+)
+
+const ragColorInactive = '#C91400'
+const ragColorActive = 'green'
+const ragColor = ref<string>(ragColorInactive)
+const hasActiveRagComponent = ref<boolean>(false)
+const ragResult = ref<RAGAnswer>()
+const ragQuestion = ref<string>()
+
+onMounted(() => {
   entityStore
     .loadUser()
     .then(reloadConcepts)
     .then(() => reloadDocuments())
-    .catch((e: Error) => renderError(e)),
-)
+    .catch((e: Error) => renderError(e))
+
+  hasActiveRag(props.dataSource?.id)
+})
 
 watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () =>
   reloadDocuments().catch((e: Error) => renderError(e)),
@@ -341,8 +376,29 @@ watch(
         documents.value = undefined
         renderError(e)
       })
+    hasActiveRag(props.dataSource?.id)
   },
 )
+
+function switchRagIconColor() {
+  if (hasActiveRagComponent.value) {
+    ragColor.value = ragColorActive
+    return
+  }
+  ragColor.value = ragColorInactive
+}
+
+function hasActiveRag(process: string | undefined) {
+  hasActiveRagComponent.value = false
+  if (!ragApi || process === undefined) return
+  ragApi
+    .getStatusOfRAG(process)
+    .then((r) => {
+      hasActiveRagComponent.value = r.data.active != undefined ? r.data.active : false
+    })
+    .then(() => switchRagIconColor())
+    .catch((e: Error) => renderError(e))
+}
 
 async function reloadConcepts() {
   if (!props.dataSource) concepts.value.length = 0
@@ -380,9 +436,7 @@ async function reloadDocuments(name?: string, page = 1) {
     return Promise.reject()
   documents.value = undefined
   document_.value = undefined
-  const conceptClusterIds = selectedConcepts.value
-    .map((c) => concepts.value[c]?.id)
-    .filter((id) => id !== undefined)
+
   documentsLoading.value = true
   return documentApi
     .getDocuments(
@@ -390,7 +444,7 @@ async function reloadDocuments(name?: string, page = 1) {
       name,
       props.documentFilter,
       undefined,
-      conceptClusterIds,
+      conceptClusterIds.value,
       undefined,
       conceptMode.value,
       mostImportantNodes.value,
@@ -479,6 +533,63 @@ function routeToDocumentQuery() {
     params: { organisationId: undefined, repositoryId: undefined, queryId: undefined },
     query: { dataSourceId: props.dataSource?.id },
   })
+}
+
+async function poseQuestionToRag() {
+  if (!props.dataSource || !documentApi || documentsLoading.value) return
+  if (!hasActiveRagComponent.value) {
+    $q.dialog({
+      title: t('ragInitNotSupportedTitle'),
+      message: t('ragInitNotSupported'),
+      persistent: true
+    })
+    return
+  }
+  const documentIds = new Array<string>()
+  let page = 1
+  let breakWhile = false
+  while (!breakWhile) {
+    await documentApi
+      .getDocuments(
+        props.dataSource.id,
+        undefined,
+        props.documentFilter,
+        undefined,
+        conceptClusterIds.value,
+        undefined,
+        conceptMode.value,
+        mostImportantNodes.value,
+        page,
+      )
+      .then((r) => {
+        r.data.content.forEach((doc) => {
+          if (doc.id != undefined) documentIds.push(doc.id)
+        })
+        if (page++ > r.data.totalPages) breakWhile = true
+      })
+  }
+
+  $q.dialog({
+    component: RAGQuestionDialog,
+    componentProps: {
+      documents: documentIds,
+      process: props.dataSource.id,
+      previousResult: ragResult.value,
+      previousQuestion: ragQuestion.value
+    },
+  })
+    .onOk((payload) => {
+      if (payload != undefined) {
+        ragResult.value = {
+          info: payload.answer != undefined? payload.answer.info : undefined,
+          answer: payload.answer != undefined? payload.answer.answer: ""
+        } as RAGAnswer
+        ragQuestion.value = payload.question
+      } else {
+        ragResult.value = undefined
+        ragQuestion.value = undefined
+      }
+    })
 }
 </script>
 

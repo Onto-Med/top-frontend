@@ -43,6 +43,7 @@
           :data-source="dataSource"
           :document-filter="documentIds"
           :document-query-offsets="documentOffsets"
+          :with-rag="env.RAG_ENABLED"
           class="cluster-form"
           @clear-query="resetPage()"
         />
@@ -60,6 +61,7 @@ import { QueryApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
+import { env } from 'src/config'
 
 const props = defineProps({
   organisationId: String,

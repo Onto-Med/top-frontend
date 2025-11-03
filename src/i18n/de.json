@@ -569,6 +569,7 @@
   },
   "pipelineManagementOfDataSource": "Pipeline-Verwaltung der Datenquelle \"{dataSource}\"",
   "configurationOfPipeline": "Pipeline Konfiguration",
+  "documentsForRAG": "KI Suche in {numberOfDocs} Dokumenten",
   "clusterReview": "Cluster-Review|Cluster-Reviews",
   "preProcessing": "Vorverarbeitung",
   "status": "Status",
@@ -620,5 +621,10 @@
   "passedCount": "{passed} von {total} bestanden",
   "passed": "Bestanden",
   "appKeywords": "Dokumentsuche, Phänotyp-Algorithmus, Phänotypdefinition, Phänotypbibliothek, Phänotypisierung, Terminologie",
-  "uploadDataSourceDescription": "Bitte geben Sie eine eindeutige Datenquellen-ID an. Die Wiederverwendung einer vorhandenen ID appendiert hochgeladene Daten und ersetzt alle Werte mit übereinstimmtendem Primärschlüssel."
+  "uploadDataSourceDescription": "Bitte geben Sie eine eindeutige Datenquellen-ID an. Die Wiederverwendung einer vorhandenen ID appendiert hochgeladene Daten und ersetzt alle Werte mit übereinstimmtendem Primärschlüssel.",
+  "useRag": "KI",
+  "question": "Frage",
+  "questioning": "Befragung",
+  "ragInitNotSupportedTitle": "Nicht unterstützt!",
+  "ragInitNotSupported": "Die RAG-Komponente ist entweder nicht aktiviert oder für diese bestimmte Datenquelle nicht verfügbar. Bitte wenden Sie sich an Ihren Administrator, um sie zu aktivieren."
 }

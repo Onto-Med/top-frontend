@@ -5,6 +5,23 @@ import { defineConfig } from '#q-app/wrappers'
 import { fileURLToPath } from 'node:url'
 
 export default defineConfig((ctx) => {
+  const boolMap = (value: string|boolean): boolean => {
+    if (value === undefined || !value) return false
+    const _return = new Map<string, boolean>([
+      ["true", true],
+      ["yes", true],
+      ["y", true],
+      ["ja", true],
+      ["j", true],
+      ["false", false],
+      ["no", false],
+      ["n", false],
+      ["nein", false],
+    ]).get(value.toString().toLowerCase())
+    if (_return === undefined) return false
+    return _return
+  }
+
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -54,15 +71,16 @@ export default defineConfig((ctx) => {
       // publicPath: '/',
       // analyze: true,
       env: {
-        OAUTH2_ENABLED: process.env.OAUTH2_ENABLED == 'true',
+        OAUTH2_ENABLED: boolMap(process.env.OAUTH2_ENABLED),
         OAUTH2_URL: process.env.OAUTH2_URL,
         OAUTH2_REALM: process.env.OAUTH2_REALM,
         OAUTH2_CLIENT_ID: process.env.OAUTH2_CLIENT_ID,
         API_URL: process.env.API_URL,
-        GDPR_NOTICE: process.env.GDPR_NOTICE == 'true',
+        GDPR_NOTICE: boolMap(process.env.GDPR_NOTICE),
         GDPR_POLICY_URL: process.env.GDPR_POLICY_URL,
         SYSTEM_NOTICE: process.env.SYSTEM_NOTICE,
-        DOCUMENTS_ENABLED: process.env.DOCUMENTS_ENABLED == 'true',
+        DOCUMENTS_ENABLED: boolMap(process.env.DOCUMENTS_ENABLED),
+        RAG_ENABLED: boolMap(process.env.RAG_ENABLED),
         TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL,
       },
       // rawDefine: {}

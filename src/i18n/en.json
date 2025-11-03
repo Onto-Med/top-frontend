@@ -568,6 +568,7 @@
     }
   },
   "pipelineManagementOfDataSource": "Pipeline management of data source '{dataSource}'",
+  "documentsForRAG": "AI search in {numberOfDocs} documents",
   "configurationOfPipeline": "Pipeline configuration",
   "clusterReview": "Cluster review|Cluster reviews",
   "preProcessing": "Pre-processing",
@@ -620,5 +621,10 @@
   "passedCount": "{passed} of {total} passed",
   "passed": "Passed",
   "appKeywords": "document-search, phenotype algorithm, phenotype definition, phenotype library, phenotyping, terminology",
-  "uploadDataSourceDescription": "Please specify a unique data source ID. Reusing an existing ID will append any uploaded data, replacing any values with matching primary keys."
+  "uploadDataSourceDescription": "Please specify a unique data source ID. Reusing an existing ID will append any uploaded data, replacing any values with matching primary keys.",
+  "useRag": "AI",
+  "question": "Question",
+  "questioning": "Questioning",
+  "ragInitNotSupportedTitle": "Not Supported!",
+  "ragInitNotSupported": "The RAG component is either not activated, or not available for this specific data source. Please ask your administrator to activate it."
 }
