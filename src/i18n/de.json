@@ -626,5 +626,5 @@
   "question": "Frage",
   "questioning": "Befragung",
   "ragInitNotSupportedTitle": "Nicht unterstützt!",
-  "ragInitNotSupported": "Die RAG Komponente ist nicht aktiviert; oder zumindest nicht für diese Datenquelle. Zur Zeit ist die Funktion, sie vom Frontend aus zu aktivieren, nicht unterstützt. Bitte wenden Sie sich an Ihre*n Administrator*in, um sie zu aktivieren."
+  "ragInitNotSupported": "Die RAG-Komponente ist entweder nicht aktiviert oder für diese bestimmte Datenquelle nicht verfügbar. Bitte wenden Sie sich an Ihren Administrator, um sie zu aktivieren."
 }
