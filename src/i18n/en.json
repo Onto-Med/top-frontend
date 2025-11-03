@@ -626,5 +626,5 @@
   "question": "Question",
   "questioning": "Questioning",
   "ragInitNotSupportedTitle": "Not Supported!",
-  "ragInitNotSupported": "The RAG component is not activated or at least not for this datasource. Activating it from within the frontend ist not supported right now. Please ask your administrator to activate it."
+  "ragInitNotSupported": "The RAG component is either not activated, or not available for this specific data source. Please ask your administrator to activate it."
 }
