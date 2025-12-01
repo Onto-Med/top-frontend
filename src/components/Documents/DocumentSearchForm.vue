@@ -191,7 +191,8 @@ import {
   DocumentGatheringMode,
   DocumentPage,
   PipelineResponseStatus,
-  Query, RAGAnswer
+  Query,
+  RAGAnswer,
 } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
@@ -216,7 +217,7 @@ const props = defineProps<{
   withRag: boolean
 }>()
 
-const emit = defineEmits(['clearQuery'])
+const emit = defineEmits(['clearQuery', 'hasNoDocuments', 'hasDocuments'])
 
 const { t } = useI18n()
 const $q = useQuasar()
@@ -431,7 +432,7 @@ async function reloadConcepts() {
 }
 
 async function reloadDocuments(name?: string, page = 1) {
-  if (!props.dataSource) documents.value = undefined
+  // if (!props.dataSource) documents.value = undefined
   if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource)
     return Promise.reject()
   documents.value = undefined
@@ -450,7 +451,11 @@ async function reloadDocuments(name?: string, page = 1) {
       mostImportantNodes.value,
       page,
     )
-    .then((r) => (documents.value = r.data))
+    .then((r) => {
+      documents.value = r.data
+      emit('hasDocuments')
+    })
+    .catch(() => emit('hasNoDocuments'))
     .finally(() => (documentsLoading.value = false))
 }
 
@@ -541,7 +546,7 @@ async function poseQuestionToRag() {
     $q.dialog({
       title: t('ragInitNotSupportedTitle'),
       message: t('ragInitNotSupported'),
-      persistent: true
+      persistent: true,
     })
     return
   }
@@ -575,21 +580,20 @@ async function poseQuestionToRag() {
       documents: documentIds,
       process: props.dataSource.id,
       previousResult: ragResult.value,
-      previousQuestion: ragQuestion.value
+      previousQuestion: ragQuestion.value,
     },
+  }).onOk((payload) => {
+    if (payload != undefined) {
+      ragResult.value = {
+        info: payload.answer != undefined ? payload.answer.info : undefined,
+        answer: payload.answer != undefined ? payload.answer.answer : '',
+      } as RAGAnswer
+      ragQuestion.value = payload.question
+    } else {
+      ragResult.value = undefined
+      ragQuestion.value = undefined
+    }
   })
-    .onOk((payload) => {
-      if (payload != undefined) {
-        ragResult.value = {
-          info: payload.answer != undefined? payload.answer.info : undefined,
-          answer: payload.answer != undefined? payload.answer.answer: ""
-        } as RAGAnswer
-        ragQuestion.value = payload.question
-      } else {
-        ragResult.value = undefined
-        ragQuestion.value = undefined
-      }
-    })
 }
 </script>
 

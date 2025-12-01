@@ -5,35 +5,46 @@
         <div class="text-h6">
           {{ t('documentSearch.title') }}
         </div>
-        <q-chip v-if="query" square removable @remove="resetPage">
-          {{ t('dataOfQuery', { thing: query.name || query.id }) }}
-          ({{ t('dataSource') }}:&nbsp;
-          <span v-if="dataSource">{{ t('quoteThing', { thing: dataSource.id }) }}</span>
-          <i v-else class="text-negative">{{ t('unavailable') }}</i
-          >)
-        </q-chip>
+        <div class="row justify-between">
+          <q-chip v-if="query" square removable @remove="resetPage">
+            {{ t('dataOfQuery', { thing: query.name || query.id }) }}
+            ({{ t('dataSource') }}:&nbsp;
+            <span v-if="dataSource">{{ t('quoteThing', { thing: dataSource.id }) }}</span>
+            <i v-else class="text-negative">{{ t('unavailable') }}</i
+            >)
+          </q-chip>
 
-        <q-select
-          v-else
-          v-model="dataSource"
-          :options="dataSources"
-          :label="t('dataSource')"
-          :error="!dataSource"
-          dense
-          hide-bottom-space
-          class="data-source-select"
-        >
-          <template #option="scope">
-            <q-item v-bind="scope.itemProps">
-              <q-item-section>
-                {{ scope.opt.title || scope.opt.id }}
-              </q-item-section>
-            </q-item>
-          </template>
-          <template #selected-item="scope">
-            {{ scope.opt.title || scope.opt.id }}
-          </template>
-        </q-select>
+          <q-select
+            v-else
+            v-model="dataSource"
+            :options="dataSources"
+            :label="t('dataSource')"
+            :error="!dataSource"
+            dense
+            hide-bottom-space
+            class="data-source-select"
+          >
+            <template #option="scope">
+              <q-item v-bind="scope.itemProps">
+                <q-item-section>
+                  {{ scope.opt.title || scope.opt.id }}
+                </q-item-section>
+              </q-item>
+            </template>
+            <template #selected-item="scope">
+              {{ scope.opt.title || scope.opt.id }}
+            </template>
+          </q-select>
+          <div v-if="dataSource && documentImport">
+            <q-separator horizontal />
+            <q-btn
+              color="primary"
+              @click="uploadDocuments"
+            >
+              {{ t('importThing', { thing: t('file', 2) }) }}
+            </q-btn>
+          </div>
+        </div>
       </q-card-section>
       <q-separator />
 
@@ -46,6 +57,8 @@
           :with-rag="env.RAG_ENABLED"
           class="cluster-form"
           @clear-query="resetPage()"
+          @has-no-documents="documentImport = true"
+          @has-documents="documentImport = false"
         />
       </q-card-section>
     </q-card>
@@ -78,6 +91,7 @@ const query = ref<Query>()
 const documentIds = ref<Array<string>>()
 const documentOffsets = ref<{ [key: string]: string[] }>()
 const router = useRouter()
+const documentImport = ref<boolean>(false)
 
 useMeta({ title: t('documentSearch.title') })
 
@@ -139,6 +153,10 @@ function resetPage() {
   documentOffsets.value = undefined
   void router.push({ name: 'documentSearch' })
 }
+
+function uploadDocuments() {
+
+}
 </script>
 
 <style lang="scss" scoped>
@@ -146,7 +164,7 @@ function resetPage() {
   min-height: 104px;
 }
 .data-source-select {
-  min-width: 50px;
+  min-width: 500px;
   max-width: 500px;
 }
 </style>

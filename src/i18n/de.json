@@ -350,6 +350,7 @@
   "unnamedEntity": "Unbenannte Entität|Unbenannte Entitäten",
   "copiedToClipboard": "In die Zwischenablage kopiert",
   "saveAsFile": "Als Datei speichern",
+  "importThing": "{thing} importieren",
   "importAndExport": "Import und Export",
   "importOrExportThing": "{thing} importieren oder exportieren",
   "importDescription": "Wählen Sie eine Datei und das entsprechende Format aus, um ihren Inhalt in dieses Repositorium hochzuladen.",

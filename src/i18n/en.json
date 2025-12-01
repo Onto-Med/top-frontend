@@ -350,6 +350,7 @@
   "unnamedEntity": "Unnamed entity|Unnamed entities",
   "copiedToClipboard": "Copied to clipboard",
   "saveAsFile": "Save as file",
+  "importThing": "Import {thing}",
   "importAndExport": "Import and export",
   "importOrExportThing": "Import or export {thing}",
   "importDescription": "Select a file and the respective format to upload it's content to the this repository.",
