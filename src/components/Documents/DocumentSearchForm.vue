@@ -656,7 +656,7 @@ async function uploadFiles() {
     return ({
       id: uuidv4(),
       name: d.name,
-      text: await Blob.text(d),
+      text: await (d as Blob).text(),
     } as Document)
   })
   await Promise.all(documentPromises).then(
