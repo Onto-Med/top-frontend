@@ -308,7 +308,9 @@
   "documentSearch": {
     "title": "Document search",
     "short": "Explorative document search",
-    "description": "Please select a data source you want to search for documents."
+    "description": "Please select a data source you want to search for documents.",
+    "noDatasourceChosen": "No datasource was selected. Please choose a datasource that either contains document or one for which no index exists to initialize an index and import documents.",
+    "noDocumentIndexServer": "There seems to be a problem with the document server."
   },
   "phenotype_repository": "Phenotype repository",
   "concept_repository": "Concept repository",

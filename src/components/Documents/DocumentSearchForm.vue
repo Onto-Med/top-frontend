@@ -108,7 +108,7 @@
         <q-separator vertical />
         <q-btn
           v-if="withRag"
-          :disable="!dataSource"
+          :disable="!dataSource || provideUpload"
           flat
           no-caps
           no-wrap
@@ -121,7 +121,7 @@
         </q-btn>
         <q-separator vertical />
         <q-btn
-          :disable="!dataSource"
+          :disable="!dataSource || provideUpload"
           flat
           no-caps
           no-wrap
@@ -136,6 +136,7 @@
       <q-separator />
 
       <table-with-actions
+        v-if="dataSource && documents"
         flat
         wrap-cells
         :disable="!dataSource"
@@ -169,7 +170,46 @@
           </q-td>
         </template>
       </table-with-actions>
-
+      <div v-else-if="provideUpload" class="q-pa-md">
+        <div class="q-gutter-md">
+          <q-select
+            v-model="documentLanguage"
+            :options="languages"
+            :label="t('language')"
+            :error="!documentLanguage"
+            emit-value
+            map-options
+            style="max-width: 250px"
+          />
+          <q-file
+            v-model="filesToUpload"
+            :label="t('importThing', { thing: t('file', 2) })"
+            :readonly="isUploading"
+            clearable
+            outlined
+            multiple
+            append
+            use-chips
+          >
+            <template v-slot:after>
+              <q-btn
+                color="primary"
+                dense
+                icon="cloud_upload"
+                round
+                @click="uploadFiles"
+                :disable="!documentLanguage || filesToUpload == undefined || filesToUpload.length <= 0"
+                :loading="isUploading"
+              ></q-btn>
+            </template>
+          </q-file>
+        </div>
+      </div>
+      <div v-else>
+        <div class="q-pa-md text-grey text-center">
+          {{ noDocumentReason }}
+        </div>
+      </div>
       <q-inner-loading :showing="documentsLoading" />
     </template>
   </q-splitter>
@@ -203,6 +243,8 @@ import { storeToRefs } from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
 import { useRouter } from 'vue-router'
 import RAGQuestionDialog from 'components/Documents/RAGQuestionDialog.vue'
+import { languages } from 'src/config'
+import { v4 as uuidv4 } from 'uuid';
 
 interface ConceptColor {
   'background-color'?: string
@@ -217,7 +259,7 @@ const props = defineProps<{
   withRag: boolean
 }>()
 
-const emit = defineEmits(['clearQuery', 'hasNoDocuments', 'hasDocuments'])
+const emit = defineEmits(['clearQuery'])
 
 const { t } = useI18n()
 const $q = useQuasar()
@@ -234,6 +276,10 @@ const document_ = ref<Document>()
 const concepts = ref<ConceptCluster[]>([])
 const conceptsLoading = ref(false)
 const documentsLoading = ref(false)
+const noDocumentReason = computed(() => {
+  if (documents.value == undefined && props.dataSource == undefined) return t('documentSearch.noDatasourceChosen')
+  return t('documentSearch.noDocumentIndexServer')
+})
 const selectedConcepts = ref<number[]>([])
 const distinctColors = [
   '#556b2f',
@@ -305,6 +351,11 @@ const conceptMode = ref(DocumentGatheringMode.Exclusive)
 const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
 
+const provideUpload = ref<boolean>(false)
+const filesToUpload = ref<File[]>([])
+const isUploading = ref(false)
+const documentLanguage = ref<string | undefined>()
+
 const cols = computed(
   () =>
     [
@@ -371,6 +422,7 @@ watch(
   () => props.dataSource,
   () => {
     concepts.value.length = 0
+    filesToUpload.value.length = 0
     reloadConcepts()
       .then(() => reloadDocuments())
       .catch((e: Error) => {
@@ -452,10 +504,12 @@ async function reloadDocuments(name?: string, page = 1) {
       page,
     )
     .then((r) => {
-      documents.value = r.data
-      emit('hasDocuments')
+      documents.value = r.data.content != undefined ? r.data : undefined
+      provideUpload.value = false
     })
-    .catch(() => emit('hasNoDocuments'))
+    .catch(() => {
+      provideUpload.value = true
+    })
     .finally(() => (documentsLoading.value = false))
 }
 
@@ -594,6 +648,24 @@ async function poseQuestionToRag() {
       ragQuestion.value = undefined
     }
   })
+}
+
+async function uploadFiles() {
+  if (props.dataSource == undefined || documentApi == undefined) return
+  const documentPromises = filesToUpload.value.map(async (d) => {
+    return ({
+      id: uuidv4(),
+      name: d.name,
+      text: await Blob.text(d),
+    } as Document)
+  })
+  await Promise.all(documentPromises).then(
+    (r) => documentApi.importDocuments(
+      props.dataSource!.id,
+      documentLanguage.value,
+      r
+    ).finally(() => reloadDocuments())
+  )
 }
 </script>
 
