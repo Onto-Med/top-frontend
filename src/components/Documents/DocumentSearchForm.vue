@@ -190,6 +190,8 @@
             multiple
             append
             use-chips
+            accept=".txt"
+            :max-total-size="env.MAX_COMBINED_DOCUMENTS_UPLOAD"
           >
             <template v-slot:after>
               <q-btn
@@ -246,7 +248,7 @@ import { storeToRefs } from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
 import { useRouter } from 'vue-router'
 import RAGQuestionDialog from 'components/Documents/RAGQuestionDialog.vue'
-import { languages } from 'src/config'
+import { languages, env } from 'src/config'
 import { v4 as uuidv4 } from 'uuid'
 
 interface ConceptColor {
@@ -512,8 +514,12 @@ async function reloadDocuments(name?: string, page = 1) {
       documents.value = r.data.content != undefined ? r.data : undefined
       provideUpload.value = false
     })
-    .catch(() => {
-      provideUpload.value = true
+    .catch((e) => {
+      if (e.status === 404) {
+        provideUpload.value = true
+      } else {
+        renderError(e)
+      }
     })
     .finally(() => (documentsLoading.value = false))
 }
