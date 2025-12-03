@@ -19,7 +19,7 @@ export const env = {
   SYSTEM_NOTICE: process.env.SYSTEM_NOTICE,
   DOCUMENTS_ENABLED: process.env.DOCUMENTS_ENABLED,
   RAG_ENABLED: process.env.RAG_ENABLED,
-  MAX_COMBINED_DOCUMENTS_UPLOAD: process.env.MAX_COMBINED_DOCUMENTS_UPLOAD || '2048',
+  MAX_COMBINED_DOCUMENTS_UPLOAD: process.env.MAX_COMBINED_DOCUMENTS_UPLOAD || '2097152',
   TOP_PHENOTYPIC_QUERY_DOC_BASE_URL:
     process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL ||
     'https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner',
