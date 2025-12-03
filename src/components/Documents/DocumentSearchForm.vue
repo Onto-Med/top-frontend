@@ -198,7 +198,9 @@
                 icon="cloud_upload"
                 round
                 @click="uploadFiles"
-                :disable="!documentLanguage || filesToUpload == undefined || filesToUpload.length <= 0"
+                :disable="
+                  !documentLanguage || filesToUpload == undefined || filesToUpload.length <= 0
+                "
                 :loading="isUploading"
               ></q-btn>
             </template>
@@ -229,6 +231,7 @@ import {
   DataSource,
   Document,
   DocumentGatheringMode,
+  DocumentImport,
   DocumentPage,
   PipelineResponseStatus,
   Query,
@@ -244,7 +247,7 @@ import ConceptClusterDialog from './ConceptClusterDialog.vue'
 import { useRouter } from 'vue-router'
 import RAGQuestionDialog from 'components/Documents/RAGQuestionDialog.vue'
 import { languages } from 'src/config'
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 
 interface ConceptColor {
   'background-color'?: string
@@ -277,7 +280,8 @@ const concepts = ref<ConceptCluster[]>([])
 const conceptsLoading = ref(false)
 const documentsLoading = ref(false)
 const noDocumentReason = computed(() => {
-  if (documents.value == undefined && props.dataSource == undefined) return t('documentSearch.noDatasourceChosen')
+  if (documents.value == undefined && props.dataSource == undefined)
+    return t('documentSearch.noDatasourceChosen')
   return t('documentSearch.noDocumentIndexServer')
 })
 const selectedConcepts = ref<number[]>([])
@@ -355,6 +359,7 @@ const provideUpload = ref<boolean>(false)
 const filesToUpload = ref<File[]>([])
 const isUploading = ref(false)
 const documentLanguage = ref<string | undefined>()
+const uploadInterval = ref<number>()
 
 const cols = computed(
   () =>
@@ -651,21 +656,41 @@ async function poseQuestionToRag() {
 }
 
 async function uploadFiles() {
-  if (props.dataSource == undefined || documentApi == undefined) return
+  if (props.dataSource == undefined || documentApi == undefined) return Promise.reject()
+  isUploading.value = true
   const documentPromises = filesToUpload.value.map(async (d) => {
-    return ({
+    return {
       id: uuidv4(),
       name: d.name,
       text: await (d as Blob).text(),
-    } as Document)
+    } as Document
   })
-  await Promise.all(documentPromises).then(
-    (r) => documentApi.importDocuments(
-      props.dataSource!.id,
-      documentLanguage.value,
-      r
-    ).finally(() => reloadDocuments())
-  )
+  await Promise.all(documentPromises)
+    .then((documents) =>
+      documentApi.importDocuments(props.dataSource!.id, documentLanguage.value, documents),
+    )
+    .then((importStatus) => checkForUpload(importStatus.data))
+}
+
+function checkForUpload(importStatus: DocumentImport) {
+  if (props.dataSource == undefined || documentApi == undefined) return
+  isUploading.value = true
+  documentApi
+    ?.getDocuments(props.dataSource.id)
+    .then((p) => {
+      if (p.data.totalElements >= (importStatus.count != undefined ? importStatus.count : 0)) {
+        isUploading.value = false
+        window.clearInterval(uploadInterval.value)
+        reloadDocuments().catch((e: Error) => {
+          renderError(e)
+        })
+      } else {
+        uploadInterval.value = window.setTimeout(() => {
+          checkForUpload(importStatus)
+        }, 5000)
+      }
+    })
+    .catch((e) => renderError(e))
 }
 </script>
 
