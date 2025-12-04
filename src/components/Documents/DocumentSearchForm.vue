@@ -191,8 +191,12 @@
             append
             use-chips
             accept=".txt"
-            :max-total-size="env.MAX_COMBINED_DOCUMENTS_UPLOAD"
+            counter
+            :max-total-size="maxCombinedFileUploadSize"
           >
+            <template v-slot:hint>
+              {{ t('documentSearch.maxCombinedSize') + ': ' + env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase() }}
+            </template>
             <template v-slot:after>
               <q-btn
                 color="primary"
@@ -362,6 +366,27 @@ const filesToUpload = ref<File[]>([])
 const isUploading = ref(false)
 const documentLanguage = ref<string | undefined>()
 const uploadInterval = ref<number>()
+
+const maxCombinedFileUploadSize = computed(() => {
+  const envVar = env.MAX_COMBINED_DOCUMENTS_UPLOAD
+  const postfix = envVar.substring(envVar.length - 2).toLowerCase()
+  let sizeValue
+  if (['kb', 'mb', 'gb'].includes(postfix)) {
+    sizeValue = Number(envVar.substring(0, envVar.length - 2))
+  } else {
+    sizeValue = Number(envVar)
+  }
+  switch (postfix) {
+    case 'kb':
+      return sizeValue * 1000
+    case 'mb':
+      return sizeValue * 1000 * 1000
+    case 'gb':
+      return sizeValue * 1000 * 1000 * 1000
+    default:
+      return sizeValue
+  }
+})
 
 const cols = computed(
   () =>
