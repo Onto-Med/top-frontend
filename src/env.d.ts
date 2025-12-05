@@ -17,6 +17,7 @@ declare namespace NodeJS {
     SYSTEM_NOTICE: string | undefined
     DOCUMENTS_ENABLED: boolean
     RAG_ENABLED: boolean
+    MAX_COMBINED_DOCUMENTS_UPLOAD: string
     TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: string
   }
 }

@@ -108,7 +108,7 @@
         <q-separator vertical />
         <q-btn
           v-if="withRag"
-          :disable="!dataSource"
+          :disable="!dataSource || provideUpload"
           flat
           no-caps
           no-wrap
@@ -121,7 +121,7 @@
         </q-btn>
         <q-separator vertical />
         <q-btn
-          :disable="!dataSource"
+          :disable="!dataSource || provideUpload"
           flat
           no-caps
           no-wrap
@@ -136,6 +136,7 @@
       <q-separator />
 
       <table-with-actions
+        v-if="dataSource && documents"
         flat
         wrap-cells
         :disable="!dataSource"
@@ -169,7 +170,54 @@
           </q-td>
         </template>
       </table-with-actions>
-
+      <div v-else-if="provideUpload" class="q-pa-md">
+        <div class="q-gutter-md">
+          <q-select
+            v-model="documentLanguage"
+            :options="languages"
+            :label="t('language')"
+            :error="!documentLanguage"
+            emit-value
+            map-options
+            style="max-width: 250px"
+          />
+          <q-file
+            v-model="filesToUpload"
+            :label="t('importThing', { thing: t('file', 2) })"
+            :readonly="isUploading"
+            clearable
+            outlined
+            multiple
+            append
+            use-chips
+            accept=".txt"
+            counter
+            :max-total-size="maxCombinedFileUploadSize"
+          >
+            <template v-slot:hint>
+              {{ t('documentSearch.maxCombinedSize') + ': ' + env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase() }}
+            </template>
+            <template v-slot:after>
+              <q-btn
+                color="primary"
+                dense
+                icon="cloud_upload"
+                round
+                @click="uploadFiles"
+                :disable="
+                  !documentLanguage || filesToUpload == undefined || filesToUpload.length <= 0
+                "
+                :loading="isUploading"
+              ></q-btn>
+            </template>
+          </q-file>
+        </div>
+      </div>
+      <div v-else>
+        <div class="q-pa-md text-grey text-center">
+          {{ noDocumentReason }}
+        </div>
+      </div>
       <q-inner-loading :showing="documentsLoading" />
     </template>
   </q-splitter>
@@ -189,9 +237,11 @@ import {
   DataSource,
   Document,
   DocumentGatheringMode,
+  DocumentImport,
   DocumentPage,
   PipelineResponseStatus,
-  Query, RAGAnswer
+  Query,
+  RAGAnswer,
 } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import TableWithActions from 'components/TableWithActions.vue'
@@ -202,6 +252,8 @@ import { storeToRefs } from 'pinia'
 import ConceptClusterDialog from './ConceptClusterDialog.vue'
 import { useRouter } from 'vue-router'
 import RAGQuestionDialog from 'components/Documents/RAGQuestionDialog.vue'
+import { languages, env } from 'src/config'
+import { v4 as uuidv4 } from 'uuid'
 
 interface ConceptColor {
   'background-color'?: string
@@ -233,6 +285,11 @@ const document_ = ref<Document>()
 const concepts = ref<ConceptCluster[]>([])
 const conceptsLoading = ref(false)
 const documentsLoading = ref(false)
+const noDocumentReason = computed(() => {
+  if (documents.value == undefined && props.dataSource == undefined)
+    return t('documentSearch.noDatasourceChosen')
+  return t('documentSearch.noDocumentIndexServer')
+})
 const selectedConcepts = ref<number[]>([])
 const distinctColors = [
   '#556b2f',
@@ -304,6 +361,33 @@ const conceptMode = ref(DocumentGatheringMode.Exclusive)
 const mostImportantNodes = ref(false)
 const splitterModel = ref(40)
 
+const provideUpload = ref<boolean>(false)
+const filesToUpload = ref<File[]>([])
+const isUploading = ref(false)
+const documentLanguage = ref<string | undefined>()
+const uploadInterval = ref<number>()
+
+const maxCombinedFileUploadSize = computed(() => {
+  const envVar = env.MAX_COMBINED_DOCUMENTS_UPLOAD
+  const postfix = envVar.substring(envVar.length - 2).toLowerCase()
+  let sizeValue
+  if (['kb', 'mb', 'gb'].includes(postfix)) {
+    sizeValue = Number(envVar.substring(0, envVar.length - 2))
+  } else {
+    sizeValue = Number(envVar)
+  }
+  switch (postfix) {
+    case 'kb':
+      return sizeValue * 1000
+    case 'mb':
+      return sizeValue * 1000 * 1000
+    case 'gb':
+      return sizeValue * 1000 * 1000 * 1000
+    default:
+      return sizeValue
+  }
+})
+
 const cols = computed(
   () =>
     [
@@ -370,6 +454,7 @@ watch(
   () => props.dataSource,
   () => {
     concepts.value.length = 0
+    filesToUpload.value.length = 0
     reloadConcepts()
       .then(() => reloadDocuments())
       .catch((e: Error) => {
@@ -431,7 +516,7 @@ async function reloadConcepts() {
 }
 
 async function reloadDocuments(name?: string, page = 1) {
-  if (!props.dataSource) documents.value = undefined
+  // if (!props.dataSource) documents.value = undefined
   if (!props.dataSource || !documentApi || documentsLoading.value || !props.dataSource)
     return Promise.reject()
   documents.value = undefined
@@ -450,7 +535,17 @@ async function reloadDocuments(name?: string, page = 1) {
       mostImportantNodes.value,
       page,
     )
-    .then((r) => (documents.value = r.data))
+    .then((r) => {
+      documents.value = r.data.content != undefined ? r.data : undefined
+      provideUpload.value = false
+    })
+    .catch((e) => {
+      if (e.status === 404) {
+        provideUpload.value = true
+      } else {
+        renderError(e)
+      }
+    })
     .finally(() => (documentsLoading.value = false))
 }
 
@@ -541,7 +636,7 @@ async function poseQuestionToRag() {
     $q.dialog({
       title: t('ragInitNotSupportedTitle'),
       message: t('ragInitNotSupported'),
-      persistent: true
+      persistent: true,
     })
     return
   }
@@ -575,21 +670,58 @@ async function poseQuestionToRag() {
       documents: documentIds,
       process: props.dataSource.id,
       previousResult: ragResult.value,
-      previousQuestion: ragQuestion.value
+      previousQuestion: ragQuestion.value,
     },
+  }).onOk((payload) => {
+    if (payload != undefined) {
+      ragResult.value = {
+        info: payload.answer != undefined ? payload.answer.info : undefined,
+        answer: payload.answer != undefined ? payload.answer.answer : '',
+      } as RAGAnswer
+      ragQuestion.value = payload.question
+    } else {
+      ragResult.value = undefined
+      ragQuestion.value = undefined
+    }
   })
-    .onOk((payload) => {
-      if (payload != undefined) {
-        ragResult.value = {
-          info: payload.answer != undefined? payload.answer.info : undefined,
-          answer: payload.answer != undefined? payload.answer.answer: ""
-        } as RAGAnswer
-        ragQuestion.value = payload.question
+}
+
+async function uploadFiles() {
+  if (props.dataSource == undefined || documentApi == undefined) return Promise.reject()
+  isUploading.value = true
+  const documentPromises = filesToUpload.value.map(async (d) => {
+    return {
+      id: uuidv4(),
+      name: d.name,
+      text: await (d as Blob).text(),
+    } as Document
+  })
+  await Promise.all(documentPromises)
+    .then((documents) =>
+      documentApi.importDocuments(props.dataSource!.id, documentLanguage.value, documents),
+    )
+    .then((importStatus) => checkForUpload(importStatus.data))
+}
+
+function checkForUpload(importStatus: DocumentImport) {
+  if (props.dataSource == undefined || documentApi == undefined) return
+  isUploading.value = true
+  documentApi
+    ?.getDocuments(props.dataSource.id)
+    .then((p) => {
+      if (p.data.totalElements >= (importStatus.count != undefined ? importStatus.count : 0)) {
+        isUploading.value = false
+        window.clearInterval(uploadInterval.value)
+        reloadDocuments().catch((e: Error) => {
+          renderError(e)
+        })
       } else {
-        ragResult.value = undefined
-        ragQuestion.value = undefined
+        uploadInterval.value = window.setTimeout(() => {
+          checkForUpload(importStatus)
+        }, 5000)
       }
     })
+    .catch((e) => renderError(e))
 }
 </script>
 

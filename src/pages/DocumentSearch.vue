@@ -139,6 +139,7 @@ function resetPage() {
   documentOffsets.value = undefined
   void router.push({ name: 'documentSearch' })
 }
+
 </script>
 
 <style lang="scss" scoped>
