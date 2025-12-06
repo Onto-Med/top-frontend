@@ -10,7 +10,7 @@
           <q-separator v-if="isAdmin" vertical />
           <q-btn
             v-if="isAdmin"
-            :disable="!dataSource"
+            :disable="!dataSource || !conceptGraphApiAccessible"
             flat
             no-caps
             no-wrap
@@ -195,7 +195,11 @@
             :max-total-size="maxCombinedFileUploadSize"
           >
             <template v-slot:hint>
-              {{ t('documentSearch.maxCombinedSize') + ': ' + env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase() }}
+              {{
+                t('documentSearch.maxCombinedSize') +
+                ': ' +
+                env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase()
+              }}
             </template>
             <template v-slot:after>
               <q-btn
@@ -290,6 +294,7 @@ const noDocumentReason = computed(() => {
     return t('documentSearch.noDatasourceChosen')
   return t('documentSearch.noDocumentIndexServer')
 })
+const conceptGraphApiAccessible = ref(true)
 const selectedConcepts = ref<number[]>([])
 const distinctColors = [
   '#556b2f',
@@ -475,7 +480,7 @@ function switchRagIconColor() {
 
 function hasActiveRag(process: string | undefined) {
   hasActiveRagComponent.value = false
-  if (!ragApi || process === undefined) return
+  if (!ragApi || process === undefined || !props.withRag) return
   ragApi
     .getStatusOfRAG(process)
     .then((r) => {
@@ -569,8 +574,12 @@ function prepareSelectedConcepts() {
 
 async function checkPipeline() {
   if (!props.dataSource) return Promise.reject()
-  return await conceptPipelineApi
+  return conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
+    .then((r) => {
+      if (r.data.pipelineId === undefined) conceptGraphApiAccessible.value = false
+      return r
+    })
     .then((r) => r.data.status === PipelineResponseStatus.Successful)
     .then((r) => (!r ? Promise.reject() : true))
 }
