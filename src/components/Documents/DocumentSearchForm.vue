@@ -448,7 +448,7 @@ onMounted(() => {
     .then(reloadConcepts)
     .then(() => reloadDocuments())
     .catch((e: Error) => renderError(e))
-
+  hasActiveCGApi()
   hasActiveRag(props.dataSource?.id)
 })
 
@@ -466,9 +466,28 @@ watch(
         documents.value = undefined
         renderError(e)
       })
+    hasActiveCGApi()
     hasActiveRag(props.dataSource?.id)
   },
 )
+
+function hasActiveCGApi() {
+  conceptPipelineApi
+    ?.getConceptPipelineManagerStatus()
+    .then((r) => {
+      console.log(r.data)
+      if (r.data.enabled != undefined && r.data.status != undefined) {
+        conceptGraphApiAccessible.value = r.data.enabled && r.data.status
+      } else {
+        conceptGraphApiAccessible.value = false
+      }
+    })
+    .catch((e: Error) => {
+      conceptGraphApiAccessible.value = false
+      renderError(e)
+    })
+}
+
 
 function switchRagIconColor() {
   if (hasActiveRagComponent.value) {
@@ -480,7 +499,7 @@ function switchRagIconColor() {
 
 function hasActiveRag(process: string | undefined) {
   hasActiveRagComponent.value = false
-  if (!ragApi || process === undefined || !props.withRag) return
+  if (!ragApi || process === undefined || !props.withRag || !conceptGraphApiAccessible.value) return
   ragApi
     .getStatusOfRAG(process)
     .then((r) => {
@@ -576,10 +595,6 @@ async function checkPipeline() {
   if (!props.dataSource) return Promise.reject()
   return conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
-    .then((r) => {
-      if (r.data.pipelineId === undefined) conceptGraphApiAccessible.value = false
-      return r
-    })
     .then((r) => r.data.status === PipelineResponseStatus.Successful)
     .then((r) => (!r ? Promise.reject() : true))
 }
