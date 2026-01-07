@@ -541,6 +541,7 @@
   "fileToDisplay": "Anzuzeigende Datei|Anzuzeigende Dateien",
   "definition": "Definition|Definitionen",
   "conceptCluster": {
+    "noApiAccessible": "Die Concept Graphs API scheint nicht erreichbar zu sein. Entweder wurde sie nicht aktiviert, oder es gibt Fehler in der Konfiguration.",
     "unfinishedSteps": "Unvollendete Schritte",
     "noConceptsAvailable": "Derzeit liegen keine Konzepte vor. Möglicherweise müssen sie zunächst aus einem Textkorpus generiert werden. Bitte nutzen Sie die Schaltfläche oben, um den Generierungsprozess zu starten.",
     "selectConceptsDescription": "Bitte geben Sie auf der rechten Seite die Konzepte an, nach denen Sie suchen möchten.",

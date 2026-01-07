@@ -81,6 +81,8 @@ export default defineConfig((ctx) => {
         SYSTEM_NOTICE: process.env.SYSTEM_NOTICE,
         DOCUMENTS_ENABLED: boolMap(process.env.DOCUMENTS_ENABLED),
         RAG_ENABLED: boolMap(process.env.RAG_ENABLED),
+        MAX_COMBINED_DOCUMENTS_UPLOAD: process.env.MAX_COMBINED_DOCUMENTS_UPLOAD,
+        ACCEPT_DOCUMENT_UPLOAD_TYPE: process.env.ACCEPT_DOCUMENT_UPLOAD_TYPE,
         TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL,
       },
       // rawDefine: {}

@@ -24,7 +24,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section v-if="conceptGraphApiAccessible">
           <q-select
             :model-value="conceptMode"
             :options="conceptModeOptions"
@@ -62,7 +62,7 @@
           />
         </q-card-section>
 
-        <q-separator />
+        <q-separator v-if="conceptGraphApiAccessible" />
 
         <q-card-section class="q-pa-none">
           <q-scroll-area style="height: 62vh">
@@ -80,7 +80,12 @@
                 dense
                 @update:model-value="prepareSelectedConcepts()"
               />
-              <div v-if="!concepts.length && !conceptsLoading" class="q-pa-md text-grey">
+              <div v-if="!conceptGraphApiAccessible" class="q-pa-md text-grey">
+                <div class="q-gutter-md text-center">
+                  <div>{{ t('conceptCluster.noApiAccessible') }}</div>
+                </div>
+              </div>
+              <div v-else-if="!concepts.length && !conceptsLoading" class="q-pa-md text-grey">
                 <div class="q-gutter-md text-center">
                   <div>{{ t('conceptCluster.noConceptsAvailable') }}</div>
                   <q-btn
@@ -121,7 +126,7 @@
         </q-btn>
         <q-separator vertical />
         <q-btn
-          :disable="!dataSource || provideUpload"
+          :disable="!dataSource || !documents || provideUpload"
           flat
           no-caps
           no-wrap
@@ -190,8 +195,8 @@
             multiple
             append
             use-chips
-            accept=".txt"
             counter
+            :accept="acceptedDocumentUploadTypes"
             :max-total-size="maxCombinedFileUploadSize"
           >
             <template v-slot:hint>
@@ -374,14 +379,14 @@ const uploadInterval = ref<number>()
 
 const maxCombinedFileUploadSize = computed(() => {
   const envVar = env.MAX_COMBINED_DOCUMENTS_UPLOAD
-  const postfix = envVar.substring(envVar.length - 2).toLowerCase()
+  const suffix = envVar.trimEnd().substring(envVar.length - 2).toLowerCase()
   let sizeValue
-  if (['kb', 'mb', 'gb'].includes(postfix)) {
-    sizeValue = Number(envVar.substring(0, envVar.length - 2))
+  if (['kb', 'mb', 'gb'].includes(suffix)) {
+    sizeValue = Number(envVar.trimEnd().substring(0, envVar.length - 2))
   } else {
     sizeValue = Number(envVar)
   }
-  switch (postfix) {
+  switch (suffix) {
     case 'kb':
       return sizeValue * 1000
     case 'mb':
@@ -391,6 +396,11 @@ const maxCombinedFileUploadSize = computed(() => {
     default:
       return sizeValue
   }
+})
+
+const acceptedDocumentUploadTypes = computed(() => {
+  // For when some processing is needed
+  return env.ACCEPT_DOCUMENT_UPLOAD_TYPE
 })
 
 const cols = computed(
