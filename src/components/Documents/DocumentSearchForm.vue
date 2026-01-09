@@ -379,7 +379,10 @@ const uploadInterval = ref<number>()
 
 const maxCombinedFileUploadSize = computed(() => {
   const envVar = env.MAX_COMBINED_DOCUMENTS_UPLOAD
-  const suffix = envVar.trimEnd().substring(envVar.length - 2).toLowerCase()
+  const suffix = envVar
+    .trimEnd()
+    .substring(envVar.length - 2)
+    .toLowerCase()
   let sizeValue
   if (['kb', 'mb', 'gb'].includes(suffix)) {
     sizeValue = Number(envVar.trimEnd().substring(0, envVar.length - 2))
@@ -496,7 +499,6 @@ function hasActiveCGApi() {
       renderError(e)
     })
 }
-
 
 function switchRagIconColor() {
   if (hasActiveRagComponent.value) {
