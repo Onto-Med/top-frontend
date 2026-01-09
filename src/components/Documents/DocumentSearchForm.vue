@@ -485,7 +485,6 @@ function hasActiveCGApi() {
   conceptPipelineApi
     ?.getConceptPipelineManagerStatus()
     .then((r) => {
-      console.log(r.data)
       if (r.data.enabled != undefined && r.data.status != undefined) {
         conceptGraphApiAccessible.value = r.data.enabled && r.data.status
       } else {
