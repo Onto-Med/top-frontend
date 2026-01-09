@@ -120,9 +120,9 @@
   "missing_value": "Fehlender Wert|Fehlende Werte",
   "phenotype": "Phänotyp|Phänotypen",
   "phenotype_group": "Phänotypgruppe|Phänotypgruppen",
-  "single_phenotype": "Einzelner Phänotyp|Einzelne Phänotypen",
+  "single_phenotype": "Einfacher Phänotyp|Einfache Phänotypen",
   "composite_phenotype": "Zusammengesetzter Phänotyp|Zusammengesetzte Phänotypen",
-  "single_restriction": "Einzelne Restriktion|Einzelne Restriktionen",
+  "single_restriction": "Einfache Restriktion|Einfache Restriktionen",
   "composite_restriction": "Zusammengesetzte Restriktion|Zusammengesetzte Restriktionen",
   "id": "ID",
   "account": "Nutzerkonto",
@@ -320,7 +320,7 @@
   "selectionMode": "Auswahlmodus",
   "itemType": {
     "title": "Elementtyp|Elementtypen",
-    "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
+    "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einfache Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
   },
   "itemTypes": {
     "allergy_intolerance": "Allergische Unverträglichkeit|Allergische Unverträglichkeiten",
