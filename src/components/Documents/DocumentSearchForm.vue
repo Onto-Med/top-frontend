@@ -10,7 +10,7 @@
           <q-separator v-if="isAdmin" vertical />
           <q-btn
             v-if="isAdmin"
-            :disable="!dataSource"
+            :disable="!dataSource || !conceptGraphApiAccessible"
             flat
             no-caps
             no-wrap
@@ -24,7 +24,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section v-if="conceptGraphApiAccessible">
           <q-select
             :model-value="conceptMode"
             :options="conceptModeOptions"
@@ -62,7 +62,7 @@
           />
         </q-card-section>
 
-        <q-separator />
+        <q-separator v-if="conceptGraphApiAccessible" />
 
         <q-card-section class="q-pa-none">
           <q-scroll-area style="height: 62vh">
@@ -80,7 +80,12 @@
                 dense
                 @update:model-value="prepareSelectedConcepts()"
               />
-              <div v-if="!concepts.length && !conceptsLoading" class="q-pa-md text-grey">
+              <div v-if="!conceptGraphApiAccessible" class="q-pa-md text-grey">
+                <div class="q-gutter-md text-center">
+                  <div>{{ t('conceptCluster.noApiAccessible') }}</div>
+                </div>
+              </div>
+              <div v-else-if="!concepts.length && !conceptsLoading" class="q-pa-md text-grey">
                 <div class="q-gutter-md text-center">
                   <div>{{ t('conceptCluster.noConceptsAvailable') }}</div>
                   <q-btn
@@ -121,7 +126,7 @@
         </q-btn>
         <q-separator vertical />
         <q-btn
-          :disable="!dataSource || provideUpload"
+          :disable="!dataSource || !documents || provideUpload"
           flat
           no-caps
           no-wrap
@@ -190,12 +195,16 @@
             multiple
             append
             use-chips
-            accept=".txt"
             counter
+            :accept="acceptedDocumentUploadTypes"
             :max-total-size="maxCombinedFileUploadSize"
           >
             <template v-slot:hint>
-              {{ t('documentSearch.maxCombinedSize') + ': ' + env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase() }}
+              {{
+                t('documentSearch.maxCombinedSize') +
+                ': ' +
+                env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase()
+              }}
             </template>
             <template v-slot:after>
               <q-btn
@@ -290,6 +299,7 @@ const noDocumentReason = computed(() => {
     return t('documentSearch.noDatasourceChosen')
   return t('documentSearch.noDocumentIndexServer')
 })
+const conceptGraphApiAccessible = ref(true)
 const selectedConcepts = ref<number[]>([])
 const distinctColors = [
   '#556b2f',
@@ -369,14 +379,17 @@ const uploadInterval = ref<number>()
 
 const maxCombinedFileUploadSize = computed(() => {
   const envVar = env.MAX_COMBINED_DOCUMENTS_UPLOAD
-  const postfix = envVar.substring(envVar.length - 2).toLowerCase()
+  const suffix = envVar
+    .trimEnd()
+    .substring(envVar.length - 2)
+    .toLowerCase()
   let sizeValue
-  if (['kb', 'mb', 'gb'].includes(postfix)) {
-    sizeValue = Number(envVar.substring(0, envVar.length - 2))
+  if (['kb', 'mb', 'gb'].includes(suffix)) {
+    sizeValue = Number(envVar.trimEnd().substring(0, envVar.length - 2))
   } else {
     sizeValue = Number(envVar)
   }
-  switch (postfix) {
+  switch (suffix) {
     case 'kb':
       return sizeValue * 1000
     case 'mb':
@@ -386,6 +399,11 @@ const maxCombinedFileUploadSize = computed(() => {
     default:
       return sizeValue
   }
+})
+
+const acceptedDocumentUploadTypes = computed(() => {
+  // For when some processing is needed
+  return env.ACCEPT_DOCUMENT_UPLOAD_TYPE
 })
 
 const cols = computed(
@@ -443,7 +461,7 @@ onMounted(() => {
     .then(reloadConcepts)
     .then(() => reloadDocuments())
     .catch((e: Error) => renderError(e))
-
+  hasActiveCGApi()
   hasActiveRag(props.dataSource?.id)
 })
 
@@ -461,9 +479,26 @@ watch(
         documents.value = undefined
         renderError(e)
       })
+    hasActiveCGApi()
     hasActiveRag(props.dataSource?.id)
   },
 )
+
+function hasActiveCGApi() {
+  conceptPipelineApi
+    ?.getConceptPipelineManagerStatus()
+    .then((r) => {
+      if (r.data.enabled != undefined && r.data.status != undefined) {
+        conceptGraphApiAccessible.value = r.data.enabled && r.data.status
+      } else {
+        conceptGraphApiAccessible.value = false
+      }
+    })
+    .catch((e: Error) => {
+      conceptGraphApiAccessible.value = false
+      renderError(e)
+    })
+}
 
 function switchRagIconColor() {
   if (hasActiveRagComponent.value) {
@@ -475,7 +510,7 @@ function switchRagIconColor() {
 
 function hasActiveRag(process: string | undefined) {
   hasActiveRagComponent.value = false
-  if (!ragApi || process === undefined) return
+  if (!ragApi || process === undefined || !props.withRag || !conceptGraphApiAccessible.value) return
   ragApi
     .getStatusOfRAG(process)
     .then((r) => {
@@ -569,7 +604,7 @@ function prepareSelectedConcepts() {
 
 async function checkPipeline() {
   if (!props.dataSource) return Promise.reject()
-  return await conceptPipelineApi
+  return conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => r.data.status === PipelineResponseStatus.Successful)
     .then((r) => (!r ? Promise.reject() : true))

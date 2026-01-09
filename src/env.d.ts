@@ -18,6 +18,7 @@ declare namespace NodeJS {
     DOCUMENTS_ENABLED: boolean
     RAG_ENABLED: boolean
     MAX_COMBINED_DOCUMENTS_UPLOAD: string
+    ACCEPT_DOCUMENT_UPLOAD_TYPE: string
     TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: string
   }
 }
