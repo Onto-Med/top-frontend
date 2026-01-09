@@ -120,10 +120,10 @@
   "missing_value": "Fehlender Wert|Fehlende Werte",
   "phenotype": "Phänotyp|Phänotypen",
   "phenotype_group": "Phänotypgruppe|Phänotypgruppen",
-  "single_phenotype": "Einfacher Phänotyp|Einfache Phänotypen",
-  "composite_phenotype": "Abgeleiteter Phänotyp|Abgeleitete Phänotypen",
-  "single_restriction": "Einfache Restriktion|Einfache Restriktionen",
-  "composite_restriction": "Abgeleitete Restriktion|Abgeleitete Restriktionen",
+  "single_phenotype": "Einfache Phänotyp-Klasse|Einfache Phänotyp-Klassen",
+  "composite_phenotype": "Abgeleitete Phänotyp-Klasse|Abgeleitete Phänotyp-Klassen",
+  "single_restriction": "Einfache Phänotyp-Restriktion|Einfache Phänotyp-Restriktionen",
+  "composite_restriction": "Abgeleitete Phänotyp-Restriktion|Abgeleitete Phänotyp-Restriktionen",
   "id": "ID",
   "account": "Nutzerkonto",
   "darkMode": "Dunkelmodus",
@@ -180,8 +180,8 @@
   "quantifier": "Quantor|Quantoren",
   "loading": "Laden",
   "unnamedCategory": "Unbenannte Kategorie",
-  "unnamedPhenotype": "Unbenannter Phänotyp",
-  "unnamedRestriction": "Unbenannte Restriktion",
+  "unnamedPhenotype": "Unbenannte Phänotyp-Klasse",
+  "unnamedRestriction": "Unbenannte Phänotyp-Restriktion",
   "backToCurrentVersion": "Zurück zur aktuellen Version",
   "showThing": "{thing} anzeigen",
   "createThing": "{thing} anlegen",
@@ -320,7 +320,7 @@
   "selectionMode": "Auswahlmodus",
   "itemType": {
     "title": "Elementtyp|Elementtypen",
-    "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einfache Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
+    "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einfache Phänotyp-Klassen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
   },
   "itemTypes": {
     "allergy_intolerance": "Allergische Unverträglichkeit|Allergische Unverträglichkeiten",
