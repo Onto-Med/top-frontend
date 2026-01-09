@@ -2,7 +2,7 @@
   "ageRestriction": "Altersbegrenzung|Altersbegrenzungen",
   "ageRestrictionDescription": "Legen Sie eine oder mehrere Altersbegrenzungen fest. Altersangaben werden in Jahren angegeben.",
   "aggregationFunction": "Aggregationsfunktion|Aggregationsfunktionen",
-  "aggregationFunctionDescription": "Dies ist ein zusammengesetzter Phänotyp, was bedeutet, dass eine Standardaggregationsfunktion für Fälle erforderlich ist, in denen keine Funktion explizit im Ausdruck eines Phänotyps angegeben ist.  Aggregationsfunktionen werden benötigt, um mehrere Phänotypwerte zu einem Wert zu aggregieren und für Berechnungen verwenden zu können.",
+  "aggregationFunctionDescription": "Dies ist ein abgeleiteter Phänotyp, was bedeutet, dass eine Standardaggregationsfunktion für Fälle erforderlich ist, in denen keine Funktion explizit im Ausdruck eines Phänotyps angegeben ist.  Aggregationsfunktionen werden benötigt, um mehrere Phänotypwerte zu einem Wert zu aggregieren und für Berechnungen verwenden zu können.",
   "and": "und",
   "asc": "Aufsteigend",
   "back": "Zurück",
@@ -120,10 +120,10 @@
   "missing_value": "Fehlender Wert|Fehlende Werte",
   "phenotype": "Phänotyp|Phänotypen",
   "phenotype_group": "Phänotypgruppe|Phänotypgruppen",
-  "single_phenotype": "Einzelner Phänotyp|Einzelne Phänotypen",
-  "composite_phenotype": "Zusammengesetzter Phänotyp|Zusammengesetzte Phänotypen",
-  "single_restriction": "Einzelne Restriktion|Einzelne Restriktionen",
-  "composite_restriction": "Zusammengesetzte Restriktion|Zusammengesetzte Restriktionen",
+  "single_phenotype": "Einfache Phänotyp-Klasse|Einfache Phänotyp-Klassen",
+  "composite_phenotype": "Abgeleitete Phänotyp-Klasse|Abgeleitete Phänotyp-Klassen",
+  "single_restriction": "Einfache Phänotyp-Restriktion|Einfache Phänotyp-Restriktionen",
+  "composite_restriction": "Abgeleitete Phänotyp-Restriktion|Abgeleitete Phänotyp-Restriktionen",
   "id": "ID",
   "account": "Nutzerkonto",
   "darkMode": "Dunkelmodus",
@@ -180,8 +180,8 @@
   "quantifier": "Quantor|Quantoren",
   "loading": "Laden",
   "unnamedCategory": "Unbenannte Kategorie",
-  "unnamedPhenotype": "Unbenannter Phänotyp",
-  "unnamedRestriction": "Unbenannte Restriktion",
+  "unnamedPhenotype": "Unbenannte Phänotyp-Klasse",
+  "unnamedRestriction": "Unbenannte Phänotyp-Restriktion",
   "backToCurrentVersion": "Zurück zur aktuellen Version",
   "showThing": "{thing} anzeigen",
   "createThing": "{thing} anlegen",
@@ -320,7 +320,7 @@
   "selectionMode": "Auswahlmodus",
   "itemType": {
     "title": "Elementtyp|Elementtypen",
-    "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einzelne Phänotypen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
+    "description": "Elementtypen werden zur weiteren Beschreibung eines Phänotyps und seiner Zuordnung zu einem Individuum verwendet. Sie können nur für einfache Phänotyp-Klassen festgelegt werden, da diese Phänotypen direkt mit den zugrunde liegenden Datenelementen verknüpft sind. Je nach Datenquelle kann sich der Datenabruf zwischen den Elementtypen drastisch unterscheiden."
   },
   "itemTypes": {
     "allergy_intolerance": "Allergische Unverträglichkeit|Allergische Unverträglichkeiten",
