@@ -50,12 +50,12 @@ fi
 
 if [[ ! -z "${MAX_COMBINED_DOCUMENTS_UPLOAD}" ]]
 then
-    sed -i "s|MAX_COMBINED_DOCUMENTS_UPLOAD\\:\"2MB\"|MAX_COMBINED_DOCUMENTS_UPLOAD:${MAX_COMBINED_DOCUMENTS_UPLOAD}|g" /usr/share/nginx/html/assets/*.js
+    sed -i "s|MAX_COMBINED_DOCUMENTS_UPLOAD\\:\"2MB\"|MAX_COMBINED_DOCUMENTS_UPLOAD:'${MAX_COMBINED_DOCUMENTS_UPLOAD}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${ACCEPT_DOCUMENT_UPLOAD_TYPE}" ]]
 then
-    sed -i "s|ACCEPT_DOCUMENT_UPLOAD_TYPE\\:\".txt\"|ACCEPT_DOCUMENT_UPLOAD_TYPE:${ACCEPT_DOCUMENT_UPLOAD_TYPE}|g" /usr/share/nginx/html/assets/*.js
+    sed -i "s|ACCEPT_DOCUMENT_UPLOAD_TYPE\\:\".txt\"|ACCEPT_DOCUMENT_UPLOAD_TYPE:'${ACCEPT_DOCUMENT_UPLOAD_TYPE}'|g" /usr/share/nginx/html/assets/*.js
 fi
 
 if [[ ! -z "${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}" ]]
