@@ -57,3 +57,11 @@ npm run lint
 ```bash
 npm run build
 ```
+
+### Adding Environment Variables
+When adding new environment variables that will be needed in the code, there are 4 places you need to register them:
+
+1. `quasar.config.ts`
+2. `src/config.ts`
+3. `src/env.d.ts`
+4. `docker-entrypoint.d/01-set-env-vars.sh`

@@ -105,129 +105,138 @@
     </template>
 
     <template #after>
-      <q-card-section class="row q-pl-md q-pa-none bg-grey-1 no-wrap">
-        <div class="text-subtitle2 q-py-md ellipsis">
-          {{ t('document', 2) }}
-        </div>
-        <q-space />
-        <q-separator vertical />
-        <q-btn
-          v-if="withRag"
-          :disable="!dataSource || provideUpload"
-          flat
-          no-caps
-          no-wrap
-          class="q-py-none"
-          @click="poseQuestionToRag"
-        >
-          <q-icon v-if="dataSource" v-bind:style="{ color: ragColor }" name="smart_toy" />
-          <q-icon v-else name="smart_toy" />
-          <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
-        </q-btn>
-        <q-separator vertical />
-        <q-btn
-          :disable="!dataSource || !documents || provideUpload"
-          flat
-          no-caps
-          no-wrap
-          class="q-py-none"
-          @click="routeToDocumentQuery"
-        >
-          <q-icon name="manage_search" />
-          <div class="q-pl-sm gt-xs ellipsis">{{ t('buildQuery') }}</div>
-        </q-btn>
-      </q-card-section>
-
-      <q-separator />
-
-      <table-with-actions
-        v-if="dataSource && documents"
-        flat
-        wrap-cells
-        :disable="!dataSource"
-        :grid="$q.screen.xs"
-        :name="t('document')"
-        :page="documents"
-        :loading="documentsLoading"
-        :columns="cols"
-        :create="false"
-        :filterable="!query"
-        :title="query ? t('documentsOf') + ': ' + query.name : undefined"
-        title-class="text-body1 text-weight-medium"
-        @request="(name, page) => reloadDocuments(name, page).catch((e: Error) => renderError(e))"
-        @row-clicked="chooseDocument($event).catch((e: Error) => renderError(e))"
-      >
-        <template v-if="query" #action-buttons>
+      <q-card>
+        <q-card-section class="row q-pl-md q-pa-none bg-grey-1 no-wrap">
+          <div class="text-subtitle2 q-py-md ellipsis">
+            {{ t('document', 2) }}
+          </div>
+          <q-space />
+          <q-separator vertical />
           <q-btn
-            icon="clear"
+            v-if="withRag"
+            :disable="!dataSource || provideUpload"
+            flat
+            no-caps
             no-wrap
-            :label="t('clear')"
-            :title="t('clearDocumentQueryResult')"
-            @click="emit('clearQuery')"
-          />
-        </template>
-        <template #row-cells="rowCellProps">
-          <q-td :title="rowCellProps.row.id">
-            {{ rowCellProps.row.name }}
-          </q-td>
-          <q-td>
-            {{ rowCellProps.row.text }}
-          </q-td>
-        </template>
-      </table-with-actions>
-      <div v-else-if="provideUpload" class="q-pa-md">
-        <div class="q-gutter-md">
-          <q-select
-            v-model="documentLanguage"
-            :options="languages"
-            :label="t('language')"
-            :error="!documentLanguage"
-            emit-value
-            map-options
-            style="max-width: 250px"
-          />
-          <q-file
-            v-model="filesToUpload"
-            :label="t('importThing', { thing: t('file', 2) })"
-            :readonly="isUploading"
-            clearable
-            outlined
-            multiple
-            append
-            use-chips
-            counter
-            :accept="acceptedDocumentUploadTypes"
-            :max-total-size="maxCombinedFileUploadSize"
+            class="q-py-none"
+            @click="poseQuestionToRag"
           >
-            <template v-slot:hint>
-              {{
-                t('documentSearch.maxCombinedSize') +
-                ': ' +
-                env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase()
-              }}
-            </template>
-            <template v-slot:after>
-              <q-btn
-                color="primary"
-                dense
-                icon="cloud_upload"
-                round
-                @click="uploadFiles"
-                :disable="
-                  !documentLanguage || filesToUpload == undefined || filesToUpload.length <= 0
+            <q-icon v-if="dataSource" v-bind:style="{ color: ragColor }" name="smart_toy" />
+            <q-icon v-else name="smart_toy" />
+            <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
+          </q-btn>
+          <q-separator vertical />
+          <q-btn
+            :disable="!dataSource || !documents || provideUpload"
+            flat
+            no-caps
+            no-wrap
+            class="q-py-none"
+            @click="routeToDocumentQuery"
+          >
+            <q-icon name="manage_search" />
+            <div class="q-pl-sm gt-xs ellipsis">{{ t('buildQuery') }}</div>
+          </q-btn>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="q-pa-none">
+          <div class="column q-pa-md">
+            <div v-if="dataSource && documents">
+              <table-with-actions
+                flat
+                wrap-cells
+                :disable="!dataSource"
+                :grid="$q.screen.xs"
+                :name="t('document')"
+                :page="documents"
+                :loading="documentsLoading"
+                :columns="cols"
+                :create="false"
+                :filterable="!query"
+                :title="query ? t('documentsOf') + ': ' + query.name : undefined"
+                title-class="text-body1 text-weight-medium"
+                @request="
+                  (name, page) => reloadDocuments(name, page).catch((e: Error) => renderError(e))
                 "
-                :loading="isUploading"
-              ></q-btn>
-            </template>
-          </q-file>
-        </div>
-      </div>
-      <div v-else>
-        <div class="q-pa-md text-grey text-center">
-          {{ noDocumentReason }}
-        </div>
-      </div>
-      <q-inner-loading :showing="documentsLoading" />
+                @row-clicked="chooseDocument($event).catch((e: Error) => renderError(e))"
+              >
+                <template v-if="query" #action-buttons>
+                  <q-btn
+                    icon="clear"
+                    no-wrap
+                    :label="t('clear')"
+                    :title="t('clearDocumentQueryResult')"
+                    @click="emit('clearQuery')"
+                  />
+                </template>
+                <template #row-cells="rowCellProps">
+                  <q-td :title="rowCellProps.row.id">
+                    {{ rowCellProps.row.name }}
+                  </q-td>
+                  <q-td>
+                    {{ rowCellProps.row.text }}
+                  </q-td>
+                </template>
+              </table-with-actions>
+            </div>
+            <div v-else-if="provideUpload">
+              <div class="q-gutter-md">
+                <q-select
+                  v-model="documentLanguage"
+                  :options="languages"
+                  :label="t('language')"
+                  :error="!documentLanguage"
+                  emit-value
+                  map-options
+                  style="max-width: 250px"
+                />
+                <q-file
+                  v-model="filesToUpload"
+                  :label="t('importThing', { thing: t('file', 2) })"
+                  :readonly="isUploading"
+                  clearable
+                  outlined
+                  multiple
+                  append
+                  use-chips
+                  counter
+                  :accept="acceptedDocumentUploadTypes"
+                  :max-total-size="maxCombinedFileUploadSize"
+                >
+                  <template v-slot:hint>
+                    {{
+                      t('documentSearch.maxCombinedSize') +
+                      ': ' +
+                      env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase()
+                    }}
+                  </template>
+                  <template v-slot:after>
+                    <q-btn
+                      color="primary"
+                      dense
+                      icon="cloud_upload"
+                      round
+                      @click="uploadFiles"
+                      :disable="
+                        !documentLanguage || filesToUpload == undefined || filesToUpload.length <= 0
+                      "
+                      :loading="isUploading"
+                    ></q-btn>
+                  </template>
+                </q-file>
+              </div>
+            </div>
+            <div v-else-if="!documentsLoading" class="q-pa-md text-grey">
+              <div class="q-gutter-md text-center">
+                <div>{{ noDocumentReason }}</div>
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+        <q-inner-loading :showing="documentsLoading" />
+      </q-card>
     </template>
   </q-splitter>
 </template>
@@ -456,33 +465,35 @@ const ragResult = ref<RAGAnswer>()
 const ragQuestion = ref<string>()
 
 onMounted(() => {
+  hasActiveCGApi()
   entityStore
     .loadUser()
     .then(reloadConcepts)
     .then(() => reloadDocuments())
-    .catch((e: Error) => renderError(e))
-  hasActiveCGApi()
+    .catch((e: Error) => onDocumentLoadError(e))
   hasActiveRag(props.dataSource?.id)
 })
 
 watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () =>
-  reloadDocuments().catch((e: Error) => renderError(e)),
+  reloadDocuments().catch((e: Error) => onDocumentLoadError(e)),
 )
 watch(
   () => props.dataSource,
   () => {
+    hasActiveCGApi()
     concepts.value.length = 0
     filesToUpload.value.length = 0
     reloadConcepts()
       .then(() => reloadDocuments())
-      .catch((e: Error) => {
-        documents.value = undefined
-        renderError(e)
-      })
-    hasActiveCGApi()
+      .catch((e: Error) => onDocumentLoadError(e))
     hasActiveRag(props.dataSource?.id)
   },
 )
+
+function onDocumentLoadError(e: Error) {
+  documents.value = undefined
+  renderError(e)
+}
 
 function hasActiveCGApi() {
   conceptPipelineApi
@@ -543,10 +554,7 @@ async function reloadConcepts() {
       return Promise.resolve()
     })
     .catch(() => reloadDocuments())
-    .catch((e: Error) => {
-      documents.value = undefined
-      renderError(e)
-    })
+    .catch((e: Error) => onDocumentLoadError(e))
     .finally(() => (conceptsLoading.value = false))
 }
 
@@ -603,7 +611,7 @@ function prepareSelectedConcepts() {
 }
 
 async function checkPipeline() {
-  if (!props.dataSource) return Promise.reject()
+  if (!props.dataSource || !conceptGraphApiAccessible.value) return Promise.reject()
   return conceptPipelineApi
     ?.getConceptGraphPipelineById(props.dataSource.id)
     .then((r) => r.data.status === PipelineResponseStatus.Successful)
@@ -747,9 +755,7 @@ function checkForUpload(importStatus: DocumentImport) {
       if (p.data.totalElements >= (importStatus.count != undefined ? importStatus.count : 0)) {
         isUploading.value = false
         window.clearInterval(uploadInterval.value)
-        reloadDocuments().catch((e: Error) => {
-          renderError(e)
-        })
+        reloadDocuments().catch((e: Error) => onDocumentLoadError(e))
       } else {
         uploadInterval.value = window.setTimeout(() => {
           checkForUpload(importStatus)

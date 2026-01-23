@@ -48,6 +48,16 @@ then
     sed -i "s|RAG_ENABLED\\:!1|RAG_ENABLED:${RAG_ENABLED}|g" /usr/share/nginx/html/assets/*.js
 fi
 
+if [[ ! -z "${MAX_COMBINED_DOCUMENTS_UPLOAD}" ]]
+then
+    sed -i "s|MAX_COMBINED_DOCUMENTS_UPLOAD\\:\"2MB\"|MAX_COMBINED_DOCUMENTS_UPLOAD:'${MAX_COMBINED_DOCUMENTS_UPLOAD}'|g" /usr/share/nginx/html/assets/*.js
+fi
+
+if [[ ! -z "${ACCEPT_DOCUMENT_UPLOAD_TYPE}" ]]
+then
+    sed -i "s|ACCEPT_DOCUMENT_UPLOAD_TYPE\\:\".txt\"|ACCEPT_DOCUMENT_UPLOAD_TYPE:'${ACCEPT_DOCUMENT_UPLOAD_TYPE}'|g" /usr/share/nginx/html/assets/*.js
+fi
+
 if [[ ! -z "${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}" ]]
 then
     sed -i "s|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL\\:\"https\\://onto-med\\.github\\.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner\"|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL:'${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}'|g" /usr/share/nginx/html/assets/*.js
