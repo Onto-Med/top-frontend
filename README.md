@@ -59,6 +59,7 @@ npm run build
 ```
 
 ### Adding Environment Variables
+
 When adding new environment variables that will be needed in the code, there are 4 places you need to register them:
 
 1. `quasar.config.ts`
