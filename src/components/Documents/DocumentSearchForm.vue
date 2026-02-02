@@ -465,70 +465,68 @@ const ragResult = ref<RAGAnswer>()
 const ragQuestion = ref<string>()
 
 onMounted(() => {
-  hasActiveCGApi()
-  entityStore
-    .loadUser()
-    .then(reloadConcepts)
-    .then(() => reloadDocuments())
-    .catch((e: Error) => onDocumentLoadError(e))
-  hasActiveRag(props.dataSource?.id)
+  void entityStore.loadUser().then(loadContent)
 })
 
 watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () =>
   reloadDocuments().catch((e: Error) => onDocumentLoadError(e)),
 )
-watch(
-  () => props.dataSource,
-  () => {
-    hasActiveCGApi()
-    concepts.value.length = 0
-    filesToUpload.value.length = 0
-    reloadConcepts()
-      .then(() => reloadDocuments())
-      .catch((e: Error) => onDocumentLoadError(e))
-    hasActiveRag(props.dataSource?.id)
-  },
-)
+watch(() => props.dataSource, loadContent)
+
+async function loadContent() {
+  concepts.value.length = 0
+  filesToUpload.value.length = 0
+  return checkActiveCGApi()
+    .then(reloadConcepts)
+    .then(() => reloadDocuments().catch((e: Error) => onDocumentLoadError(e)))
+    .then(checkActiveRag)
+}
 
 function onDocumentLoadError(e: Error) {
   documents.value = undefined
   renderError(e)
 }
 
-function hasActiveCGApi() {
-  conceptPipelineApi
-    ?.getConceptPipelineManagerStatus()
+async function checkActiveCGApi() {
+  if (!conceptPipelineApi) {
+    conceptGraphApiAccessible.value = false
+    return Promise.resolve(false)
+  }
+  return conceptPipelineApi
+    .getConceptPipelineManagerStatus()
     .then((r) => {
-      if (r.data.enabled != undefined && r.data.status != undefined) {
-        conceptGraphApiAccessible.value = r.data.enabled && r.data.status
-      } else {
-        conceptGraphApiAccessible.value = false
-      }
+      conceptGraphApiAccessible.value = (r.data.enabled && r.data.status) || false
+      return conceptGraphApiAccessible.value
     })
     .catch((e: Error) => {
       conceptGraphApiAccessible.value = false
       renderError(e)
+      return false
     })
 }
 
 function switchRagIconColor() {
-  if (hasActiveRagComponent.value) {
-    ragColor.value = ragColorActive
-    return
-  }
-  ragColor.value = ragColorInactive
+  ragColor.value = hasActiveRagComponent.value ? ragColorActive : ragColorInactive
 }
 
-function hasActiveRag(process: string | undefined) {
-  hasActiveRagComponent.value = false
-  if (!ragApi || process === undefined || !props.withRag || !conceptGraphApiAccessible.value) return
-  ragApi
+async function checkActiveRag() {
+  const process = props.dataSource?.id
+  if (!ragApi || process === undefined || !props.withRag || !conceptGraphApiAccessible.value) {
+    hasActiveRagComponent.value = false
+    return Promise.resolve(false)
+  }
+  return ragApi
     .getStatusOfRAG(process)
     .then((r) => {
-      hasActiveRagComponent.value = r.data.active != undefined ? r.data.active : false
+      hasActiveRagComponent.value = r.data.active || false
+      switchRagIconColor()
+      return hasActiveRagComponent.value
     })
-    .then(() => switchRagIconColor())
-    .catch((e: Error) => renderError(e))
+    .catch((e: Error) => {
+      hasActiveRagComponent.value = false
+      renderError(e)
+      return false
+    })
 }
 
 async function reloadConcepts() {
