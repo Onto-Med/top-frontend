@@ -58,6 +58,7 @@
             class="col column full-width"
             :show-context-menu="writable"
             :is-concept-repository="isConceptRepository"
+            :auto-expand="!isConceptRepository"
             @delete-entity="deleteEntity"
             @create-entity="handleEntityCreation"
             @duplicate-entity="handleEntityDuplication"
