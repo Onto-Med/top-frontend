@@ -44,7 +44,7 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn flat :label="t('cancel')" color="primary" @click="onCancelClick" />
+        <q-btn flat :label="t('cancel')" color="primary" @click="onDialogHide" />
         <q-btn flat :label="t('move')" color="primary" @click="onOkClick" />
       </q-card-actions>
     </q-card>
@@ -71,10 +71,9 @@ const props = defineProps({
 
 const { t } = useI18n()
 const { notify, renderError } = useNotify()
-const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } = useDialogPluginComponent()
+const { dialogRef, onDialogHide } = useDialogPluginComponent()
 const { getTitle, isCategory, isConcept, isPhenotype, isRestricted, routeToEntity } =
   useEntityFormatter()
-const onCancelClick = onDialogCancel
 const entityStore = useEntityStore()
 const { organisationId, repositoryId } = storeToRefs(entityStore)
 const superEntities = ref<(Category | Concept | undefined)[]>([])
@@ -99,7 +98,7 @@ function onOkClick() {
     .moveEntity(props.entity, superEntities.value.filter((e) => !!e) as Entity[])
     .then(() => {
       notify(t('thingMoved', { thing: t('entity') }), 'positive')
-      onDialogOK()
+      onDialogHide()
     })
     .catch((e: Error) => renderError(e))
 }
