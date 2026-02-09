@@ -181,6 +181,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  autoExpand: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['update:selected', 'deleteEntity', 'createEntity', 'duplicateEntity'])
@@ -196,6 +200,7 @@ const expansion = ref([] as string[])
 const filterEntityType = ref(undefined as EntityType | undefined)
 const filterDataType = ref(undefined as DataType | undefined)
 const filterItemType = ref(undefined as ItemType | undefined)
+let localAutoExpand = true
 
 const entityTypeOptions = computed((): EntityType[] => {
   if (props.isConceptRepository) return [EntityType.SingleConcept, EntityType.CompositeConcept]
@@ -232,6 +237,7 @@ watch(
 )
 
 function expand(entity: Entity | undefined): void {
+  if (!localAutoExpand) return
   if (!entity || !entity.id || !tree.value?.getNodeByKey(entity.id)) return
   if (!tree.value?.isExpanded(entity.id)) tree.value?.setExpanded(entity.id, true)
 
@@ -244,6 +250,7 @@ function expand(entity: Entity | undefined): void {
     (entity as Category).superCategories?.forEach((c) =>
       expand(props.nodes?.find((n) => n.id === c.id)),
     )
+  localAutoExpand = props.autoExpand
 }
 
 function removeEmptyNodes(nodes: TreeNode[], types: EntityType[]): TreeNode[] {
@@ -361,10 +368,10 @@ async function onLazyLoad({ node, done, fail }: LazyLoadDetails) {
 
 async function handleSearch(entity?: Entity) {
   if (!entity) return
-  await entityStore.loadEntity(entity.id).then((e) => {
-    emit('update:selected', e)
-    void nextTick(() => expand(entity))
-  })
+  localAutoExpand = true
+  await entityStore
+    .loadEntity(entity.id)
+    .then((e) => nextTick(() => emit('update:selected', e)))
 }
 
 async function handleDelete(entity: Entity, cascade?: boolean) {
