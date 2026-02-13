@@ -1,0 +1,40 @@
+map ${NGINX_ACCESS_LOG} $loggable {
+  default 0;
+  "true" 1;
+  "1" 1;
+}
+
+server {
+  listen 80 default_server;
+
+  root /usr/share/nginx/html;
+
+  add_header X-Frame-Options "SAMEORIGIN";
+  add_header X-XSS-Protection "1; mode=block";
+  add_header X-Content-Type-Options "nosniff";
+
+  index index.html;
+
+  charset utf-8;
+
+  access_log /var/log/nginx/access.log combined if=$loggable;
+  error_log /var/log/nginx/error.log ${NGINX_ERROR_LOG_LEVEL};
+
+  location / {
+    try_files $uri $uri/ /index.html;
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+  }
+
+  location = /favicon.ico {
+    access_log off;
+    log_not_found off;
+  }
+  location = /robots.txt {
+    access_log off;
+    log_not_found off;
+  }
+
+  location ~ /\.(?!well-known).* {
+    deny all;
+  }
+}
