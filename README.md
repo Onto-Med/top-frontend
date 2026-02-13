@@ -12,7 +12,6 @@ A Quasar Framework app
    or use the `.devcontainer/devcontainer.json` configuration to build a [Development Container](https://containers.dev/).
 
 2. The npm package `@onto-med/top-api` is hosted in the GitHub Packages registry, thus requires authentication.
-
    1. Create a [personal access token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) at <https://github.com/settings/tokens> and give it access to `read:packages`.
    2. Optionally, export your token to the environment variable `NPM_AUTH_TOKEN`.
    3. Alternatively to the step above, you can authenticate at GitHub via `npm login --scope=@onto-med --auth-type=legacy --registry=https://npm.pkg.github.com`
@@ -31,7 +30,7 @@ npm run dev
 You can specify the following environment variables via `.env` file or command line:
 
 | variable name                     | default value                                                                                  | description                                                                                                                                                       |
-|-----------------------------------|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | OAUTH2_ENABLED                    | false                                                                                          | Enable or disable authentication via Keycloak                                                                                                                     |
 | OAUTH2_URL                        | http://127.0.0.1:8081/                                                                         | Keycloak URL                                                                                                                                                      |
 | OAUTH2_REALM                      | top-realm                                                                                      | Keycloak realm name                                                                                                                                               |
@@ -45,6 +44,8 @@ You can specify the following environment variables via `.env` file or command l
 | MAX_COMBINED_DOCUMENTS_UPLOAD     | 2MB                                                                                            | Set the maximum combined size for document upload (in bytes when no suffix is given, else append either 'KB' or 'MB'); need to be set accordingly in the backend. |
 | ACCEPT_DOCUMENT_UPLOAD_TYPE       | .txt                                                                                           | The allowed file types for document uploading (needs to be comma separated list, e.g.: ".txt, .pdf")                                                              |
 | TOP_PHENOTYPIC_QUERY_DOC_BASE_URL | https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner | This URL is used to generate deep links to functions and constants documentation                                                                                  |
+| NGINX_ACCESS_LOG                  | false                                                                                          | Enable or disable nginx access logging                                                                                                                            |
+| NGINX_ERROR_LOG_LEVEL             | warn                                                                                           | Set nginx [error log level](https://nginx.org/en/docs/ngx_core_module.html#error_log)                                                                             |
 
 ### Lint the files
 
