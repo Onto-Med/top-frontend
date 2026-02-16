@@ -87,12 +87,12 @@
     </template>
     <template #after>
       <enum-select
-        v-if="selection"
         v-model:selected="codeScope"
         :enum="CodeScope"
         i18n-prefix="codeScope"
         :clearable="false"
         show-tooltip
+        class="scope-input"
       />
       <q-btn
         v-if="!noBtn"
@@ -300,5 +300,8 @@ function onScroll({ to, direction, ref }: ScrollDetails) {
 <style lang="scss" scoped>
 .system-input {
   width: 150px;
+}
+.scope-input {
+  width: 100px;
 }
 </style>
