@@ -12,7 +12,7 @@
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
-        <q-avatar>
+        <q-avatar rounded color="white">
           <img src="/images/logo.svg" />
         </q-avatar>
         <q-toolbar-title to="/" shrink class="text-weight-bold gt-xs">
