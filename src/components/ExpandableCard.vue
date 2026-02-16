@@ -19,7 +19,6 @@
         <slot name="toolbar" />
         <q-btn
           v-if="helpText"
-          v-show="$q.screen.gt.sm"
           flat
           round
           dense
@@ -34,16 +33,16 @@
       <div v-show="expanded">
         <q-separator />
 
-        <q-card-section class="row q-pa-none">
-          <div class="col q-pa-md">
-            <slot />
-          </div>
-
-          <q-separator v-show="$q.screen.gt.sm && showHelp" vertical />
-
-          <div v-show="$q.screen.gt.sm && showHelp" class="col-6 q-pa-md">
+        <q-card-section class="q-pa-none">
+          <div v-show="showHelp" class="q-pa-md">
             <div class="text-subtitle1">{{ t('help') }}:</div>
             {{ helpText }}
+          </div>
+
+          <q-separator v-show="showHelp && $slots['default']" />
+
+          <div v-show="$slots['default']" class="q-pa-md">
+            <slot />
           </div>
         </q-card-section>
 
