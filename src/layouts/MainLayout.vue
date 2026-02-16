@@ -1,10 +1,10 @@
 <template>
-  <q-layout view="hHh Lpr fFf" :class="{ 'bg-grey-1': !isDarkModeActive }" aria-disabled="true">
+  <q-layout view="hHh Lpr fFf" :class="{ 'bg-grey-1': !$q.dark.isActive }" aria-disabled="true">
     <q-header
       elevated
       :class="{
-        'bg-white text-grey-8': !isDarkModeActive,
-        'bg-dark text-grey-2': isDarkModeActive,
+        'bg-white text-grey-8': !$q.dark.isActive,
+        'bg-dark text-grey-2': $q.dark.isActive,
       }"
       class="q-py-xs"
       height-hint="58"
@@ -35,10 +35,10 @@
           rounded
           no-caps
           no-wrap
-          :icon="isDarkModeActive ? 'light_mode' : 'dark_mode'"
-          :title="isDarkModeActive ? t('lightMode') : t('darkMode')"
+          :icon="$q.dark.isActive ? 'light_mode' : 'dark_mode'"
+          :title="$q.dark.isActive ? t('lightMode') : t('darkMode')"
           class="q-mr-sm"
-          @click="toggleDarkMode()"
+          @click="$q.dark.toggle()"
         />
 
         <language-switch />
@@ -102,7 +102,7 @@
       :mini="!leftDrawerOpen"
       show-if-above
       bordered
-      :class="{ 'bg-grey-2': !isDarkModeActive }"
+      :class="{ 'bg-grey-2': !$q.dark.isActive }"
       :width="240"
     >
       <q-scroll-area class="fit">
@@ -255,9 +255,6 @@ const links = computed(() => {
   return links
 })
 
-const toggleDarkMode = $q.dark.toggle
-const isDarkModeActive = computed(() => $q.dark.isActive)
-
 const productName = packageInfo.productName
 const documentationUrl = packageInfo.homepage
 const repositoryUrl = packageInfo.repository
@@ -299,9 +296,17 @@ const metaData = () =>
 
 useMeta(metaData)
 
-onMounted(() => performPing())
+onMounted(() => {
+  $q.dark.set($q.localStorage.getItem('darkMode') as boolean)
+  performPing()
+})
 
 watch(leftDrawerOpen, (newVal) => $q.localStorage.set('minimiseDrawer', !newVal))
+
+watch(
+  () => $q.dark.isActive,
+  (newVal) => $q.localStorage.set('darkMode', newVal),
+)
 
 function performPing() {
   if (loading.value) return
