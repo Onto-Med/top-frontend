@@ -134,7 +134,7 @@
 import { Code, CodePage, CodeScope, CodeSystem } from '@onto-med/top-api'
 import { computed, ref, inject, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import CodeSystemInput from 'src/components/CodeSystemInput.vue'
+import CodeSystemInput from 'src/components/EntityEditor/Code/CodeSystemInput.vue'
 import { CodeApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 import { QInput, QSelect } from 'quasar'
