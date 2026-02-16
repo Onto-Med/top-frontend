@@ -65,7 +65,7 @@
               v-for="col in headerProps.cols"
               :key="col.name"
               :props="headerProps"
-              class="bg-grey-1"
+              :class="{ 'bg-grey-1': !$q.dark.isActive }"
             >
               {{ col.label }}
             </q-th>
