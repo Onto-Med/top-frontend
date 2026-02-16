@@ -37,9 +37,8 @@
       </q-toolbar-title>
     </template>
 
-    <template #default>
+    <template v-if="!readonly" #default>
       <code-input
-        v-if="!readonly"
         :disabled-codes="disabledCodes"
         :manual-entry="showManualForm"
         @select="addEntries([$event as CodeWithScope])"
