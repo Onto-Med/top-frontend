@@ -92,6 +92,7 @@
         :enum="CodeScope"
         i18n-prefix="codeScope"
         :clearable="false"
+        show-tooltip
       />
       <q-btn
         v-if="!noBtn"

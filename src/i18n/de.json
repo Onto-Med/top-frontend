@@ -519,6 +519,11 @@
     "title": "Geltungsbereich",
     "description": "Der Geltungsbereich dieses Codes."
   },
+  "codeScopeDescriptions": {
+    "LEAVES": "Die Blätter unterhalb des angegebenen Codes in der Hierarchie werden übernommen.",
+    "SELF": "Nur der angegebene Code wird übernommen.",
+    "SUBTREE": "Alle Codes, die unterhalb des angegebenen Codes in der Hierarchie liegen, werden übernommen."
+  },
   "codeScopes": {
     "LEAVES": "Blätter",
     "SUBTREE": "Teilbaum",

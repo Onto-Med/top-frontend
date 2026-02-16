@@ -519,6 +519,11 @@
     "title": "Scope",
     "description": "The scope of this code."
   },
+  "codeScopeDescriptions": {
+    "LEAVES": "All descendant codes that are leaves in the code system hierarchy are adopted.",
+    "SELF": "Only the code itself is adopted.",
+    "SUBTREE": "All descendant codes in the code system hierarchy are adopted."
+  },
   "codeScopes": {
     "SELF": "Self",
     "LEAVES": "Leaves",
