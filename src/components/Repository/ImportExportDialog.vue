@@ -2,6 +2,7 @@
   <q-dialog :model-value="show" @update:model-value="onShowChanged">
     <q-card class="export-dialog">
       <q-card-section class="text-h6">
+        <q-icon name="sync_alt" class="rotate-90" />
         {{ t('importOrExportThing', { thing: t('repository') }) }}
       </q-card-section>
 
@@ -9,6 +10,22 @@
 
       <div>
         <q-card-section>
+          <q-btn-toggle
+            v-model="mode"
+            no-caps
+            spread
+            :options="[
+              { label: t('import'), value: 'import', icon: 'upload' },
+              { label: t('export'), value: 'export', icon: 'download' },
+            ]"
+          />
+        </q-card-section>
+
+        <q-card-section v-show="!mode">
+          <p v-t="'selectImportExport'" />
+        </q-card-section>
+
+        <q-card-section v-show="mode === 'import'">
           <p>{{ t('importDescription') }}</p>
 
           <q-select
@@ -18,6 +35,7 @@
             :placeholder="t('selectThing', { thing: t('format') })"
             class="q-mb-md"
             option-label="id"
+            :error="!importConverter"
           />
 
           <q-file
@@ -25,6 +43,7 @@
             :label="t('repositoryImportFile')"
             :accept="acceptedExtension"
             :disable="!importConverter"
+            :error="!importFile"
           >
             <template #prepend>
               <q-icon name="attach_file" />
@@ -42,9 +61,7 @@
           </q-file>
         </q-card-section>
 
-        <q-separator />
-
-        <q-card-section>
+        <q-card-section v-show="mode === 'export'">
           <p>{{ t('exportDescription') }}</p>
 
           <q-select
@@ -54,6 +71,7 @@
             :placeholder="t('selectThing', { thing: t('format') })"
             option-label="id"
             class="q-mb-md"
+            :error="!exportConverter"
             @change="result = undefined"
           >
             <template #after>
@@ -117,6 +135,7 @@ const { t } = useI18n()
 const repositoryApi = inject(RepositoryApiKey)
 const entityStore = useEntityStore()
 const { notify, renderError } = useNotify()
+const mode = ref<'import' | 'export' | undefined>(undefined)
 const exportConverter = ref(undefined as Converter | undefined)
 const importConverter = ref(undefined as Converter | undefined)
 const loading = ref(false)
@@ -204,6 +223,7 @@ function copyToFile() {
 
 function onShowChanged(newVal: boolean) {
   result.value = undefined
+  mode.value = undefined
   emit('update:show', newVal)
 }
 </script>
