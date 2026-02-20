@@ -62,3 +62,8 @@ if [[ ! -z "${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}" ]]
 then
     sed -i "s|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL\\:\"https\\://onto-med\\.github\\.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner\"|TOP_PHENOTYPIC_QUERY_DOC_BASE_URL:'${TOP_PHENOTYPIC_QUERY_DOC_BASE_URL}'|g" /usr/share/nginx/html/assets/*.js
 fi
+
+if [[ ! -z "${QUERIES_ENABLED}" ]]
+then
+    sed -i "s|QUERIES_ENABLED\\:!1|QUERIES_ENABLED:${QUERIES_ENABLED}|g" /usr/share/nginx/html/assets/*.js
+fi

@@ -24,6 +24,7 @@ export const env = {
   TOP_PHENOTYPIC_QUERY_DOC_BASE_URL:
     process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL ||
     'https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner',
+  QUERIES_ENABLED: process.env.QUERIES_ENABLED || process.env.QUERIES_ENABLED === undefined,
 } as NodeJS.ProcessEnv
 
 /**

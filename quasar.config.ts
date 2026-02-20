@@ -84,6 +84,7 @@ export default defineConfig((ctx) => {
         MAX_COMBINED_DOCUMENTS_UPLOAD: process.env.MAX_COMBINED_DOCUMENTS_UPLOAD,
         ACCEPT_DOCUMENT_UPLOAD_TYPE: process.env.ACCEPT_DOCUMENT_UPLOAD_TYPE,
         TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: process.env.TOP_PHENOTYPIC_QUERY_DOC_BASE_URL,
+        QUERIES_ENABLED: boolMap(process.env.QUERIES_ENABLED),
       },
       // rawDefine: {}
       // ignorePublicFolder: true,
