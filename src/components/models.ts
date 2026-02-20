@@ -1,4 +1,4 @@
-import { Entity } from '@onto-med/top-api'
+import { Code, CodeScope, Entity } from '@onto-med/top-api'
 import { QSelect, QVirtualScroll } from 'quasar'
 
 export interface ScrollDetails {
@@ -18,4 +18,9 @@ export interface VScrollDetails {
 export interface ForkResult {
   count: number
   entity?: Entity
+}
+
+export interface CodeWithScope {
+  code: Code
+  scope: CodeScope
 }

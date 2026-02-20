@@ -516,7 +516,7 @@
     "failed": "Beim Code-Import ist ein Fehler aufgetreteten."
   },
   "codeScope": {
-    "title": "Geltungsbereich",
+    "title": "Bereich",
     "description": "Der Geltungsbereich dieses Codes."
   },
   "codeScopeDescriptions": {

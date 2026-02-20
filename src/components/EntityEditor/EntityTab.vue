@@ -232,6 +232,7 @@ import { useEntityStore } from 'src/stores/entity-store'
 import { EntityApiKey } from 'src/boot/axios'
 import { copyToClipboard, useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
+import useDefaultHelpers from 'src/mixins/useDefaultHelpers'
 
 const props = defineProps({
   entity: {
@@ -269,11 +270,12 @@ const emit = defineEmits([
 ])
 
 const { t, d } = useI18n()
-const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType, isConcept } =
+const { copy } = useDefaultHelpers()
+const { getTitle, isRestricted, isPhenotype, hasDataType, hasExpression, hasItemType } =
   useEntityFormatter()
 const { notify, renderError } = useNotify()
 const router = useRouter()
-const local = ref(clone(props.entity))
+const local = ref(copy(props.entity))
 const entityApi = inject(EntityApiKey)
 const entityStore = useEntityStore()
 const showJson = ref(false)
@@ -313,7 +315,7 @@ const isValid = computed((): boolean => {
 watch(
   () => props.entity,
   (value: Category | Phenotype | Concept) => {
-    local.value = clone(value)
+    local.value = copy(value)
   },
   { deep: true },
 )
@@ -330,15 +332,8 @@ onMounted(() => {
     .finally(() => (loading.value = false))
 })
 
-function clone(value: Category | Phenotype | Concept) {
-  if (isConcept(value)) {
-    return JSON.parse(JSON.stringify(value)) as Concept
-  }
-  return JSON.parse(JSON.stringify(value)) as Phenotype
-}
-
 function prefillFromVersion(entity: Category | Phenotype): void {
-  local.value = clone(entity)
+  local.value = copy(entity)
   restrictionKey.value++
   void router.replace({
     name: 'editor',

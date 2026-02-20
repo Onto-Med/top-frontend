@@ -1,5 +1,5 @@
 <template v-slot="append">
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialogRef">
     <q-card class="dialog-content">
       <q-card-section>
         <div class="text-h6">{{ t('codeImport.title') }}</div>
@@ -115,7 +115,7 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn flat :label="t('cancel')" color="primary" @click="onCancelClick" />
+        <q-btn flat :label="t('cancel')" color="primary" @click="onDialogCancel" />
         <q-btn flat :disable="!isValid" :label="t('import')" color="primary" @click="onOkClick" />
       </q-card-actions>
     </q-card>
@@ -133,9 +133,8 @@ import EnumSelect from 'src/components/EnumSelect.vue'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { t, te } = useI18n()
-const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { renderError } = useNotify()
-const onCancelClick = onDialogCancel
 const codes = ref<Code[]>([])
 const selection = ref<Code[]>([])
 const hasHeader = ref(false)
@@ -200,7 +199,6 @@ function onHasHeaderChanged(value?: boolean) {
 function onOkClick() {
   if (!isValid.value) return
   onDialogOK(selection.value)
-  onDialogHide()
 }
 </script>
 

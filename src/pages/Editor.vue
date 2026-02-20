@@ -178,7 +178,6 @@ import EntityTree from 'src/components/EntityEditor/EntityTree.vue'
 import ExportDialog from 'src/components/Repository/ImportExportDialog.vue'
 import RepositoryTestDialog from 'src/components/Repository/RepositoryTestDialog.vue'
 import {
-  Category,
   Entity,
   EntityType,
   LocalisableText,
@@ -190,6 +189,7 @@ import { EntityApiKey } from 'src/boot/axios'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useMeta, useQuasar } from 'quasar'
 import Dialog from 'src/components/Dialog.vue'
+import useDefaultHelpers from 'src/mixins/useDefaultHelpers'
 
 interface EditorTab {
   state: Entity
@@ -209,6 +209,7 @@ const props = defineProps({
 
 const { t, locale } = useI18n()
 const $q = useQuasar()
+const { copy } = useDefaultHelpers()
 const { canWrite, getIcon, getTitle, isRestricted, isPhenotype, repositoryIcon, isConcept } =
   useEntityFormatter()
 const router = useRouter()
@@ -266,7 +267,7 @@ onMounted(() => {
     })
     .then((entity) => {
       if (!entity) return
-      tabs.value = [{ selectedVersion: props.version, state: clone(entity), dirty: false }]
+      tabs.value = [{ selectedVersion: props.version, state: copy(entity), dirty: false }]
       selected.value = entity
     })
     .catch((e: Error) => {
@@ -300,7 +301,7 @@ watch(selected, (entity) => {
   if (entity) {
     let tab = getTab(entity)
     if (!tab) {
-      tabs.value.push({ selectedVersion: entity.version, state: clone(entity), dirty: false })
+      tabs.value.push({ selectedVersion: entity.version, state: copy(entity), dirty: false })
       tab = tabs.value[tabs.value.length - 1]
     }
     void router.push({
@@ -340,10 +341,6 @@ watch(
 )
 
 watch(splitterModel, (newVal) => $q.localStorage.set('editorSplitterWidth', newVal))
-
-function clone(value: Category | Phenotype | Concept) {
-  return JSON.parse(JSON.stringify(value)) as Category | Phenotype | Concept
-}
 
 function equals(expected: unknown, actual: unknown) {
   return JSON.stringify(expected) === JSON.stringify(actual)
@@ -440,7 +437,7 @@ function saveEntity(entity: Entity) {
       notify(t('thingSaved', { thing: t(entity.entityType) }), 'positive')
       const tab = getTab(r)
       if (tab) {
-        tab.state = clone(r)
+        tab.state = copy(r)
         tab.dirty = false
         tab.selectedVersion = r.version
       }
@@ -513,7 +510,7 @@ function reset(tab: EditorTab) {
       },
       query: { version: entity.version },
     })
-    handleTabUpdate(tab, clone(entity))
+    handleTabUpdate(tab, copy(entity))
   } else {
     closeTab(tab.state)
   }

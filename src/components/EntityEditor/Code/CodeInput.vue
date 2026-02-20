@@ -17,7 +17,7 @@
     @filter="autoSuggest"
     @virtual-scroll="onScroll"
     @keyup.enter="select(selection)"
-    @update:model-value="noBtn ? select($event) : undefined"
+    @update:model-value="noBtn ? select($event, codeScope) : undefined"
   >
     <template #selected>
       <span v-show="selection">
@@ -87,12 +87,13 @@
     </template>
     <template #after>
       <enum-select
-        v-if="selection"
         v-model:selected="codeScope"
         :enum="CodeScope"
         i18n-prefix="codeScope"
         :clearable="false"
         show-tooltip
+        class="scope-input"
+        @update:model-value="noBtn ? select(selection, $event) : undefined"
       />
       <q-btn
         v-if="!noBtn"
@@ -230,7 +231,7 @@ function select(entry?: Code, scope?: CodeScope, manual = false) {
     code: entry,
     scope: scope,
   })
-  selection.value = undefined
+  if (!props.noBtn) selection.value = undefined
   if (manual) {
     if (entry)
       manualCode.value = {
@@ -300,5 +301,8 @@ function onScroll({ to, direction, ref }: ScrollDetails) {
 <style lang="scss" scoped>
 .system-input {
   width: 150px;
+}
+.scope-input {
+  width: 100px;
 }
 </style>
