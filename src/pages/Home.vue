@@ -29,7 +29,7 @@
         </q-card>
       </div>
 
-      <div class="col-lg-4 col-sm-6 col-12">
+      <div v-show="env.MODELS_ENABLED" class="col-lg-4 col-sm-6 col-12">
         <q-card
           v-ripple
           class="fit text-center cursor-pointer q-hoverable"
