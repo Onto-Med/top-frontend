@@ -86,8 +86,10 @@
 
       <q-card-actions align="right">
         <q-btn flat :label="t('cancel')" color="primary" @click="onCancelClick" />
-        <q-btn flat :disable="!isValid" :label="t('import')" color="primary" @click="onOkClick" />
+        <q-btn flat :disable="!isValid || loading" :label="t('import')" color="primary" @click="onOkClick" />
       </q-card-actions>
+
+      <q-inner-loading :showing="loading" />
     </q-card>
   </q-dialog>
 </template>
@@ -143,6 +145,7 @@ const restrictions = ref<NumberRestriction[]>([])
 const itemType = ref<ItemType>()
 const dataType = ref<DataType>()
 const unit = ref<string>()
+const loading = ref(false)
 
 const entity = computed(() => {
   if (selection.value) return toEntity(selection.value)
@@ -207,6 +210,7 @@ function toEntity(codeWithScope?: CodeWithScope) {
 
 function onOkClick() {
   if (!entity.value || !selection.value) return
+  loading.value = true
   const localEntity = copy(entity.value)
   collectCodes([selection.value])
     .then((codes) => {
@@ -234,6 +238,7 @@ function onOkClick() {
       notify(t('entityImported', { count: (r?.length || 0) + 1 }), 'positive')
     })
     .catch((e: Error) => renderError(e))
+    .finally(() => (loading.value = false))
 }
 </script>
 
