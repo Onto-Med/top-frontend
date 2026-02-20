@@ -110,6 +110,7 @@ import { useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 import CodeImportDialog from './CodeImportDialog.vue'
 import { CodeWithScope } from 'src/components/models'
+import useCode from 'src/mixins/useCode'
 
 const props = defineProps({
   modelValue: {
@@ -127,6 +128,7 @@ const emit = defineEmits(['update:modelValue', 'update:expanded'])
 const { t } = useI18n()
 const $q = useQuasar()
 const { notify } = useNotify()
+const { codeEquals } = useCode()
 const showManualForm = ref(false)
 const showHelp = ref(false)
 const codeApi = inject(CodeApiKey)
@@ -137,11 +139,6 @@ const disabledCodes = computed(() => {
     props.modelValue.some((c2, i2) => codeEquals(c1, c2) && i1 != i2),
   )
 })
-
-function codeEquals(code1?: Code, code2?: Code) {
-  if (!code1 || !code2) return false
-  return code1.codeSystem.uri == code2.codeSystem.uri && code1.code == code2.code
-}
 
 async function addEntries(entries?: CodeWithScope[]) {
   if (!entries) return Promise.resolve([false])
