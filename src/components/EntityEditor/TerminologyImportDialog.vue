@@ -116,6 +116,8 @@ import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
 import EnumSelect from '../EnumSelect.vue'
 import { CodeWithScope } from '../models'
+import useDefaultHelpers from 'src/mixins/useDefaultHelpers'
+import useCode from 'src/mixins/useCode'
 
 const props = defineProps({
   repositoryType: {
@@ -129,8 +131,10 @@ defineEmits(['hide', 'ok'])
 
 const { locale, t } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+const { copy } = useDefaultHelpers()
 const { isPhenotype, isConcept, restrictionToString } = useEntityFormatter()
 const entityStore = useEntityStore()
+const { collectCodes } = useCode()
 const { notify, renderError } = useNotify()
 const onCancelClick = onDialogCancel
 const selection = ref<CodeWithScope>()
@@ -202,9 +206,13 @@ function toEntity(codeWithScope?: CodeWithScope) {
 }
 
 function onOkClick() {
-  if (!entity.value) return
-  entityStore
-    .saveEntity(entity.value)
+  if (!entity.value || !selection.value) return
+  const localEntity = copy(entity.value)
+  collectCodes([selection.value])
+    .then((codes) => {
+      localEntity.codes = codes
+    })
+    .then(() => entityStore.saveEntity(localEntity))
     .then(() => {
       if (props.repositoryType === RepositoryType.PhenotypeRepository) {
         return Promise.all(
