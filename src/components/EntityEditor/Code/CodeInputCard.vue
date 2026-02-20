@@ -101,8 +101,7 @@
 
 <script setup lang="ts">
 import { Code, CodeScope } from '@onto-med/top-api'
-import { CodeApiKey } from 'src/boot/axios'
-import { computed, ref, inject } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExpandableCard from 'src/components/ExpandableCard.vue'
 import CodeInput from './CodeInput.vue'
@@ -128,10 +127,9 @@ const emit = defineEmits(['update:modelValue', 'update:expanded'])
 const { t } = useI18n()
 const $q = useQuasar()
 const { notify } = useNotify()
-const { codeEquals } = useCode()
+const { collectCodes, codeEquals } = useCode()
 const showManualForm = ref(false)
 const showHelp = ref(false)
-const codeApi = inject(CodeApiKey)
 const loading = ref(false)
 
 const disabledCodes = computed(() => {
@@ -139,32 +137,6 @@ const disabledCodes = computed(() => {
     props.modelValue.some((c2, i2) => codeEquals(c1, c2) && i1 != i2),
   )
 })
-
-async function addEntries(entries?: CodeWithScope[]) {
-  if (!entries) return Promise.resolve([false])
-  if (!codeApi) return Promise.reject({ message: t('errorLoadingData', { type: 'Code' }) })
-
-  loading.value = true
-  const newModelValue = props.modelValue.slice()
-  return Promise.all(
-    entries.map(async ({ code: code, scope: scope }) => {
-      if (newModelValue.some((c) => codeEquals(c, code))) return false
-      if (scope == CodeScope.Self) {
-        newModelValue.push(code)
-      } else {
-        await codeApi
-          ?.getCode(encodeURIComponent(code.uri!), code?.codeSystem?.externalId || '', scope)
-          .then((r) => newModelValue.push(r.data))
-      }
-      return true
-    }),
-  )
-    .then((r) => {
-      emit('update:modelValue', newModelValue)
-      return r
-    })
-    .finally(() => (loading.value = false))
-}
 
 function removeEntry(codeToRemove: Code) {
   const newModelValue = props.modelValue.slice()
@@ -187,23 +159,40 @@ function removeNestedSubNode(code: Code, codeToRemove: Code) {
   }
 }
 
+function addEntries(entries: CodeWithScope[]) {
+  loading.value = true
+  collectCodes(entries)
+    .then((codes) => {
+      const newModelValue = props.modelValue.slice()
+      let accepted = 0
+      for (const code of codes) {
+        if (!newModelValue.some((c) => codeEquals(c, code))) {
+          newModelValue.push(code)
+          accepted++
+        }
+      }
+      emit('update:modelValue', newModelValue)
+      return accepted
+    })
+    .finally(() => (loading.value = false))
+    .then((accepted) => {
+      notify(t('codeImport.imported', accepted), 'positive')
+      emit('update:expanded', true)
+    })
+    .catch((e: Error) => {
+      notify(t('codeImport.failed') + ` (${e.message})`)
+    })
+}
+
 function showImportDialog() {
   $q.dialog({
     component: CodeImportDialog,
-  }).onOk((codes: Code[]) => {
+  }).onOk((codes: Code[]) =>
     addEntries(
       codes.map((code) => {
-        return { code: code, scope: CodeScope.Self }
+        return { code, scope: CodeScope.Self }
       }),
-    )
-      .then((r) => {
-        const accepted = r.filter((e) => !!e).length
-        notify(t('codeImport.imported', accepted), 'positive')
-        emit('update:expanded', true)
-      })
-      .catch((e: Error) => {
-        notify(t('codeImport.failed') + ` (${e.message})`)
-      })
-  })
+    ),
+  )
 }
 </script>
