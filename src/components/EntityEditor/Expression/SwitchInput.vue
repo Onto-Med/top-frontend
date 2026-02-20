@@ -82,6 +82,7 @@ import { useI18n } from 'vue-i18n'
 import EntityChip from 'src/components/EntityEditor/EntityChip.vue'
 import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
+import useDefaultHelpers from 'src/mixins/useDefaultHelpers'
 
 const props = defineProps({
   modelValue: {
@@ -101,6 +102,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'entityClicked'])
 
 const { t } = useI18n()
+const { copy } = useDefaultHelpers()
 const { organisationId, repositoryId } = storeToRefs(useEntityStore())
 const entityTypes = [
   EntityType.SinglePhenotype,
@@ -135,10 +137,6 @@ const mappings = computed(() => {
     }, [] as Mapping[])
 })
 
-function clone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj)) as T
-}
-
 function buildValueConstant(value?: number) {
   return {
     functionId: 'value',
@@ -147,7 +145,7 @@ function buildValueConstant(value?: number) {
 }
 
 function addMapping() {
-  const newModelValue = clone(props.modelValue)
+  const newModelValue = copy(props.modelValue)
   if (!newModelValue.arguments) newModelValue.arguments = []
   const defaultValue = hasDefaultValue.value
     ? newModelValue.arguments.splice(newModelValue.arguments.length - 1)
@@ -159,13 +157,13 @@ function addMapping() {
 }
 
 function removeMappingByIndex(index: number) {
-  const newModelValue = clone(props.modelValue)
+  const newModelValue = copy(props.modelValue)
   newModelValue.arguments?.splice(index * 2, 2)
   emit('update:modelValue', newModelValue)
 }
 
 function setDefaultValue(value?: number) {
-  const newModelValue = clone(props.modelValue)
+  const newModelValue = copy(props.modelValue)
   if (!newModelValue.arguments) newModelValue.arguments = []
   if (hasDefaultValue.value) newModelValue.arguments.splice(newModelValue.arguments.length - 1)
   if (value) newModelValue.arguments.push(buildValueConstant(value))
@@ -173,14 +171,14 @@ function setDefaultValue(value?: number) {
 }
 
 function setMappingEntity(index: number, entityId?: string) {
-  const newModelValue = clone(props.modelValue)
+  const newModelValue = copy(props.modelValue)
   if (!newModelValue.arguments || !newModelValue.arguments[index * 2]) return
   newModelValue.arguments[index * 2] = { functionId: 'entity', entityId: entityId }
   emit('update:modelValue', newModelValue)
 }
 
 function setMappingValue(index: number, value?: number) {
-  const newModelValue = clone(props.modelValue)
+  const newModelValue = copy(props.modelValue)
   if (!newModelValue.arguments || !newModelValue.arguments[index * 2 + 1]) return
   newModelValue.arguments[index * 2 + 1] = buildValueConstant(value)
   emit('update:modelValue', newModelValue)
