@@ -21,7 +21,7 @@
             icon="content_copy"
             size="sm"
             class="q-ml-xs"
-            :title="t('copyToClipboard')"
+            :title="t('copyThing', { thing: t('id') })"
             @click="copyToClipboard(local.id)"
           />
         </q-toolbar-title>

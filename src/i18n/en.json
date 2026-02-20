@@ -519,6 +519,11 @@
     "title": "Scope",
     "description": "The scope of this code."
   },
+  "codeScopeDescriptions": {
+    "LEAVES": "All descendant codes that are leaves in the code system hierarchy are adopted.",
+    "SELF": "Only the code itself is adopted.",
+    "SUBTREE": "All descendant codes in the code system hierarchy are adopted."
+  },
   "codeScopes": {
     "SELF": "Self",
     "LEAVES": "Leaves",
@@ -631,5 +636,6 @@
   "question": "Question",
   "questioning": "Questioning",
   "ragInitNotSupportedTitle": "Not Supported!",
-  "ragInitNotSupported": "The RAG component is either not activated, or not available for this specific data source. Please ask your administrator to activate it."
+  "ragInitNotSupported": "The RAG component is either not activated, or not available for this specific data source. Please ask your administrator to activate it.",
+  "selectImportExport": "Please select whether you would like to import phenotypes into this repository or export all the phenotypes it contains. You can then use the exported file to import your phenotypes into another system."
 }

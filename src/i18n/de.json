@@ -519,6 +519,11 @@
     "title": "Geltungsbereich",
     "description": "Der Geltungsbereich dieses Codes."
   },
+  "codeScopeDescriptions": {
+    "LEAVES": "Die Blätter unterhalb des angegebenen Codes in der Hierarchie werden übernommen.",
+    "SELF": "Nur der angegebene Code wird übernommen.",
+    "SUBTREE": "Alle Codes, die unterhalb des angegebenen Codes in der Hierarchie liegen, werden übernommen."
+  },
   "codeScopes": {
     "LEAVES": "Blätter",
     "SUBTREE": "Teilbaum",
@@ -631,5 +636,6 @@
   "question": "Frage",
   "questioning": "Befragung",
   "ragInitNotSupportedTitle": "Nicht unterstützt!",
-  "ragInitNotSupported": "Die RAG-Komponente ist entweder nicht aktiviert oder für diese bestimmte Datenquelle nicht verfügbar. Bitte wenden Sie sich an Ihren Administrator, um sie zu aktivieren."
+  "ragInitNotSupported": "Die RAG-Komponente ist entweder nicht aktiviert oder für diese bestimmte Datenquelle nicht verfügbar. Bitte wenden Sie sich an Ihren Administrator, um sie zu aktivieren.",
+  "selectImportExport": "Bitte wählen Sie aus, ob Sie Phänotypen in dieses Repositorium importieren oder alle darin enthaltenen Phänotypen exportieren möchten. Anschließend können Sie die exportierte Datei verwenden, um Ihre Phänotypen in ein anderes System zu importieren."
 }

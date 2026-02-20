@@ -28,7 +28,8 @@
         <q-btn
           dense
           flat
-          class="text-caption q-item__label--caption"
+          no-caps
+          class="text-caption"
           icon="upload_file"
           :label="t('import')"
           :title="t('codeInput.importCsvDescription')"
@@ -37,9 +38,8 @@
       </q-toolbar-title>
     </template>
 
-    <template #default>
+    <template v-if="!readonly" #default>
       <code-input
-        v-if="!readonly"
         :disabled-codes="disabledCodes"
         :manual-entry="showManualForm"
         @select="addEntries([$event as CodeWithScope])"

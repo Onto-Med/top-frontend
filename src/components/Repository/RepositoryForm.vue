@@ -58,6 +58,7 @@
           i18n-prefix="repositoryType"
           :enum="RepositoryType"
           :readonly="!isNew"
+          required
         />
 
         <q-input v-model="state.description" type="textarea" :label="t('description')" />

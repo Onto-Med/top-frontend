@@ -65,7 +65,7 @@
               v-for="col in headerProps.cols"
               :key="col.name"
               :props="headerProps"
-              class="bg-grey-1"
+              :class="{ 'bg-grey-1': !$q.dark.isActive }"
             >
               {{ col.label }}
             </q-th>
@@ -79,8 +79,8 @@
             <slot name="row-cells" :row="bodyProps.row">
               <q-td>{{ bodyProps.row.name || bodyProps.row.id }}</q-td>
               <q-td>{{ bodyProps.row.description }}</q-td>
-              <q-td :title="t('createdAt', { date: d(bodyProps.row.createdAt, 'long') })">
-                {{ d(bodyProps.row.updatedAt, 'long') }}
+              <q-td :title="t('updatedAt', { date: d(bodyProps.row.updatedAt, 'long') })">
+                {{ d(bodyProps.row.createdAt, 'long') }}
               </q-td>
             </slot>
           </q-tr>
@@ -163,7 +163,7 @@ const cols = computed(() => {
     { name: 'actions' },
     { name: 'name', field: 'name', label: t('name'), align: 'left', required: true },
     { name: 'description', field: 'description', label: t('description'), align: 'left' },
-    { name: 'updatedAt', field: 'updatedAt', label: t('updatedAt'), align: 'left' },
+    { name: 'createdAt', field: 'createdAt', label: t('createdAt'), align: 'left' },
   ] as QTableProps['columns']
 })
 

@@ -11,13 +11,13 @@
       >
         <template #header="headerProps">
           <q-tr :props="headerProps">
-            <q-th class="bg-grey-1" auto-width />
-            <q-th class="bg-grey-1"> # </q-th>
+            <q-th :class="{ 'bg-grey-1': !$q.dark.isActive }" auto-width />
+            <q-th :class="{ 'bg-grey-1': !$q.dark.isActive }"> # </q-th>
             <q-th
               v-for="col in headerProps.cols"
               :key="col.name"
               :props="headerProps"
-              class="bg-grey-1"
+              :class="{ 'bg-grey-1': !$q.dark.isActive }"
             >
               {{ col.label }}
             </q-th>

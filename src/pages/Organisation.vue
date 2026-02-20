@@ -8,9 +8,14 @@
               <q-icon name="groups" :title="t('organisation')" class="q-mr-sm q-tree__icon" />
               {{ organisation.name }}
             </div>
-            <small v-if="organisation.createdAt" class="gt-xs">
-              {{ t('createdAt', { date: d(organisation.createdAt, 'long') }) }}
-            </small>
+            <small
+              ><div v-if="organisation.createdAt">
+                {{ t('createdAt', { date: d(organisation.createdAt, 'long') }) }}
+              </div>
+              <div v-if="organisation.updatedAt">
+                {{ t('updatedAt', { date: d(organisation.updatedAt, 'long') }) }}
+              </div></small
+            >
           </div>
           <div v-if="manage" class="col-auto">
             <q-btn icon="settings" color="primary" :label="t('manage')">

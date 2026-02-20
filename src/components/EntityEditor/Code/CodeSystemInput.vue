@@ -32,7 +32,7 @@ import { CodeSystem, CodeSystemPage } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
-import { ScrollDetails } from './models'
+import { ScrollDetails } from 'src/components/models'
 
 const props = defineProps<{
   modelValue?: CodeSystem
