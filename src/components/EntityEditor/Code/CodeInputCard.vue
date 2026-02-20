@@ -109,11 +109,7 @@ import CodeInput from './CodeInput.vue'
 import { useQuasar } from 'quasar'
 import useNotify from 'src/mixins/useNotify'
 import CodeImportDialog from './CodeImportDialog.vue'
-
-interface CodeWithScope {
-  code: Code
-  scope: CodeScope
-}
+import { CodeWithScope } from 'src/components/models'
 
 const props = defineProps({
   modelValue: {

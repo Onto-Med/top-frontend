@@ -94,7 +94,6 @@
 
 <script setup lang="ts">
 import {
-  Code,
   DataType,
   Entity,
   EntityType,
@@ -116,6 +115,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { useEntityStore } from 'src/stores/entity-store'
 import useNotify from 'src/mixins/useNotify'
 import EnumSelect from '../EnumSelect.vue'
+import { CodeWithScope } from '../models'
 
 const props = defineProps({
   repositoryType: {
@@ -133,7 +133,7 @@ const { isPhenotype, isConcept, restrictionToString } = useEntityFormatter()
 const entityStore = useEntityStore()
 const { notify, renderError } = useNotify()
 const onCancelClick = onDialogCancel
-const selection = ref<{ code: Code }>()
+const selection = ref<CodeWithScope>()
 const withRestrictions = ref(false)
 const restrictions = ref<NumberRestriction[]>([])
 const itemType = ref<ItemType>()
@@ -141,7 +141,7 @@ const dataType = ref<DataType>()
 const unit = ref<string>()
 
 const entity = computed(() => {
-  if (selection.value) return toEntity(selection.value?.code)
+  if (selection.value) return toEntity(selection.value)
   return undefined
 })
 
@@ -163,36 +163,36 @@ function addRestriction() {
   })
 }
 
-function toEntity(code?: Code) {
-  if (!code) return undefined
+function toEntity(codeWithScope?: CodeWithScope) {
+  if (!codeWithScope?.code) return undefined
   if (props.repositoryType === RepositoryType.ConceptRepository) {
     return {
-      codes: [code],
+      codes: [codeWithScope.code],
       entityType: EntityType.SingleConcept,
       id: (uuidv4 as () => string)(),
       superConcepts: props.superEntity ? [props.superEntity] : [],
-      synonyms: code.synonyms?.map((s) => ({ lang: locale.value, text: s })),
+      synonyms: codeWithScope.code.synonyms?.map((s) => ({ lang: locale.value, text: s })),
       titles: [
         {
           lang: locale.value,
-          text: code.name || t('unnamedConcept'),
+          text: codeWithScope.code.name || t('unnamedConcept'),
         },
       ],
     } as SingleConcept
   }
   if (props.repositoryType === RepositoryType.PhenotypeRepository) {
     return {
-      codes: [code],
+      codes: [codeWithScope.code],
       dataType: dataType.value,
       entityType: EntityType.SinglePhenotype,
       id: (uuidv4 as () => string)(),
       itemType: itemType.value,
       superCategories: props.superEntity ? [props.superEntity] : [],
-      synonyms: code.synonyms?.map((s) => ({ lang: locale.value, text: s })),
+      synonyms: codeWithScope.code.synonyms?.map((s) => ({ lang: locale.value, text: s })),
       titles: [
         {
           lang: locale.value,
-          text: code.name || t('unnamedPhenotype'),
+          text: codeWithScope.code.name || t('unnamedPhenotype'),
         },
       ],
       unit: dataType.value === DataType.Number ? unit.value : undefined,
