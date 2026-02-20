@@ -27,6 +27,9 @@ const routes: RouteRecordRaw[] = [
             dataSourceId: query.dataSourceId,
           }
         },
+        meta: {
+          disabled: !env.QUERIES_ENABLED,
+        },
       },
       {
         name: 'editor',

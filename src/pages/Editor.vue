@@ -33,7 +33,7 @@
                 <q-icon name="rule" />
               </q-btn>
               <q-btn
-                v-if="writable"
+                v-if="writable && env.MODELS_ENABLED"
                 dense
                 :icon="isConceptRepository ? 'find_in_page' : 'manage_search'"
                 :title="t('buildQuery')"
@@ -190,6 +190,7 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useMeta, useQuasar } from 'quasar'
 import Dialog from 'src/components/Dialog.vue'
 import useDefaultHelpers from 'src/mixins/useDefaultHelpers'
+import { env } from 'src/config'
 
 interface EditorTab {
   state: Entity
