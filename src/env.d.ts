@@ -20,5 +20,6 @@ declare namespace NodeJS {
     MAX_COMBINED_DOCUMENTS_UPLOAD: string
     ACCEPT_DOCUMENT_UPLOAD_TYPE: string
     TOP_PHENOTYPIC_QUERY_DOC_BASE_URL: string
+    QUERIES_ENABLED: boolean
   }
 }

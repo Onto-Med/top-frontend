@@ -46,6 +46,7 @@ You can specify the following environment variables via `.env` file or command l
 | TOP_PHENOTYPIC_QUERY_DOC_BASE_URL | https://onto-med.github.io/top-phenotypic-query/care/smith/top/top_phenotypic_query/c2reasoner | This URL is used to generate deep links to functions and constants documentation                                                                                  |
 | NGINX_ACCESS_LOG                  | false                                                                                          | Enable or disable nginx access logging                                                                                                                            |
 | NGINX_ERROR_LOG_LEVEL             | warn                                                                                           | Set nginx [error log level](https://nginx.org/en/docs/ngx_core_module.html#error_log)                                                                             |
+| QUERIES_ENABLED                   | true                                                                                           | Show or hide GUI elements related to query execution                                                                                                              |
 
 ### Lint the files
 

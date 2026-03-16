@@ -31,7 +31,7 @@
                       {{ t('permission', 2) }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-if="isAdmin" v-close-popup clickable @click="showDataSourceDialog">
+                  <q-item v-if="isAdmin && env.QUERIES_ENABLED" v-close-popup clickable @click="showDataSourceDialog">
                     <q-item-section>
                       {{ t('dataSource', 2) }}
                     </q-item-section>
@@ -138,6 +138,7 @@ import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
 import { useMeta, useQuasar } from 'quasar'
+import { env } from 'src/config'
 
 const { t, d } = useI18n()
 const $q = useQuasar()

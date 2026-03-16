@@ -234,15 +234,17 @@ const loading = ref(false)
 const backendDetails = ref<AppDescription>()
 
 const links = computed(() => {
-  const links = [
-    {
+  const links = []
+
+  if (env.QUERIES_ENABLED) {
+    links.push({
       title: t('query', 2),
       icon: 'manage_search',
       caption: t('navbar.query.caption'),
       routeName: 'queryBuilder',
       isHidden: keycloak.value && !keycloak.value.authenticated,
-    },
-  ]
+    })
+  }
   if (env.DOCUMENTS_ENABLED) {
     links.push({
       title: t('document', 2),
