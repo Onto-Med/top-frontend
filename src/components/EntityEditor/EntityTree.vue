@@ -99,6 +99,7 @@
               :duplicatable="duplicatable"
               :entity="node"
               :importable="importable"
+              :is-concept-repository="isConceptRepository"
               @delete-entity-clicked="handleDelete"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="handleEntityDuplication"
