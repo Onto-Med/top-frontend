@@ -9,6 +9,12 @@
       <q-card-section class="q-pa-none">
         <div class="text-italic q-pa-md">
           {{ t('entityImport.concept.description') }}
+          {{
+            (props.superEntity != null)? t('entityImport.concept.descriptionAdd',
+              {
+                superConcept: superConceptLabel?.text
+              }): ''
+          }}
         </div>
       </q-card-section>
       <q-card-section>
@@ -55,9 +61,10 @@ import { useDialogPluginComponent } from 'quasar'
 import { Entity, EntityType, LocalisableText, RepositoryType } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
-// import useNotify from 'src/mixins/useNotify'
+import useNotify from 'src/mixins/useNotify'
 import { useEntityStore } from 'stores/entity-store'
 import { languages } from 'src/config'
+import { v4 as uuidv4 } from 'uuid'
 
 const props = defineProps({
   repositoryType: {
@@ -69,9 +76,9 @@ const props = defineProps({
 
 defineEmits(['hide', 'ok'])
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
-// const { notify } = useNotify()
+const { notify } = useNotify()
 const entityStore = useEntityStore()
 const onCancelClick = onDialogCancel
 
@@ -81,6 +88,13 @@ const conceptLanguage = ref<string | undefined>()
 
 const hasNoFiles = computed(() => {
   return files.value == null || files.value.length <= 0
+})
+const superConceptLabel = computed(() => {
+  const localeTitles = props.superEntity?.titles?.filter((title) => title.lang == locale.value)
+  if (localeTitles?.length == 0) {
+    return props.superEntity?.titles?.at(0)
+  }
+  return localeTitles?.at(0)
 })
 
 async function populateConcept(entity: Entity, array: Array<string>, language: string) {
@@ -111,21 +125,25 @@ async function parseFile(f: File) {
 
 async function onOkClick() {
   if (files.value != null) {
+    let count = 0
     const filesPromises = files.value.map(async (file: File) => parseFile(file))
     await Promise.all(filesPromises).then(async (conceptArrs) => {
       for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
-        if (props.superEntity != null) {
-          const entity: Entity = entityStore.addEntity(
+        count += 1
+        let entity: Entity
+        if (props.superEntity != null && props.superEntity.id != null) {
+          entity = entityStore.addEntity(
             EntityType.SingleConcept,
-            props.superEntity.id!,
+            props.superEntity.id,
           )
-          await populateConcept(entity, concepts, conceptLanguage.value!).then(() => {
-            onDialogOK()
-          })
         } else {
-          console.log('no super')
+          entity = { id: (uuidv4 as () => string)(), entityType: EntityType.SingleConcept }
         }
+        await populateConcept(entity, concepts, conceptLanguage.value!)
       }
+    }).then(() => {
+      notify(t('entityImported', { count: count }), 'positive')
+      onDialogOK()
     })
   }
 }

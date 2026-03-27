@@ -475,7 +475,8 @@
     },
     "concept": {
       "titleAdd": "from Concept List",
-      "description": "Please select the files you want to import concepts from. Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym."
+      "description": "Please select the files you want to import concepts from. Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym.",
+      "descriptionAdd": "(The concepts will have '{superConcept}' as Super Concept.)"
     }
   },
   "withRestriction": "With restriction|With restrictions",

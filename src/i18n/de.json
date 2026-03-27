@@ -475,7 +475,8 @@
     },
     "concept": {
       "titleAdd": "aus Konzept-Liste",
-      "description": "Bitte wählen sie die Dateien aus, mit denen Sie die Konzepte importieren wollen. Jede Datei wird als ein eigenes Konzept gehandelt, in der der erste Zeileneintrag der Titel wird und die folgenden Zeileneinträge die Synonyme."
+      "description": "Bitte wählen sie die Dateien aus, mit denen Sie die Konzepte importieren wollen. Jede Datei wird als ein eigenes Konzept gehandelt, in der der erste Zeileneintrag der Titel wird und die folgenden Zeileneinträge die Synonyme.",
+      "descriptionAdd": "(Die Konzepte werden '{superConcept}' als Eltern-Konzept haben.)"
     }
   },
   "withRestriction": "Mit Restriktion|Mit Restriktionen",
