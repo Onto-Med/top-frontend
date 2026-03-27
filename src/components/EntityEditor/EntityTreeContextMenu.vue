@@ -95,6 +95,7 @@ import EntityMoveDialog from './EntityMoveDialog.vue'
 import TerminologyImportDialog from './TerminologyImportDialog.vue'
 import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
+import ConceptListImportDialog from 'components/EntityEditor/ConceptListImportDialog.vue'
 
 const props = defineProps({
   entity: Object as () => Entity,
@@ -179,7 +180,13 @@ function showTerminologyImportDialog() {
 }
 
 function showConceptImportDialog() {
-  console.log("Import Concepts")
+  $q.dialog({
+    component: ConceptListImportDialog,
+    componentProps: {
+      repositoryType: repository.value?.repositoryType,
+      superEntity: props.entity,
+    },
+  })
 }
 
 function emitCreateEntity(entityType: EntityType, entityId: string | undefined) {

@@ -470,12 +470,12 @@
   "entityImport": {
     "title": "Import",
     "terminology": {
-      "titleAdd": "from terminology",
+      "titleAdd": "from Terminology",
       "description": "Please select a code from the terminology server with the form above. The resulting entity will be displayed here."
     },
     "concept": {
-      "titleAdd": "from concept list",
-      "description": "Description"
+      "titleAdd": "from Concept List",
+      "description": "Please select the files you want to import concepts from. Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym."
     }
   },
   "withRestriction": "With restriction|With restrictions",
