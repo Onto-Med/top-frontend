@@ -8,13 +8,7 @@
       </q-card-section>
       <q-card-section class="q-pa-none">
         <div class="text-italic q-pa-md">
-          {{ t('entityImport.concept.description') }}
-          {{
-            (props.superEntity != null)? t('entityImport.concept.descriptionAdd',
-              {
-                superConcept: superConceptLabel?.text
-              }): ''
-          }}
+          {{ importDescription }}
         </div>
       </q-card-section>
       <q-card-section>
@@ -89,12 +83,22 @@ const conceptLanguage = ref<string | undefined>()
 const hasNoFiles = computed(() => {
   return files.value == null || files.value.length <= 0
 })
-const superConceptLabel = computed(() => {
+const importDescription = computed(() => {
   const localeTitles = props.superEntity?.titles?.filter((title) => title.lang == locale.value)
+  let superTitle = localeTitles?.at(0)?.text
   if (localeTitles?.length == 0) {
-    return props.superEntity?.titles?.at(0)
+    superTitle = props.superEntity?.titles?.at(0)?.text
   }
-  return localeTitles?.at(0)
+
+  let importDesc = t('entityImport.concept.description')
+  if (props.superEntity != null) {
+    importDesc += (' ' + t('entityImport.concept.descriptionAdd',
+        {
+          superConcept: superTitle
+        })
+    )
+  }
+  return importDesc
 })
 
 async function populateConcept(entity: Entity, array: Array<string>, language: string) {
