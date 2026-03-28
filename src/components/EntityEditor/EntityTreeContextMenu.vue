@@ -58,8 +58,22 @@
       "
       dense
     >
-      <q-item v-close-popup clickable @click="showTerminologyImportDialog">
-        <q-item-section>{{ t('terminologyImport.title') }}</q-item-section>
+      <q-item clickable>
+        <q-item-section>{{ t('entityImport.title') }}</q-item-section>
+        <q-item-section side>
+          <q-icon name="keyboard_arrow_right" />
+        </q-item-section>
+          <q-menu anchor="top end" self="top start">
+            <q-list>
+              <q-item v-close-popup clickable @click="showTerminologyImportDialog">
+                <q-item-section>{{ t('entityImport.terminology.titleAdd') }}</q-item-section>
+              </q-item>
+              <!-- This doesnt show up when clicking in editor and not on an entity; don't know why -->
+              <q-item v-if="isConceptRepository" v-close-popup clickable @click="showConceptImportDialog">
+                <q-item-section>{{ t('entityImport.concept.titleAdd') }}</q-item-section>
+              </q-item>
+            </q-list>
+        </q-menu>
       </q-item>
     </q-list>
     <q-list v-if="deletable && entity" dense>
@@ -81,6 +95,7 @@ import EntityMoveDialog from './EntityMoveDialog.vue'
 import TerminologyImportDialog from './TerminologyImportDialog.vue'
 import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
+import ConceptListImportDialog from 'components/EntityEditor/ConceptListImportDialog.vue'
 
 const props = defineProps({
   entity: Object as () => Entity,
@@ -103,6 +118,10 @@ const props = defineProps({
   createable: {
     type: Boolean,
     default: true,
+  },
+  isConceptRepository: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -153,6 +172,16 @@ function showMoveDialog() {
 function showTerminologyImportDialog() {
   $q.dialog({
     component: TerminologyImportDialog,
+    componentProps: {
+      repositoryType: repository.value?.repositoryType,
+      superEntity: props.entity,
+    },
+  })
+}
+
+function showConceptImportDialog() {
+  $q.dialog({
+    component: ConceptListImportDialog,
     componentProps: {
       repositoryType: repository.value?.repositoryType,
       superEntity: props.entity,

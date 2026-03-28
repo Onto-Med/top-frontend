@@ -467,9 +467,17 @@
   "conceptEntity": "Query Concept",
   "conceptEntitySelection": "Select one of the concepts in the left tree by clicking on it.",
   "select": "Select",
-  "terminologyImport": {
-    "title": "Import from terminology",
-    "description": "Please select a code from the terminology server with the form above. The resulting entity will be displayed here."
+  "entityImport": {
+    "title": "Import",
+    "terminology": {
+      "titleAdd": "from Terminology",
+      "description": "Please select a code from the terminology server with the form above. The resulting entity will be displayed here."
+    },
+    "concept": {
+      "titleAdd": "from Concept List",
+      "description": "Please select the files you want to import concepts from. Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym.",
+      "descriptionAdd": "(The concepts will have '{superConcept}' as Super Concept.)"
+    }
   },
   "withRestriction": "With restriction|With restrictions",
   "entityImported": "No entities were imported|One entity has been imported|{count} entities have been imported",

@@ -99,6 +99,7 @@
               :duplicatable="duplicatable"
               :entity="node"
               :importable="importable"
+              :is-concept-repository="isConceptRepository"
               @delete-entity-clicked="handleDelete"
               @create-entity-clicked="handleCreateEntityClicked"
               @duplicate-entity-clicked="handleEntityDuplication"
@@ -113,6 +114,7 @@
         :allowed-entity-types="allowedEntityTypes"
         :createable="createable"
         :importable="importable"
+        :is-concept-repository="isConceptRepository"
         @create-entity-clicked="handleCreateEntityClicked"
       />
       <slot v-else name="empty-context-menu" />
