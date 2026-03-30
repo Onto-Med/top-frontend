@@ -19,6 +19,7 @@
           <q-file
             v-model="files"
             :label="t('importThing', { thing: t('single_concept', 2) })"
+            :error="!files || files.length <= 0"
             outlined
             use-chips
             multiple
