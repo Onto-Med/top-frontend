@@ -2,7 +2,7 @@
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="dialog-content">
       <q-card-section>
-        <div class="text-h6">{{ t('terminologyImport.title') }}</div>
+        <div class="text-h6">{{ t('entityImport.title') + " " + t('entityImport.terminology.titleAdd') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -15,7 +15,7 @@
 
       <q-card-section class="q-pa-none">
         <div v-if="!entity" class="text-italic q-pa-md">
-          {{ t('terminologyImport.description') }}
+          {{ t('entityImport.terminology.description') }}
         </div>
         <div v-else>
           <div class="row q-px-sm q-pb-sm">
