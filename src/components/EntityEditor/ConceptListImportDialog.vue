@@ -92,11 +92,11 @@ const importDescription = computed(() => {
 
   let importDesc = t('entityImport.concept.description')
   if (props.superEntity != null) {
-    importDesc += (' ' + t('entityImport.concept.descriptionAdd',
-        {
-          superConcept: superTitle
-        })
-    )
+    importDesc +=
+      ' ' +
+      t('entityImport.concept.descriptionAdd', {
+        superConcept: superTitle,
+      })
   }
   return importDesc
 })
@@ -131,24 +131,23 @@ async function onOkClick() {
   if (files.value != null) {
     let count = 0
     const filesPromises = files.value.map(async (file: File) => parseFile(file))
-    await Promise.all(filesPromises).then(async (conceptArrs) => {
-      for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
-        count += 1
-        let entity: Entity
-        if (props.superEntity != null && props.superEntity.id != null) {
-          entity = entityStore.addEntity(
-            EntityType.SingleConcept,
-            props.superEntity.id,
-          )
-        } else {
-          entity = { id: (uuidv4 as () => string)(), entityType: EntityType.SingleConcept }
+    await Promise.all(filesPromises)
+      .then(async (conceptArrs) => {
+        for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
+          count += 1
+          let entity: Entity
+          if (props.superEntity != null && props.superEntity.id != null) {
+            entity = entityStore.addEntity(EntityType.SingleConcept, props.superEntity.id)
+          } else {
+            entity = { id: (uuidv4 as () => string)(), entityType: EntityType.SingleConcept }
+          }
+          await populateConcept(entity, concepts, conceptLanguage.value!)
         }
-        await populateConcept(entity, concepts, conceptLanguage.value!)
-      }
-    }).then(() => {
-      notify(t('entityImported', { count: count }), 'positive')
-      onDialogOK()
-    })
+      })
+      .then(() => {
+        notify(t('entityImported', { count: count }), 'positive')
+        onDialogOK()
+      })
   }
 }
 </script>

@@ -63,16 +63,21 @@
         <q-item-section side>
           <q-icon name="keyboard_arrow_right" />
         </q-item-section>
-          <q-menu anchor="top end" self="top start">
-            <q-list>
-              <q-item v-close-popup clickable @click="showTerminologyImportDialog">
-                <q-item-section>{{ t('entityImport.terminology.titleAdd') }}</q-item-section>
-              </q-item>
-              <!-- This doesnt show up when clicking in editor and not on an entity; don't know why -->
-              <q-item v-if="isConceptRepository" v-close-popup clickable @click="showConceptImportDialog">
-                <q-item-section>{{ t('entityImport.concept.titleAdd') }}</q-item-section>
-              </q-item>
-            </q-list>
+        <q-menu anchor="top end" self="top start">
+          <q-list>
+            <q-item v-close-popup clickable @click="showTerminologyImportDialog">
+              <q-item-section>{{ t('entityImport.terminology.titleAdd') }}</q-item-section>
+            </q-item>
+            <!-- This doesnt show up when clicking in editor and not on an entity; don't know why -->
+            <q-item
+              v-if="isConceptRepository"
+              v-close-popup
+              clickable
+              @click="showConceptImportDialog"
+            >
+              <q-item-section>{{ t('entityImport.concept.titleAdd') }}</q-item-section>
+            </q-item>
+          </q-list>
         </q-menu>
       </q-item>
     </q-list>
