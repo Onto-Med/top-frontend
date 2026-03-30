@@ -6,6 +6,9 @@
           {{ t('entityImport.title') + ' ' + t('entityImport.concept.titleAdd') }}
         </div>
       </q-card-section>
+
+      <q-separator />
+
       <q-card-section class="q-pa-none">
         <div class="text-italic q-pa-md">
           {{ importDescription }}
@@ -19,17 +22,23 @@
             outlined
             use-chips
             multiple
-            style="max-width: 300px"
-          />
-          <q-select
-            v-model="conceptLanguage"
-            :options="languages"
-            :label="t('language')"
-            :error="!conceptLanguage"
-            emit-value
-            map-options
-            style="max-width: 250px"
-          />
+            clearable
+            stack-label
+          >
+            <template #after>
+              <q-select
+                v-model="conceptLanguage"
+                :options="languages"
+                :label="t('language')"
+                :error="!conceptLanguage"
+                emit-value
+                map-options
+                hide-bottom-space
+                stack-label
+                class="lang-input"
+              />
+            </template>
+          </q-file>
         </div>
       </q-card-section>
       <q-separator />
@@ -152,4 +161,8 @@ async function onOkClick() {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped>
+.lang-input {
+  width: 140px;
+}
+</style>
