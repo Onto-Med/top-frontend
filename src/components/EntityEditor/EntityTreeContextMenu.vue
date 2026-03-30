@@ -64,7 +64,7 @@
           <q-icon name="keyboard_arrow_right" />
         </q-item-section>
         <q-menu anchor="top end" self="top start">
-          <q-list>
+          <q-list dense>
             <q-item v-close-popup clickable @click="showTerminologyImportDialog">
               <q-item-section>{{ t('entityImport.terminology.titleAdd') }}</q-item-section>
             </q-item>
