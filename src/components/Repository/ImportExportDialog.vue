@@ -22,7 +22,12 @@
         </q-card-section>
 
         <q-card-section v-show="!mode">
-          <p v-t="'selectImportExport'" />
+          <p v-if="props.repository.repositoryType === RepositoryType.PhenotypeRepository">
+            {{ t('selectImportExport', { thing: t('phenotype', 2) }) }}
+          </p>
+          <p v-else>
+            {{ t('selectImportExport', { thing: t('concept', 2) }) }}
+          </p>
         </q-card-section>
 
         <q-card-section v-show="mode === 'import'">
@@ -115,10 +120,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, onMounted, computed } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RepositoryApiKey } from 'src/boot/axios'
-import { Converter, Purpose, Repository } from '@onto-med/top-api'
+import { Converter, Purpose, Repository, RepositoryType } from '@onto-med/top-api'
 import useNotify from 'src/mixins/useNotify'
 import { copyToClipboard, exportFile } from 'quasar'
 import { useEntityStore } from 'src/stores/entity-store'
