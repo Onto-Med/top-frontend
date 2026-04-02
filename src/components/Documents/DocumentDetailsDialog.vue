@@ -153,6 +153,7 @@ async function displayDocument(dir: number) {
 .content {
   width: 750px;
   max-width: 80vw;
+  overflow: hidden;
 }
 .highlighted-text {
   height: 85vh;
