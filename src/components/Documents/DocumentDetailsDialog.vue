@@ -4,43 +4,43 @@
       <q-card-section class="row items-center">
         <div class="text-h6">
           <q-icon name="article" />
-          {{ document.name }}
+          {{ slide }}
         </div>
-        <q-space />
-        <q-btn-group push spread>
-          <q-btn icon="keyboard_arrow_left" no-caps @click="displayDocument" />
-          <q-btn icon="keyboard_arrow_right" no-caps />
-        </q-btn-group>
         <q-space />
         <q-btn v-close-popup icon="close" flat round dense />
       </q-card-section>
 
       <q-separator />
-      <q-carousel
-        v-model="slide"
-        transition-prev="slide-right"
-        transition-next="slide-left"
-        control-color="black"
-        infinite
-        arrows
-        keep-alive
-        navigation
-      >
-        <q-carousel-slide v-for="id in availableDocuments" name="slide" :key="id" :index="id">
-          <q-card-section class="scroll q-pa-none">
-            <q-scroll-area class="highlighted-text">
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <pre class="q-pa-sm q-ma-none" v-html="document.highlightedText" />
-            </q-scroll-area>
-          </q-card-section>
-        </q-carousel-slide>
-      </q-carousel>
-      <!--      <q-card-section class="scroll q-pa-none">-->
-      <!--        <q-scroll-area class="highlighted-text">-->
-      <!--          &lt;!&ndash; eslint-disable-next-line vue/no-v-html &ndash;&gt;-->
-      <!--          <pre class="q-pa-sm q-ma-none" v-html="document.highlightedText" />-->
-      <!--        </q-scroll-area>-->
-      <!--      </q-card-section>-->
+      <q-card-section>
+        <q-carousel
+          v-model="slide"
+          transition-prev="slide-right"
+          transition-next="slide-left"
+          control-color="black"
+          infinite
+          arrows
+          keep-alive
+        >
+          <q-carousel-slide
+            :name="slide"
+          >
+            <div class="scroll q-pa-none">
+              <q-scroll-area class="highlighted-text">
+                <pre class="q-pa-sm q-ma-none" v-html="documentRef?.highlightedText" />
+              </q-scroll-area>
+            </div>
+          </q-carousel-slide>
+          <!--          <q-carousel-slide-->
+          <!--            v-for="id in availableDocuments"-->
+          <!--            name="slide"-->
+          <!--            class="column no-wrap flex-center"-->
+          <!--            :key="id"-->
+          <!--            :index="id"-->
+          <!--          >-->
+          <!--            {{ "text" }}-->
+          <!--          </q-carousel-slide>-->
+        </q-carousel>
+      </q-card-section>
     </q-card>
   </q-dialog>
 </template>
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ConceptCluster, DataSource, Document } from '@onto-med/top-api'
 import { useDialogPluginComponent } from 'quasar'
-import { inject, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { DocumentApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 
@@ -72,7 +72,17 @@ const props = defineProps<{
 
 const { dialogRef } = useDialogPluginComponent()
 
-const slide = ref('style')
+const slide = ref(props.document.name)
+const docIdx = ref(0)
+const documentRef = ref(props.document)
+
+onMounted(() => {
+  if (props.document.name != undefined && props.document.id != undefined) {
+    slide.value = props.document.name
+    docIdx.value = props.availableDocuments.findIndex((idx) => props.document.id === idx)
+  }
+  displayDocument().catch((e) => renderError(e))
+})
 
 async function displayDocument() {
   let documentId = props.document.id
@@ -102,7 +112,7 @@ async function displayDocument() {
       props.documentQueryOffsets,
     )
     .then((r) => {
-      console.log(r)
+      documentRef.value = r.data
     })
     .catch((e: Error) => renderError(e))
 }
