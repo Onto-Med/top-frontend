@@ -2,6 +2,11 @@
   <q-dialog ref="dialogRef">
     <q-card class="content">
       <q-card-section class="row items-center">
+        <q-btn-group push spread>
+          <q-btn icon="keyboard_arrow_left" :disable="docIdx === 0" no-caps @click="displayDocument(-1)" />
+          <q-btn icon="keyboard_arrow_right" :disable="docIdx >= availableDocuments.length - 1" no-caps @click="displayDocument(1)" />
+        </q-btn-group>
+        <q-space />
         <div class="text-h6">
           <q-icon name="article" />
           {{ slide }}
@@ -12,34 +17,45 @@
 
       <q-separator />
       <q-card-section>
-        <q-carousel
-          v-model="slide"
-          transition-prev="slide-right"
-          transition-next="slide-left"
-          control-color="black"
-          infinite
-          arrows
-          keep-alive
-        >
-          <q-carousel-slide
-            :name="slide"
-          >
+<!--        <q-carousel-->
+<!--          v-model="slide"-->
+<!--          transition-prev="slide-right"-->
+<!--          transition-next="slide-left"-->
+<!--          control-color="black"-->
+<!--          infinite-->
+<!--          keep-alive-->
+<!--          navigation-->
+<!--        >-->
+<!--          <q-carousel-slide :name="slide" v-for="id in availableDocuments" :key="id" >-->
             <div class="scroll q-pa-none">
               <q-scroll-area class="highlighted-text">
                 <pre class="q-pa-sm q-ma-none" v-html="documentRef?.highlightedText" />
               </q-scroll-area>
             </div>
-          </q-carousel-slide>
-          <!--          <q-carousel-slide-->
-          <!--            v-for="id in availableDocuments"-->
-          <!--            name="slide"-->
-          <!--            class="column no-wrap flex-center"-->
-          <!--            :key="id"-->
-          <!--            :index="id"-->
-          <!--          >-->
-          <!--            {{ "text" }}-->
-          <!--          </q-carousel-slide>-->
-        </q-carousel>
+<!--          </q-carousel-slide>-->
+<!--          <template v-slot:control>-->
+<!--            <q-carousel-control position="bottom-right" :offset="[18, 18]" class="q-gutter-xs">-->
+<!--              <q-btn-->
+<!--                push-->
+<!--                round-->
+<!--                dense-->
+<!--                color="orange"-->
+<!--                text-color="black"-->
+<!--                icon="arrow_left"-->
+<!--                @click="displayDocument(-1)"-->
+<!--              />-->
+<!--              <q-btn-->
+<!--                push-->
+<!--                round-->
+<!--                dense-->
+<!--                color="orange"-->
+<!--                text-color="black"-->
+<!--                icon="arrow_right"-->
+<!--                @click="displayDocument(1)"-->
+<!--              />-->
+<!--            </q-carousel-control>-->
+<!--          </template>-->
+<!--        </q-carousel>-->
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -63,7 +79,7 @@ interface ConceptColor {
 const props = defineProps<{
   document: Document
   availableDocuments: Array<string>
-  documentQueryOffsets?: string[] | undefined
+  documentQueryOffsets?: { [key: string]: string[] } | undefined
   dataSource: DataSource
   selectedConcepts: number[]
   conceptColors: ConceptColor[]
@@ -81,14 +97,24 @@ onMounted(() => {
     slide.value = props.document.name
     docIdx.value = props.availableDocuments.findIndex((idx) => props.document.id === idx)
   }
-  displayDocument().catch((e) => renderError(e))
+  displayDocument(0).catch((e) => renderError(e))
 })
 
-async function displayDocument() {
-  let documentId = props.document.id
-  if (documentId === undefined) {
-    if (props.availableDocuments.length == 0) return Promise.reject()
-    documentId = props.availableDocuments[0]
+async function displayDocument(dir: number) {
+  let documentId: string | undefined
+  let newIdx: number = docIdx.value
+
+  if (dir == 0) {
+    documentId = props.document.id
+    if (documentId === undefined) {
+      if (props.availableDocuments.length == 0) return Promise.reject()
+      documentId = props.availableDocuments[0]
+    }
+  } else {
+    newIdx = docIdx.value + dir
+    if (newIdx < 0) newIdx = 0
+    if (newIdx >= props.availableDocuments.length) newIdx = props.availableDocuments.length - 1
+    documentId = props.availableDocuments[newIdx]
   }
 
   if (!props.dataSource) return Promise.reject()
@@ -104,15 +130,20 @@ async function displayDocument() {
           props.concepts[c]?.id,
       )
   }
+
+  if (documentId === undefined) return Promise.reject()
+
   await documentApi
     ?.getSingleDocumentById(
-      documentId!,
+      documentId,
       props.dataSource.id,
       conceptIds,
-      props.documentQueryOffsets,
+      (props.documentQueryOffsets === undefined || documentId == null) ? undefined : props.documentQueryOffsets[documentId],
     )
     .then((r) => {
       documentRef.value = r.data
+      slide.value = documentRef.value.name
+      docIdx.value = newIdx
     })
     .catch((e: Error) => renderError(e))
 }

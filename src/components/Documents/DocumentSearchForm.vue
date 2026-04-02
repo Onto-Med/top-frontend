@@ -661,7 +661,7 @@ async function chooseDocument(document: Document) {
         if (name_this < name_that) return -1;
         return 0
       }).map((entry) => entry[0]),
-      documentQueryOffsets: (props.documentQueryOffsets === undefined || document.id == null) ? undefined : props.documentQueryOffsets[document.id],
+      documentQueryOffsets: (props.documentQueryOffsets === undefined || document.id == null) ? undefined : props.documentQueryOffsets,
       dataSource: props.dataSource,
       selectedConcepts: selectedConcepts.value,
       conceptColors: conceptColors,
