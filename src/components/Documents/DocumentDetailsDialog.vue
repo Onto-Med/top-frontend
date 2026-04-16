@@ -3,8 +3,18 @@
     <q-card class="content">
       <q-card-section class="row items-center">
         <q-btn-group push spread>
-          <q-btn icon="keyboard_arrow_left" :disable="docIdx === 0" no-caps @click="displayDocument(-1)" />
-          <q-btn icon="keyboard_arrow_right" :disable="docIdx >= availableDocuments.length - 1" no-caps @click="displayDocument(1)" />
+          <q-btn
+            icon="keyboard_arrow_left"
+            :disable="docIdx === 0"
+            no-caps
+            @click="displayDocument(-1)"
+          />
+          <q-btn
+            icon="keyboard_arrow_right"
+            :disable="docIdx >= availableDocuments.length - 1"
+            no-caps
+            @click="displayDocument(1)"
+          />
         </q-btn-group>
         <q-space />
         <div class="text-h6">
@@ -17,45 +27,11 @@
 
       <q-separator />
       <q-card-section>
-<!--        <q-carousel-->
-<!--          v-model="slide"-->
-<!--          transition-prev="slide-right"-->
-<!--          transition-next="slide-left"-->
-<!--          control-color="black"-->
-<!--          infinite-->
-<!--          keep-alive-->
-<!--          navigation-->
-<!--        >-->
-<!--          <q-carousel-slide :name="slide" v-for="id in availableDocuments" :key="id" >-->
-            <div class="scroll q-pa-none">
-              <q-scroll-area class="highlighted-text">
-                <pre class="q-pa-sm q-ma-none" v-html="documentRef?.highlightedText" />
-              </q-scroll-area>
-            </div>
-<!--          </q-carousel-slide>-->
-<!--          <template v-slot:control>-->
-<!--            <q-carousel-control position="bottom-right" :offset="[18, 18]" class="q-gutter-xs">-->
-<!--              <q-btn-->
-<!--                push-->
-<!--                round-->
-<!--                dense-->
-<!--                color="orange"-->
-<!--                text-color="black"-->
-<!--                icon="arrow_left"-->
-<!--                @click="displayDocument(-1)"-->
-<!--              />-->
-<!--              <q-btn-->
-<!--                push-->
-<!--                round-->
-<!--                dense-->
-<!--                color="orange"-->
-<!--                text-color="black"-->
-<!--                icon="arrow_right"-->
-<!--                @click="displayDocument(1)"-->
-<!--              />-->
-<!--            </q-carousel-control>-->
-<!--          </template>-->
-<!--        </q-carousel>-->
+        <div class="scroll q-pa-none">
+          <q-scroll-area class="highlighted-text">
+            <pre id="document-scrolled-area" class="q-pa-sm q-ma-none" v-html="documentRef?.highlightedText" />
+          </q-scroll-area>
+        </div>
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -63,12 +39,13 @@
 
 <script setup lang="ts">
 import { ConceptCluster, DataSource, Document } from '@onto-med/top-api'
-import { useDialogPluginComponent } from 'quasar'
+import { useDialogPluginComponent, scroll } from 'quasar'
 import { inject, onMounted, ref } from 'vue'
 import { DocumentApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 
 const { renderError } = useNotify()
+const { getScrollTarget } = scroll
 const documentApi = inject(DocumentApiKey)
 
 interface ConceptColor {
@@ -138,12 +115,16 @@ async function displayDocument(dir: number) {
       documentId,
       props.dataSource.id,
       conceptIds,
-      (props.documentQueryOffsets === undefined || documentId == null) ? undefined : props.documentQueryOffsets[documentId],
+      props.documentQueryOffsets === undefined || documentId == null
+        ? undefined
+        : props.documentQueryOffsets[documentId],
     )
     .then((r) => {
       documentRef.value = r.data
       slide.value = documentRef.value.name
       docIdx.value = newIdx
+      const scrollArea = document.getElementById('document-scrolled-area')
+      if (scrollArea) getScrollTarget(scrollArea).scrollTo(0,0)
     })
     .catch((e: Error) => renderError(e))
 }
