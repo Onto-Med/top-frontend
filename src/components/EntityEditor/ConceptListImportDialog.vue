@@ -1,68 +1,81 @@
 <template v-slot="append">
   <q-dialog ref="dialogRef" @hide="onDialogHide">
-    <q-card class="dialog-content">
-      <q-card-section>
-        <div class="text-h6">
-          {{ t('entityImport.title') + ' ' + t('entityImport.concept.titleAdd') }}
-        </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-section class="q-pa-none">
-        <div class="text-italic q-pa-md">
-          {{ importDescription }}
-        </div>
-      </q-card-section>
-      <q-card-section>
-        <div class="q-gutter-md">
-          <q-file
-            v-model="files"
-            :label="t('importThing', { thing: t('single_concept', 2) })"
-            :error="!files || files.length <= 0"
-            outlined
-            use-chips
-            multiple
-            clearable
-            stack-label
+    <q-card class="content" style="min-width: 600px; max-width: min-content">
+        <q-stepper ref="stepper" v-model="step" active-icon="none" animated>
+          <q-step
+            :name="1"
+            :title="t('entityImport.title') + ' ' + t('entityImport.concept.titleAdd')"
+            :done="step > 1"
+            icon="upload"
           >
-            <template #after>
-              <q-select
-                v-model="conceptLanguage"
-                :options="languages"
-                :label="t('language')"
-                :error="!conceptLanguage && !advancedImport"
-                emit-value
-                map-options
-                hide-bottom-space
+            <p>
+              <small>{{ importDescription }}</small>
+            </p>
+            <div class="q-gutter-md">
+              <q-file
+                v-model="files"
+                :label="t('importThing', { thing: t('single_concept', 2) })"
+                :error="!files || files.length <= 0"
+                outlined
+                use-chips
+                multiple
+                clearable
                 stack-label
-                class="lang-input"
+              >
+                <template #after>
+                  <q-select
+                    v-model="conceptLanguage"
+                    :options="languages"
+                    :label="t('language')"
+                    :error="!conceptLanguage && !advancedImport"
+                    emit-value
+                    map-options
+                    hide-bottom-space
+                    stack-label
+                    class="lang-input"
+                  />
+                </template>
+              </q-file>
+            </div>
+            <q-toggle v-model="advancedImport" :label="t('entityImport.concept.advancedImport')" />
+          </q-step>
+          <q-step
+            :name="2"
+            :title="t('entityImport.concept.advancedImport')"
+            :done="step > 2"
+            caption="optional"
+            icon="settings"
+          >
+            <AdvancedConceptListImport
+              :files="files != undefined? (files as File[]): undefined"
+              :languages="conceptLanguage"
+            />
+          </q-step>
+          <template #navigation>
+            <q-separator />
+            <q-stepper-navigation class="q-mt-md">
+              <q-btn
+                flat
+                :label="step === 1? t('cancel'): t('back')"
+                color="primary"
+                @click="onCancelClick"
               />
-            </template>
-          </q-file>
-        </div>
-      </q-card-section>
-      <q-toggle v-model="advancedImport" :label="t('entityImport.concept.advancedImport')" />
-      <q-separator />
-
-      <q-card-actions align="right">
-        <q-btn flat :label="t('cancel')" color="primary" @click="onCancelClick" />
-        <q-btn
-          flat
-          :disable="loading || (!conceptLanguage && !advancedImport) || hasNoFiles"
-          :label="advancedImport? t('continue'): t('import')"
-          color="primary"
-          @click="onOkClick"
-        />
-      </q-card-actions>
-
-      <q-inner-loading :showing="loading" />
+              <q-btn
+                flat
+                :disable="loading || (!conceptLanguage && !advancedImport) || hasNoFiles"
+                :label="advancedImport && step === 1? t('continue'): t('import')"
+                color="primary"
+                @click="onOkClick"
+              />
+            </q-stepper-navigation>
+          </template>
+        </q-stepper>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
-import { useDialogPluginComponent, useQuasar } from 'quasar'
+import { QStepper, useDialogPluginComponent } from 'quasar'
 import { Entity, EntityType, LocalisableText, RepositoryType } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
@@ -82,12 +95,12 @@ const props = defineProps({
 
 defineEmits(['hide', 'ok'])
 
-const $q = useQuasar()
 const { t, locale } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
-const { notify } = useNotify()
+const { notify, renderError } = useNotify()
 const entityStore = useEntityStore()
-const onCancelClick = onDialogCancel
+const stepper = ref<QStepper>()
+const step = ref(1)
 
 const loading = ref(false)
 const files = ref<null | []>(null)
@@ -141,35 +154,46 @@ async function parseFile(f: File) {
   return entities
 }
 
-async function onOkClick() {
-  if (advancedImport.value) $q.dialog({
-    component: AdvancedConceptListImport,
-    componentProps: { files: files.value, language: conceptLanguage.value },
-  })
-  else {
-    if (files.value != null) {
-      let count = 0
-      const filesPromises = files.value.map(async (file: File) => parseFile(file))
-      await Promise.all(filesPromises)
-        .then(async (conceptArrs) => {
-          for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
-            count += 1
-            let entity: Entity
-            if (props.superEntity != null && props.superEntity.id != null) {
-              entity = entityStore.addEntity(EntityType.SingleConcept, props.superEntity.id)
-            } else {
-              entity = { id: (uuidv4 as () => string)(), entityType: EntityType.SingleConcept }
-            }
-            await populateConcept(entity, concepts, conceptLanguage.value!)
+async function createEntities() {
+  if (files.value != null) {
+    let count = 0
+    const filesPromises = files.value.map(async (file: File) => parseFile(file))
+    await Promise.all(filesPromises)
+      .then(async (conceptArrs) => {
+        for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
+          count += 1
+          let entity: Entity
+          if (props.superEntity != null && props.superEntity.id != null) {
+            entity = entityStore.addEntity(EntityType.SingleConcept, props.superEntity.id)
+          } else {
+            entity = { id: (uuidv4 as () => string)(), entityType: EntityType.SingleConcept }
           }
-        })
-        .then(() => {
-          notify(t('entityImported', { count: count }), 'positive')
-          onDialogOK()
-        })
-    }
+          await populateConcept(entity, concepts, conceptLanguage.value!)
+        }
+      })
+      .then(() => {
+        notify(t('entityImported', { count: count }), 'positive')
+        onDialogOK()
+      })
   }
 }
+
+function onOkClick() {
+  if (step.value === 1 && advancedImport.value) {
+      step.value += 1
+  } else {
+    createEntities().catch((e: Error) => renderError(e))
+  }
+}
+
+function onCancelClick() {
+  if (step.value === 1) {
+    onDialogCancel()
+  } else {
+    step.value -= 1
+  }
+}
+
 </script>
 
 <style lang="scss" scoped>

@@ -1,35 +1,27 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
-    <q-card class="dialog-content">
-      <q-table :rows="rows" :columns="cols" flat hide-pagination row-key="id">
-        <template v-slot:top>
-          <q-btn size="sm" color="primary" label="Add Hierarchy" @click="addHierarchy" />
-          <q-btn
-            size="sm"
-            v-if="rows.length !== 0"
-            class="q-ml-sm"
-            color="primary"
-            label="Remove Hierarchy"
-            @click="removeHierarchy"
-          />
-        </template>
-      </q-table>
-      <q-card-actions align="right">
-        <q-btn flat :label="t('cancel')" color="primary" @click="onCancelClick" />
-        <q-btn flat :label="t('import')" color="primary" @click="onOkClick" />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+    <q-table :rows="rows" :columns="cols" flat hide-pagination row-key="id">
+      <template v-slot:top>
+        <q-btn size="sm" color="primary" label="Add Hierarchy" @click="addHierarchy" />
+        <q-btn
+          size="sm"
+          v-if="rows.length !== 0"
+          class="q-ml-sm"
+          color="primary"
+          label="Remove Hierarchy"
+          @click="removeHierarchy"
+        />
+      </template>
+    </q-table>
 </template>
 
 <script setup lang="ts">
-import { QTableProps, useDialogPluginComponent } from 'quasar'
+import { QTableProps } from 'quasar'
 import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
   files: {
-    type: Array as () => FileDescription[],
+    type: Array as () => File[],
     default: () => [],
   },
   language: {
@@ -40,7 +32,6 @@ const props = defineProps({
 
 const rows = ref([] as FileDescription[])
 
-const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { t, locale } = useI18n()
 
 const cols = ref([
@@ -68,8 +59,8 @@ watch(locale, (newLocale) => {
     const langCol = cols.value.find(c => c.name === 'language')
     if (langCol) langCol.label = t('language')
   }
+  console.log(newLocale)
 })
-const onCancelClick = onDialogCancel
 
 onMounted(() => {
   rows.value = props.files.map(
@@ -81,10 +72,6 @@ onMounted(() => {
     )
   }
 )
-
-function onOkClick() {
-  onDialogOK()
-}
 
 function addHierarchy() {
   if (cols.value?.some(c => c.name === 'hierarchy')) return
