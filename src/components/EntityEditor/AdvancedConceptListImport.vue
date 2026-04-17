@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { QTableProps, useDialogPluginComponent } from 'quasar'
 import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
   files: {
@@ -40,28 +40,35 @@ const props = defineProps({
 
 const rows = ref([] as FileDescription[])
 
-const cols = computed(() => {
-  return [
-    {
-      name: 'name',
-      label: t('file'),
-      field: (row: FileDescription) => row.name,
-      required: true,
-      align: 'left',
-      sortable: true,
-    },
-    {
-      name: 'language',
-      label: t('language'),
-      field: (row: FileDescription) => row.language,
-      required: true,
-      align: 'left',
-    },
-  ] as QTableProps['columns']
-})
-
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { t, locale } = useI18n()
+
+const cols = ref([
+  {
+    name: 'name',
+    label: t('file'),
+    field: (row: FileDescription) => row.name,
+    required: true,
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'language',
+    label: t('language'),
+    field: (row: FileDescription) => row.language,
+    required: true,
+    align: 'left',
+  },
+] as QTableProps['columns'])
+
+watch(locale, (newLocale) => {
+  if (cols.value) {
+    const nameCol = cols.value.find(c => c.name === 'name')
+    if (nameCol) nameCol.label = t('file')
+    const langCol = cols.value.find(c => c.name === 'language')
+    if (langCol) langCol.label = t('language')
+  }
+})
 const onCancelClick = onDialogCancel
 
 onMounted(() => {
@@ -80,21 +87,21 @@ function onOkClick() {
 }
 
 function addHierarchy() {
+  if (cols.value?.some(c => c.name === 'hierarchy')) return
   cols.value?.push({
     name: 'hierarchy',
     label: 'Hierarchy',
-    field: (row) => {
-      if (row.hierarchy) return ''
-      return null
-    },
+    field: (row: FileDescription) => row.hierarchy?.join(', '),
+    align: 'left',
   })
-  rows.value = rows.value?.map((item: FileDescription) => ({
-    name: item.name,
-    language: item.language,
-    hierarchy: undefined
-  } as FileDescription))
 }
-function removeHierarchy() {}
+
+function removeHierarchy() {
+  const index = cols.value?.findIndex(c => c.name === 'hierarchy')
+  if (index !== undefined && index !== -1) {
+    cols.value?.splice(index, 1)
+  }
+}
 
 interface FileDescription {
   name: string
