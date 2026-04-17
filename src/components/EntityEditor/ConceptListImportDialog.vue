@@ -31,7 +31,7 @@
                 v-model="conceptLanguage"
                 :options="languages"
                 :label="t('language')"
-                :error="!conceptLanguage"
+                :error="!conceptLanguage && !advancedImport"
                 emit-value
                 map-options
                 hide-bottom-space
@@ -42,14 +42,15 @@
           </q-file>
         </div>
       </q-card-section>
+      <q-toggle v-model="advancedImport" :label="t('entityImport.concept.advancedImport')" />
       <q-separator />
 
       <q-card-actions align="right">
         <q-btn flat :label="t('cancel')" color="primary" @click="onCancelClick" />
         <q-btn
           flat
-          :disable="loading || !conceptLanguage || hasNoFiles"
-          :label="t('import')"
+          :disable="loading || (!conceptLanguage && !advancedImport) || hasNoFiles"
+          :label="advancedImport? t('continue'): t('import')"
           color="primary"
           @click="onOkClick"
         />
@@ -61,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDialogPluginComponent } from 'quasar'
+import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { Entity, EntityType, LocalisableText, RepositoryType } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
@@ -69,6 +70,7 @@ import useNotify from 'src/mixins/useNotify'
 import { useEntityStore } from 'stores/entity-store'
 import { languages } from 'src/config'
 import { v4 as uuidv4 } from 'uuid'
+import AdvancedConceptListImport from 'components/EntityEditor/AdvancedConceptListImport.vue'
 
 const props = defineProps({
   repositoryType: {
@@ -80,6 +82,7 @@ const props = defineProps({
 
 defineEmits(['hide', 'ok'])
 
+const $q = useQuasar()
 const { t, locale } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { notify } = useNotify()
@@ -89,6 +92,7 @@ const onCancelClick = onDialogCancel
 const loading = ref(false)
 const files = ref<null | []>(null)
 const conceptLanguage = ref<string | undefined>()
+const advancedImport = ref(false)
 
 const hasNoFiles = computed(() => {
   return files.value == null || files.value.length <= 0
@@ -138,26 +142,32 @@ async function parseFile(f: File) {
 }
 
 async function onOkClick() {
-  if (files.value != null) {
-    let count = 0
-    const filesPromises = files.value.map(async (file: File) => parseFile(file))
-    await Promise.all(filesPromises)
-      .then(async (conceptArrs) => {
-        for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
-          count += 1
-          let entity: Entity
-          if (props.superEntity != null && props.superEntity.id != null) {
-            entity = entityStore.addEntity(EntityType.SingleConcept, props.superEntity.id)
-          } else {
-            entity = { id: (uuidv4 as () => string)(), entityType: EntityType.SingleConcept }
+  if (advancedImport.value) $q.dialog({
+    component: AdvancedConceptListImport,
+    componentProps: { files: files.value, language: conceptLanguage.value },
+  })
+  else {
+    if (files.value != null) {
+      let count = 0
+      const filesPromises = files.value.map(async (file: File) => parseFile(file))
+      await Promise.all(filesPromises)
+        .then(async (conceptArrs) => {
+          for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
+            count += 1
+            let entity: Entity
+            if (props.superEntity != null && props.superEntity.id != null) {
+              entity = entityStore.addEntity(EntityType.SingleConcept, props.superEntity.id)
+            } else {
+              entity = { id: (uuidv4 as () => string)(), entityType: EntityType.SingleConcept }
+            }
+            await populateConcept(entity, concepts, conceptLanguage.value!)
           }
-          await populateConcept(entity, concepts, conceptLanguage.value!)
-        }
-      })
-      .then(() => {
-        notify(t('entityImported', { count: count }), 'positive')
-        onDialogOK()
-      })
+        })
+        .then(() => {
+          notify(t('entityImported', { count: count }), 'positive')
+          onDialogOK()
+        })
+    }
   }
 }
 </script>
