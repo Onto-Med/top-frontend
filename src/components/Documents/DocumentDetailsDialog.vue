@@ -30,7 +30,11 @@
         <div class="scroll q-pa-none">
           <q-scroll-area class="highlighted-text">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <pre id="document-scrolled-area" class="q-pa-sm q-ma-none" v-html="documentRef?.highlightedText" />
+            <pre
+              id="document-scrolled-area"
+              class="q-pa-sm q-ma-none"
+              v-html="documentRef?.highlightedText"
+            />
           </q-scroll-area>
         </div>
       </q-card-section>
@@ -125,7 +129,7 @@ async function displayDocument(dir: number) {
       slide.value = documentRef.value.name
       docIdx.value = newIdx
       const scrollArea = document.getElementById('document-scrolled-area')
-      if (scrollArea) getScrollTarget(scrollArea).scrollTo(0,0)
+      if (scrollArea) getScrollTarget(scrollArea).scrollTo(0, 0)
     })
     .catch((e: Error) => renderError(e))
 }

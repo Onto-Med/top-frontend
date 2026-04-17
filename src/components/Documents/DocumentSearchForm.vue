@@ -121,7 +121,7 @@
             class="q-py-none"
             @click="poseQuestionToRag"
           >
-            <q-icon v-if="dataSource" v-bind:style="{ color: ragColor }" name="smart_toy" />
+            <q-icon v-if="dataSource" :style="{ color: ragColor }" name="smart_toy" />
             <q-icon v-else name="smart_toy" />
             <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
           </q-btn>
@@ -205,14 +205,14 @@
                   :accept="acceptedDocumentUploadTypes"
                   :max-total-size="maxCombinedFileUploadSize"
                 >
-                  <template v-slot:hint>
+                  <template #hint>
                     {{
                       t('documentSearch.maxCombinedSize') +
                       ': ' +
                       env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase()
                     }}
                   </template>
-                  <template v-slot:after>
+                  <template #after>
                     <q-btn
                       color="primary"
                       dense
@@ -530,9 +530,9 @@ async function checkActiveRag() {
     })
 }
 
-async function filterDocuments(): Promise<Map<string, string|undefined>> {
+async function filterDocuments(): Promise<Map<string, string | undefined>> {
   if (!props.dataSource || documentApi === undefined) return Promise.reject()
-  const filteredDocuments = new Map<string, string|undefined>()
+  const filteredDocuments = new Map<string, string | undefined>()
   let page = 1
   let breakWhile = false
   while (!breakWhile) {
@@ -652,21 +652,26 @@ async function chooseDocument(document: Document) {
     component: DocumentDetailsDialog,
     componentProps: {
       document: document,
-      availableDocuments: [...filteredDocuments].sort((a, b) => {
-        const name_this = a[1]
-        const name_that = b[1]
-        if (name_this === undefined && name_that === undefined) return 0
-        if (name_this === undefined) return -1
-        if (name_that === undefined) return 1
-        if (name_this > name_that) return 1;
-        if (name_this < name_that) return -1;
-        return 0
-      }).map((entry) => entry[0]),
-      documentQueryOffsets: (props.documentQueryOffsets === undefined || document.id == null) ? undefined : props.documentQueryOffsets,
+      availableDocuments: [...filteredDocuments]
+        .sort((a, b) => {
+          const name_this = a[1]
+          const name_that = b[1]
+          if (name_this === undefined && name_that === undefined) return 0
+          if (name_this === undefined) return -1
+          if (name_that === undefined) return 1
+          if (name_this > name_that) return 1
+          if (name_this < name_that) return -1
+          return 0
+        })
+        .map((entry) => entry[0]),
+      documentQueryOffsets:
+        props.documentQueryOffsets === undefined || document.id == null
+          ? undefined
+          : props.documentQueryOffsets,
       dataSource: props.dataSource,
       selectedConcepts: selectedConcepts.value,
       conceptColors: conceptColors,
-      concepts: concepts.value
+      concepts: concepts.value,
     },
   })
 }
