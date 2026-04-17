@@ -130,7 +130,7 @@ async function populateConcept(entity: Entity, array: Array<string>, language: s
 async function parseFile(f: File) {
   const entities: Array<string> = []
   await f.text().then((r) =>
-    r.split(new RegExp(/\r+\n/)).forEach((line: string) => {
+    r.split(new RegExp(/\r*\n/)).forEach((line: string) => {
       if (line.trim().length != 0) entities.push(line)
     }),
   )

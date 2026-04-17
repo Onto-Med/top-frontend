@@ -121,7 +121,7 @@
             class="q-py-none"
             @click="poseQuestionToRag"
           >
-            <q-icon v-if="dataSource" v-bind:style="{ color: ragColor }" name="smart_toy" />
+            <q-icon v-if="dataSource" :style="{ color: ragColor }" name="smart_toy" />
             <q-icon v-else name="smart_toy" />
             <div class="q-pl-sm gt-xs ellipsis">{{ t('useRag') }}</div>
           </q-btn>
@@ -160,7 +160,7 @@
                 @request="
                   (name, page) => reloadDocuments(name, page).catch((e: Error) => renderError(e))
                 "
-                @row-clicked="chooseDocument($event).catch((e: Error) => renderError(e))"
+                @row-clicked="chooseDocument($event)"
               >
                 <template v-if="query" #action-buttons>
                   <q-btn
@@ -205,14 +205,14 @@
                   :accept="acceptedDocumentUploadTypes"
                   :max-total-size="maxCombinedFileUploadSize"
                 >
-                  <template v-slot:hint>
+                  <template #hint>
                     {{
                       t('documentSearch.maxCombinedSize') +
                       ': ' +
                       env.MAX_COMBINED_DOCUMENTS_UPLOAD.toUpperCase()
                     }}
                   </template>
-                  <template v-slot:after>
+                  <template #after>
                     <q-btn
                       color="primary"
                       dense
@@ -468,9 +468,9 @@ onMounted(() => {
   void entityStore.loadUser().then(loadContent)
 })
 
-watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () =>
-  reloadDocuments().catch((e: Error) => onDocumentLoadError(e)),
-)
+watch([mostImportantNodes, conceptMode, selectedConcepts, () => props.documentFilter], () => {
+  reloadDocuments().catch((e: Error) => onDocumentLoadError(e))
+})
 watch(() => props.dataSource, loadContent)
 
 async function loadContent() {
@@ -480,6 +480,7 @@ async function loadContent() {
     .then(reloadConcepts)
     .then(() => reloadDocuments().catch((e: Error) => onDocumentLoadError(e)))
     .then(checkActiveRag)
+    .catch((e: Error) => renderError(e))
 }
 
 function onDocumentLoadError(e: Error) {
@@ -527,6 +528,34 @@ async function checkActiveRag() {
       renderError(e)
       return false
     })
+}
+
+async function filterDocuments(): Promise<Map<string, string | undefined>> {
+  if (!props.dataSource || documentApi === undefined) return Promise.reject()
+  const filteredDocuments = new Map<string, string | undefined>()
+  let page = 1
+  let breakWhile = false
+  while (!breakWhile) {
+    await documentApi
+      .getDocuments(
+        props.dataSource.id,
+        undefined,
+        props.documentFilter,
+        undefined,
+        conceptClusterIds.value,
+        undefined,
+        conceptMode.value,
+        mostImportantNodes.value,
+        page,
+      )
+      .then((r) => {
+        r.data.content.forEach((doc) => {
+          if (doc != undefined && doc.id != undefined) filteredDocuments.set(doc.id, doc.name)
+        })
+        if (page++ > r.data.totalPages) breakWhile = true
+      })
+  }
+  return filteredDocuments
 }
 
 async function reloadConcepts() {
@@ -617,33 +646,34 @@ async function checkPipeline() {
 }
 
 async function chooseDocument(document: Document) {
-  if (document.id == null) return
-  const offsets =
-    props.documentQueryOffsets != undefined ? props.documentQueryOffsets[document.id] : undefined
-  if (!props.dataSource) return Promise.reject()
-  const conceptIds = new Array<string>()
-  for (const c of selectedConcepts.value) {
-    if (c != undefined)
-      conceptIds.push(
-        '$color::' +
-          conceptColors[c]?.['background-color'] +
-          '|' +
-          conceptColors[c]?.['color'] +
-          '::color$' +
-          concepts.value[c]?.id,
-      )
-  }
-  await documentApi
-    ?.getSingleDocumentById(document.id, props.dataSource.id, conceptIds, offsets)
-    .then((r) => {
-      $q.dialog({
-        component: DocumentDetailsDialog,
-        componentProps: {
-          document: r.data,
-        },
-      })
-    })
-    .catch((e: Error) => renderError(e))
+  const filteredDocuments = await filterDocuments()
+  if (filteredDocuments === undefined) return
+  $q.dialog({
+    component: DocumentDetailsDialog,
+    componentProps: {
+      document: document,
+      availableDocuments: [...filteredDocuments]
+        .sort((a, b) => {
+          const name_this = a[1]
+          const name_that = b[1]
+          if (name_this === undefined && name_that === undefined) return 0
+          if (name_this === undefined) return -1
+          if (name_that === undefined) return 1
+          if (name_this > name_that) return 1
+          if (name_this < name_that) return -1
+          return 0
+        })
+        .map((entry) => entry[0]),
+      documentQueryOffsets:
+        props.documentQueryOffsets === undefined || document.id == null
+          ? undefined
+          : props.documentQueryOffsets,
+      dataSource: props.dataSource,
+      selectedConcepts: selectedConcepts.value,
+      conceptColors: conceptColors,
+      concepts: concepts.value,
+    },
+  })
 }
 
 function showRegenerateDialog() {
@@ -681,34 +711,13 @@ async function poseQuestionToRag() {
     })
     return
   }
-  const documentIds = new Array<string>()
-  let page = 1
-  let breakWhile = false
-  while (!breakWhile) {
-    await documentApi
-      .getDocuments(
-        props.dataSource.id,
-        undefined,
-        props.documentFilter,
-        undefined,
-        conceptClusterIds.value,
-        undefined,
-        conceptMode.value,
-        mostImportantNodes.value,
-        page,
-      )
-      .then((r) => {
-        r.data.content.forEach((doc) => {
-          if (doc.id != undefined) documentIds.push(doc.id)
-        })
-        if (page++ > r.data.totalPages) breakWhile = true
-      })
-  }
+  const filteredDocuments = await filterDocuments()
+  if (filteredDocuments === undefined) return
 
   $q.dialog({
     component: RAGQuestionDialog,
     componentProps: {
-      documents: documentIds,
+      documents: [...filteredDocuments].map((entry) => entry[0]),
       process: props.dataSource.id,
       previousResult: ragResult.value,
       previousQuestion: ragQuestion.value,
