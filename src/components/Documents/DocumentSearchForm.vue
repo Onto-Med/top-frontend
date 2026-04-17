@@ -480,6 +480,7 @@ async function loadContent() {
     .then(reloadConcepts)
     .then(() => reloadDocuments().catch((e: Error) => onDocumentLoadError(e)))
     .then(checkActiveRag)
+    .catch((e: Error) => renderError(e))
 }
 
 function onDocumentLoadError(e: Error) {
