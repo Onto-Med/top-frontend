@@ -35,6 +35,9 @@
               </q-list>
             </q-popup-edit>
           </q-td>
+          <q-td key="nameAsTitle" :props="props">
+            <q-toggle dense v-model="props.row.nameAsTitle"/>
+          </q-td>
           <q-td
             v-for="i in hierarchyCount"
             :key="i"
@@ -68,12 +71,13 @@ const props = defineProps({
   language: {
     type: String as () => string | undefined,
     default: () => undefined,
-  },
+  }
 })
 
 const { t, locale } = useI18n()
 
 const rows = ref([] as FileDescription[])
+defineExpose({ rows })
 
 const cols = ref([
   {
@@ -89,7 +93,14 @@ const cols = ref([
     label: t('language'),
     field: (row: FileDescription) => row.language,
     required: true,
-    align: 'left',
+    align: 'center',
+  },
+  {
+    name: 'nameAsTitle',
+    label: t('entityImport.concept.nameAsTitleCaption'),
+    field: (row: FileDescription) => row.nameAsTitle,
+    required: true,
+    align: 'center',
   },
 ] as QTableProps['columns'])
 
@@ -103,19 +114,12 @@ onMounted(() => {
         ({
           name: fi.name,
           language: props.language === undefined ? locale.value : props.language,
+          nameAsTitle: false,
           hierarchy: new Array(maxHierarchy)
         }) as FileDescription,
     )
   }
 )
-
-function updateHierarchy(val: string, hierarchyList: string[], index: number) {
-  console.log(val)
-  console.log(hierarchyList)
-  hierarchyList.splice(index, 0, val)
-  console.log(hierarchyList)
-  return true
-}
 
 function addHierarchy() {
   if (maxHierarchyReached.value) return
@@ -133,12 +137,16 @@ function removeHierarchy() {
   if (index !== undefined && index !== -1) {
     cols.value?.splice(index, 1)
   }
+  rows.value.forEach((row: FileDescription) => {
+    row.hierarchy[hierarchyCount.value - 1] = ""
+  })
   hierarchyCount.value -= 1
 }
 
-interface FileDescription {
+export interface FileDescription {
   name: string
   language: string
+  nameAsTitle: boolean
   hierarchy: string[]
 }
 </script>
