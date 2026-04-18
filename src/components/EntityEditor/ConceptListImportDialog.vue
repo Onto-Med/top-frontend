@@ -6,7 +6,7 @@
             :name="1"
             :title="t('entityImport.title') + ' ' + t('entityImport.concept.titleAdd')"
             :done="step > 1"
-            icon="upload"
+            icon="upload_file"
           >
             <p>
               <small>{{ importDescription }}</small>

@@ -646,5 +646,6 @@
   "questioning": "Befragung",
   "ragInitNotSupportedTitle": "Nicht unterstützt!",
   "ragInitNotSupported": "Die RAG-Komponente ist entweder nicht aktiviert oder für diese bestimmte Datenquelle nicht verfügbar. Bitte wenden Sie sich an Ihren Administrator, um sie zu aktivieren.",
-  "selectImportExport": "Bitte wählen Sie aus, ob Sie {thing} in dieses Repositorium importieren oder alle darin enthaltenen {thing} exportieren möchten. Anschließend können Sie die exportierte Datei verwenden, um Ihre {thing} in ein anderes System zu importieren."
+  "selectImportExport": "Bitte wählen Sie aus, ob Sie {thing} in dieses Repositorium importieren oder alle darin enthaltenen {thing} exportieren möchten. Anschließend können Sie die exportierte Datei verwenden, um Ihre {thing} in ein anderes System zu importieren.",
+  "hierarchy": "Hierarchie"
 }
