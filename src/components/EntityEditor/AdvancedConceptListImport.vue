@@ -36,12 +36,13 @@
             </q-popup-edit>
           </q-td>
           <q-td
-            v-for="index in hierarchyCount"
-            :key="index"
+            v-for="i in hierarchyCount"
+            :key="i"
           >
-            <q-popup-edit dense buttons v-model="props.row.hierarchy[index]" v-slot="scope">
+            {{ props.row.hierarchy[i - 1] }}
+            <q-popup-edit dense buttons v-model="props.row.hierarchy[i - 1]" v-slot="scope">
               <q-input
-                :model-value=scope.value
+                v-model="scope.value"
                 dense
                 autofocus
                 @keyup.enter="scope.set"
