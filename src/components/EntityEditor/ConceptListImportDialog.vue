@@ -184,8 +184,8 @@ async function createEntities() {
   if (files.value != null) {
     if (advancedImportRef.value != null) {
       fileDescriptions = advancedImportRef.value.rows
-      for (const [i, hSet] of advancedImportRef.value.hierarchyTags.entries()) {
-        for (const tag of hSet) hierarchyEntityMap.set(i + '-' + tag, undefined)
+      for (const [hIdx, hSet] of advancedImportRef.value.hierarchyTags.entries()) {
+        for (const tag of hSet) hierarchyEntityMap.set(hIdx + '-' + tag, undefined)
       }
     }
 
@@ -199,17 +199,16 @@ async function createEntities() {
           if (fileDescriptions != undefined) {
             const fileDesc = fileDescriptions[count]
             if (fileDesc != undefined) {
-              for (const [hLvl, tag] of fileDesc.hierarchy.entries()) {
+              for (const [hIdx, tag] of fileDesc.hierarchy.entries()) {
                 if (tag === undefined || tag.length === 0) continue
+                const hLvl = hIdx + 1
                 if (hierarchyEntityMap.get(hLvl + '-' + tag) === undefined) {
-                  hierarchyEntityMap.set(hLvl + '-' + tag, createSuperEntity(entity))
+                  hierarchyEntityMap.set(
+                    hLvl + '-' + tag,
+                    await populateConcept(createSuperEntity(entity), [tag], fileDesc.language, undefined),
+                  )
                 }
-                entity = await populateConcept(
-                  createSuperEntity(hierarchyEntityMap.get(hLvl + '-' + tag)),
-                  [tag],
-                  fileDesc.language,
-                  undefined,
-                )
+                entity = hierarchyEntityMap.get(hLvl + '-' + tag)
               }
             }
           }
