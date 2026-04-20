@@ -199,16 +199,20 @@ async function createEntities() {
           if (fileDescriptions != undefined) {
             const fileDesc = fileDescriptions[count]
             if (fileDesc != undefined) {
+              const path = []
               for (const [hIdx, tag] of fileDesc.hierarchy.entries()) {
                 if (tag === undefined || tag.length === 0) continue
                 const hLvl = hIdx + 1
-                if (hierarchyEntityMap.get(hLvl + '-' + tag) === undefined) {
+                path.push(hLvl + '-' + tag)
+                const finalKey = path.join("_")
+
+                if (hierarchyEntityMap.get(finalKey) === undefined) {
                   hierarchyEntityMap.set(
-                    hLvl + '-' + tag,
+                    finalKey,
                     await populateConcept(createSuperEntity(entity), [tag], fileDesc.language, undefined),
                   )
                 }
-                entity = hierarchyEntityMap.get(hLvl + '-' + tag)
+                entity = hierarchyEntityMap.get(finalKey)
               }
             }
           }
