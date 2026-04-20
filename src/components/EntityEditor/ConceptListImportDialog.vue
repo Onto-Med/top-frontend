@@ -107,10 +107,12 @@ const step = ref(1)
 
 const loading = ref(false)
 const files = ref<null | []>(null)
-const fileDescriptions = ref<FileDescription[] | null>(null)
 const conceptLanguage = ref<string | undefined>()
 const advancedImport = ref(false)
 const advancedImportRef = ref<InstanceType<typeof AdvancedConceptListImport> | null>(null)
+
+let fileDescriptions: FileDescription[] = []
+const hierarchyEntityMap = new Map<string, Entity | undefined>()
 
 const hasNoFiles = computed(() => {
   return files.value == null || files.value.length <= 0
@@ -181,7 +183,10 @@ function createSuperEntity(parent: Entity | undefined) {
 async function createEntities() {
   if (files.value != null) {
     if (advancedImportRef.value != null) {
-      fileDescriptions.value = advancedImportRef.value.rows
+      fileDescriptions = advancedImportRef.value.rows
+      for (const [i, hSet] of advancedImportRef.value.hierarchyTags.entries()) {
+        for (const tag of hSet) hierarchyEntityMap.set(i + '-' + tag, undefined)
+      }
     }
 
     let count = 0
@@ -191,23 +196,30 @@ async function createEntities() {
         for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
           let entity: Entity | undefined = props.superEntity
 
-          if (fileDescriptions.value != undefined) {
-            const fileDesc = fileDescriptions.value[count]
+          if (fileDescriptions != undefined) {
+            const fileDesc = fileDescriptions[count]
             if (fileDesc != undefined) {
-              for (const hierarchy of fileDesc.hierarchy) {
-                if (hierarchy === undefined || hierarchy.length === 0) continue
-                entity = await populateConcept(createSuperEntity(entity), [hierarchy], fileDesc.language, undefined)
+              for (const [hLvl, tag] of fileDesc.hierarchy.entries()) {
+                if (tag === undefined || tag.length === 0) continue
+                if (hierarchyEntityMap.get(hLvl + '-' + tag) === undefined) {
+                  hierarchyEntityMap.set(hLvl + '-' + tag, createSuperEntity(entity))
+                }
+                entity = await populateConcept(
+                  createSuperEntity(hierarchyEntityMap.get(hLvl + '-' + tag)),
+                  [tag],
+                  fileDesc.language,
+                  undefined,
+                )
               }
             }
           }
-
           entity = createSuperEntity(entity)
 
           await populateConcept(
             entity,
             concepts,
             conceptLanguage.value!,
-            fileDescriptions.value != undefined ? fileDescriptions.value[count] : undefined,
+            fileDescriptions != undefined ? fileDescriptions[count] : undefined,
           )
           count += 1
         }
