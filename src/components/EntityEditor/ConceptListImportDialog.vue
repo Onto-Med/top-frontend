@@ -57,6 +57,7 @@
           <q-stepper-navigation class="q-mt-md">
             <q-btn
               flat
+              :disable="loading"
               :label="step === 1 ? t('cancel') : t('back')"
               color="primary"
               @click="onCancelClick"
@@ -71,6 +72,7 @@
           </q-stepper-navigation>
         </template>
       </q-stepper>
+      <q-inner-loading :showing="loading" :label="t('pleaseWait') + '...'" />
     </q-card>
   </q-dialog>
 </template>
@@ -182,6 +184,7 @@ function createSuperEntity(parent: Entity | undefined) {
 
 async function createEntities() {
   if (files.value != null) {
+    loading.value = true
     if (advancedImportRef.value != null) {
       fileDescriptions = advancedImportRef.value.rows
       for (const [hIdx, hSet] of advancedImportRef.value.hierarchyTags.entries()) {
@@ -231,6 +234,7 @@ async function createEntities() {
         notify(t('entityImported', { count: count }), 'positive')
         onDialogOK()
       })
+      .finally(() => loading.value = false)
   }
 }
 
