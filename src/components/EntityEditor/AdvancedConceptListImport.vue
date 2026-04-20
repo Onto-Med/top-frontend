@@ -1,5 +1,5 @@
 <template>
-  <q-table :rows="rows" :columns="cols" flat hide-pagination row-key="id">
+  <q-table :rows="rows" :columns="cols" flat row-key="id">
     <template v-slot:top>
       <q-btn
         size="sm"
@@ -54,15 +54,21 @@
             @save="pushTag(i, $event)"
           >
             <div>
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
+              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set">
+                <template v-slot:append>
+                  <q-icon name="close" @click="scope.value = ''" />
+                </template>
+              </q-input>
             </div>
             <div class="q-pt-sm">
               <q-chip
-                v-for="(tag, j) in hierarchyTags.get(i)"
+                v-for="(tag, j) in getTagsForHierarchy(i)"
                 :key="j"
                 dense
                 clickable
+                removable
                 @click="scope.value = tag"
+                @remove="removeTag(i, tag)"
               >
                 {{ tag }}
               </q-chip>
@@ -138,6 +144,12 @@ onMounted(() => {
   )
 })
 
+function getTagsForHierarchy(hierarchy: number) {
+  const tags = hierarchyTags.value.get(hierarchy)
+  if (tags === undefined) return []
+  return [...tags].filter((t) => t != undefined && t.length > 0).toSorted()
+}
+
 function addHierarchy() {
   if (maxHierarchyReached.value) return
   hierarchyCount.value += 1
@@ -162,7 +174,12 @@ function removeHierarchy() {
 }
 
 function pushTag(idx: number, val: string) {
+  if (val.length <= 0) return
   hierarchyTags.value.get(idx)?.add(val)
+}
+
+function removeTag(idx: number, val: string) {
+  hierarchyTags.value.get(idx)?.delete(val)
 }
 
 export interface FileDescription {
