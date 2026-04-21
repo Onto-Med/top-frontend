@@ -1,5 +1,18 @@
 <template>
-  <q-table :rows="rows" :columns="cols" flat row-key="id">
+  <p>
+    <small>
+      {{ t('entityImport.concept.description.advancedDescription') }}
+    </small>
+  </p>
+  <q-table
+    :rows="rows.filter((row) => row.name.endsWith('.txt'))"
+    :columns="cols"
+    :no-data-label="t('noDataPresent')"
+    flat
+    dense
+    row-key="id"
+    class="q-pa-none"
+  >
     <template v-slot:top>
       <q-btn
         size="sm"
@@ -20,8 +33,8 @@
     </template>
     <template v-slot:body="props">
       <q-tr :props="props">
-        <q-td key="name" :props="props">{{ props.row.name }}</q-td>
-        <q-td key="language" :props="props">
+        <q-td key="name" class="non-selectable" :props="props">{{ props.row.name }}</q-td>
+        <q-td key="language" class="cursor-pointer" :props="props">
           {{ props.row.language }}
           <q-popup-edit dense buttons v-model="props.row.language" v-slot="scope">
             <q-list padding dense class="rounded-borders text-primary">
@@ -44,7 +57,7 @@
         <q-td key="nameAsTitle" :props="props">
           <q-toggle dense v-model="props.row.nameAsTitle" />
         </q-td>
-        <q-td v-for="i in hierarchyCount" :key="i">
+        <q-td v-for="i in hierarchyCount" :key="i" class="cursor-pointer">
           {{ props.row.hierarchy[i - 1] }}
           <q-popup-edit
             dense

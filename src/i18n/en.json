@@ -475,8 +475,14 @@
     },
     "concept": {
       "titleAdd": "from Concept List",
-      "description": "Please select the files you want to import concepts from. Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym.",
-      "descriptionAdd": "(The concepts will have '{superConcept}' as Super Concept.)",
+      "description": {
+        "base": "Please select the file(s) you want to import concepts from.",
+        "addition": "(The concepts will have '{superConcept}' as Super Concept.)",
+        "typeExplanation": "Right now, the following file types are supported. For further information on their respective format, refer to the links: ",
+        "txt": "Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym.",
+        "csv": "A CSV file might describe multiple concepts (one each line and the title will be the first entry respectively).\nThe corresponding synonyms should be separated by the separator (default: ','). A different separator can be defined in the first line with the prefix 'sep=' (e.g.: 'sep=;' for semicolon or 'sep=\\t' for tabulator).",
+        "advancedDescription": "You can further customize each txt file import by: selecting a different language than chosen in the previous step, toggling whether the file name should be used as title, and by adding parent concepts with 'add hierarchy' (max. 3)."
+      },
       "advancedImport": "Advanced Import",
       "nameAsTitleCaption": "File name as Title"
     }

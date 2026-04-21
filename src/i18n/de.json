@@ -475,8 +475,14 @@
     },
     "concept": {
       "titleAdd": "aus Konzept-Liste",
-      "description": "Bitte wählen sie die Dateien aus, mit denen Sie die Konzepte importieren wollen. Jede Datei wird als ein eigenes Konzept gehandelt, in der der erste Zeileneintrag der Titel wird und die folgenden Zeileneinträge die Synonyme.",
-      "descriptionAdd": "(Die Konzepte werden '{superConcept}' als Eltern-Konzept haben.)",
+      "description": {
+        "base": "Bitte wählen sie die Datei(en) aus, mit denen Sie die Konzepte importieren wollen.",
+        "addition": "(Die Konzepte werden '{superConcept}' als Eltern-Konzept haben.)",
+        "typeExplanation": "Aktuell werden folgende Datei-Typen unterstützt. Für weitere Informationen zu den jeweiligen Formaten, beachten Sie die Links: ",
+        "txt": "Jede Datei wird als ein eigenes Konzept gehandelt, in der der erste Zeileneintrag der Titel wird und die folgenden Zeileneinträge die Synonyme.",
+        "csv": "Eine CSV Datei kann mehrere Konzepte beschreiben (eins per Zeile und der Titel ist der jeweils erste Eintrag).\nDie einzelnen Synonyme sind dann entsprechend durch das Trennzeichen abgegrenzt (Standard: ','). Ein anderes Trennzeichen kann in der ersten Zeile der CSV mit dem Prefix 'sep=' definiert werden (z.B.: 'sep=;' für Semikolon oder 'sep=\\t' für Tabulator).",
+        "advancedDescription": "Sie können den Import für jede txt Datei genauer konfigurieren, indem Sie: eine andere Sprache auswählen als die im vorherigen Schritt gewählte, auswählen ob der Dateiname als Titel verwendet werden soll und zusätzliche Elternkonzepte hinzufügen (max. 3)."
+      },
       "advancedImport": "Erweiterter Import",
       "nameAsTitleCaption": "Dateinamen als Titel"
     }

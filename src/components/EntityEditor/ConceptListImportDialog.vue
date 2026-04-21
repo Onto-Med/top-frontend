@@ -9,7 +9,20 @@
           icon="upload_file"
         >
           <p>
-            <small>{{ importDescription }}</small>
+            <small>{{ importDescription }}
+              <q-chip
+                v-for="(ftype, i) in ['txt', 'csv']"
+                :key="i"
+                size="sm"
+                color="primary"
+                text-color="white"
+                dense
+                clickable
+                @click="openFileTypeDescription(ftype)"
+              >
+                {{ ftype }}
+              </q-chip>
+            </small>
           </p>
           <div class="q-gutter-md">
             <q-file
@@ -21,6 +34,7 @@
               multiple
               clearable
               stack-label
+              accept=".txt,.csv"
             >
               <template #after>
                 <q-select
@@ -78,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { QStepper, useDialogPluginComponent } from 'quasar'
+import { QStepper, useDialogPluginComponent, useQuasar } from 'quasar'
 import { Entity, EntityType, LocalisableText, RepositoryType } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
@@ -104,6 +118,7 @@ const { t, locale } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { notify, renderError } = useNotify()
 const entityStore = useEntityStore()
+const $q = useQuasar()
 const stepper = ref<QStepper>()
 const step = ref(1)
 
@@ -126,14 +141,15 @@ const importDescription = computed(() => {
     superTitle = props.superEntity?.titles?.at(0)?.text
   }
 
-  let importDesc = t('entityImport.concept.description')
+  let importDesc = t('entityImport.concept.description.base')
   if (props.superEntity != null) {
     importDesc +=
       ' ' +
-      t('entityImport.concept.descriptionAdd', {
+      t('entityImport.concept.description.addition', {
         superConcept: superTitle,
       })
   }
+  importDesc += '\n' + t('entityImport.concept.description.typeExplanation')
   return importDesc
 })
 
@@ -162,13 +178,33 @@ async function populateConcept(
   return await entityStore.saveEntity(entity)
 }
 
-async function parseFile(f: File) {
-  const entities: Array<string> = []
+async function parseFile(f: File): Promise<Array<string[]>> {
+  const entities: Array<string[]> = []
+  const tempEntities: Array<string> = []
+  const isCSV = f.name.endsWith('.csv')
+  let sep = ','
+
+  let lineCount = 0
   await f.text().then((r) =>
     r.split(new RegExp(/\r*\n/)).forEach((line: string) => {
-      if (line.trim().length != 0) entities.push(line)
+      if (line.trim().length != 0) {
+        if (isCSV && lineCount == 0 && line.startsWith('sep=')) {
+          const tempSep = line.split('=')[1]
+          sep = tempSep != undefined && tempSep[0] != undefined ? tempSep[0] : ','
+          return
+        }
+
+        if (!isCSV) {
+          tempEntities.push(line)
+        } else {
+          entities.push(line.split(sep).map((item: string) => item.trim()))
+        }
+
+        lineCount++
+      }
     }),
   )
+  if (!isCSV) entities.push(tempEntities)
   return entities
 }
 
@@ -192,49 +228,58 @@ async function createEntities() {
       }
     }
 
-    let count = 0
+    let fileCount = 0
+    let entityCount = 0
     const filesPromises = files.value.map(async (file: File) => parseFile(file))
     await Promise.all(filesPromises)
-      .then(async (conceptArrs) => {
-        for (const concepts of conceptArrs.filter((arr) => arr.length > 0)) {
-          let entity: Entity | undefined = props.superEntity
+      .then(async (filesArray) => {
+        for (const innerConceptArray of filesArray) {
+          for (const innerConcept of innerConceptArray.filter((arr) => arr.length > 0)) {
+            let entity: Entity | undefined = props.superEntity
 
-          if (fileDescriptions != undefined) {
-            const fileDesc = fileDescriptions[count]
-            if (fileDesc != undefined) {
-              const path = []
-              for (const [hIdx, tag] of fileDesc.hierarchy.entries()) {
-                if (tag === undefined || tag.length === 0) continue
-                const hLvl = hIdx + 1
-                path.push(hLvl + '-' + tag)
-                const finalKey = path.join("_")
+            if (fileDescriptions != undefined) {
+              const fileDesc = fileDescriptions[fileCount]
+              if (fileDesc != undefined) {
+                const path = []
+                for (const [hIdx, tag] of fileDesc.hierarchy.entries()) {
+                  if (tag === undefined || tag.length === 0) continue
+                  const hLvl = hIdx + 1
+                  path.push(hLvl + '-' + tag)
+                  const finalKey = path.join('_')
 
-                if (hierarchyEntityMap.get(finalKey) === undefined) {
-                  hierarchyEntityMap.set(
-                    finalKey,
-                    await populateConcept(createSuperEntity(entity), [tag], fileDesc.language, undefined),
-                  )
+                  if (hierarchyEntityMap.get(finalKey) === undefined) {
+                    hierarchyEntityMap.set(
+                      finalKey,
+                      await populateConcept(
+                        createSuperEntity(entity),
+                        [tag],
+                        fileDesc.language,
+                        undefined,
+                      ),
+                    )
+                  }
+                  entity = hierarchyEntityMap.get(finalKey)
                 }
-                entity = hierarchyEntityMap.get(finalKey)
               }
             }
-          }
-          entity = createSuperEntity(entity)
+            entity = createSuperEntity(entity)
 
-          await populateConcept(
-            entity,
-            concepts,
-            conceptLanguage.value!,
-            fileDescriptions != undefined ? fileDescriptions[count] : undefined,
-          )
-          count += 1
+            await populateConcept(
+              entity,
+              innerConcept,
+              conceptLanguage.value!,
+              fileDescriptions != undefined ? fileDescriptions[fileCount] : undefined,
+            )
+            entityCount += 1
+          }
+          fileCount += 1
         }
       })
       .then(() => {
-        notify(t('entityImported', { count: count }), 'positive')
+        notify(t('entityImported', { count: entityCount }), 'positive')
         onDialogOK()
       })
-      .finally(() => loading.value = false)
+      .finally(() => (loading.value = false))
   }
 }
 
@@ -253,10 +298,25 @@ function onCancelClick() {
     step.value -= 1
   }
 }
+
+function openFileTypeDescription(ftype: string) {
+  const typeDescMap = new Map([
+    ['txt', t('entityImport.concept.description.txt')],
+    ['csv', t('entityImport.concept.description.csv')],
+  ])
+  $q.dialog({
+    title: ftype.toUpperCase(),
+    message: typeDescMap.get(ftype),
+    class: "dialog-lb"
+  })
+}
 </script>
 
 <style lang="scss" scoped>
 .lang-input {
   width: 140px;
+}
+.dialog-lb {
+  white-space: pre-line;
 }
 </style>
