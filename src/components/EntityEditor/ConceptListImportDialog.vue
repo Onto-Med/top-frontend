@@ -1,15 +1,17 @@
 <template v-slot="append">
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="content" style="min-width: 600px; max-width: min-content">
-      <q-stepper ref="stepper" v-model="step" active-icon="none" animated>
+      <q-stepper ref="stepper" v-model="step" active-icon="none" active-color="primary" animated>
         <q-step
           :name="1"
           :title="t('entityImport.title') + ' ' + t('entityImport.concept.titleAdd')"
           :done="step > 1"
           icon="upload_file"
         >
-          <p>
-            <small>{{ importDescription }}
+          <div class="q-mb-lg">
+            <small>{{ importDescription }}</small>
+            <br/>
+            <div id="center-chips">
               <q-chip
                 v-for="(ftype, i) in ['txt', 'csv']"
                 :key="i"
@@ -22,8 +24,8 @@
               >
                 {{ ftype }}
               </q-chip>
-            </small>
-          </p>
+            </div>
+          </div>
           <div class="q-gutter-md">
             <q-file
               v-model="files"
@@ -318,5 +320,8 @@ function openFileTypeDescription(ftype: string) {
 }
 .dialog-lb {
   white-space: pre-line;
+}
+#center-chips {
+  text-align: center;
 }
 </style>

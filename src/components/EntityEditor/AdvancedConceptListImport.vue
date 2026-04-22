@@ -31,12 +31,24 @@
         @click="removeHierarchy"
       />
     </template>
+    <template v-slot:header-cell-language="props">
+      <q-th :props="props">
+<!--        <q-chip size="md" dense><small>{{ props.col.label }}</small></q-chip>-->
+        {{ props.col.label }}
+      </q-th>
+    </template>
+    <template v-slot:header-cell-nameAsTitle="props">
+      <q-th :props="props">
+<!--        <q-chip size="md" dense><small>{{ props.col.label }}</small></q-chip>-->
+        {{ props.col.label }}
+      </q-th>
+    </template>
     <template v-slot:body="props">
       <q-tr :props="props">
         <q-td key="name" class="non-selectable" :props="props">{{ props.row.name }}</q-td>
         <q-td key="language" class="cursor-pointer" :props="props">
           {{ props.row.language }}
-          <q-popup-edit dense buttons v-model="props.row.language" v-slot="scope">
+          <q-popup-edit dense buttons v-model="props.row.language" v-slot="scope" :label-cancel="t('cancel')" :label-set="t('save')">
             <q-list padding dense class="rounded-borders text-primary">
               <q-item
                 v-for="(item, index) in languages"
@@ -64,6 +76,8 @@
             buttons
             v-model="props.row.hierarchy[i - 1]"
             v-slot="scope"
+            :label-cancel="t('cancel')"
+            :label-set="t('save')"
             @save="pushTag(i, $event)"
           >
             <div>
