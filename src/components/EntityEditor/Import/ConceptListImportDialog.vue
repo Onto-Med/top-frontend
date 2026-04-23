@@ -104,7 +104,8 @@ import { languages } from 'src/config'
 import { v4 as uuidv4 } from 'uuid'
 import AdvancedConceptListImport, {
   FileDescription,
-} from 'components/EntityEditor/AdvancedConceptListImport.vue'
+} from './AdvancedConceptListImport.vue'
+import FileTypeDescription from './FileTypeDescription.vue'
 
 const props = defineProps({
   repositoryType: {
@@ -162,19 +163,31 @@ async function populateConcept(
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   fileDesc: undefined | FileDescription,
 ) {
+  function stringParsing(str: string|undefined, defaultLang: string) {
+    const strArr = str?.split("|")
+    const title = strArr != undefined? strArr[0]: undefined
+    const lang = (strArr != undefined && strArr.length > 1)? strArr[1] : defaultLang
+    return [title, lang]
+  }
+
   const nameAsTitle = fileDesc != undefined && fileDesc.nameAsTitle
   const finalLang = fileDesc != undefined ? fileDesc.language : language
 
+  // Title and its language
+  const [title, lang] = stringParsing(array[0], finalLang)
   entity.titles = [
     {
-      lang: finalLang,
-      text: nameAsTitle ? fileDesc.name.split('.').slice(0, -1).join('') : array[0],
+      lang: lang,
+      text: nameAsTitle ? fileDesc.name.split('.').slice(0, -1).join('') : title,
     } as LocalisableText,
   ]
+
+  // Synonyms and their language
   entity.synonyms = array.slice(nameAsTitle ? 0 : 1).map((con: string) => {
+    const [syn, lang] = stringParsing(con, finalLang)
     return {
-      lang: finalLang,
-      text: con,
+      lang: lang,
+      text: syn,
     } as LocalisableText
   })
   return await entityStore.saveEntity(entity)
@@ -199,6 +212,7 @@ async function parseFile(f: File): Promise<Array<string[]>> {
         if (!isCSV) {
           tempEntities.push(line)
         } else {
+          console.log(line.split(sep))
           entities.push(line.split(sep).map((item: string) => item.trim()))
         }
 
@@ -307,9 +321,11 @@ function openFileTypeDescription(ftype: string) {
     ['csv', t('entityImport.concept.description.csv')],
   ])
   $q.dialog({
-    title: ftype.toUpperCase(),
-    message: typeDescMap.get(ftype),
-    class: "dialog-lb"
+    component: FileTypeDescription,
+      componentProps: {
+        text: typeDescMap.get(ftype),
+        title: ftype
+    },
   })
 }
 </script>

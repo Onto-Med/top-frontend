@@ -96,10 +96,10 @@ import Dialog from 'src/components/Dialog.vue'
 import { useQuasar } from 'quasar'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import EntityMoveDialog from './EntityMoveDialog.vue'
-import TerminologyImportDialog from './TerminologyImportDialog.vue'
+import TerminologyImportDialog from './Import/TerminologyImportDialog.vue'
 import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
-import ConceptListImportDialog from 'components/EntityEditor/ConceptListImportDialog.vue'
+import ConceptListImportDialog from 'components/EntityEditor/Import/ConceptListImportDialog.vue'
 
 const props = defineProps({
   entity: Object as () => Entity,

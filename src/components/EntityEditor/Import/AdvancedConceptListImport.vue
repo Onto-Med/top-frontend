@@ -31,18 +31,6 @@
         @click="removeHierarchy"
       />
     </template>
-    <template v-slot:header-cell-language="props">
-      <q-th :props="props">
-<!--        <q-chip size="md" dense><small>{{ props.col.label }}</small></q-chip>-->
-        {{ props.col.label }}
-      </q-th>
-    </template>
-    <template v-slot:header-cell-nameAsTitle="props">
-      <q-th :props="props">
-<!--        <q-chip size="md" dense><small>{{ props.col.label }}</small></q-chip>-->
-        {{ props.col.label }}
-      </q-th>
-    </template>
     <template v-slot:body="props">
       <q-tr :props="props">
         <q-td key="name" class="non-selectable" :props="props">{{ props.row.name }}</q-td>
