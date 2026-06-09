@@ -475,8 +475,16 @@
     },
     "concept": {
       "titleAdd": "aus Konzept-Liste",
-      "description": "Bitte wählen sie die Dateien aus, mit denen Sie die Konzepte importieren wollen. Jede Datei wird als ein eigenes Konzept gehandelt, in der der erste Zeileneintrag der Titel wird und die folgenden Zeileneinträge die Synonyme.",
-      "descriptionAdd": "(Die Konzepte werden '{superConcept}' als Eltern-Konzept haben.)"
+      "description": {
+        "base": "Bitte wählen sie die Datei(en) aus, mit denen Sie die Konzepte importieren wollen.",
+        "addition": "(Die Konzepte werden '{superConcept}' als Eltern-Konzept haben.)",
+        "typeExplanation": "Aktuell werden folgende Datei-Typen unterstützt. Für weitere Informationen zu den jeweiligen Formaten, beachten Sie die Links: ",
+        "txt": "Jede Datei wird als ein eigenes Konzept gehandelt, in der der erste Zeileneintrag der Titel wird und die folgenden Zeileneinträge die Synonyme.<br>Sie können auch am Ende eines Synonyms ein <code>'&vert;'</code> mit einem Ländercode stellen, um die allgemeine Sprache für dieses Synonym zu überschreiben (z.B. <code>'English Synonym&vert;en'</code>).",
+        "csv": "Eine CSV Datei kann mehrere Konzepte beschreiben (eins per Zeile und der Titel ist der jeweils erste Eintrag).<br>Die einzelnen Synonyme sind dann entsprechend durch das Trennzeichen abgegrenzt (Standard:&nbsp;<code>','</code>). Ein anderes Trennzeichen kann in der ersten Zeile der CSV mit dem Prefix <code>'sep='</code> definiert werden (z.B.: <code>'sep=;'</code> für Semikolon).<br>Bitte benutzen Sie nicht den vertikalen Strich <code>'&vert;'</code> als Trennzeichen, da er für das Setzen der Sprache von einzelnen Synonymen verwendet wird. Sie können also am Ende eines Synonyms ein <code>'&vert;'</code> mit einem Ländercode stellen, um die allgemeine Sprache für dieses Synonym zu überschreiben (z.B. <code>'English Synonym&vert;en'</code>).",
+        "advancedDescription": "Sie können den Import für jede txt Datei genauer konfigurieren, indem Sie: eine andere Sprache auswählen als die im vorherigen Schritt gewählte, auswählen ob der Dateiname als Titel verwendet werden soll und zusätzliche Elternkonzepte hinzufügen (max. 3)."
+      },
+      "advancedImport": "Erweiterter Import",
+      "nameAsTitleCaption": "Dateinamen als Titel"
     }
   },
   "withRestriction": "Mit Restriktion|Mit Restriktionen",
@@ -645,5 +653,6 @@
   "questioning": "Befragung",
   "ragInitNotSupportedTitle": "Nicht unterstützt!",
   "ragInitNotSupported": "Die RAG-Komponente ist entweder nicht aktiviert oder für diese bestimmte Datenquelle nicht verfügbar. Bitte wenden Sie sich an Ihren Administrator, um sie zu aktivieren.",
-  "selectImportExport": "Bitte wählen Sie aus, ob Sie {thing} in dieses Repositorium importieren oder alle darin enthaltenen {thing} exportieren möchten. Anschließend können Sie die exportierte Datei verwenden, um Ihre {thing} in ein anderes System zu importieren."
+  "selectImportExport": "Bitte wählen Sie aus, ob Sie {thing} in dieses Repositorium importieren oder alle darin enthaltenen {thing} exportieren möchten. Anschließend können Sie die exportierte Datei verwenden, um Ihre {thing} in ein anderes System zu importieren.",
+  "hierarchy": "Hierarchie"
 }

@@ -475,8 +475,16 @@
     },
     "concept": {
       "titleAdd": "from Concept List",
-      "description": "Please select the files you want to import concepts from. Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym.",
-      "descriptionAdd": "(The concepts will have '{superConcept}' as Super Concept.)"
+      "description": {
+        "base": "Please select the file(s) you want to import concepts from.",
+        "addition": "(The concepts will have '{superConcept}' as Super Concept.)",
+        "typeExplanation": "Right now, the following file types are supported. For further information on their respective format, refer to the links: ",
+        "txt": "Each file will be treated as a new concept where the first line entry will be the title and each subsequent line entry will be a synonym.<br>You can also put <code>'&vert;'</code> with a country code as a suffix of a synonym, for overwriting the general language for this synonym (e.g. <code>'Deutsches Synonym&vert;de'</code>).",
+        "csv": "A CSV file might describe multiple concepts (one each line and the title will be the first entry respectively).<br>The corresponding synonyms should be separated by a separator (default:&nbsp;<code>','</code>). A different separator can be defined in the first line with the prefix <code>'sep='</code> (e.g.: <code>'sep=;'</code> for semicolon).<br>Please do not use the vertical bar <code>'&vert;'</code> as a separator, because it is used for setting the language of individual synonyms. That is, you can put <code>'&vert;'</code> with a country code as a suffix of a synonym, for overwriting the general language for this synonym (e.g. <code>'Deutsches Synonym&vert;de'</code>).",
+        "advancedDescription": "You can further customize each txt file import by: selecting a different language than chosen in the previous step, toggling whether the file name should be used as title, and by adding parent concepts with 'add hierarchy' (max. 3)."
+      },
+      "advancedImport": "Advanced Import",
+      "nameAsTitleCaption": "File name as Title"
     }
   },
   "withRestriction": "With restriction|With restrictions",
@@ -645,5 +653,6 @@
   "questioning": "Questioning",
   "ragInitNotSupportedTitle": "Not Supported!",
   "ragInitNotSupported": "The RAG component is either not activated, or not available for this specific data source. Please ask your administrator to activate it.",
-  "selectImportExport": "Please select whether you would like to import {thing} into this repository or export all the {thing} it contains. You can then use the exported file to import your {thing} into another system."
+  "selectImportExport": "Please select whether you would like to import {thing} into this repository or export all the {thing} it contains. You can then use the exported file to import your {thing} into another system.",
+  "hierarchy": "Hierarchy"
 }
