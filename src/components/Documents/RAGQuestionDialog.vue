@@ -62,7 +62,7 @@ import { useI18n } from 'vue-i18n'
 import { computed, inject, onBeforeUnmount, onMounted, PropType, ref } from 'vue'
 import { RagApiKey, DocumentApiKey } from 'boot/axios'
 import useNotify from 'src/mixins/useNotify'
-import { RAGAnswer, RAGFilter } from '@onto-med/top-api'
+import { ConceptCluster, DataSource, RAGAnswer, RAGFilter } from '@onto-med/top-api'
 import DocumentDetailsDialog from 'components/Documents/DocumentDetailsDialog.vue'
 
 const ragApi = inject(RagApiKey)
@@ -132,13 +132,20 @@ async function poseQuestion() {
 
 async function showDocument(evt: Event, row: DocumentReference) {
   if (props.process === undefined) return
+  const offsets = offsetsForDocumentHighlight(row)
   await documentApi
-    ?.getSingleDocumentById(row.id, props.process, [], [])
+    ?.getSingleDocumentById(row.id, props.process, [], offsets)
     .then((r) => {
       $q.dialog({
         component: DocumentDetailsDialog,
         componentProps: {
           document: r.data,
+          availableDocuments: ragResultDocumentIds(),
+          documentQueryOffsets: offsets.length > 0 ? { [row.id]: offsets } : undefined,
+          dataSource: { id: props.process } as DataSource,
+          selectedConcepts: [],
+          conceptColors: [],
+          concepts: [] as ConceptCluster[],
         },
       })
     })
@@ -150,11 +157,36 @@ function parseRagAnswer(r: RAGAnswer) {
   ragAdditionalInfo.value = r.info
   const arr: DocumentReference[] = []
   if (r.info != undefined) {
-    Object.entries(JSON.parse(r.info)).forEach((entry) => arr.push(
-      { 'name': (entry[1] as DocumentResult).doc_name, 'id': (entry[1] as DocumentResult).doc_id, 'ref': entry[0] }
-    ))
+    Object.entries(JSON.parse(r.info)).forEach((entry) => {
+      const result = entry[1] as DocumentResult
+      arr.push({
+        name: result.doc_name,
+        id: result.doc_id,
+        ref: entry[0],
+        chunkStart: result.chunk_start,
+        chunkEnd: result.chunk_end,
+        documentHighlightStart: result.document_highlight_start,
+        documentHighlightEnd: result.document_highlight_end,
+      })
+    })
   }
   ragAdditionalInfoArr.value = arr
+}
+
+function formatRange(start?: number | null, end?: number | null): string {
+  return start != undefined && end != undefined ? `${start}-${end}` : ''
+}
+
+function offsetsForDocumentHighlight(row: DocumentReference): string[] {
+  const highlightRange = formatRange(row.documentHighlightStart, row.documentHighlightEnd)
+  if (highlightRange) return [highlightRange]
+  const chunkRange = formatRange(row.chunkStart, row.chunkEnd)
+  return chunkRange ? [chunkRange] : []
+}
+
+function ragResultDocumentIds(): string[] {
+  const ids = ragAdditionalInfoArr.value?.map((reference) => reference.id) ?? []
+  return [...new Set(ids)]
 }
 
 function wrapUpQuestioning() {
@@ -162,14 +194,22 @@ function wrapUpQuestioning() {
 }
 
 interface DocumentReference {
-  name: string;
-  id: string;
-  ref: string;
+  name: string
+  id: string
+  ref: string
+  chunkStart?: number | null
+  chunkEnd?: number | null
+  documentHighlightStart?: number | null
+  documentHighlightEnd?: number | null
 }
 
 interface DocumentResult {
-  doc_id: string;
-  doc_name: string;
+  doc_id: string
+  doc_name: string
+  chunk_start?: number | null
+  chunk_end?: number | null
+  document_highlight_start?: number | null
+  document_highlight_end?: number | null
 }
 </script>
 <style scoped lang="scss"></style>
