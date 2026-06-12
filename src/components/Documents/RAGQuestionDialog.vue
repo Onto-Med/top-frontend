@@ -132,20 +132,21 @@ async function poseQuestion() {
 
 async function showDocument(evt: Event, row: DocumentReference) {
   if (props.process === undefined) return
-  const offsets = offsetsForDocumentHighlight(row)
   await documentApi
-    ?.getSingleDocumentById(row.id, props.process, [], offsets)
+    ?.getSingleDocumentById(row.id, props.process, [], [])
     .then((r) => {
       $q.dialog({
         component: DocumentDetailsDialog,
         componentProps: {
           document: r.data,
-          availableDocuments: ragResultDocumentIds(),
-          documentQueryOffsets: offsets.length > 0 ? { [row.id]: offsets } : undefined,
+          availableDocuments: ragResultDocumentIds(row),
+          documentQueryOffsets: undefined,
           dataSource: { id: props.process } as DataSource,
           selectedConcepts: [],
           conceptColors: [],
           concepts: [] as ConceptCluster[],
+          ragReference: toRagReference(row),
+          ragReferences: ragReferencesByDocument(row),
         },
       })
     })
@@ -167,30 +168,79 @@ function parseRagAnswer(r: RAGAnswer) {
         chunkEnd: result.chunk_end,
         documentHighlightStart: result.document_highlight_start,
         documentHighlightEnd: result.document_highlight_end,
+        retrievedSnippet: result.retrieved_snippet,
+        highlight: result.highlight,
       })
     })
   }
   ragAdditionalInfoArr.value = arr
 }
 
-function formatRange(start?: number | null, end?: number | null): string {
-  return start != undefined && end != undefined ? `${start}-${end}` : ''
+function toRagReference(row: DocumentReference): RagReference {
+  return {
+    ref: row.ref,
+    chunkStart: row.chunkStart,
+    chunkEnd: row.chunkEnd,
+    documentHighlightStart: row.documentHighlightStart,
+    documentHighlightEnd: row.documentHighlightEnd,
+    retrievedSnippet: row.retrievedSnippet,
+    highlight: row.highlight,
+  }
 }
 
-function offsetsForDocumentHighlight(row: DocumentReference): string[] {
-  const highlightRange = formatRange(row.documentHighlightStart, row.documentHighlightEnd)
-  if (highlightRange) return [highlightRange]
-  const chunkRange = formatRange(row.chunkStart, row.chunkEnd)
-  return chunkRange ? [chunkRange] : []
+function ragReferencesByDocument(preferredRow: DocumentReference): Record<string, RagReference> {
+  const references: Record<string, RagReference> = {
+    [preferredRow.id]: toRagReference(preferredRow),
+  }
+  selectableRagReferences(preferredRow).forEach((reference) => {
+    if (references[reference.id] === undefined) references[reference.id] = toRagReference(reference)
+  })
+  return references
 }
 
-function ragResultDocumentIds(): string[] {
-  const ids = ragAdditionalInfoArr.value?.map((reference) => reference.id) ?? []
+function ragResultDocumentIds(preferredRow: DocumentReference): string[] {
+  const ids = selectableRagReferences(preferredRow).map((reference) => reference.id)
   return [...new Set(ids)]
+}
+
+function selectableRagReferences(preferredRow: DocumentReference): DocumentReference[] {
+  const references = ragAdditionalInfoArr.value ?? []
+  const citedRefs = citedRagRefs()
+  let selectedReferences = citedRefs.size > 0
+    ? references.filter((reference) => citedRefs.has(reference.ref))
+    : references.filter((reference) => hasRagHighlight(reference))
+
+  if (selectedReferences.length === 0) selectedReferences = references
+  if (!selectedReferences.some((reference) => reference.id === preferredRow.id)) {
+    selectedReferences = [preferredRow, ...selectedReferences]
+  }
+  return selectedReferences
+}
+
+function citedRagRefs(): Set<string> {
+  const matches = ragAnswer.value?.matchAll(/\[(\d+)]/g) ?? []
+  return new Set([...matches].map((match) => `[${match[1]}]`))
+}
+
+function hasRagHighlight(reference: DocumentReference): boolean {
+  return Boolean(
+    reference.highlight ||
+      (reference.documentHighlightStart != undefined && reference.documentHighlightEnd != undefined),
+  )
 }
 
 function wrapUpQuestioning() {
   startedQuestioning.value = false
+}
+
+interface RagReference {
+  ref: string
+  chunkStart?: number | null
+  chunkEnd?: number | null
+  documentHighlightStart?: number | null
+  documentHighlightEnd?: number | null
+  retrievedSnippet?: string
+  highlight?: string
 }
 
 interface DocumentReference {
@@ -201,6 +251,8 @@ interface DocumentReference {
   chunkEnd?: number | null
   documentHighlightStart?: number | null
   documentHighlightEnd?: number | null
+  retrievedSnippet?: string
+  highlight?: string
 }
 
 interface DocumentResult {
@@ -210,6 +262,8 @@ interface DocumentResult {
   chunk_end?: number | null
   document_highlight_start?: number | null
   document_highlight_end?: number | null
+  retrieved_snippet?: string
+  highlight?: string
 }
 </script>
 <style scoped lang="scss"></style>

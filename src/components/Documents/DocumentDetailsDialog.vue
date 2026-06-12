@@ -26,8 +26,52 @@
       </q-card-section>
 
       <q-separator />
-      <q-card-section>
-        <div class="scroll q-pa-none">
+
+      <q-card-section v-if="currentRagReference" class="q-pb-none">
+        <q-banner rounded class="rag-reference-banner">
+          <template #avatar>
+            <q-icon name="manage_search" color="primary" />
+          </template>
+          <div class="text-subtitle2">RAG source {{ currentRagReference.ref }}</div>
+          <div class="q-mt-xs row q-gutter-xs">
+            <q-chip
+              v-if="formatRange(currentRagReference.documentHighlightStart, currentRagReference.documentHighlightEnd)"
+              dense
+              color="orange-2"
+              text-color="dark"
+            >
+              Highlight:
+              {{ formatRange(currentRagReference.documentHighlightStart, currentRagReference.documentHighlightEnd) }}
+            </q-chip>
+            <q-chip
+              v-if="formatRange(currentRagReference.chunkStart, currentRagReference.chunkEnd)"
+              dense
+              color="blue-1"
+              text-color="dark"
+            >
+              Chunk: {{ formatRange(currentRagReference.chunkStart, currentRagReference.chunkEnd) }}
+            </q-chip>
+          </div>
+          <div
+            v-if="currentRagReference.retrievedSnippet"
+            class="rag-snippet q-mt-sm"
+            :style="{ maxHeight: `${ragSnippetHeight}px` }"
+          >
+            {{ currentRagReference.retrievedSnippet }}
+          </div>
+          <div
+            v-if="currentRagReference.retrievedSnippet"
+            class="rag-banner-resize-handle q-mt-xs"
+            title="Drag to resize"
+            @pointerdown.prevent="startResizeRagBanner"
+          >
+            <q-icon name="drag_handle" size="sm" />
+          </div>
+        </q-banner>
+      </q-card-section>
+
+      <q-card-section class="document-section">
+        <div class="document-scroll-container q-pa-none">
           <q-scroll-area class="highlighted-text">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <pre
@@ -45,7 +89,7 @@
 <script setup lang="ts">
 import { ConceptCluster, DataSource, Document } from '@onto-med/top-api'
 import { useDialogPluginComponent, scroll } from 'quasar'
-import { inject, onMounted, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { DocumentApiKey } from 'src/boot/axios'
 import useNotify from 'src/mixins/useNotify'
 
@@ -58,6 +102,16 @@ interface ConceptColor {
   color?: string
 }
 
+interface RagReference {
+  ref: string
+  chunkStart?: number | null
+  chunkEnd?: number | null
+  documentHighlightStart?: number | null
+  documentHighlightEnd?: number | null
+  retrievedSnippet?: string
+  highlight?: string
+}
+
 const props = defineProps<{
   document: Document
   availableDocuments: Array<string>
@@ -66,6 +120,8 @@ const props = defineProps<{
   selectedConcepts: number[]
   conceptColors: ConceptColor[]
   concepts: ConceptCluster[]
+  ragReference?: RagReference
+  ragReferences?: Record<string, RagReference>
 }>()
 
 const { dialogRef } = useDialogPluginComponent()
@@ -73,6 +129,16 @@ const { dialogRef } = useDialogPluginComponent()
 const slide = ref(props.document.name)
 const docIdx = ref(0)
 const documentRef = ref(props.document)
+const ragSnippetHeight = ref(88)
+const resizeStartY = ref<number>()
+const resizeStartHeight = ref<number>()
+const currentRagReference = computed(() => {
+  const documentId = documentRef.value.id
+  if (documentId != undefined && props.ragReferences?.[documentId] != undefined) {
+    return props.ragReferences[documentId]
+  }
+  return props.ragReference
+})
 
 onMounted(() => {
   if (props.document.name != undefined && props.document.id != undefined) {
@@ -81,6 +147,32 @@ onMounted(() => {
   }
   displayDocument(0).catch((e) => renderError(e))
 })
+
+onBeforeUnmount(() => stopResizeRagBanner())
+
+function formatRange(start?: number | null, end?: number | null): string {
+  return start != undefined && end != undefined ? `${start}-${end}` : ''
+}
+
+function startResizeRagBanner(event: PointerEvent) {
+  resizeStartY.value = event.clientY
+  resizeStartHeight.value = ragSnippetHeight.value
+  window.addEventListener('pointermove', resizeRagBanner)
+  window.addEventListener('pointerup', stopResizeRagBanner)
+}
+
+function resizeRagBanner(event: PointerEvent) {
+  if (resizeStartY.value == undefined || resizeStartHeight.value == undefined) return
+  const delta = event.clientY - resizeStartY.value
+  ragSnippetHeight.value = Math.min(Math.max(resizeStartHeight.value + delta, 48), 320)
+}
+
+function stopResizeRagBanner() {
+  resizeStartY.value = undefined
+  resizeStartHeight.value = undefined
+  window.removeEventListener('pointermove', resizeRagBanner)
+  window.removeEventListener('pointerup', stopResizeRagBanner)
+}
 
 async function displayDocument(dir: number) {
   let documentId: string | undefined
@@ -137,12 +229,50 @@ async function displayDocument(dir: number) {
 
 <style scoped lang="scss">
 .content {
+  display: flex;
+  flex-direction: column;
   width: 750px;
   max-width: 80vw;
+  height: 90vh;
   overflow: hidden;
 }
+.rag-reference-banner {
+  background: #fff8e1;
+  border-left: 4px solid var(--q-primary);
+}
+
+.rag-snippet {
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.rag-banner-resize-handle {
+  align-items: center;
+  color: $grey-7;
+  cursor: ns-resize;
+  display: flex;
+  justify-content: center;
+  line-height: 1;
+  user-select: none;
+}
+
+.rag-banner-resize-handle:hover {
+  color: var(--q-primary);
+}
+
+.document-section {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.document-scroll-container {
+  height: 100%;
+  min-height: 0;
+}
+
 .highlighted-text {
-  height: 85vh;
+  height: 100%;
   width: 100%;
   pre {
     font-family: inherit;
