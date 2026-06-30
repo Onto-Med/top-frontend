@@ -721,6 +721,10 @@ async function poseQuestionToRag() {
       process: props.dataSource.id,
       previousResult: ragResult.value,
       previousQuestion: ragQuestion.value,
+      dataSource: props.dataSource,
+      selectedConcepts: selectedConcepts.value,
+      conceptColors: conceptColors,
+      concepts: concepts.value,
     },
   }).onOk((payload) => {
     if (payload != undefined) {

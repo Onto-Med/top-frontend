@@ -71,11 +71,29 @@ const { t } = useI18n()
 const $q = useQuasar()
 const { dialogRef, onDialogOK } = useDialogPluginComponent()
 
+interface ConceptColor {
+  'background-color'?: string
+  color?: string
+}
+
 const props = defineProps({
   documents: Array<string>,
   process: String,
   previousResult: Object as PropType<RAGAnswer>,
-  previousQuestion: String
+  previousQuestion: String,
+  dataSource: Object as PropType<DataSource>,
+  selectedConcepts: {
+    type: Array as PropType<number[]>,
+    default: () => [],
+  },
+  conceptColors: {
+    type: Array as PropType<ConceptColor[]>,
+    default: () => [],
+  },
+  concepts: {
+    type: Array as PropType<ConceptCluster[]>,
+    default: () => [],
+  },
 })
 
 const { renderError } = useNotify()
@@ -141,10 +159,10 @@ async function showDocument(evt: Event, row: DocumentReference) {
           document: r.data,
           availableDocuments: ragResultDocumentIds(row),
           documentQueryOffsets: undefined,
-          dataSource: { id: props.process } as DataSource,
-          selectedConcepts: [],
-          conceptColors: [],
-          concepts: [] as ConceptCluster[],
+          dataSource: props.dataSource ?? ({ id: props.process } as DataSource),
+          selectedConcepts: props.selectedConcepts,
+          conceptColors: props.conceptColors,
+          concepts: props.concepts,
           ragReference: toRagReference(row),
           ragReferences: ragReferencesByDocument(row),
         },
