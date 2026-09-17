@@ -33,3 +33,7 @@ yarn-error.log*
 # local .env files
 .env.local*
 .env
+/npm_install.sh
+/npm_update.sh
+/start-frontend.sh
+/start-frontend-with-rag.sh
