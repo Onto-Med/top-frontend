@@ -731,7 +731,7 @@ async function poseQuestionToRag() {
       ragResult.value = {
         info: payload.answer != undefined ? payload.answer.info : undefined,
         answer: payload.answer != undefined ? payload.answer.answer : '',
-      } as RAGAnswer
+      }
       ragQuestion.value = payload.question
     } else {
       ragResult.value = undefined
@@ -747,8 +747,8 @@ async function uploadFiles() {
     return {
       id: uuidv4(),
       name: d.name,
-      text: await (d as Blob).text(),
-    } as Document
+      text: await d.text(),
+    }
   })
   await Promise.all(documentPromises)
     .then((documents) =>

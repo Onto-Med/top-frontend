@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Entity, ForkingInstruction } from '@onto-med/top-api'
+import { Entity } from '@onto-med/top-api'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { useI18n } from 'vue-i18n'
 import { useEntityStore } from 'src/stores/entity-store'
@@ -96,7 +96,7 @@ function handleCreateFork() {
   emit('createFork', {
     cascade: cascade.value,
     update: update.value,
-  } as ForkingInstruction)
+  })
   reset()
 }
 </script>

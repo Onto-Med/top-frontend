@@ -247,6 +247,10 @@ function deleteQuery(query: PhenotypeQuery) {
     })
 }
 
+function isConceptQueryInstance(query: Query): query is ConceptQuery {
+  return 'entityId' in query
+}
+
 function prefillQuery(query?: Query) {
   void router.replace({
     name: 'queryBuilder',
@@ -257,8 +261,8 @@ function prefillQuery(query?: Query) {
     },
   })
   if (!query) return
-  if (isConceptQuery.value) {
-    conceptQueryForm.value?.prefillQuery(query as ConceptQuery, preSelectedDataSource.value)
+  if (isConceptQuery.value && isConceptQueryInstance(query)) {
+    conceptQueryForm.value?.prefillQuery(query, preSelectedDataSource.value)
   } else if (isPhenotypeQuery.value) {
     phenotypeQueryForm.value?.prefillQuery(query)
   }

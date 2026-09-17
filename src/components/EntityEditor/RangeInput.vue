@@ -115,7 +115,7 @@ const inputType = computed(() => {
 function updateMinimum(value?: number | string | null) {
   if (!value) emit('update:minimum', undefined)
   if (props.type === DataType.Number) {
-    emit('update:minimum', value as number)
+    emit('update:minimum', value)
   } else if (props.type === DataType.DateTime) {
     emit('update:minimum', new Date(value as string))
   }
@@ -124,7 +124,7 @@ function updateMinimum(value?: number | string | null) {
 function updateMaximum(value?: number | string | null) {
   if (!value) emit('update:maximum', undefined)
   if (props.type === DataType.Number) {
-    emit('update:maximum', value as number)
+    emit('update:maximum', value)
   } else if (props.type === DataType.DateTime) {
     emit('update:maximum', new Date(value as string))
   }

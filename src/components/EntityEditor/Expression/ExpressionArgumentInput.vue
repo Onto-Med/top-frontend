@@ -234,7 +234,7 @@ const fun = computed(() => {
     id: props.modelValue.functionId,
     title: t('invalid').toUpperCase(),
     notation: NotationEnum.Prefix,
-  } as ExpressionFunction
+  }
 })
 
 const argumentCount = computed(() => countArguments(props.modelValue, fun.value))

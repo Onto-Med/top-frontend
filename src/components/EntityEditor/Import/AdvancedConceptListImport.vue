@@ -148,15 +148,12 @@ const hierarchyCount = ref(0)
 const maxHierarchyReached = computed(() => hierarchyCount.value >= maxHierarchy)
 
 onMounted(() => {
-  rows.value = props.files.map(
-    (fi) =>
-      ({
-        name: fi.name,
-        language: props.language === undefined ? locale.value : props.language,
-        nameAsTitle: false,
-        hierarchy: new Array(maxHierarchy),
-      }) as FileDescription,
-  )
+  rows.value = props.files.map((fi) => ({
+    name: fi.name,
+    language: props.language === undefined ? locale.value : props.language,
+    nameAsTitle: false,
+    hierarchy: new Array(maxHierarchy),
+  }))
 })
 
 function getTagsForHierarchy(hierarchy: number) {

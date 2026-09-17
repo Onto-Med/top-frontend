@@ -177,7 +177,7 @@ async function doExport() {
       if (typeof r.data === 'object' || Array.isArray(r.data)) {
         result.value = JSON.stringify(r.data)
       } else {
-        result.value = r.data as string
+        result.value = r.data
       }
     })
     .catch((e: Error) => renderError(e))

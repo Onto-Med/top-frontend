@@ -318,7 +318,7 @@ export const useEntityStore = defineStore('entity', {
               entity: r.data.filter((e) =>
                 e.equivalentEntities?.find((eq) => eq.id === entity.id),
               )[0],
-            } as ForkResult
+            }
           }
           return { count: 0 }
         })

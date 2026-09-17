@@ -269,9 +269,10 @@ function toTree(list: Entity[], excludeTypeIfEmpty: EntityType[] = []): TreeNode
   const map: Map<string, TreeNode> = new Map<string, TreeNode>()
   const treeNodes: TreeNode[] = []
 
-  list
-    .filter((e) => e.id)
-    .forEach((e) => map.set(e.id as string, { ...e, children: [], lazy: true } as TreeNode))
+  list.forEach((e) => {
+    if (!e.id) return
+    map.set(e.id, { ...e, children: [], lazy: true })
+  })
 
   list
     .filter((e) => e.id)

@@ -90,7 +90,7 @@ onMounted(async () => {
 })
 
 function newOrganisation(): Organisation {
-  return { id: uuidv4() } as Organisation
+  return { id: uuidv4() }
 }
 
 async function reload(filter: string | undefined = undefined, page = 1): Promise<void> {
