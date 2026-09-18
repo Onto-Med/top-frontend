@@ -287,7 +287,16 @@
       "description": "Erweitern Sie dieses SingleConcept mit Concept Graphs und prüfen Sie semantische Vorschläge, bevor TOP-Entitäten erzeugt werden.",
       "partiallyConnected": "Profildaten werden vom Backend geladen. Ausführung der Expansion und Entitätserzeugung sind noch nicht verbunden.",
       "generatedEntities": "Vorschau erzeugter Entitäten",
-      "generatedEntitiesCaption": "Die erzeugten SingleConcept- und CompositeConcept-Strukturen werden hier vor dem Speichern angezeigt."
+      "generatedEntitiesCaption": "Nur Vorschau: Diese erzeugten SingleConcept- und CompositeConcept-Strukturen werden noch nicht gespeichert."
+    },
+    "preview": {
+      "singleConcepts": "SingleConcept-Vorschau",
+      "compositeConcepts": "CompositeConcept-Vorschau",
+      "sourceConcept": "Bestehendes Ausgangskonzept",
+      "categoryConcept": "Konzept, das für eine ausgewählte semantische Kategorie erzeugt wird.",
+      "relationConcept": "CompositeConcept, das für eine ausgewählte semantische Relation erzeugt wird.",
+      "noSingleConcepts": "Wählen Sie mindestens eine Kategorie, um erzeugte SingleConcepts anzuzeigen.",
+      "noCompositeConcepts": "Wählen Sie Quell-/Zielkategorien für Relationen, um erzeugte CompositeConcepts anzuzeigen."
     }
   },
   "organisationPage": {
