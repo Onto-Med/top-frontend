@@ -262,6 +262,34 @@
     },
     "title": "Entitätseditor"
   },
+  "queryExpansion": {
+    "contextMenu": "Query Expansion...",
+    "sourceConcept": "Ausgangskonzept",
+    "profile": "Profil",
+    "categories": "Kategorien",
+    "relations": "Relationen",
+    "defaultCategory": "Standard",
+    "source": "Quelle",
+    "target": "Ziel",
+    "sourceCategories": "Quellkategorien",
+    "targetCategories": "Zielkategorien",
+    "noCategories": "Für dieses Profil sind keine Kategorien verfügbar.",
+    "noRelations": "Für dieses Profil sind keine Relationen verfügbar.",
+    "noProfiles": "Es sind keine Query-Expansion-Profile verfügbar.",
+    "loadError": "Query-Expansion-Profildaten konnten nicht geladen werden.",
+    "apiUnavailable": "Die Query API ist in diesem Dialog nicht verfügbar.",
+    "steps": {
+      "source": "Ausgangspunkt",
+      "semanticReview": "Semantische Prüfung",
+      "preview": "Vorschau"
+    },
+    "placeholder": {
+      "description": "Erweitern Sie dieses SingleConcept mit Concept Graphs und prüfen Sie semantische Vorschläge, bevor TOP-Entitäten erzeugt werden.",
+      "partiallyConnected": "Profildaten werden vom Backend geladen. Ausführung der Expansion und Entitätserzeugung sind noch nicht verbunden.",
+      "generatedEntities": "Vorschau erzeugter Entitäten",
+      "generatedEntitiesCaption": "Die erzeugten SingleConcept- und CompositeConcept-Strukturen werden hier vor dem Speichern angezeigt."
+    }
+  },
   "organisationPage": {
     "description": "Der Inhalt des {productName} ist nach Organisationen gegliedert. Bündeln Sie Modelle in einer Organisation, wenn Sie möchten, dass sie die gleichen Zugriffsrechte haben. Sie können andere Benutzer zu Ihren Organisationen einladen, indem Sie ihnen Lese-, Schreib- oder Verwaltungsrechte erteilen. Alle verfügbaren Organisationen sind unten aufgeführt. Die Symbole auf der linken Seite zeigen Ihre Zugangsrechte an.",
     "confirmDelete": "Möchten Sie diese Organisation wirklich löschen?"

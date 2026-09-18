@@ -38,6 +38,12 @@
 
     <q-separator />
 
+    <q-list v-if="canExpandQuery" dense>
+      <q-item v-close-popup clickable @click="showQueryExpansionDialog">
+        <q-item-section>{{ t('queryExpansion.contextMenu') }}</q-item-section>
+      </q-item>
+    </q-list>
+
     <q-list v-if="createable && entity && entity.createdAt && !isRestricted(entity)" dense>
       <q-item v-close-popup clickable @click="showMoveDialog">
         <q-item-section>{{ t('moveTo') }}</q-item-section>
@@ -91,7 +97,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Entity, EntityType } from '@onto-med/top-api'
+import { Entity, EntityType, SingleConcept } from '@onto-med/top-api'
 import Dialog from 'src/components/Dialog.vue'
 import { useQuasar } from 'quasar'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
@@ -100,6 +106,7 @@ import TerminologyImportDialog from './Import/TerminologyImportDialog.vue'
 import { storeToRefs } from 'pinia'
 import { useEntityStore } from 'src/stores/entity-store'
 import ConceptListImportDialog from 'components/EntityEditor/Import/ConceptListImportDialog.vue'
+import QueryExpansionDialog from 'components/Documents/QueryExpansionDialog.vue'
 
 const props = defineProps({
   entity: Object as () => Entity,
@@ -151,6 +158,10 @@ const abstractEntityTypes = computed(() =>
   ].filter((e) => props.allowedEntityTypes.includes(e)),
 )
 
+const canExpandQuery = computed(
+  () => props.entity?.createdAt && props.entity.entityType === EntityType.SingleConcept,
+)
+
 function showDeleteDialog() {
   if (!props.entity) return
   $q.dialog({
@@ -189,6 +200,16 @@ function showConceptImportDialog() {
     componentProps: {
       repositoryType: repository.value?.repositoryType,
       superEntity: props.entity,
+    },
+  })
+}
+
+function showQueryExpansionDialog() {
+  if (!props.entity || props.entity.entityType !== EntityType.SingleConcept) return
+  $q.dialog({
+    component: QueryExpansionDialog,
+    componentProps: {
+      concept: props.entity as SingleConcept,
     },
   })
 }
