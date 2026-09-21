@@ -1,7 +1,14 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="query-expansion-dialog">
-      <q-stepper ref="stepper" v-model="step" active-icon="none" active-color="primary" animated>
+      <q-stepper
+        ref="stepper"
+        v-model="step"
+        active-icon="none"
+        active-color="primary"
+        animated
+        class="query-expansion-stepper"
+      >
         <q-step :name="1" :title="t('queryExpansion.steps.source')" :done="step > 1" icon="search">
           <div class="text-body2 q-mb-md">
             {{ t('queryExpansion.placeholder.description') }}
@@ -15,6 +22,19 @@
             :model-value="conceptTitle"
             :label="t('queryExpansion.sourceConcept')"
             readonly
+            outlined
+            dense
+            class="q-mb-md"
+          />
+
+          <q-select
+            v-model="selectedDataSourceId"
+            :options="dataSourceOptions"
+            :label="t('dataSource')"
+            :loading="loadingDataSources"
+            :disable="loadingDataSources"
+            emit-value
+            map-options
             outlined
             dense
           />
@@ -62,20 +82,11 @@
           </q-card>
 
           <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <q-list bordered separator>
-                <q-item-label header>
-                  <div class="row items-center justify-between">
-                    <span>{{ t('queryExpansion.relations') }}</span>
-                    <span class="text-caption text-grey-7">
-                      {{ selectedRelationIds.length }}/{{ selectedProfile?.relations?.length || 0 }}
-                    </span>
-                  </div>
-                </q-item-label>
+            <div class="col-12 col-md-3">
+              <q-list bordered separator class="semantic-scroll-box">
+                <q-item-label header>{{ t('queryExpansion.relations') }}</q-item-label>
                 <q-item v-if="loadingProfile">
-                  <q-item-section>
-                    <q-spinner size="sm" />
-                  </q-item-section>
+                  <q-item-section><q-spinner size="sm" /></q-item-section>
                 </q-item>
                 <q-item v-else-if="!selectedProfile?.relations?.length">
                   <q-item-section>
@@ -86,147 +97,173 @@
                   v-for="relation in selectedProfile?.relations"
                   :key="relation.id"
                   clickable
-                  :active="selectedRelation?.id === relation.id"
-                  active-class="bg-blue-1 text-primary"
-                  @click="selectedRelationId = relation.id"
+                  draggable="true"
+                  @dragstart="startRelationDrag(relation.id)"
+                  @click="addRelationMapping(relation.id)"
                 >
-                  <q-item-section side top>
-                    <q-checkbox
-                      :model-value="selectedRelationIds.includes(relation.id)"
-                      @update:model-value="toggleRelation(relation.id, Boolean($event))"
-                      @click.stop
-                    />
-                  </q-item-section>
                   <q-item-section>
                     <q-item-label>{{ relation.label || relation.id }}</q-item-label>
-                    <q-item-label v-if="relation.description" caption>
-                      {{ relation.description }}
-                    </q-item-label>
+                    <q-item-label caption>{{ relation.description }}</q-item-label>
                     <q-item-label caption>
-                      {{ t('queryExpansion.sourceCategories') }}:
-                      <q-chip
-                        v-for="categoryId in getRelationSelection(relation.id).sourceCategoryIds"
-                        :key="`${relation.id}-source-${categoryId}`"
-                        dense
-                        size="sm"
-                        color="secondary"
-                        text-color="white"
-                      >
-                        {{ categoryId }}
-                      </q-chip>
-                      <span v-if="!getRelationSelection(relation.id).sourceCategoryIds.length">-</span>
+                      {{ t('mapping', 2) }}: {{ relationMappingCount(relation.id) }}
                     </q-item-label>
-                    <q-item-label caption>
-                      {{ t('queryExpansion.targetCategories') }}:
-                      <q-chip
-                        v-for="categoryId in getRelationSelection(relation.id).targetCategoryIds"
-                        :key="`${relation.id}-target-${categoryId}`"
-                        dense
-                        size="sm"
-                        color="accent"
-                        text-color="white"
-                      >
-                        {{ categoryId }}
-                      </q-chip>
-                      <span v-if="!getRelationSelection(relation.id).targetCategoryIds.length">-</span>
-                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-icon name="add" />
                   </q-item-section>
                 </q-item>
               </q-list>
             </div>
 
-            <div class="col-12 col-md-6">
-              <q-list bordered separator>
-                <q-item-label header>
-                  <div class="row items-center justify-between">
-                    <span>{{ t('queryExpansion.categories') }}</span>
-                    <span class="text-caption text-grey-7">
-                      {{ selectedCategoryIds.length }}/{{ selectedProfile?.categories?.length || 0 }}
-                    </span>
-                  </div>
-                </q-item-label>
+            <div class="col-12 col-md-3">
+              <q-list bordered separator class="semantic-scroll-box">
+                <q-item-label header>{{ t('category', 2) }}</q-item-label>
                 <q-item v-if="loadingProfile">
-                  <q-item-section>
-                    <q-spinner size="sm" />
-                  </q-item-section>
+                  <q-item-section><q-spinner size="sm" /></q-item-section>
                 </q-item>
                 <q-item v-else-if="!selectedProfile?.categories?.length">
                   <q-item-section>
                     <q-item-label caption>{{ t('queryExpansion.noCategories') }}</q-item-label>
                   </q-item-section>
                 </q-item>
-                <q-item
-                  v-for="category in selectedProfile?.categories"
-                  :key="category.id"
-                  clickable
-                  :active="isCategoryConnected(category.id)"
-                  active-class="bg-blue-1 text-primary"
-                  @click="toggleCategory(category.id)"
-                >
-                  <q-item-section side top>
-                    <q-checkbox
-                      :model-value="selectedCategoryIds.includes(category.id)"
-                      @update:model-value="toggleCategory(category.id, Boolean($event))"
-                      @click.stop
-                    />
-                  </q-item-section>
+                <q-item v-for="category in selectedProfile?.categories" :key="category.id">
                   <q-item-section>
-                    <q-item-label>
-                      {{ category.id }}
+                    <div>
+                      <q-chip
+                        draggable="true"
+                        clickable
+                        :outline="!selectedCategoryIds.includes(category.id)"
+                        color="primary"
+                        text-color="white"
+                        @dragstart="startCategoryDrag(category.id)"
+                        @click="toggleCategory(category.id)"
+                      >
+                        {{ category.id }}
+                      </q-chip>
                       <q-badge
                         v-if="selectedProfile?.defaultCategories?.includes(category.id)"
                         color="primary"
-                        class="q-ml-sm"
+                        class="q-ml-xs"
                       >
                         {{ t('queryExpansion.defaultCategory') }}
                       </q-badge>
-                      <q-badge
-                        v-if="isSelectedRelationSource(category.id)"
-                        color="secondary"
-                        class="q-ml-sm"
-                      >
-                        {{ t('queryExpansion.source') }}
-                      </q-badge>
-                      <q-badge
-                        v-if="isSelectedRelationTarget(category.id)"
-                        color="accent"
-                        class="q-ml-sm"
-                      >
-                        {{ t('queryExpansion.target') }}
-                      </q-badge>
-                    </q-item-label>
-                    <q-item-label caption>{{ category.description }}</q-item-label>
-                    <div v-if="selectedRelation" class="row q-col-gutter-sm q-mt-xs">
-                      <div class="col-auto">
-                        <q-checkbox
-                          dense
-                          :disable="!selectedRelation.sourceCategories?.includes(category.id)"
-                          :model-value="isSelectedRelationSource(category.id)"
-                          :label="t('queryExpansion.source')"
-                          @update:model-value="toggleRelationCategory('source', category.id, Boolean($event))"
-                          @click.stop
-                        />
-                      </div>
-                      <div class="col-auto">
-                        <q-checkbox
-                          dense
-                          :disable="!selectedRelation.targetCategories?.includes(category.id)"
-                          :model-value="isSelectedRelationTarget(category.id)"
-                          :label="t('queryExpansion.target')"
-                          @update:model-value="toggleRelationCategory('target', category.id, Boolean($event))"
-                          @click.stop
-                        />
-                      </div>
                     </div>
+                    <q-item-label caption>{{ category.description }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <q-card
+                flat
+                bordered
+                class="mapping-drop-zone semantic-scroll-box"
+                @dragover.prevent
+                @drop="dropRelationMapping"
+              >
+                <q-card-section>
+                  <div class="row items-center justify-between q-mb-sm">
+                    <div class="text-subtitle2">{{ t('mapping', 2) }}</div>
+                    <div class="text-caption text-grey-7">
+                      {{ relationMappings.length }} {{ t('mapping', relationMappings.length) }}
+                    </div>
+                  </div>
+
+                  <q-banner v-if="relationMappings.length === 0" rounded class="bg-grey-2 text-grey-9">
+                    {{ t('queryExpansion.noMappings') }}
+                  </q-banner>
+
+                  <q-card
+                    v-for="mapping in relationMappings"
+                    :key="mapping.id"
+                    flat
+                    bordered
+                    class="q-mb-md"
+                  >
+                    <q-card-section>
+                      <div class="row items-start justify-between q-mb-sm">
+                        <div>
+                          <div class="text-subtitle2">{{ relationLabel(mapping.relationId) }}</div>
+                          <div class="text-caption text-grey-7">{{ mapping.relationId }}</div>
+                        </div>
+                        <q-btn
+                          flat
+                          dense
+                          round
+                          icon="delete"
+                          :title="t('delete')"
+                          @click="removeRelationMapping(mapping.id)"
+                        />
+                      </div>
+
+                      <div class="row q-col-gutter-sm">
+                        <div class="col-12 col-sm-6">
+                          <div
+                            class="relation-role-drop-zone source-zone"
+                            @dragover.prevent
+                            @drop="dropCategory(mapping.id, 'source')"
+                          >
+                            <div class="text-caption text-bold q-mb-xs">
+                              {{ t('queryExpansion.sourceCategories') }}
+                            </div>
+                            <q-chip
+                              v-for="categoryId in mapping.sourceCategoryIds"
+                              :key="`${mapping.id}-source-${categoryId}`"
+                              dense
+                              removable
+                              color="secondary"
+                              text-color="white"
+                              @remove="removeMappingCategory(mapping.id, 'source', categoryId)"
+                            >
+                              {{ categoryId }}
+                            </q-chip>
+                            <div v-if="mapping.sourceCategoryIds.length === 0" class="text-caption text-grey-7">
+                              {{ t('queryExpansion.dropSourceCategories') }}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                          <div
+                            class="relation-role-drop-zone target-zone"
+                            @dragover.prevent
+                            @drop="dropCategory(mapping.id, 'target')"
+                          >
+                            <div class="text-caption text-bold q-mb-xs">
+                              {{ t('queryExpansion.targetCategories') }}
+                            </div>
+                            <q-chip
+                              v-for="categoryId in mapping.targetCategoryIds"
+                              :key="`${mapping.id}-target-${categoryId}`"
+                              dense
+                              removable
+                              color="accent"
+                              text-color="white"
+                              @remove="removeMappingCategory(mapping.id, 'target', categoryId)"
+                            >
+                              {{ categoryId }}
+                            </q-chip>
+                            <div v-if="mapping.targetCategoryIds.length === 0" class="text-caption text-grey-7">
+                              {{ t('queryExpansion.dropTargetCategories') }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </q-card-section>
+              </q-card>
             </div>
           </div>
         </q-step>
 
         <q-step :name="3" :title="t('queryExpansion.steps.preview')" icon="account_tree">
-          <q-banner rounded class="bg-grey-2 text-grey-9 q-mb-md">
+          <q-banner v-if="expansionError" rounded class="bg-negative text-white q-mb-md">
+            {{ expansionError }}
+          </q-banner>
+
+          <q-banner v-else rounded class="bg-grey-2 text-grey-9 q-mb-md">
             {{ t('queryExpansion.placeholder.generatedEntitiesCaption') }}
           </q-banner>
 
@@ -330,12 +367,14 @@
             <q-btn
               flat
               color="primary"
-              :label="step < 3 ? t('continue') : t('close')"
+              :disable="expanding || saving || (step === 1 && !selectedDataSourceId)"
+              :label="step < 3 ? t('continue') : t('save')"
               @click="onContinueClick"
             />
           </q-stepper-navigation>
         </template>
       </q-stepper>
+      <q-inner-loading :showing="expanding || saving" :label="expanding ? t('queryExpansion.expanding') : t('pleaseWait')" />
     </q-card>
   </q-dialog>
 </template>
@@ -343,14 +382,41 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from 'vue'
 import { QStepper, useDialogPluginComponent } from 'quasar'
-import { SingleConcept, type QueryExpansionProfile } from '@onto-med/top-api'
+import {
+  EntityType,
+  QueryType,
+  type DataSource,
+  type LocalisableText,
+  type QueryExpansionCandidate,
+  type QueryExpansionProfile,
+  type QueryExpansionRelation,
+  type QueryExpansionRequest,
+  type QueryExpansionResponse,
+  type SingleConcept,
+} from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
 import { QueryApiKey } from 'src/boot/axios'
+import { useEntityStore } from 'stores/entity-store'
 
-interface RelationCategorySelection {
+interface RelationMapping {
+  id: string
+  relationId: string
   sourceCategoryIds: string[]
   targetCategoryIds: string[]
+}
+
+type QueryExpansionProfileWithDefaults = QueryExpansionProfile & {
+  defaultRelations?: string[]
+  default_relations?: string[]
+}
+
+type QueryExpansionRequestWithMappings = QueryExpansionRequest & {
+  relationMappings?: Array<{
+    relationId: string
+    sourceCategoryIds: string[]
+    targetCategoryIds: string[]
+  }>
 }
 
 interface PreviewSingleConcept {
@@ -376,9 +442,10 @@ const props = defineProps({
 
 defineEmits(['hide', 'ok'])
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { getTitle } = useEntityFormatter()
+const entityStore = useEntityStore()
 const queryApi = inject(QueryApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
@@ -387,43 +454,57 @@ const selectedProfile = ref<QueryExpansionProfile>()
 const selectedProfileName = ref<string>()
 const loadingProfiles = ref(false)
 const loadingProfile = ref(false)
+const loadingDataSources = ref(false)
+const expanding = ref(false)
+const saving = ref(false)
 const profileLoadError = ref<string>()
+const expansionError = ref<string>()
+const dataSources = ref<DataSource[]>([])
+const selectedDataSourceId = ref<string>()
+const expansionResponse = ref<QueryExpansionResponse>()
 const selectedCategoryIds = ref<string[]>([])
-const selectedRelationIds = ref<string[]>([])
-const selectedRelationId = ref<string>()
-const relationCategorySelections = ref<Record<string, RelationCategorySelection>>({})
+const relationMappings = ref<RelationMapping[]>([])
+const draggedRelationId = ref<string>()
+const draggedCategoryId = ref<string>()
+let mappingCounter = 0
 
 const conceptTitle = computed(() => getTitle(props.concept))
-const selectedRelation = computed(() =>
-  selectedProfile.value?.relations?.find((relation) => relation.id === selectedRelationId.value),
-)
 const profileOptions = computed(() =>
   profiles.value.map((profile) => ({
     label: profile.languageName ? `${profile.name} (${profile.languageName})` : profile.name,
     value: profile.name,
   })),
 )
-const previewSingleConcepts = computed<PreviewSingleConcept[]>(() =>
-  selectedCategoryIds.value.map((categoryId) => {
+const dataSourceOptions = computed(() =>
+  dataSources.value.map((dataSource) => ({
+    label: dataSource.title ? `${dataSource.title} (${dataSource.id})` : dataSource.id,
+    value: dataSource.id,
+  })),
+)
+const expansionCandidates = computed<QueryExpansionCandidate[]>(() =>
+  Object.values(expansionResponse.value?.expansions || {}).flat(),
+)
+const previewSingleConcepts = computed<PreviewSingleConcept[]>(() => {
+  if (expansionResponse.value?.expansions) return expansionCandidates.value.map(toPreviewSingleConcept)
+  return selectedCategoryIds.value.map((categoryId) => {
     const category = selectedProfile.value?.categories?.find(({ id }) => id === categoryId)
     return {
       id: categoryId,
       title: `${conceptTitle.value} — ${categoryId}`,
       description: category?.description || t('queryExpansion.preview.categoryConcept'),
     }
-  }),
-)
+  })
+})
 const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() =>
-  selectedRelationIds.value
-    .map((relationId) => {
-      const relation = selectedProfile.value?.relations?.find(({ id }) => id === relationId)
-      const selection = getRelationSelection(relationId)
+  relationMappings.value
+    .map((mapping, index) => {
+      const relation = getRelation(mapping.relationId)
       return {
-        id: relationId,
-        title: `${conceptTitle.value} — ${relation?.label || relationId}`,
+        id: mapping.id,
+        title: `${conceptTitle.value} — ${relation?.label || mapping.relationId} #${index + 1}`,
         description: relation?.description || t('queryExpansion.preview.relationConcept'),
-        sourceCategoryIds: selection.sourceCategoryIds,
-        targetCategoryIds: selection.targetCategoryIds,
+        sourceCategoryIds: mapping.sourceCategoryIds,
+        targetCategoryIds: mapping.targetCategoryIds,
       }
     })
     .filter(
@@ -434,7 +515,27 @@ const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() =>
 
 onMounted(() => {
   void loadProfiles()
+  void loadDataSources()
 })
+
+function toPreviewSingleConcept(candidate: QueryExpansionCandidate, index: number): PreviewSingleConcept {
+  return {
+    id: `${candidate.category || 'candidate'}-${index}-${candidate.term}`,
+    title: candidate.term,
+    description: [candidate.category, candidate.status, candidate.rationale].filter(Boolean).join(' — '),
+  }
+}
+
+async function loadDataSources() {
+  loadingDataSources.value = true
+  try {
+    const sources = await entityStore.getDataSources(QueryType.Concept)
+    dataSources.value = sources
+    selectedDataSourceId.value = sources[0]?.id
+  } finally {
+    loadingDataSources.value = false
+  }
+}
 
 async function loadProfiles() {
   loadingProfiles.value = true
@@ -452,6 +553,75 @@ async function loadProfiles() {
   }
 }
 
+async function expandQuery() {
+  if (!queryApi || !selectedDataSourceId.value) return
+  expanding.value = true
+  expansionError.value = undefined
+  try {
+    const request: QueryExpansionRequestWithMappings = {
+      term: conceptTitle.value,
+      language: inferExpansionLanguage(),
+      categories: selectedCategoryIds.value,
+      relationMappings: relationMappings.value.map((mapping) => ({
+        relationId: mapping.relationId,
+        sourceCategoryIds: mapping.sourceCategoryIds,
+        targetCategoryIds: mapping.targetCategoryIds,
+      })),
+    }
+    const response = await queryApi.expandQueryForDataSource(selectedDataSourceId.value, request)
+    expansionResponse.value = response.data
+  } catch (e) {
+    expansionError.value = e instanceof Error ? e.message : t('queryExpansion.expandError')
+    throw e
+  } finally {
+    expanding.value = false
+  }
+}
+
+function inferExpansionLanguage() {
+  const profileName = selectedProfileName.value || ''
+  const profileLanguage = profileName.split('_').at(-1)
+  return profileLanguage && profileLanguage.length === 2 ? profileLanguage : locale.value
+}
+
+async function saveExpansionEntities() {
+  if (!props.concept.id) return
+  const candidates = uniqueExpansionCandidates()
+  if (candidates.length === 0) {
+    onDialogOK()
+    return
+  }
+
+  saving.value = true
+  try {
+    const lang = inferExpansionLanguage()
+    for (const candidate of candidates) {
+      const entity = entityStore.addEntity(EntityType.SingleConcept, props.concept.id) as SingleConcept
+      entity.titles = [{ lang, text: candidate.term } as LocalisableText]
+      entity.descriptions = [
+        {
+          lang,
+          text: [candidate.category, candidate.rationale].filter(Boolean).join(' — '),
+        } as LocalisableText,
+      ]
+      await entityStore.saveEntity(entity)
+    }
+    onDialogOK()
+  } finally {
+    saving.value = false
+  }
+}
+
+function uniqueExpansionCandidates() {
+  const seen = new Set<string>()
+  return expansionCandidates.value.filter((candidate) => {
+    const key = `${candidate.category || ''}:${candidate.term.toLocaleLowerCase()}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
 async function loadProfile(profileName: string | null) {
   if (!profileName) return
   loadingProfile.value = true
@@ -460,24 +630,9 @@ async function loadProfile(profileName: string | null) {
     if (!queryApi) throw new Error(t('queryExpansion.apiUnavailable'))
     const response = await queryApi.getQueryExpansionProfile(profileName)
     selectedProfile.value = response.data
-    selectedCategoryIds.value = selectedProfile.value.defaultCategories?.length
-      ? [...selectedProfile.value.defaultCategories]
-      : selectedProfile.value.categories?.map((category) => category.id) || []
-    selectedRelationIds.value = selectedProfile.value.relations?.map((relation) => relation.id) || []
-    relationCategorySelections.value = Object.fromEntries(
-      (selectedProfile.value.relations || []).map((relation) => [
-        relation.id,
-        {
-          sourceCategoryIds: (relation.sourceCategories || []).filter((categoryId) =>
-            selectedCategoryIds.value.includes(categoryId),
-          ),
-          targetCategoryIds: (relation.targetCategories || []).filter((categoryId) =>
-            selectedCategoryIds.value.includes(categoryId),
-          ),
-        },
-      ]),
-    )
-    selectedRelationId.value = selectedProfile.value?.relations?.[0]?.id
+    mappingCounter = 0
+    relationMappings.value = createProfileRelationMappings(selectedProfile.value)
+    selectedCategoryIds.value = getInitialSelectedCategoryIds(selectedProfile.value, relationMappings.value)
   } catch (e) {
     profileLoadError.value = e instanceof Error ? e.message : t('queryExpansion.loadError')
   } finally {
@@ -485,24 +640,111 @@ async function loadProfile(profileName: string | null) {
   }
 }
 
-function getRelationSelection(relationId: string): RelationCategorySelection {
-  if (!relationCategorySelections.value[relationId])
-    relationCategorySelections.value[relationId] = { sourceCategoryIds: [], targetCategoryIds: [] }
-  return relationCategorySelections.value[relationId]
+function createProfileRelationMappings(profile: QueryExpansionProfile): RelationMapping[] {
+  const defaultRelationIds = getDefaultRelationIds(profile)
+  return (profile.relations || [])
+    .filter((relation) => defaultRelationIds.includes(relation.id))
+    .filter(
+      (relation) =>
+        (relation.sourceCategories && relation.sourceCategories.length > 0) ||
+        (relation.targetCategories && relation.targetCategories.length > 0),
+    )
+    .map((relation) => ({
+      id: `mapping-${++mappingCounter}`,
+      relationId: relation.id,
+      sourceCategoryIds: [...(relation.sourceCategories || [])],
+      targetCategoryIds: [...(relation.targetCategories || [])],
+    }))
 }
 
-function isSelectedRelationSource(categoryId: string) {
-  if (!selectedRelationId.value) return false
-  return getRelationSelection(selectedRelationId.value).sourceCategoryIds.includes(categoryId)
+function getDefaultRelationIds(profile: QueryExpansionProfile): string[] {
+  const profileWithDefaults = profile as QueryExpansionProfileWithDefaults
+  const defaultRelationIds = profileWithDefaults.defaultRelations || profileWithDefaults.default_relations || []
+  const profileRelationIds = new Set((profile.relations || []).map(({ id }) => id))
+  return defaultRelationIds.filter((relationId) => profileRelationIds.has(relationId))
 }
 
-function isSelectedRelationTarget(categoryId: string) {
-  if (!selectedRelationId.value) return false
-  return getRelationSelection(selectedRelationId.value).targetCategoryIds.includes(categoryId)
+function getInitialSelectedCategoryIds(
+  profile: QueryExpansionProfile,
+  mappings: RelationMapping[],
+): string[] {
+  return Array.from(
+    new Set([
+      ...(profile.defaultCategories?.length
+        ? profile.defaultCategories
+        : profile.categories?.map((category) => category.id) || []),
+      ...mappings.flatMap((mapping) => [
+        ...mapping.sourceCategoryIds,
+        ...mapping.targetCategoryIds,
+      ]),
+    ]),
+  )
 }
 
-function isCategoryConnected(categoryId: string) {
-  return isSelectedRelationSource(categoryId) || isSelectedRelationTarget(categoryId)
+function getRelation(relationId: string): QueryExpansionRelation | undefined {
+  return selectedProfile.value?.relations?.find(({ id }) => id === relationId)
+}
+
+function relationLabel(relationId: string) {
+  const relation = getRelation(relationId)
+  return relation?.label || relationId
+}
+
+function relationMappingCount(relationId: string) {
+  return relationMappings.value.filter((mapping) => mapping.relationId === relationId).length
+}
+
+function addRelationMapping(relationId: string) {
+  if (!getRelation(relationId)) return
+  relationMappings.value.push({
+    id: `mapping-${++mappingCounter}`,
+    relationId,
+    sourceCategoryIds: [],
+    targetCategoryIds: [],
+  })
+}
+
+function removeRelationMapping(mappingId: string) {
+  relationMappings.value = relationMappings.value.filter(({ id }) => id !== mappingId)
+}
+
+function startRelationDrag(relationId: string) {
+  draggedRelationId.value = relationId
+}
+
+function dropRelationMapping() {
+  if (!draggedRelationId.value) return
+  addRelationMapping(draggedRelationId.value)
+  draggedRelationId.value = undefined
+}
+
+function startCategoryDrag(categoryId: string) {
+  draggedCategoryId.value = categoryId
+}
+
+function dropCategory(mappingId: string, role: 'source' | 'target') {
+  if (!draggedCategoryId.value) return
+  addMappingCategory(mappingId, role, draggedCategoryId.value)
+  draggedCategoryId.value = undefined
+}
+
+function addMappingCategory(mappingId: string, role: 'source' | 'target', categoryId: string) {
+  const mapping = relationMappings.value.find(({ id }) => id === mappingId)
+  if (!mapping) return
+  const relation = getRelation(mapping.relationId)
+  const allowedCategoryIds = role === 'source' ? relation?.sourceCategories : relation?.targetCategories
+  if (!allowedCategoryIds?.includes(categoryId)) return
+
+  const categoryIds = role === 'source' ? mapping.sourceCategoryIds : mapping.targetCategoryIds
+  if (!categoryIds.includes(categoryId)) categoryIds.push(categoryId)
+  toggleCategory(categoryId, true)
+}
+
+function removeMappingCategory(mappingId: string, role: 'source' | 'target', categoryId: string) {
+  const mapping = relationMappings.value.find(({ id }) => id === mappingId)
+  if (!mapping) return
+  const key = role === 'source' ? 'sourceCategoryIds' : 'targetCategoryIds'
+  mapping[key] = mapping[key].filter((id) => id !== categoryId)
 }
 
 function toggleCategory(categoryId: string, checked?: boolean) {
@@ -511,36 +753,10 @@ function toggleCategory(categoryId: string, checked?: boolean) {
   if (shouldSelect && !isSelected) selectedCategoryIds.value.push(categoryId)
   if (!shouldSelect && isSelected) {
     selectedCategoryIds.value = selectedCategoryIds.value.filter((id) => id !== categoryId)
-    Object.values(relationCategorySelections.value).forEach((selection) => {
-      selection.sourceCategoryIds = selection.sourceCategoryIds.filter((id) => id !== categoryId)
-      selection.targetCategoryIds = selection.targetCategoryIds.filter((id) => id !== categoryId)
+    relationMappings.value.forEach((mapping) => {
+      mapping.sourceCategoryIds = mapping.sourceCategoryIds.filter((id) => id !== categoryId)
+      mapping.targetCategoryIds = mapping.targetCategoryIds.filter((id) => id !== categoryId)
     })
-  }
-}
-
-function toggleRelation(relationId: string, checked?: boolean) {
-  const isSelected = selectedRelationIds.value.includes(relationId)
-  const shouldSelect = checked ?? !isSelected
-  if (shouldSelect && !isSelected) selectedRelationIds.value.push(relationId)
-  if (!shouldSelect && isSelected)
-    selectedRelationIds.value = selectedRelationIds.value.filter((id) => id !== relationId)
-}
-
-function toggleRelationCategory(role: 'source' | 'target', categoryId: string, checked: boolean) {
-  if (!selectedRelation.value || !selectedRelationId.value) return
-  const allowedCategories =
-    role === 'source' ? selectedRelation.value.sourceCategories : selectedRelation.value.targetCategories
-  if (!allowedCategories?.includes(categoryId)) return
-
-  const selection = getRelationSelection(selectedRelationId.value)
-  const key = role === 'source' ? 'sourceCategoryIds' : 'targetCategoryIds'
-  const isSelected = selection[key].includes(categoryId)
-
-  if (checked && !isSelected) selection[key].push(categoryId)
-  if (!checked && isSelected) selection[key] = selection[key].filter((id) => id !== categoryId)
-  if (checked) {
-    toggleCategory(categoryId, true)
-    toggleRelation(selectedRelationId.value, true)
   }
 }
 
@@ -550,14 +766,62 @@ function onCancelClick() {
 }
 
 function onContinueClick() {
-  if (step.value < 3) stepper.value?.next()
-  else onDialogOK()
+  if (step.value === 1) {
+    stepper.value?.next()
+    return
+  }
+  if (step.value === 2) {
+    void expandQuery().then(() => stepper.value?.next()).catch(() => undefined)
+    return
+  }
+  void saveExpansionEntities().catch(() => undefined)
 }
 </script>
 
 <style lang="scss">
 .query-expansion-dialog {
-  min-width: 640px;
-  max-width: 900px;
+  min-width: min(1100px, 95vw);
+  max-width: 95vw;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.query-expansion-stepper {
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.query-expansion-stepper .q-stepper__content {
+  overflow: hidden;
+}
+
+.query-expansion-stepper .q-stepper__step-content {
+  overflow: hidden;
+}
+
+.semantic-scroll-box {
+  max-height: min(30rem, calc(92vh - 18rem));
+  overflow-y: auto;
+}
+
+.mapping-drop-zone {
+  min-height: 18rem;
+}
+
+.relation-role-drop-zone {
+  min-height: 5rem;
+  border: 1px dashed $grey-5;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.source-zone {
+  background: rgba($secondary, 0.08);
+}
+
+.target-zone {
+  background: rgba($accent, 0.08);
 }
 </style>
