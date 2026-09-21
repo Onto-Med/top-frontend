@@ -138,7 +138,7 @@
                         @dragstart="startCategoryDrag(category.id)"
                         @click="toggleCategory(category.id)"
                       >
-                        {{ category.id }}
+                        {{ categoryLabel(category.id) }}
                       </q-chip>
                       <q-badge
                         v-if="selectedProfile?.defaultCategories?.includes(category.id)"
@@ -148,7 +148,10 @@
                         {{ t('queryExpansion.defaultCategory') }}
                       </q-badge>
                     </div>
-                    <q-item-label caption>{{ category.description }}</q-item-label>
+                    <q-item-label caption>
+                      <span class="text-weight-medium">{{ category.id }}</span>
+                      <span v-if="category.description"> — {{ category.description }}</span>
+                    </q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -216,7 +219,7 @@
                               text-color="white"
                               @remove="removeMappingCategory(mapping.id, 'source', categoryId)"
                             >
-                              {{ categoryId }}
+                              {{ categoryLabel(categoryId) }}
                             </q-chip>
                             <div v-if="mapping.sourceCategoryIds.length === 0" class="text-caption text-grey-7">
                               {{ t('queryExpansion.dropSourceCategories') }}
@@ -242,7 +245,7 @@
                               text-color="white"
                               @remove="removeMappingCategory(mapping.id, 'target', categoryId)"
                             >
-                              {{ categoryId }}
+                              {{ categoryLabel(categoryId) }}
                             </q-chip>
                             <div v-if="mapping.targetCategoryIds.length === 0" class="text-caption text-grey-7">
                               {{ t('queryExpansion.dropTargetCategories') }}
@@ -326,7 +329,7 @@
                             color="secondary"
                             text-color="white"
                           >
-                            {{ t('queryExpansion.source') }}: {{ source }}
+                            {{ t('queryExpansion.source') }}: {{ categoryLabel(source) }}
                           </q-chip>
                           <q-chip
                             v-for="target in composite.targetCategoryIds"
@@ -336,7 +339,7 @@
                             color="accent"
                             text-color="white"
                           >
-                            {{ t('queryExpansion.target') }}: {{ target }}
+                            {{ t('queryExpansion.target') }}: {{ categoryLabel(target) }}
                           </q-chip>
                         </div>
                       </q-item-section>
@@ -383,10 +386,9 @@
 import { computed, inject, onMounted, ref } from 'vue'
 import { QStepper, useDialogPluginComponent } from 'quasar'
 import {
-  EntityType,
   QueryType,
+  type CompositeConcept,
   type DataSource,
-  type LocalisableText,
   type QueryExpansionCandidate,
   type QueryExpansionProfile,
   type QueryExpansionRelation,
@@ -406,17 +408,29 @@ interface RelationMapping {
   targetCategoryIds: string[]
 }
 
+type QueryExpansionProfileCategoryWithLabel = NonNullable<QueryExpansionProfile['categories']>[number] & {
+  label?: string
+}
+
 type QueryExpansionProfileWithDefaults = QueryExpansionProfile & {
   defaultRelations?: string[]
   default_relations?: string[]
 }
 
 type QueryExpansionRequestWithMappings = QueryExpansionRequest & {
+  sourceConceptId?: string
   relationMappings?: Array<{
     relationId: string
     sourceCategoryIds: string[]
     targetCategoryIds: string[]
   }>
+}
+
+type QueryExpansionResponseWithDrafts = QueryExpansionResponse & {
+  generatedEntityDrafts?: {
+    singleConcepts?: SingleConcept[]
+    compositeConcepts?: CompositeConcept[]
+  }
 }
 
 interface PreviewSingleConcept {
@@ -461,7 +475,7 @@ const profileLoadError = ref<string>()
 const expansionError = ref<string>()
 const dataSources = ref<DataSource[]>([])
 const selectedDataSourceId = ref<string>()
-const expansionResponse = ref<QueryExpansionResponse>()
+const expansionResponse = ref<QueryExpansionResponseWithDrafts>()
 const selectedCategoryIds = ref<string[]>([])
 const relationMappings = ref<RelationMapping[]>([])
 const draggedRelationId = ref<string>()
@@ -484,7 +498,20 @@ const dataSourceOptions = computed(() =>
 const expansionCandidates = computed<QueryExpansionCandidate[]>(() =>
   Object.values(expansionResponse.value?.expansions || {}).flat(),
 )
+const generatedSingleConceptDrafts = computed(
+  () => expansionResponse.value?.generatedEntityDrafts?.singleConcepts || [],
+)
+const generatedCompositeConceptDrafts = computed(
+  () => expansionResponse.value?.generatedEntityDrafts?.compositeConcepts || [],
+)
 const previewSingleConcepts = computed<PreviewSingleConcept[]>(() => {
+  if (generatedSingleConceptDrafts.value.length > 0) {
+    return generatedSingleConceptDrafts.value.map((concept) => ({
+      id: concept.id || getTitle(concept),
+      title: getTitle(concept),
+      description: concept.descriptions?.map(({ text }) => text).join(' — ') || '',
+    }))
+  }
   if (expansionResponse.value?.expansions) return expansionCandidates.value.map(toPreviewSingleConcept)
   return selectedCategoryIds.value.map((categoryId) => {
     const category = selectedProfile.value?.categories?.find(({ id }) => id === categoryId)
@@ -495,8 +522,17 @@ const previewSingleConcepts = computed<PreviewSingleConcept[]>(() => {
     }
   })
 })
-const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() =>
-  relationMappings.value
+const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() => {
+  if (generatedCompositeConceptDrafts.value.length > 0) {
+    return generatedCompositeConceptDrafts.value.map((concept) => ({
+      id: concept.id || getTitle(concept),
+      title: getTitle(concept),
+      description: concept.descriptions?.map(({ text }) => text).join(' — ') || '',
+      sourceCategoryIds: [],
+      targetCategoryIds: [],
+    }))
+  }
+  return relationMappings.value
     .map((mapping, index) => {
       const relation = getRelation(mapping.relationId)
       return {
@@ -510,8 +546,8 @@ const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() =>
     .filter(
       ({ sourceCategoryIds, targetCategoryIds }) =>
         sourceCategoryIds.length > 0 || targetCategoryIds.length > 0,
-    ),
-)
+    )
+})
 
 onMounted(() => {
   void loadProfiles()
@@ -560,6 +596,7 @@ async function expandQuery() {
   try {
     const request: QueryExpansionRequestWithMappings = {
       term: conceptTitle.value,
+      sourceConceptId: props.concept.id,
       language: inferExpansionLanguage(),
       categories: selectedCategoryIds.value,
       relationMappings: relationMappings.value.map((mapping) => ({
@@ -569,7 +606,7 @@ async function expandQuery() {
       })),
     }
     const response = await queryApi.expandQueryForDataSource(selectedDataSourceId.value, request)
-    expansionResponse.value = response.data
+    expansionResponse.value = response.data as QueryExpansionResponseWithDrafts
   } catch (e) {
     expansionError.value = e instanceof Error ? e.message : t('queryExpansion.expandError')
     throw e
@@ -585,41 +622,22 @@ function inferExpansionLanguage() {
 }
 
 async function saveExpansionEntities() {
-  if (!props.concept.id) return
-  const candidates = uniqueExpansionCandidates()
-  if (candidates.length === 0) {
+  const drafts = [
+    ...generatedSingleConceptDrafts.value,
+    ...generatedCompositeConceptDrafts.value,
+  ]
+  if (drafts.length === 0) {
     onDialogOK()
     return
   }
 
   saving.value = true
   try {
-    const lang = inferExpansionLanguage()
-    for (const candidate of candidates) {
-      const entity = entityStore.addEntity(EntityType.SingleConcept, props.concept.id) as SingleConcept
-      entity.titles = [{ lang, text: candidate.term } as LocalisableText]
-      entity.descriptions = [
-        {
-          lang,
-          text: [candidate.category, candidate.rationale].filter(Boolean).join(' — '),
-        } as LocalisableText,
-      ]
-      await entityStore.saveEntity(entity)
-    }
+    for (const draft of drafts) await entityStore.saveEntity(draft)
     onDialogOK()
   } finally {
     saving.value = false
   }
-}
-
-function uniqueExpansionCandidates() {
-  const seen = new Set<string>()
-  return expansionCandidates.value.filter((candidate) => {
-    const key = `${candidate.category || ''}:${candidate.term.toLocaleLowerCase()}`
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
 }
 
 async function loadProfile(profileName: string | null) {
@@ -688,6 +706,13 @@ function getRelation(relationId: string): QueryExpansionRelation | undefined {
 function relationLabel(relationId: string) {
   const relation = getRelation(relationId)
   return relation?.label || relationId
+}
+
+function categoryLabel(categoryId: string) {
+  const category = selectedProfile.value?.categories?.find(({ id }) => id === categoryId) as
+    | QueryExpansionProfileCategoryWithLabel
+    | undefined
+  return category?.label || categoryId
 }
 
 function relationMappingCount(relationId: string) {
