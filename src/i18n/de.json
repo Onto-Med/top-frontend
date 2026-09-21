@@ -275,10 +275,12 @@
     "noCategories": "Für dieses Profil sind keine Kategorien verfügbar.",
     "noRelations": "Für dieses Profil sind keine Relationen verfügbar.",
     "noProfiles": "Es sind keine Query-Expansion-Profile verfügbar.",
+    "noConfiguredDataSources": "Es sind keine Concept-Datenquellen mit Query-Expansion-Konfiguration verfügbar.",
     "noMappings": "Ziehen Sie eine Relation hierher oder klicken Sie auf eine Relation, um eine Zuordnung anzulegen. Ziehen Sie danach Kategorien in die Quell-/Zielbereiche.",
     "dropSourceCategories": "Quellkategorien hier ablegen.",
     "dropTargetCategories": "Zielkategorien hier ablegen.",
     "loadError": "Query-Expansion-Profildaten konnten nicht geladen werden.",
+    "dataSourceLoadError": "Datenquellen mit Query-Expansion-Konfiguration konnten nicht geladen werden.",
     "apiUnavailable": "Die Query API ist in diesem Dialog nicht verfügbar.",
     "expanding": "Query Expansion wird ausgeführt...",
     "expandError": "Query Expansion ist fehlgeschlagen.",
@@ -289,7 +291,7 @@
     },
     "placeholder": {
       "description": "Erweitern Sie dieses SingleConcept mit Concept Graphs und prüfen Sie semantische Vorschläge, bevor TOP-Entitäten erzeugt werden.",
-      "partiallyConnected": "Profildaten werden vom Backend geladen. Ausführung der Expansion und Entitätserzeugung sind noch nicht verbunden.",
+      "partiallyConnected": "Wählen Sie eine Concept-Datenquelle mit Query-Expansion-Konfiguration aus. Es werden nur entsprechend konfigurierte Datenquellen angezeigt.",
       "generatedEntities": "Vorschau erzeugter Entitäten",
       "generatedEntitiesCaption": "Nur Vorschau: Diese erzeugten SingleConcept- und CompositeConcept-Strukturen werden noch nicht gespeichert."
     },

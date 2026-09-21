@@ -32,12 +32,23 @@
             :options="dataSourceOptions"
             :label="t('dataSource')"
             :loading="loadingDataSources"
-            :disable="loadingDataSources"
+            :disable="loadingDataSources || dataSourceOptions.length === 0"
             emit-value
             map-options
             outlined
             dense
           />
+
+          <q-banner v-if="dataSourceLoadError" rounded class="bg-negative text-white q-mt-md">
+            {{ dataSourceLoadError }}
+          </q-banner>
+          <q-banner
+            v-else-if="!loadingDataSources && dataSourceOptions.length === 0"
+            rounded
+            class="bg-grey-2 text-grey-9 q-mt-md"
+          >
+            {{ t('queryExpansion.noConfiguredDataSources') }}
+          </q-banner>
         </q-step>
 
         <q-step
@@ -62,6 +73,10 @@
 
           <q-banner v-if="profileLoadError" rounded class="bg-negative text-white q-mb-md">
             {{ profileLoadError }}
+          </q-banner>
+
+          <q-banner v-if="expansionError" rounded class="bg-negative text-white q-mb-md">
+            {{ expansionError }}
           </q-banner>
 
           <q-banner
@@ -277,7 +292,7 @@
                   <div class="text-subtitle2 q-mb-sm">
                     {{ t('queryExpansion.preview.singleConcepts') }}
                   </div>
-                  <q-list dense separator>
+                  <q-list dense separator class="preview-scroll-box">
                     <q-item>
                       <q-item-section side>
                         <q-icon name="article" color="primary" />
@@ -287,16 +302,32 @@
                         <q-item-label caption>{{ t('queryExpansion.preview.sourceConcept') }}</q-item-label>
                       </q-item-section>
                     </q-item>
-                    <q-item v-for="concept in previewSingleConcepts" :key="concept.id">
-                      <q-item-section side>
-                        <q-icon name="label" color="secondary" />
-                      </q-item-section>
-                      <q-item-section>
-                        <q-item-label>{{ concept.title }}</q-item-label>
-                        <q-item-label caption>{{ concept.description }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item v-if="previewSingleConcepts.length === 0">
+                    <q-expansion-item
+                      v-for="group in previewSingleConceptGroups"
+                      :key="group.id"
+                      :label="group.title"
+                      icon="folder"
+                      dense
+                      default-opened
+                    >
+                      <q-item v-for="concept in group.concepts" :key="concept.id" dense>
+                        <q-item-section side>
+                          <q-checkbox
+                            :model-value="isDraftSelected(concept.id)"
+                            dense
+                            @update:model-value="toggleDraftSelection(concept.id, $event)"
+                          />
+                        </q-item-section>
+                        <q-item-section side>
+                          <q-icon name="label" color="secondary" />
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label>{{ concept.title }}</q-item-label>
+                          <q-item-label v-if="concept.description" caption>{{ concept.description }}</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </q-expansion-item>
+                    <q-item v-if="previewSingleConceptGroups.length === 0">
                       <q-item-section>
                         <q-item-label caption>{{ t('queryExpansion.preview.noSingleConcepts') }}</q-item-label>
                       </q-item-section>
@@ -312,39 +343,55 @@
                   <div class="text-subtitle2 q-mb-sm">
                     {{ t('queryExpansion.preview.compositeConcepts') }}
                   </div>
-                  <q-list dense separator>
-                    <q-item v-for="composite in previewCompositeConcepts" :key="composite.id">
-                      <q-item-section side top>
-                        <q-icon name="account_tree" color="accent" />
-                      </q-item-section>
-                      <q-item-section>
-                        <q-item-label>{{ composite.title }}</q-item-label>
-                        <q-item-label caption>{{ composite.description }}</q-item-label>
-                        <div class="q-mt-xs">
-                          <q-chip
-                            v-for="source in composite.sourceCategoryIds"
-                            :key="`${composite.id}-source-${source}`"
+                  <q-list dense separator class="preview-scroll-box">
+                    <q-expansion-item
+                      v-for="group in previewCompositeConceptGroups"
+                      :key="group.id"
+                      :label="group.title"
+                      icon="account_tree"
+                      dense
+                      default-opened
+                    >
+                      <q-item v-for="composite in group.concepts" :key="composite.id" dense>
+                        <q-item-section side top>
+                          <q-checkbox
+                            :model-value="isDraftSelected(composite.id)"
                             dense
-                            size="sm"
-                            color="secondary"
-                            text-color="white"
-                          >
-                            {{ t('queryExpansion.source') }}: {{ categoryLabel(source) }}
-                          </q-chip>
-                          <q-chip
-                            v-for="target in composite.targetCategoryIds"
-                            :key="`${composite.id}-target-${target}`"
-                            dense
-                            size="sm"
-                            color="accent"
-                            text-color="white"
-                          >
-                            {{ t('queryExpansion.target') }}: {{ categoryLabel(target) }}
-                          </q-chip>
-                        </div>
-                      </q-item-section>
-                    </q-item>
-                    <q-item v-if="previewCompositeConcepts.length === 0">
+                            @update:model-value="toggleDraftSelection(composite.id, $event)"
+                          />
+                        </q-item-section>
+                        <q-item-section side top>
+                          <q-icon name="account_tree" color="accent" />
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label>{{ composite.title }}</q-item-label>
+                          <q-item-label v-if="composite.description && composite.description !== composite.title" caption>{{ composite.description }}</q-item-label>
+                          <div class="q-mt-xs">
+                            <q-chip
+                              v-for="source in composite.sourceCategoryIds"
+                              :key="`${composite.id}-source-${source}`"
+                              dense
+                              size="sm"
+                              color="secondary"
+                              text-color="white"
+                            >
+                              {{ t('queryExpansion.source') }}: {{ categoryLabel(source) }}
+                            </q-chip>
+                            <q-chip
+                              v-for="target in composite.targetCategoryIds"
+                              :key="`${composite.id}-target-${target}`"
+                              dense
+                              size="sm"
+                              color="accent"
+                              text-color="white"
+                            >
+                              {{ t('queryExpansion.target') }}: {{ categoryLabel(target) }}
+                            </q-chip>
+                          </div>
+                        </q-item-section>
+                      </q-item>
+                    </q-expansion-item>
+                    <q-item v-if="previewCompositeConceptGroups.length === 0">
                       <q-item-section>
                         <q-item-label caption>
                           {{ t('queryExpansion.preview.noCompositeConcepts') }}
@@ -370,7 +417,7 @@
             <q-btn
               flat
               color="primary"
-              :disable="expanding || saving || (step === 1 && !selectedDataSourceId)"
+              :disable="expanding || saving || !selectedDataSourceId || (step === 2 && !selectedProfile)"
               :label="step < 3 ? t('continue') : t('save')"
               @click="onContinueClick"
             />
@@ -386,12 +433,15 @@
 import { computed, inject, onMounted, ref } from 'vue'
 import { QStepper, useDialogPluginComponent } from 'quasar'
 import {
+  EntityType,
   QueryType,
   type CompositeConcept,
   type DataSource,
+  type Entity,
   type QueryExpansionCandidate,
   type QueryExpansionProfile,
   type QueryExpansionRelation,
+  type Expression,
   type QueryExpansionRequest,
   type QueryExpansionResponse,
   type SingleConcept,
@@ -406,10 +456,6 @@ interface RelationMapping {
   relationId: string
   sourceCategoryIds: string[]
   targetCategoryIds: string[]
-}
-
-type QueryExpansionProfileCategoryWithLabel = NonNullable<QueryExpansionProfile['categories']>[number] & {
-  label?: string
 }
 
 type QueryExpansionProfileWithDefaults = QueryExpansionProfile & {
@@ -447,6 +493,12 @@ interface PreviewCompositeConcept {
   targetCategoryIds: string[]
 }
 
+interface PreviewGroup<T> {
+  id: string
+  title: string
+  concepts: T[]
+}
+
 const props = defineProps({
   concept: {
     type: Object as () => SingleConcept,
@@ -472,10 +524,12 @@ const loadingDataSources = ref(false)
 const expanding = ref(false)
 const saving = ref(false)
 const profileLoadError = ref<string>()
+const dataSourceLoadError = ref<string>()
 const expansionError = ref<string>()
 const dataSources = ref<DataSource[]>([])
 const selectedDataSourceId = ref<string>()
 const expansionResponse = ref<QueryExpansionResponseWithDrafts>()
+const selectedDraftIds = ref<string[]>([])
 const selectedCategoryIds = ref<string[]>([])
 const relationMappings = ref<RelationMapping[]>([])
 const draggedRelationId = ref<string>()
@@ -522,6 +576,40 @@ const previewSingleConcepts = computed<PreviewSingleConcept[]>(() => {
     }
   })
 })
+const previewSingleConceptGroups = computed<PreviewGroup<PreviewSingleConcept>[]>(() => {
+  if (generatedSingleConceptDrafts.value.length === 0) {
+    return [
+      {
+        id: 'selected',
+        title: t('category', 2),
+        concepts: previewSingleConcepts.value,
+      },
+    ].filter((group) => group.concepts.length > 0)
+  }
+
+  const groups = generatedSingleConceptDrafts.value
+    .filter((concept) => concept.superConcepts?.some((superConcept) => superConcept.id === props.concept.id))
+    .map((categoryConcept) => ({
+      id: categoryConcept.id || getTitle(categoryConcept),
+      title: getTitle(categoryConcept),
+      concepts: generatedSingleConceptDrafts.value
+        .filter((concept) => concept.superConcepts?.some((superConcept) => superConcept.id === categoryConcept.id))
+        .map(toPreviewSingleConceptDraft),
+    }))
+    .filter((group) => group.concepts.length > 0)
+
+  const categoryConceptIds = new Set(groups.map((group) => group.id))
+  const groupedConceptIds = new Set(groups.flatMap((group) => group.concepts.map((concept) => concept.id)))
+  const ungrouped = generatedSingleConceptDrafts.value
+    .filter((concept) => !categoryConceptIds.has(concept.id || getTitle(concept)))
+    .filter((concept) => !groupedConceptIds.has(concept.id || getTitle(concept)))
+    .map(toPreviewSingleConceptDraft)
+  if (ungrouped.length > 0) {
+    groups.push({ id: 'ungrouped', title: t('queryExpansion.preview.singleConcepts'), concepts: ungrouped })
+  }
+  return groups
+})
+
 const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() => {
   if (generatedCompositeConceptDrafts.value.length > 0) {
     return generatedCompositeConceptDrafts.value.map((concept) => ({
@@ -548,11 +636,36 @@ const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() => {
         sourceCategoryIds.length > 0 || targetCategoryIds.length > 0,
     )
 })
+const previewCompositeConceptGroups = computed<PreviewGroup<PreviewCompositeConcept>[]>(() => {
+  const groups = new Map<string, PreviewCompositeConcept[]>()
+  previewCompositeConcepts.value.forEach((concept) => {
+    const relation = extractRelationLabel(concept.title)
+    groups.set(relation, [...(groups.get(relation) || []), concept])
+  })
+  return Array.from(groups.entries()).map(([relation, concepts]) => ({
+    id: relation,
+    title: relation,
+    concepts,
+  }))
+})
 
 onMounted(() => {
   void loadProfiles()
   void loadDataSources()
 })
+
+function toPreviewSingleConceptDraft(concept: SingleConcept): PreviewSingleConcept {
+  return {
+    id: concept.id || getTitle(concept),
+    title: getTitle(concept),
+    description: concept.descriptions?.map(({ text }) => text).join(' — ') || '',
+  }
+}
+
+function extractRelationLabel(title: string) {
+  const match = title.match(/--(.+?)-->/)
+  return match?.[1]?.trim() || t('queryExpansion.relations')
+}
 
 function toPreviewSingleConcept(candidate: QueryExpansionCandidate, index: number): PreviewSingleConcept {
   return {
@@ -564,13 +677,33 @@ function toPreviewSingleConcept(candidate: QueryExpansionCandidate, index: numbe
 
 async function loadDataSources() {
   loadingDataSources.value = true
+  dataSourceLoadError.value = undefined
   try {
+    if (!queryApi) throw new Error(t('queryExpansion.apiUnavailable'))
     const sources = await entityStore.getDataSources(QueryType.Concept)
-    dataSources.value = sources
-    selectedDataSourceId.value = sources[0]?.id
+    const configuredSources = await filterQueryExpansionDataSources(sources)
+    dataSources.value = configuredSources
+    selectedDataSourceId.value = configuredSources[0]?.id
+  } catch (e) {
+    dataSourceLoadError.value = getRequestErrorMessage(e, t('queryExpansion.dataSourceLoadError'))
   } finally {
     loadingDataSources.value = false
   }
+}
+
+async function filterQueryExpansionDataSources(sources: DataSource[]) {
+  if (!queryApi) return []
+  const checks = await Promise.all(
+    sources.map(async (source) => {
+      try {
+        await queryApi.getDataSourceQueryExpansionConfig(source.id)
+        return source
+      } catch {
+        return undefined
+      }
+    }),
+  )
+  return checks.filter((source): source is DataSource => source !== undefined)
 }
 
 async function loadProfiles() {
@@ -583,7 +716,7 @@ async function loadProfiles() {
     selectedProfileName.value = profiles.value[0]?.name
     if (selectedProfileName.value) await loadProfile(selectedProfileName.value)
   } catch (e) {
-    profileLoadError.value = e instanceof Error ? e.message : t('queryExpansion.loadError')
+    profileLoadError.value = getRequestErrorMessage(e, t('queryExpansion.loadError'))
   } finally {
     loadingProfiles.value = false
   }
@@ -606,13 +739,49 @@ async function expandQuery() {
       })),
     }
     const response = await queryApi.expandQueryForDataSource(selectedDataSourceId.value, request)
-    expansionResponse.value = response.data as QueryExpansionResponseWithDrafts
+    expansionResponse.value = response.data
+    selectAllGeneratedDrafts()
   } catch (e) {
-    expansionError.value = e instanceof Error ? e.message : t('queryExpansion.expandError')
+    expansionError.value = getRequestErrorMessage(e, t('queryExpansion.expandError'))
     throw e
   } finally {
     expanding.value = false
   }
+}
+
+function getRequestErrorMessage(error: unknown, fallback: string) {
+  const responseData = getErrorResponseData(error)
+  if (typeof responseData === 'string' && responseData.trim()) return responseData
+  if (isRecord(responseData)) {
+    const message = responseData.message
+    if (typeof message === 'string' && message.trim()) return message
+    const errorMessage = responseData.error
+    if (typeof errorMessage === 'string' && errorMessage.trim()) return errorMessage
+    const details = responseData.details
+    if (Array.isArray(details) && details.length > 0) {
+      const detailMessage = details
+        .map((detail) => {
+          if (!isRecord(detail)) return String(detail)
+          const location = Array.isArray(detail.loc) ? detail.loc.join('.') : undefined
+          const message = typeof detail.msg === 'string' ? detail.msg : undefined
+          return [location, message].filter(Boolean).join(': ')
+        })
+        .filter(Boolean)
+        .join('; ')
+      if (detailMessage) return detailMessage
+    }
+  }
+  return error instanceof Error && error.message ? error.message : fallback
+}
+
+function getErrorResponseData(error: unknown): unknown {
+  if (!isRecord(error)) return undefined
+  const response = error.response
+  return isRecord(response) ? response.data : undefined
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 function inferExpansionLanguage() {
@@ -622,9 +791,15 @@ function inferExpansionLanguage() {
 }
 
 async function saveExpansionEntities() {
-  const drafts = [
-    ...generatedSingleConceptDrafts.value,
-    ...generatedCompositeConceptDrafts.value,
+  const selectedIds = new Set(selectedDraftIds.value)
+  const selectedCompositeDrafts = generatedCompositeConceptDrafts.value.filter(
+    (draft) => draft.id && selectedIds.has(draft.id),
+  )
+  selectedCompositeDrafts.forEach((draft) => collectExpressionEntityIds(draft.expression).forEach((id) => selectedIds.add(id)))
+  const selectedSingles = getSelectedSingleConceptDrafts(selectedIds)
+  const drafts: Entity[] = [
+    ...selectedSingles,
+    ...groupCompositeDraftsForSave(selectedCompositeDrafts),
   ]
   if (drafts.length === 0) {
     onDialogOK()
@@ -640,6 +815,142 @@ async function saveExpansionEntities() {
   }
 }
 
+function selectAllGeneratedDrafts() {
+  const visibleSingleDrafts = generatedSingleConceptDrafts.value.filter(
+    (draft) => !draft.superConcepts?.some((superConcept) => superConcept.id === props.concept.id),
+  )
+  selectedDraftIds.value = [
+    ...visibleSingleDrafts,
+    ...generatedCompositeConceptDrafts.value,
+  ]
+    .map((draft) => draft.id)
+    .filter((id): id is string => typeof id === 'string')
+}
+
+function isDraftSelected(draftId: string) {
+  return selectedDraftIds.value.includes(draftId)
+}
+
+function toggleDraftSelection(draftId: string, selected: boolean) {
+  selectedDraftIds.value = selected
+    ? Array.from(new Set([...selectedDraftIds.value, draftId]))
+    : selectedDraftIds.value.filter((id) => id !== draftId)
+}
+
+function groupCompositeDraftsForSave(drafts: CompositeConcept[]): CompositeConcept[] {
+  const grouped = new Map<string, CompositeConcept[]>()
+  drafts.forEach((draft) => {
+    const parts = getCompositeGroupingParts(draft)
+    if (!parts) {
+      grouped.set(draft.id || getTitle(draft), [draft])
+      return
+    }
+    const key = `${parts.functionId}:${parts.sourceId}:${parts.relationLabel}`
+    grouped.set(key, [...(grouped.get(key) || []), draft])
+  })
+
+  return Array.from(grouped.values()).flatMap((group) => {
+    const first = group[0]
+    if (!first) return []
+    if (group.length === 1) return [first]
+    const parts = getCompositeGroupingParts(first)
+    if (!parts) return [first]
+    const targets = group
+      .map(getCompositeGroupingParts)
+      .filter((part): part is CompositeGroupingParts => part !== undefined)
+    const targetExpressions: Expression[] = targets.map((target) => ({ entityId: target.targetId }))
+    const targetExpression: Expression =
+      targetExpressions.length === 1
+        ? targetExpressions[0] || { entityId: parts.targetId }
+        : { functionId: 'OR', arguments: targetExpressions }
+    const expression = combineSourceAndTargetExpression(parts.functionId, parts.sourceId, targetExpression)
+    const targetTitle = targets.map((target) => target.targetTitle).join(' OR ')
+    const title = `${parts.sourceTitle} --${parts.relationLabel}--> ${targetTitle}`
+    const groupedDraft: CompositeConcept = {
+      ...first,
+      id: crypto.randomUUID(),
+      entityType: EntityType.CompositeConcept,
+      titles: [{ lang: first.titles?.[0]?.lang || locale.value, text: title }],
+      descriptions: undefined,
+      expression,
+    }
+    return [groupedDraft]
+  })
+}
+
+interface CompositeGroupingParts {
+  functionId: string
+  sourceId: string
+  targetId: string
+  sourceTitle: string
+  relationLabel: string
+  targetTitle: string
+}
+
+function getCompositeGroupingParts(draft: CompositeConcept): CompositeGroupingParts | undefined {
+  const expression = draft.expression
+  const functionId = expression.functionId
+  const args = expression.arguments || []
+  const sourceArg = args[0]
+  const targetArg = args[1]
+  const sourceId = sourceArg?.entityId
+  const targetId = targetArg?.entityId
+  if (!functionId || !sourceId || !targetId) return undefined
+  const titleParts = parseRelationTitle(getTitle(draft))
+  return {
+    functionId,
+    sourceId,
+    targetId,
+    sourceTitle: titleParts?.source || sourceId,
+    relationLabel: titleParts?.relation || functionId,
+    targetTitle: titleParts?.target || targetId,
+  }
+}
+
+function parseRelationTitle(title: string) {
+  const match = title.match(/^(.*?)\s*--(.+?)-->\s*(.*)$/)
+  if (!match) return undefined
+  const [, source, relation, target] = match
+  if (!source || !relation || !target) return undefined
+  return {
+    source: source.trim(),
+    relation: relation.trim(),
+    target: target.trim(),
+  }
+}
+
+function combineSourceAndTargetExpression(functionId: string, sourceId: string, targetExpression: Expression): Expression {
+  const sourceExpression: Expression = { entityId: sourceId }
+  if (functionId === 'OR') {
+    return targetExpression.functionId === 'OR'
+      ? { functionId: 'OR', arguments: [sourceExpression, ...(targetExpression.arguments || [])] }
+      : { functionId, arguments: [sourceExpression, targetExpression] }
+  }
+  return { functionId, arguments: [sourceExpression, targetExpression] }
+}
+
+function collectExpressionEntityIds(expression?: Expression): string[] {
+  if (!expression) return []
+  return [
+    ...(expression.entityId ? [expression.entityId] : []),
+    ...(expression.arguments || []).flatMap(collectExpressionEntityIds),
+  ]
+}
+
+function getSelectedSingleConceptDrafts(selectedIds: Set<string>) {
+  const draftsById = new Map(generatedSingleConceptDrafts.value.map((draft) => [draft.id, draft]))
+  const selectedSingles = generatedSingleConceptDrafts.value.filter(
+    (draft) => draft.id && selectedIds.has(draft.id),
+  )
+  selectedSingles.forEach((draft) => {
+    draft.superConcepts?.forEach((superConcept) => {
+      const superDraft = draftsById.get(superConcept.id)
+      if (superDraft?.id) selectedIds.add(superDraft.id)
+    })
+  })
+  return generatedSingleConceptDrafts.value.filter((draft) => draft.id && selectedIds.has(draft.id))
+}
+
 async function loadProfile(profileName: string | null) {
   if (!profileName) return
   loadingProfile.value = true
@@ -652,7 +963,7 @@ async function loadProfile(profileName: string | null) {
     relationMappings.value = createProfileRelationMappings(selectedProfile.value)
     selectedCategoryIds.value = getInitialSelectedCategoryIds(selectedProfile.value, relationMappings.value)
   } catch (e) {
-    profileLoadError.value = e instanceof Error ? e.message : t('queryExpansion.loadError')
+    profileLoadError.value = getRequestErrorMessage(e, t('queryExpansion.loadError'))
   } finally {
     loadingProfile.value = false
   }
@@ -709,9 +1020,7 @@ function relationLabel(relationId: string) {
 }
 
 function categoryLabel(categoryId: string) {
-  const category = selectedProfile.value?.categories?.find(({ id }) => id === categoryId) as
-    | QueryExpansionProfileCategoryWithLabel
-    | undefined
+  const category = selectedProfile.value?.categories?.find(({ id }) => id === categoryId)
   return category?.label || categoryId
 }
 
@@ -828,6 +1137,11 @@ function onContinueClick() {
 
 .semantic-scroll-box {
   max-height: min(30rem, calc(92vh - 18rem));
+  overflow-y: auto;
+}
+
+.preview-scroll-box {
+  max-height: min(28rem, calc(92vh - 18rem));
   overflow-y: auto;
 }
 
