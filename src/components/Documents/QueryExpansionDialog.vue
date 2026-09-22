@@ -43,7 +43,7 @@
             {{ dataSourceLoadError }}
           </q-banner>
           <q-banner
-            v-else-if="!loadingDataSources && dataSourceOptions.length === 0"
+            v-else-if="!loadingDataSources && !hasQueryExpansionCapableDataSource"
             rounded
             class="bg-grey-2 text-grey-9 q-mt-md"
           >
@@ -458,6 +458,12 @@ interface RelationMapping {
   targetCategoryIds: string[]
 }
 
+interface QueryExpansionDataSourceCapability {
+  source: DataSource
+  capable: boolean
+  reason?: string
+}
+
 type QueryExpansionProfileWithDefaults = QueryExpansionProfile & {
   defaultRelations?: string[]
   default_relations?: string[]
@@ -526,7 +532,7 @@ const saving = ref(false)
 const profileLoadError = ref<string>()
 const dataSourceLoadError = ref<string>()
 const expansionError = ref<string>()
-const dataSources = ref<DataSource[]>([])
+const dataSourceCapabilities = ref<QueryExpansionDataSourceCapability[]>([])
 const selectedDataSourceId = ref<string>()
 const expansionResponse = ref<QueryExpansionResponseWithDrafts>()
 const selectedDraftIds = ref<string[]>([])
@@ -544,10 +550,14 @@ const profileOptions = computed(() =>
   })),
 )
 const dataSourceOptions = computed(() =>
-  dataSources.value.map((dataSource) => ({
-    label: dataSource.title ? `${dataSource.title} (${dataSource.id})` : dataSource.id,
-    value: dataSource.id,
+  dataSourceCapabilities.value.map(({ source, capable, reason }) => ({
+    label: getDataSourceOptionLabel(source, capable, reason),
+    value: source.id,
+    disable: !capable,
   })),
+)
+const hasQueryExpansionCapableDataSource = computed(() =>
+  dataSourceCapabilities.value.some(({ capable }) => capable),
 )
 const expansionCandidates = computed<QueryExpansionCandidate[]>(() =>
   Object.values(expansionResponse.value?.expansions || {}).flat(),
@@ -680,10 +690,10 @@ async function loadDataSources() {
   dataSourceLoadError.value = undefined
   try {
     if (!queryApi) throw new Error(t('queryExpansion.apiUnavailable'))
-    const sources = await entityStore.getDataSources(QueryType.Concept)
-    const configuredSources = await filterQueryExpansionDataSources(sources)
-    dataSources.value = configuredSources
-    selectedDataSourceId.value = configuredSources[0]?.id
+    const sources = await getApplicableConceptDataSources()
+    const capabilities = await getQueryExpansionDataSourceCapabilities(sources)
+    dataSourceCapabilities.value = capabilities
+    selectedDataSourceId.value = capabilities.find(({ capable }) => capable)?.source.id
   } catch (e) {
     dataSourceLoadError.value = getRequestErrorMessage(e, t('queryExpansion.dataSourceLoadError'))
   } finally {
@@ -691,19 +701,38 @@ async function loadDataSources() {
   }
 }
 
-async function filterQueryExpansionDataSources(sources: DataSource[]) {
-  if (!queryApi) return []
-  const checks = await Promise.all(
+async function getApplicableConceptDataSources() {
+  if (queryApi && entityStore.organisationId) {
+    return queryApi
+      .getOrganisationDataSources(entityStore.organisationId, QueryType.Concept)
+      .then((response) => response.data)
+  }
+  return entityStore.getDataSources(QueryType.Concept)
+}
+
+async function getQueryExpansionDataSourceCapabilities(
+  sources: DataSource[],
+): Promise<QueryExpansionDataSourceCapability[]> {
+  if (!queryApi) return sources.map((source) => ({ source, capable: false }))
+  return Promise.all(
     sources.map(async (source) => {
       try {
         await queryApi.getDataSourceQueryExpansionConfig(source.id)
-        return source
-      } catch {
-        return undefined
+        return { source, capable: true }
+      } catch (e) {
+        return {
+          source,
+          capable: false,
+          reason: getRequestErrorMessage(e, t('queryExpansion.noConfiguredDataSources')),
+        }
       }
     }),
   )
-  return checks.filter((source): source is DataSource => source !== undefined)
+}
+
+function getDataSourceOptionLabel(source: DataSource, capable: boolean, reason?: string) {
+  const label = source.title ? `${source.title} (${source.id})` : source.id
+  return capable || !reason ? label : `${label} — ${reason}`
 }
 
 async function loadProfiles() {
