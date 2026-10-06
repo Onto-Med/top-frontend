@@ -284,6 +284,11 @@
     "apiUnavailable": "Query API is not available in this dialog.",
     "expanding": "Expanding query...",
     "expandError": "Query expansion failed.",
+    "discardAndEditSettings": "Discard preview and edit settings",
+    "discardPreviewTitle": "Discard generated preview?",
+    "discardPreviewMessage": "Going back to semantic review or closing this dialog will discard the generated concepts and relations. To use different settings, you will need to generate a new preview.",
+    "stayOnPreview": "Stay on preview",
+    "discardPreviewConfirm": "Discard preview",
     "steps": {
       "source": "Source",
       "semanticReview": "Semantic review",

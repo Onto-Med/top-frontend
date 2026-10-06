@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialogRef" :persistent="protectGeneratedWork" @hide="onDialogHide">
     <q-card class="query-expansion-dialog">
       <q-stepper
         ref="stepper"
@@ -156,7 +156,7 @@
                         {{ categoryLabel(category.id) }}
                       </q-chip>
                       <q-badge
-                        v-if="selectedProfile?.defaultCategories?.includes(category.id)"
+                        v-if="isDefaultCategory(category.id)"
                         color="primary"
                         class="q-ml-xs"
                       >
@@ -407,12 +407,21 @@
 
         <template #navigation>
           <q-separator />
-          <q-stepper-navigation class="q-mt-md">
+          <q-stepper-navigation class="q-mt-md row items-center">
             <q-btn
               flat
-              :label="step === 1 ? t('cancel') : t('back')"
+              :label="backButtonLabel"
               color="primary"
               @click="onCancelClick"
+            />
+            <q-space />
+            <q-btn
+              v-if="step === 3"
+              flat
+              color="primary"
+              :disable="expanding || saving"
+              :label="t('close')"
+              @click="requestDialogCancel"
             />
             <q-btn
               flat
@@ -431,7 +440,7 @@
 
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from 'vue'
-import { QStepper, useDialogPluginComponent } from 'quasar'
+import { QStepper, useDialogPluginComponent, useQuasar } from 'quasar'
 import {
   EntityType,
   QueryType,
@@ -448,7 +457,7 @@ import {
 } from '@onto-med/top-api'
 import { useI18n } from 'vue-i18n'
 import useEntityFormatter from 'src/mixins/useEntityFormatter'
-import { QueryApiKey } from 'src/boot/axios'
+import { QueryApiKey, QueryExpansionApiKey } from 'src/boot/axios'
 import { useEntityStore } from 'stores/entity-store'
 
 interface RelationMapping {
@@ -465,12 +474,15 @@ interface QueryExpansionDataSourceCapability {
 }
 
 type QueryExpansionProfileWithDefaults = QueryExpansionProfile & {
+  defaultCategories?: string[]
+  default_categories?: string[]
   defaultRelations?: string[]
   default_relations?: string[]
 }
 
 type QueryExpansionRequestWithMappings = QueryExpansionRequest & {
   sourceConceptId?: string
+  profileName?: string
   relationMappings?: Array<{
     relationId: string
     sourceCategoryIds: string[]
@@ -515,10 +527,12 @@ const props = defineProps({
 defineEmits(['hide', 'ok'])
 
 const { t, locale } = useI18n()
+const $q = useQuasar()
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 const { getTitle } = useEntityFormatter()
 const entityStore = useEntityStore()
 const queryApi = inject(QueryApiKey)
+const queryExpansionApi = inject(QueryExpansionApiKey)
 const stepper = ref<QStepper>()
 const step = ref(1)
 const profiles = ref<QueryExpansionProfile[]>([])
@@ -658,6 +672,15 @@ const previewCompositeConceptGroups = computed<PreviewGroup<PreviewCompositeConc
     concepts,
   }))
 })
+const hasGeneratedPreview = computed(
+  () => generatedSingleConceptDrafts.value.length > 0 || generatedCompositeConceptDrafts.value.length > 0,
+)
+const protectGeneratedWork = computed(() => expanding.value || saving.value || hasGeneratedPreview.value)
+const backButtonLabel = computed(() => {
+  if (step.value === 1) return t('cancel')
+  if (step.value === 3 && hasGeneratedPreview.value) return t('queryExpansion.discardAndEditSettings')
+  return t('back')
+})
 
 onMounted(() => {
   void loadProfiles()
@@ -713,11 +736,12 @@ async function getApplicableConceptDataSources() {
 async function getQueryExpansionDataSourceCapabilities(
   sources: DataSource[],
 ): Promise<QueryExpansionDataSourceCapability[]> {
-  if (!queryApi) return sources.map((source) => ({ source, capable: false }))
+  if (!queryExpansionApi) return sources.map((source) => ({ source, capable: false }))
+  const api = queryExpansionApi
   return Promise.all(
     sources.map(async (source) => {
       try {
-        await queryApi.getDataSourceQueryExpansionConfig(source.id)
+        await api.getDataSourceQueryExpansionConfig(source.id)
         return { source, capable: true }
       } catch (e) {
         return {
@@ -739,8 +763,8 @@ async function loadProfiles() {
   loadingProfiles.value = true
   profileLoadError.value = undefined
   try {
-    if (!queryApi) throw new Error(t('queryExpansion.apiUnavailable'))
-    const response = await queryApi.getQueryExpansionProfiles()
+    if (!queryExpansionApi) throw new Error(t('queryExpansion.apiUnavailable'))
+    const response = await queryExpansionApi.getQueryExpansionProfiles()
     profiles.value = response.data || []
     selectedProfileName.value = profiles.value[0]?.name
     if (selectedProfileName.value) await loadProfile(selectedProfileName.value)
@@ -752,13 +776,14 @@ async function loadProfiles() {
 }
 
 async function expandQuery() {
-  if (!queryApi || !selectedDataSourceId.value) return
+  if (!queryExpansionApi || !selectedDataSourceId.value) return
   expanding.value = true
   expansionError.value = undefined
   try {
     const request: QueryExpansionRequestWithMappings = {
       term: conceptTitle.value,
       sourceConceptId: props.concept.id,
+      profileName: selectedProfileName.value,
       language: inferExpansionLanguage(),
       categories: selectedCategoryIds.value,
       relationMappings: relationMappings.value.map((mapping) => ({
@@ -767,7 +792,7 @@ async function expandQuery() {
         targetCategoryIds: mapping.targetCategoryIds,
       })),
     }
-    const response = await queryApi.expandQueryForDataSource(selectedDataSourceId.value, request)
+    const response = await queryExpansionApi.expandQueryForDataSource(selectedDataSourceId.value, request)
     expansionResponse.value = response.data
     selectAllGeneratedDrafts()
   } catch (e) {
@@ -985,8 +1010,8 @@ async function loadProfile(profileName: string | null) {
   loadingProfile.value = true
   profileLoadError.value = undefined
   try {
-    if (!queryApi) throw new Error(t('queryExpansion.apiUnavailable'))
-    const response = await queryApi.getQueryExpansionProfile(profileName)
+    if (!queryExpansionApi) throw new Error(t('queryExpansion.apiUnavailable'))
+    const response = await queryExpansionApi.getQueryExpansionProfile(profileName)
     selectedProfile.value = response.data
     mappingCounter = 0
     relationMappings.value = createProfileRelationMappings(selectedProfile.value)
@@ -1002,17 +1027,19 @@ function createProfileRelationMappings(profile: QueryExpansionProfile): Relation
   const defaultRelationIds = getDefaultRelationIds(profile)
   return (profile.relations || [])
     .filter((relation) => defaultRelationIds.includes(relation.id))
-    .filter(
-      (relation) =>
-        (relation.sourceCategories && relation.sourceCategories.length > 0) ||
-        (relation.targetCategories && relation.targetCategories.length > 0),
-    )
-    .map((relation) => ({
-      id: `mapping-${++mappingCounter}`,
-      relationId: relation.id,
-      sourceCategoryIds: [...(relation.sourceCategories || [])],
-      targetCategoryIds: [...(relation.targetCategories || [])],
-    }))
+    .map((relation) => createRelationMapping(relation, profile))
+}
+
+function createRelationMapping(
+  relation: QueryExpansionRelation,
+  profile: QueryExpansionProfile | undefined = selectedProfile.value,
+): RelationMapping {
+  return {
+    id: `mapping-${++mappingCounter}`,
+    relationId: relation.id,
+    sourceCategoryIds: getDefaultRelationCategoryIds(relation, 'source', profile),
+    targetCategoryIds: getDefaultRelationCategoryIds(relation, 'target', profile),
+  }
 }
 
 function getDefaultRelationIds(profile: QueryExpansionProfile): string[] {
@@ -1022,15 +1049,30 @@ function getDefaultRelationIds(profile: QueryExpansionProfile): string[] {
   return defaultRelationIds.filter((relationId) => profileRelationIds.has(relationId))
 }
 
+function getDefaultCategoryIds(profile: QueryExpansionProfile): string[] {
+  const profileWithDefaults = profile as QueryExpansionProfileWithDefaults
+  const defaultCategoryIds = profileWithDefaults.defaultCategories || profileWithDefaults.default_categories || []
+  const profileCategoryIds = new Set((profile.categories || []).map(({ id }) => id))
+  return defaultCategoryIds.filter((categoryId) => profileCategoryIds.has(categoryId))
+}
+
+function getDefaultRelationCategoryIds(
+  relation: QueryExpansionRelation,
+  role: 'source' | 'target',
+  profile: QueryExpansionProfile | undefined,
+): string[] {
+  const defaultCategoryIds = new Set(profile ? getDefaultCategoryIds(profile) : [])
+  const allowedCategoryIds = role === 'source' ? relation.sourceCategories : relation.targetCategories
+  return (allowedCategoryIds || []).filter((categoryId) => defaultCategoryIds.has(categoryId))
+}
+
 function getInitialSelectedCategoryIds(
   profile: QueryExpansionProfile,
   mappings: RelationMapping[],
 ): string[] {
   return Array.from(
     new Set([
-      ...(profile.defaultCategories?.length
-        ? profile.defaultCategories
-        : profile.categories?.map((category) => category.id) || []),
+      ...getDefaultCategoryIds(profile),
       ...mappings.flatMap((mapping) => [
         ...mapping.sourceCategoryIds,
         ...mapping.targetCategoryIds,
@@ -1053,18 +1095,18 @@ function categoryLabel(categoryId: string) {
   return category?.label || categoryId
 }
 
+function isDefaultCategory(categoryId: string) {
+  return selectedProfile.value ? getDefaultCategoryIds(selectedProfile.value).includes(categoryId) : false
+}
+
 function relationMappingCount(relationId: string) {
   return relationMappings.value.filter((mapping) => mapping.relationId === relationId).length
 }
 
 function addRelationMapping(relationId: string) {
-  if (!getRelation(relationId)) return
-  relationMappings.value.push({
-    id: `mapping-${++mappingCounter}`,
-    relationId,
-    sourceCategoryIds: [],
-    targetCategoryIds: [],
-  })
+  const relation = getRelation(relationId)
+  if (!relation) return
+  relationMappings.value.push(createRelationMapping(relation))
 }
 
 function removeRelationMapping(mappingId: string) {
@@ -1124,8 +1166,52 @@ function toggleCategory(categoryId: string, checked?: boolean) {
 }
 
 function onCancelClick() {
-  if (step.value === 1) onDialogCancel()
-  else stepper.value?.previous()
+  if (step.value === 1) {
+    void requestDialogCancel()
+    return
+  }
+  if (step.value === 3 && hasGeneratedPreview.value) {
+    void confirmDiscardGeneratedPreview().then((confirmed) => {
+      if (!confirmed) return
+      clearGeneratedPreview()
+      stepper.value?.previous()
+    })
+    return
+  }
+  stepper.value?.previous()
+}
+
+async function requestDialogCancel() {
+  if (protectGeneratedWork.value && !(await confirmDiscardGeneratedPreview())) return
+  onDialogCancel()
+}
+
+function confirmDiscardGeneratedPreview(): Promise<boolean> {
+  return new Promise((resolve) => {
+    $q.dialog({
+      title: t('queryExpansion.discardPreviewTitle'),
+      message: t('queryExpansion.discardPreviewMessage'),
+      cancel: {
+        label: t('queryExpansion.stayOnPreview'),
+        flat: true,
+      },
+      ok: {
+        label: t('queryExpansion.discardPreviewConfirm'),
+        color: 'negative',
+        flat: true,
+      },
+      persistent: true,
+    })
+      .onOk(() => resolve(true))
+      .onCancel(() => resolve(false))
+      .onDismiss(() => resolve(false))
+  })
+}
+
+function clearGeneratedPreview() {
+  expansionResponse.value = undefined
+  selectedDraftIds.value = []
+  expansionError.value = undefined
 }
 
 function onContinueClick() {

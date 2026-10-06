@@ -284,6 +284,11 @@
     "apiUnavailable": "Die Query API ist in diesem Dialog nicht verfügbar.",
     "expanding": "Query Expansion wird ausgeführt...",
     "expandError": "Query Expansion ist fehlgeschlagen.",
+    "discardAndEditSettings": "Vorschau verwerfen und Einstellungen bearbeiten",
+    "discardPreviewTitle": "Erzeugte Vorschau verwerfen?",
+    "discardPreviewMessage": "Wenn Sie zur semantischen Prüfung zurückgehen oder diesen Dialog schließen, werden die erzeugten Konzepte und Relationen verworfen. Um andere Einstellungen zu verwenden, müssen Sie eine neue Vorschau erzeugen.",
+    "stayOnPreview": "In der Vorschau bleiben",
+    "discardPreviewConfirm": "Vorschau verwerfen",
     "steps": {
       "source": "Ausgangspunkt",
       "semanticReview": "Semantische Prüfung",

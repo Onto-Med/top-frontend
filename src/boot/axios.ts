@@ -8,6 +8,7 @@ import {
   EntityApi,
   OrganisationApi,
   QueryApi,
+  QueryExpansionApi,
   RepositoryApi,
   UserApi,
   CodeApi,
@@ -30,6 +31,7 @@ export const EntityApiKey: InjectionKey<EntityApi> = Symbol('entityApi')
 export const OrganisationApiKey: InjectionKey<OrganisationApi> = Symbol('organisationApi')
 export const RepositoryApiKey: InjectionKey<RepositoryApi> = Symbol('repositoryApi')
 export const QueryApiKey: InjectionKey<QueryApi> = Symbol('queryApi')
+export const QueryExpansionApiKey: InjectionKey<QueryExpansionApi> = Symbol('queryExpansionApi')
 export const DocumentApiKey: InjectionKey<DocumentApi> = Symbol('documentApi')
 export const PhraseApiKey: InjectionKey<PhraseApi> = Symbol('phraseApi')
 export const ConceptClusterApiKey: InjectionKey<ConceptclusterApi> = Symbol('conceptClusterApi')
@@ -63,6 +65,7 @@ export default defineBoot(({ app }) => {
   app.provide(OrganisationApiKey, new OrganisationApi(undefined, '', api))
   app.provide(RepositoryApiKey, new RepositoryApi(undefined, '', api))
   app.provide(QueryApiKey, new QueryApi(undefined, '', api))
+  app.provide(QueryExpansionApiKey, new QueryExpansionApi(undefined, '', api))
   app.provide(DocumentApiKey, new DocumentApi(undefined, '', api))
   app.provide(PhraseApiKey, new PhraseApi(undefined, '', api))
   app.provide(ConceptClusterApiKey, new ConceptclusterApi(undefined, '', api))
