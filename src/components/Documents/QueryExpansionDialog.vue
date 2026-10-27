@@ -475,9 +475,10 @@
 
         <template #navigation>
           <q-separator />
-          <q-stepper-navigation class="q-mt-md row items-center">
+          <q-stepper-navigation class="compact-stepper-navigation row items-center">
             <q-btn
               flat
+              dense
               :label="backButtonLabel"
               color="primary"
               @click="onCancelClick"
@@ -486,6 +487,7 @@
             <q-btn
               v-if="step === 3"
               flat
+              dense
               color="primary"
               :disable="expanding || saving"
               :label="t('close')"
@@ -493,6 +495,7 @@
             />
             <q-btn
               flat
+              dense
               color="primary"
               :disable="expanding || saving || !selectedDataSourceId || (step === 2 && !selectedProfile)"
               :label="step < 3 ? t('continue') : t('save')"
@@ -1562,6 +1565,11 @@ function confirmUnsupportedRelationMappings(): Promise<boolean> {
   overflow-y: auto;
 }
 
+.compact-stepper-navigation {
+  margin-top: 0;
+  padding: 0.375rem 0.5rem !important;
+}
+
 .semantic-review-panels {
   display: flex;
   flex-direction: column;
@@ -1624,11 +1632,12 @@ function confirmUnsupportedRelationMappings(): Promise<boolean> {
 }
 
 .catalog-sticky-header {
+  top: 1px;
   box-shadow: 0 1px 0 $grey-4;
 }
 
 .mapping-sticky-header {
-  top: -0.5rem;
+  top: 0;
   margin: -0.5rem -0.5rem 0.25rem;
   padding: 0.5rem;
   border-bottom: 1px solid $grey-4;
