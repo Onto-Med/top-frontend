@@ -271,6 +271,7 @@
     "selectedCategory": "Selected for generation",
     "inactiveCategory": "Not selected",
     "dragCategoryToMapping": "Drag this category into a relation mapping.",
+    "resizeSemanticPanels": "Resize semantic catalogs and mappings",
     "source": "source",
     "target": "target",
     "sourceCategories": "Source categories",

@@ -271,6 +271,7 @@
     "selectedCategory": "Für die Erzeugung ausgewählt",
     "inactiveCategory": "Nicht ausgewählt",
     "dragCategoryToMapping": "Diese Kategorie in eine Relationszuordnung ziehen.",
+    "resizeSemanticPanels": "Größe von semantischen Katalogen und Zuordnungen ändern",
     "source": "Quelle",
     "target": "Ziel",
     "sourceCategories": "Quellkategorien",

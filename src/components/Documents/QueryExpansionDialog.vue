@@ -96,10 +96,16 @@
 <!--            </q-card-section>-->
 <!--          </q-card>-->
 
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <q-list bordered separator dense class="semantic-catalog-scroll-box">
-                <q-item-label header class="q-py-sm">{{ t('queryExpansion.relations') }}</q-item-label>
+          <div ref="semanticPanelsRef" class="semantic-review-panels">
+            <div
+              class="semantic-catalog-row row q-col-gutter-x-md"
+              :style="{ height: `${catalogPanelHeight}px` }"
+            >
+              <div class="col-12 col-md-6 semantic-catalog-scroll-box">
+                <q-list bordered separator dense>
+                <q-item-label header class="semantic-sticky-header catalog-sticky-header q-py-sm">
+                  {{ t('queryExpansion.relations') }}
+                </q-item-label>
                 <q-item v-if="loadingProfile">
                   <q-item-section><q-spinner size="sm" /></q-item-section>
                 </q-item>
@@ -133,12 +139,14 @@
                     <q-icon name="add" />
                   </q-item-section>
                 </q-item>
-              </q-list>
-            </div>
+                </q-list>
+              </div>
 
-            <div class="col-12 col-md-6">
-              <q-list bordered separator dense class="semantic-catalog-scroll-box">
-                <q-item-label header class="q-py-sm">{{ t('category', 2) }}</q-item-label>
+            <div class="col-12 col-md-6 semantic-catalog-scroll-box">
+              <q-list bordered separator dense>
+                <q-item-label header class="semantic-sticky-header catalog-sticky-header q-py-sm">
+                  {{ t('category', 2) }}
+                </q-item-label>
                 <q-item v-if="loadingProfile">
                   <q-item-section><q-spinner size="sm" /></q-item-section>
                 </q-item>
@@ -202,8 +210,19 @@
                 </q-item>
               </q-list>
             </div>
+            </div>
 
-            <div class="col-12 q-mt-sm">
+            <div
+              class="semantic-panel-divider"
+              role="separator"
+              aria-orientation="horizontal"
+              :aria-label="t('queryExpansion.resizeSemanticPanels')"
+              @pointerdown="startSemanticPanelResize"
+            >
+              <q-icon name="drag_handle" size="sm" />
+            </div>
+
+            <div class="semantic-mapping-row">
               <q-card
                 flat
                 bordered
@@ -212,7 +231,7 @@
                 @drop="dropRelationMapping"
               >
                 <q-card-section class="q-pa-sm">
-                  <div class="row items-center justify-between q-mb-xs">
+                  <div class="semantic-sticky-header mapping-sticky-header row items-center justify-between q-mb-xs">
                     <div class="text-subtitle2">{{ t('mapping', 2) }}</div>
                     <div class="text-caption text-grey-7">
                       {{ relationMappings.length }} {{ t('mapping', relationMappings.length) }}
@@ -488,7 +507,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { QStepper, useDialogPluginComponent, useQuasar } from 'quasar'
 import {
   EntityType,
@@ -584,6 +603,8 @@ const entityStore = useEntityStore()
 const queryApi = inject(QueryApiKey)
 const queryExpansionApi = inject(QueryExpansionApiKey)
 const stepper = ref<QStepper>()
+const semanticPanelsRef = ref<HTMLElement>()
+const catalogPanelHeight = ref(240)
 const step = ref(1)
 const profiles = ref<QueryExpansionProfile[]>([])
 const selectedProfile = ref<QueryExpansionProfile>()
@@ -762,6 +783,55 @@ onMounted(() => {
   void loadProfiles()
   void loadDataSources()
 })
+
+onBeforeUnmount(() => stopSemanticPanelResize())
+
+let semanticPanelResizeCleanup: (() => void) | undefined
+
+function startSemanticPanelResize(event: PointerEvent) {
+  const panels = semanticPanelsRef.value
+  if (!panels) return
+  event.preventDefault()
+  stopSemanticPanelResize()
+
+  const startY = event.clientY
+  const startHeight = catalogPanelHeight.value
+  const minimumCatalogHeight = 160
+  const minimumMappingHeight = 224
+  const dividerHeight = 20
+  const maximumCatalogHeight = Math.max(
+    minimumCatalogHeight,
+    panels.clientHeight - minimumMappingHeight - dividerHeight,
+  )
+  const previousCursor = document.body.style.cursor
+  const previousUserSelect = document.body.style.userSelect
+
+  const resize = (moveEvent: PointerEvent) => {
+    catalogPanelHeight.value = Math.min(
+      maximumCatalogHeight,
+      Math.max(minimumCatalogHeight, startHeight + moveEvent.clientY - startY),
+    )
+  }
+  const stop = () => stopSemanticPanelResize()
+
+  document.body.style.cursor = 'row-resize'
+  document.body.style.userSelect = 'none'
+  window.addEventListener('pointermove', resize)
+  window.addEventListener('pointerup', stop)
+  window.addEventListener('pointercancel', stop)
+  semanticPanelResizeCleanup = () => {
+    window.removeEventListener('pointermove', resize)
+    window.removeEventListener('pointerup', stop)
+    window.removeEventListener('pointercancel', stop)
+    document.body.style.cursor = previousCursor
+    document.body.style.userSelect = previousUserSelect
+  }
+}
+
+function stopSemanticPanelResize() {
+  semanticPanelResizeCleanup?.()
+  semanticPanelResizeCleanup = undefined
+}
 
 function getGeneratedSynonymConceptDraftIds(drafts: SingleConcept[]): Set<string> {
   const synonymCategoryDraftIds = new Set(
@@ -1488,18 +1558,84 @@ function confirmUnsupportedRelationMappings(): Promise<boolean> {
 }
 
 .query-expansion-stepper .q-stepper__step-content {
+  overflow-x: hidden;
   overflow-y: auto;
+}
+
+.semantic-review-panels {
+  display: flex;
+  flex-direction: column;
+  height: min(38rem, calc(92vh - 19rem));
+  min-height: 24rem;
+}
+
+.semantic-catalog-row {
+  flex: 0 0 auto;
+  min-height: 10rem;
+  overflow: hidden;
+}
+
+.semantic-catalog-row > div {
+  height: 100%;
+  min-height: 0;
   overflow-x: hidden;
 }
 
-.semantic-catalog-scroll-box {
-  max-height: min(15rem, calc(92vh - 24rem));
-  overflow-y: auto;
+.semantic-catalog-scroll-box,
+.semantic-mapping-scroll-box {
+  display: block;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
 }
 
-.semantic-mapping-scroll-box {
-  max-height: min(22rem, calc(92vh - 18rem));
-  overflow-y: auto;
+.semantic-panel-divider {
+  flex: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $grey-7;
+  cursor: row-resize;
+  touch-action: none;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+}
+
+.semantic-panel-divider:hover {
+  color: $primary;
+  border-color: rgba($primary, 0.45);
+  background: rgba($primary, 0.05);
+}
+
+.semantic-mapping-row {
+  flex: 1 1 auto;
+  min-height: 14rem;
+  overflow: hidden;
+}
+
+.semantic-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: white !important;
+}
+
+.catalog-sticky-header {
+  box-shadow: 0 1px 0 $grey-4;
+}
+
+.mapping-sticky-header {
+  top: -0.5rem;
+  margin: -0.5rem -0.5rem 0.25rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid $grey-4;
+}
+
+.body--dark .semantic-sticky-header {
+  background: $dark !important;
 }
 
 .preview-scroll-box {
@@ -1597,5 +1733,31 @@ function confirmUnsupportedRelationMappings(): Promise<boolean> {
 
 .target-zone {
   background: rgba($accent, 0.08);
+}
+
+@media (max-width: 1023px) {
+  .semantic-review-panels {
+    height: auto;
+    min-height: 0;
+  }
+
+  .semantic-catalog-row {
+    height: auto !important;
+    min-height: 0;
+  }
+
+  .semantic-catalog-row > div {
+    height: 15rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .semantic-panel-divider {
+    display: none;
+  }
+
+  .semantic-mapping-row {
+    flex: none;
+    height: 22rem;
+  }
 }
 </style>
