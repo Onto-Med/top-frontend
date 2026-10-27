@@ -258,7 +258,7 @@
     },
     "delete": {
       "confirm": "Do you really want to delete the entity irrevocably? All saved versions and restrictions will also be deleted.",
-      "cascade": "Delete contained entities as well."
+      "cascade": "Include subtree / contained entities"
     },
     "title": "Entity Editor"
   },
@@ -268,6 +268,9 @@
     "profile": "Profile",
     "relations": "Relations",
     "defaultCategory": "default",
+    "selectedCategory": "Selected for generation",
+    "inactiveCategory": "Not selected",
+    "dragCategoryToMapping": "Drag this category into a relation mapping.",
     "source": "source",
     "target": "target",
     "sourceCategories": "Source categories",
@@ -279,6 +282,9 @@
     "noMappings": "Drag a relation here or click a relation to add a mapping. Then drag categories into source/target drop zones.",
     "dropSourceCategories": "Drop source categories here.",
     "dropTargetCategories": "Drop target categories here.",
+    "unsupportedMappingCategory": "This category is not listed as supported for this relation side in the selected profile.",
+    "unsupportedMappingTitle": "Continue with unsupported mappings?",
+    "unsupportedMappingMessage": "{count} relation mapping category is not listed as supported by the selected profile. Concept Graphs may ignore it or return lower-quality results. Do you want to continue anyway?|{count} relation mapping categories are not listed as supported by the selected profile. Concept Graphs may ignore them or return lower-quality results. Do you want to continue anyway?",
     "loadError": "Could not load query-expansion profile metadata.",
     "dataSourceLoadError": "Could not load query-expansion-enabled data sources.",
     "apiUnavailable": "Query API is not available in this dialog.",

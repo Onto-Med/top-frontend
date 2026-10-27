@@ -258,7 +258,7 @@
     },
     "delete": {
       "confirm": "Möchten Sie die Entität wirklich unwiderruflich löschen? Alle gespeicherten Versionen und Restriktionen werden ebenfalls gelöscht.",
-      "cascade": "Enthaltene Entitäten ebenfalls löschen."
+      "cascade": "Unterbaum / enthaltene Entitäten einschließen"
     },
     "title": "Entitätseditor"
   },
@@ -268,6 +268,9 @@
     "profile": "Profil",
     "relations": "Relationen",
     "defaultCategory": "Standard",
+    "selectedCategory": "Für die Erzeugung ausgewählt",
+    "inactiveCategory": "Nicht ausgewählt",
+    "dragCategoryToMapping": "Diese Kategorie in eine Relationszuordnung ziehen.",
     "source": "Quelle",
     "target": "Ziel",
     "sourceCategories": "Quellkategorien",
@@ -279,6 +282,9 @@
     "noMappings": "Ziehen Sie eine Relation hierher oder klicken Sie auf eine Relation, um eine Zuordnung anzulegen. Ziehen Sie danach Kategorien in die Quell-/Zielbereiche.",
     "dropSourceCategories": "Quellkategorien hier ablegen.",
     "dropTargetCategories": "Zielkategorien hier ablegen.",
+    "unsupportedMappingCategory": "Diese Kategorie ist im ausgewählten Profil für diese Relationsseite nicht als unterstützt aufgeführt.",
+    "unsupportedMappingTitle": "Mit nicht unterstützten Zuordnungen fortfahren?",
+    "unsupportedMappingMessage": "{count} Kategorie in einer Relationszuordnung ist im ausgewählten Profil nicht als unterstützt aufgeführt. Concept Graphs ignoriert sie möglicherweise oder liefert schlechtere Ergebnisse. Möchten Sie trotzdem fortfahren?|{count} Kategorien in Relationszuordnungen sind im ausgewählten Profil nicht als unterstützt aufgeführt. Concept Graphs ignoriert sie möglicherweise oder liefert schlechtere Ergebnisse. Möchten Sie trotzdem fortfahren?",
     "loadError": "Query-Expansion-Profildaten konnten nicht geladen werden.",
     "dataSourceLoadError": "Datenquellen mit Query-Expansion-Konfiguration konnten nicht geladen werden.",
     "apiUnavailable": "Die Query API ist in diesem Dialog nicht verfügbar.",

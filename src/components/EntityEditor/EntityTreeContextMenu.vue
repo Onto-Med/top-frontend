@@ -140,7 +140,7 @@ const emit = defineEmits(['createEntityClicked', 'deleteEntityClicked', 'duplica
 
 const { t } = useI18n()
 const $q = useQuasar()
-const { isCategory, isRestricted } = useEntityFormatter()
+const { isCategory, isConcept, isRestricted } = useEntityFormatter()
 const { repository } = storeToRefs(useEntityStore())
 
 const entries = [
@@ -168,7 +168,7 @@ function showDeleteDialog() {
     component: Dialog,
     componentProps: {
       message: t('entityEditor.delete.confirm'),
-      checkbox: isCategory(props.entity),
+      checkbox: isCategory(props.entity) || isConcept(props.entity),
       checkboxLabel: t('entityEditor.delete.cascade'),
     },
   }).onOk((cascade) => {

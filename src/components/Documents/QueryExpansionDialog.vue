@@ -67,7 +67,7 @@
             map-options
             outlined
             dense
-            class="q-mb-md"
+            class="q-mb-sm"
             @update:model-value="(value) => loadProfile(value)"
           />
 
@@ -87,19 +87,19 @@
             {{ t('queryExpansion.noProfiles') }}
           </q-banner>
 
-          <q-card v-if="selectedProfile" flat bordered class="q-mb-md">
-            <q-card-section>
-              <div class="text-subtitle2">{{ selectedProfile.name }}</div>
-              <div v-if="selectedProfile.languageName" class="text-caption text-grey-7">
-                {{ t('language') }}: {{ selectedProfile.languageName }}
-              </div>
-            </q-card-section>
-          </q-card>
+<!--          <q-card v-if="selectedProfile" flat bordered class="q-mb-md">-->
+<!--            <q-card-section>-->
+<!--              <div class="text-subtitle2">{{ selectedProfile.name }}</div>-->
+<!--              <div v-if="selectedProfile.languageName" class="text-caption text-grey-7">-->
+<!--                {{ t('language') }}: {{ selectedProfile.languageName }}-->
+<!--              </div>-->
+<!--            </q-card-section>-->
+<!--          </q-card>-->
 
           <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-3">
-              <q-list bordered separator class="semantic-scroll-box">
-                <q-item-label header>{{ t('queryExpansion.relations') }}</q-item-label>
+            <div class="col-12 col-md-6">
+              <q-list bordered separator dense class="semantic-catalog-scroll-box">
+                <q-item-label header class="q-py-sm">{{ t('queryExpansion.relations') }}</q-item-label>
                 <q-item v-if="loadingProfile">
                   <q-item-section><q-spinner size="sm" /></q-item-section>
                 </q-item>
@@ -112,7 +112,13 @@
                   v-for="relation in selectedProfile?.relations"
                   :key="relation.id"
                   clickable
+                  dense
                   draggable="true"
+                  class="relation-review-item q-ma-xs"
+                  :class="{
+                    'relation-review-item--mapped': relationMappingCount(relation.id) > 0,
+                    'relation-review-item--inactive': relationMappingCount(relation.id) === 0,
+                  }"
                   @dragstart="startRelationDrag(relation.id)"
                   @click="addRelationMapping(relation.id)"
                 >
@@ -130,9 +136,9 @@
               </q-list>
             </div>
 
-            <div class="col-12 col-md-3">
-              <q-list bordered separator class="semantic-scroll-box">
-                <q-item-label header>{{ t('category', 2) }}</q-item-label>
+            <div class="col-12 col-md-6">
+              <q-list bordered separator dense class="semantic-catalog-scroll-box">
+                <q-item-label header class="q-py-sm">{{ t('category', 2) }}</q-item-label>
                 <q-item v-if="loadingProfile">
                   <q-item-section><q-spinner size="sm" /></q-item-section>
                 </q-item>
@@ -141,47 +147,72 @@
                     <q-item-label caption>{{ t('queryExpansion.noCategories') }}</q-item-label>
                   </q-item-section>
                 </q-item>
-                <q-item v-for="category in selectedProfile?.categories" :key="category.id">
+                <q-item
+                  v-for="category in selectedProfile?.categories"
+                  :key="category.id"
+                  clickable
+                  dense
+                  draggable="true"
+                  class="category-review-item q-ma-xs"
+                  :class="{
+                    'category-review-item--mapped': categoryMappingCount(category.id) > 0,
+                    'category-review-item--selected': selectedCategoryIds.includes(category.id) && categoryMappingCount(category.id) === 0,
+                    'category-review-item--inactive': !selectedCategoryIds.includes(category.id),
+                  }"
+                  @dragstart="startCategoryDrag(category.id)"
+                  @click="toggleCategory(category.id)"
+                >
+                  <q-item-section avatar>
+                    <q-checkbox
+                      :model-value="selectedCategoryIds.includes(category.id)"
+                      color="primary"
+                      dense
+                      @click.stop
+                      @update:model-value="toggleCategory(category.id, $event)"
+                    />
+                  </q-item-section>
                   <q-item-section>
-                    <div>
-                      <q-chip
-                        draggable="true"
-                        clickable
-                        :outline="!selectedCategoryIds.includes(category.id)"
-                        color="primary"
-                        text-color="white"
-                        @dragstart="startCategoryDrag(category.id)"
-                        @click="toggleCategory(category.id)"
-                      >
-                        {{ categoryLabel(category.id) }}
-                      </q-chip>
-                      <q-badge
-                        v-if="isDefaultCategory(category.id)"
-                        color="primary"
-                        class="q-ml-xs"
-                      >
+                    <q-item-label class="row items-center q-gutter-xs">
+                      <span class="text-weight-medium">{{ categoryLabel(category.id) }}</span>
+                      <q-badge v-if="isDefaultCategory(category.id)" color="primary" outline>
                         {{ t('queryExpansion.defaultCategory') }}
                       </q-badge>
-                    </div>
+                    </q-item-label>
                     <q-item-label caption>
                       <span class="text-weight-medium">{{ category.id }}</span>
                       <span v-if="category.description"> — {{ category.description }}</span>
                     </q-item-label>
+                    <q-item-label caption class="category-review-status">
+                      <template v-if="categoryMappingCount(category.id) > 0">
+                        {{ categoryMappingCount(category.id) }} {{ t('mapping', categoryMappingCount(category.id)) }}
+                      </template>
+                      <template v-else-if="selectedCategoryIds.includes(category.id)">
+                        {{ t('queryExpansion.selectedCategory') }}
+                      </template>
+                      <template v-else>
+                        {{ t('queryExpansion.inactiveCategory') }}
+                      </template>
+                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-icon name="drag_indicator" color="grey-7">
+                      <q-tooltip>{{ t('queryExpansion.dragCategoryToMapping') }}</q-tooltip>
+                    </q-icon>
                   </q-item-section>
                 </q-item>
               </q-list>
             </div>
 
-            <div class="col-12 col-md-6">
+            <div class="col-12 q-mt-sm">
               <q-card
                 flat
                 bordered
-                class="mapping-drop-zone semantic-scroll-box"
+                class="mapping-drop-zone semantic-mapping-scroll-box"
                 @dragover.prevent
                 @drop="dropRelationMapping"
               >
-                <q-card-section>
-                  <div class="row items-center justify-between q-mb-sm">
+                <q-card-section class="q-pa-sm">
+                  <div class="row items-center justify-between q-mb-xs">
                     <div class="text-subtitle2">{{ t('mapping', 2) }}</div>
                     <div class="text-caption text-grey-7">
                       {{ relationMappings.length }} {{ t('mapping', relationMappings.length) }}
@@ -197,10 +228,10 @@
                     :key="mapping.id"
                     flat
                     bordered
-                    class="q-mb-md"
+                    class="q-mb-sm"
                   >
-                    <q-card-section>
-                      <div class="row items-start justify-between q-mb-sm">
+                    <q-card-section class="q-pa-sm">
+                      <div class="row items-start justify-between q-mb-xs">
                         <div>
                           <div class="text-subtitle2">{{ relationLabel(mapping.relationId) }}</div>
                           <div class="text-caption text-grey-7">{{ mapping.relationId }}</div>
@@ -230,11 +261,20 @@
                               :key="`${mapping.id}-source-${categoryId}`"
                               dense
                               removable
-                              color="secondary"
+                              :color="getMappingCategoryColor(mapping, 'source', categoryId, 'secondary')"
                               text-color="white"
                               @remove="removeMappingCategory(mapping.id, 'source', categoryId)"
                             >
+                              <q-icon
+                                v-if="!isMappingCategoryAllowed(mapping, 'source', categoryId)"
+                                name="warning"
+                                size="xs"
+                                class="q-mr-xs"
+                              />
                               {{ categoryLabel(categoryId) }}
+                              <q-tooltip v-if="!isMappingCategoryAllowed(mapping, 'source', categoryId)">
+                                {{ t('queryExpansion.unsupportedMappingCategory') }}
+                              </q-tooltip>
                             </q-chip>
                             <div v-if="mapping.sourceCategoryIds.length === 0" class="text-caption text-grey-7">
                               {{ t('queryExpansion.dropSourceCategories') }}
@@ -256,11 +296,20 @@
                               :key="`${mapping.id}-target-${categoryId}`"
                               dense
                               removable
-                              color="accent"
+                              :color="getMappingCategoryColor(mapping, 'target', categoryId, 'accent')"
                               text-color="white"
                               @remove="removeMappingCategory(mapping.id, 'target', categoryId)"
                             >
+                              <q-icon
+                                v-if="!isMappingCategoryAllowed(mapping, 'target', categoryId)"
+                                name="warning"
+                                size="xs"
+                                class="q-mr-xs"
+                              />
                               {{ categoryLabel(categoryId) }}
+                              <q-tooltip v-if="!isMappingCategoryAllowed(mapping, 'target', categoryId)">
+                                {{ t('queryExpansion.unsupportedMappingCategory') }}
+                              </q-tooltip>
                             </q-chip>
                             <div v-if="mapping.targetCategoryIds.length === 0" class="text-caption text-grey-7">
                               {{ t('queryExpansion.dropTargetCategories') }}
@@ -448,6 +497,7 @@ import {
   type DataSource,
   type Entity,
   type QueryExpansionCandidate,
+  type QueryExpansionConcept,
   type QueryExpansionProfile,
   type QueryExpansionRelation,
   type Expression,
@@ -576,11 +626,23 @@ const hasQueryExpansionCapableDataSource = computed(() =>
 const expansionCandidates = computed<QueryExpansionCandidate[]>(() =>
   Object.values(expansionResponse.value?.expansions || {}).flat(),
 )
-const generatedSingleConceptDrafts = computed(
+const synonymPreviewConcepts = computed<PreviewSingleConcept[]>(() => getSynonymPreviewConcepts())
+const rawGeneratedSingleConceptDrafts = computed(
   () => expansionResponse.value?.generatedEntityDrafts?.singleConcepts || [],
 )
-const generatedCompositeConceptDrafts = computed(
-  () => expansionResponse.value?.generatedEntityDrafts?.compositeConcepts || [],
+const generatedSynonymConceptDraftIds = computed(() =>
+  getGeneratedSynonymConceptDraftIds(rawGeneratedSingleConceptDrafts.value),
+)
+const generatedSingleConceptDrafts = computed(() =>
+  rawGeneratedSingleConceptDrafts.value.filter(
+    (draft) => !draft.id || !generatedSynonymConceptDraftIds.value.has(draft.id),
+  ),
+)
+const generatedCompositeConceptDrafts = computed(() =>
+  (expansionResponse.value?.generatedEntityDrafts?.compositeConcepts || []).filter(
+    (draft) =>
+      !collectExpressionEntityIds(draft.expression).some((id) => generatedSynonymConceptDraftIds.value.has(id)),
+  ),
 )
 const previewSingleConcepts = computed<PreviewSingleConcept[]>(() => {
   if (generatedSingleConceptDrafts.value.length > 0) {
@@ -590,7 +652,10 @@ const previewSingleConcepts = computed<PreviewSingleConcept[]>(() => {
       description: concept.descriptions?.map(({ text }) => text).join(' — ') || '',
     }))
   }
-  if (expansionResponse.value?.expansions) return expansionCandidates.value.map(toPreviewSingleConcept)
+  if (expansionResponse.value?.expansions)
+    return expansionCandidates.value
+      .filter((candidate) => !isSynonymCategory(candidate.category))
+      .map(toPreviewSingleConcept)
   return selectedCategoryIds.value.map((categoryId) => {
     const category = selectedProfile.value?.categories?.find(({ id }) => id === categoryId)
     return {
@@ -601,8 +666,14 @@ const previewSingleConcepts = computed<PreviewSingleConcept[]>(() => {
   })
 })
 const previewSingleConceptGroups = computed<PreviewGroup<PreviewSingleConcept>[]>(() => {
+  const synonymGroup = {
+    id: 'synonyms',
+    title: t('synonym', 2),
+    concepts: synonymPreviewConcepts.value,
+  }
   if (generatedSingleConceptDrafts.value.length === 0) {
     return [
+      synonymGroup,
       {
         id: 'selected',
         title: t('category', 2),
@@ -631,7 +702,7 @@ const previewSingleConceptGroups = computed<PreviewGroup<PreviewSingleConcept>[]
   if (ungrouped.length > 0) {
     groups.push({ id: 'ungrouped', title: t('queryExpansion.preview.singleConcepts'), concepts: ungrouped })
   }
-  return groups
+  return [synonymGroup, ...groups].filter((group) => group.concepts.length > 0)
 })
 
 const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() => {
@@ -660,6 +731,8 @@ const previewCompositeConcepts = computed<PreviewCompositeConcept[]>(() => {
         sourceCategoryIds.length > 0 || targetCategoryIds.length > 0,
     )
 })
+const invalidRelationMappingCategoryCount = computed(() => getInvalidRelationMappingCategories().length)
+
 const previewCompositeConceptGroups = computed<PreviewGroup<PreviewCompositeConcept>[]>(() => {
   const groups = new Map<string, PreviewCompositeConcept[]>()
   previewCompositeConcepts.value.forEach((concept) => {
@@ -673,7 +746,10 @@ const previewCompositeConceptGroups = computed<PreviewGroup<PreviewCompositeConc
   }))
 })
 const hasGeneratedPreview = computed(
-  () => generatedSingleConceptDrafts.value.length > 0 || generatedCompositeConceptDrafts.value.length > 0,
+  () =>
+    generatedSingleConceptDrafts.value.length > 0 ||
+    generatedCompositeConceptDrafts.value.length > 0 ||
+    synonymPreviewConcepts.value.length > 0,
 )
 const protectGeneratedWork = computed(() => expanding.value || saving.value || hasGeneratedPreview.value)
 const backButtonLabel = computed(() => {
@@ -686,6 +762,27 @@ onMounted(() => {
   void loadProfiles()
   void loadDataSources()
 })
+
+function getGeneratedSynonymConceptDraftIds(drafts: SingleConcept[]): Set<string> {
+  const synonymCategoryDraftIds = new Set(
+    drafts
+      .filter((draft) => draft.superConcepts?.some((superConcept) => superConcept.id === props.concept.id))
+      .filter((draft) => isSynonymCategory(getTitle(draft)))
+      .map((draft) => draft.id)
+      .filter((id): id is string => typeof id === 'string'),
+  )
+  const synonymDraftIds = new Set(synonymCategoryDraftIds)
+  drafts
+    .filter((draft) =>
+      draft.superConcepts?.some(
+        (superConcept) => superConcept.id && synonymCategoryDraftIds.has(superConcept.id),
+      ),
+    )
+    .forEach((draft) => {
+      if (draft.id) synonymDraftIds.add(draft.id)
+    })
+  return synonymDraftIds
+}
 
 function toPreviewSingleConceptDraft(concept: SingleConcept): PreviewSingleConcept {
   return {
@@ -706,6 +803,49 @@ function toPreviewSingleConcept(candidate: QueryExpansionCandidate, index: numbe
     title: candidate.term,
     description: [candidate.category, candidate.status, candidate.rationale].filter(Boolean).join(' — '),
   }
+}
+
+function toSynonymPreviewConcept(term: string, description = ''): PreviewSingleConcept {
+  return {
+    id: getSynonymDraftId(term),
+    title: term,
+    description,
+  }
+}
+
+function getSynonymPreviewConcepts(): PreviewSingleConcept[] {
+  const concepts = expansionResponse.value?.concepts || []
+  const fromConcepts = concepts
+    .filter((concept) => isSynonymCategory(concept.category))
+    .flatMap(getConceptTerms)
+    .map((term) => toSynonymPreviewConcept(term, t('synonym')))
+  const fromCandidates = expansionCandidates.value
+    .filter((candidate) => isSynonymCategory(candidate.category))
+    .map((candidate) =>
+      toSynonymPreviewConcept(
+        candidate.term,
+        [candidate.category, candidate.status, candidate.rationale].filter(Boolean).join(' — '),
+      ),
+    )
+  return deduplicatePreviewConcepts([...fromConcepts, ...fromCandidates])
+}
+
+function getConceptTerms(concept: QueryExpansionConcept): string[] {
+  const terms = concept.terms?.length ? concept.terms : [concept.label]
+  return terms.filter((term): term is string => typeof term === 'string' && term.trim().length > 0)
+}
+
+function deduplicatePreviewConcepts(concepts: PreviewSingleConcept[]): PreviewSingleConcept[] {
+  return Array.from(new Map(concepts.map((concept) => [concept.id, concept])).values())
+}
+
+function getSynonymDraftId(term: string) {
+  return `synonym:${term.trim().toLocaleLowerCase()}`
+}
+
+function isSynonymCategory(category?: string) {
+  const normalized = category?.trim().toLocaleLowerCase()
+  return normalized === 'synonym' || normalized === 'synonyms' || normalized === 'synonyme'
 }
 
 async function loadDataSources() {
@@ -851,7 +991,9 @@ async function saveExpansionEntities() {
   )
   selectedCompositeDrafts.forEach((draft) => collectExpressionEntityIds(draft.expression).forEach((id) => selectedIds.add(id)))
   const selectedSingles = getSelectedSingleConceptDrafts(selectedIds)
+  const sourceConceptWithSynonyms = createSourceConceptWithSelectedSynonyms(selectedIds)
   const drafts: Entity[] = [
+    ...(sourceConceptWithSynonyms ? [sourceConceptWithSynonyms] : []),
     ...selectedSingles,
     ...groupCompositeDraftsForSave(selectedCompositeDrafts),
   ]
@@ -874,11 +1016,10 @@ function selectAllGeneratedDrafts() {
     (draft) => !draft.superConcepts?.some((superConcept) => superConcept.id === props.concept.id),
   )
   selectedDraftIds.value = [
-    ...visibleSingleDrafts,
-    ...generatedCompositeConceptDrafts.value,
-  ]
-    .map((draft) => draft.id)
-    .filter((id): id is string => typeof id === 'string')
+    ...visibleSingleDrafts.map((draft) => draft.id),
+    ...generatedCompositeConceptDrafts.value.map((draft) => draft.id),
+    ...synonymPreviewConcepts.value.map((draft) => draft.id),
+  ].filter((id): id is string => typeof id === 'string')
 }
 
 function isDraftSelected(draftId: string) {
@@ -889,6 +1030,33 @@ function toggleDraftSelection(draftId: string, selected: boolean) {
   selectedDraftIds.value = selected
     ? Array.from(new Set([...selectedDraftIds.value, draftId]))
     : selectedDraftIds.value.filter((id) => id !== draftId)
+}
+
+function createSourceConceptWithSelectedSynonyms(selectedIds: Set<string>): SingleConcept | undefined {
+  const selectedSynonyms = synonymPreviewConcepts.value
+    .filter((synonym) => selectedIds.has(synonym.id))
+    .map((synonym) => synonym.title.trim())
+    .filter(Boolean)
+  if (selectedSynonyms.length === 0) return undefined
+
+  const language = inferExpansionLanguage()
+  const existingSynonyms = props.concept.synonyms || []
+  const existingKeys = new Set(
+    existingSynonyms.map(({ lang, text }) => getSynonymKey(text, lang || language)),
+  )
+  const newSynonyms = selectedSynonyms
+    .filter((synonym) => !existingKeys.has(getSynonymKey(synonym, language)))
+    .map((synonym) => ({ lang: language, text: synonym }))
+  if (newSynonyms.length === 0) return undefined
+
+  return {
+    ...props.concept,
+    synonyms: [...existingSynonyms, ...newSynonyms],
+  }
+}
+
+function getSynonymKey(text: string | undefined, lang: string) {
+  return `${lang}:${(text || '').trim().toLocaleLowerCase()}`
 }
 
 function groupCompositeDraftsForSave(drafts: CompositeConcept[]): CompositeConcept[] {
@@ -1103,10 +1271,25 @@ function relationMappingCount(relationId: string) {
   return relationMappings.value.filter((mapping) => mapping.relationId === relationId).length
 }
 
+function categoryMappingCount(categoryId: string) {
+  return relationMappings.value.filter(
+    (mapping) =>
+      mapping.sourceCategoryIds.includes(categoryId) || mapping.targetCategoryIds.includes(categoryId),
+  ).length
+}
+
 function addRelationMapping(relationId: string) {
   const relation = getRelation(relationId)
   if (!relation) return
-  relationMappings.value.push(createRelationMapping(relation))
+  const mapping = createRelationMapping(relation)
+  relationMappings.value.push(mapping)
+  selectMappingCategories(mapping)
+}
+
+function selectMappingCategories(mapping: RelationMapping) {
+  ;[...mapping.sourceCategoryIds, ...mapping.targetCategoryIds].forEach((categoryId) =>
+    toggleCategory(categoryId, true),
+  )
 }
 
 function removeRelationMapping(mappingId: string) {
@@ -1136,13 +1319,40 @@ function dropCategory(mappingId: string, role: 'source' | 'target') {
 function addMappingCategory(mappingId: string, role: 'source' | 'target', categoryId: string) {
   const mapping = relationMappings.value.find(({ id }) => id === mappingId)
   if (!mapping) return
-  const relation = getRelation(mapping.relationId)
-  const allowedCategoryIds = role === 'source' ? relation?.sourceCategories : relation?.targetCategories
-  if (!allowedCategoryIds?.includes(categoryId)) return
 
   const categoryIds = role === 'source' ? mapping.sourceCategoryIds : mapping.targetCategoryIds
   if (!categoryIds.includes(categoryId)) categoryIds.push(categoryId)
   toggleCategory(categoryId, true)
+}
+
+function isMappingCategoryAllowed(
+  mapping: RelationMapping,
+  role: 'source' | 'target',
+  categoryId: string,
+) {
+  const relation = getRelation(mapping.relationId)
+  const allowedCategoryIds = role === 'source' ? relation?.sourceCategories : relation?.targetCategories
+  return allowedCategoryIds?.includes(categoryId) ?? false
+}
+
+function getMappingCategoryColor(
+  mapping: RelationMapping,
+  role: 'source' | 'target',
+  categoryId: string,
+  fallbackColor: string,
+) {
+  return isMappingCategoryAllowed(mapping, role, categoryId) ? fallbackColor : 'negative'
+}
+
+function getInvalidRelationMappingCategories() {
+  return relationMappings.value.flatMap((mapping) => [
+    ...mapping.sourceCategoryIds
+      .filter((categoryId) => !isMappingCategoryAllowed(mapping, 'source', categoryId))
+      .map((categoryId) => ({ mapping, role: 'source' as const, categoryId })),
+    ...mapping.targetCategoryIds
+      .filter((categoryId) => !isMappingCategoryAllowed(mapping, 'target', categoryId))
+      .map((categoryId) => ({ mapping, role: 'target' as const, categoryId })),
+  ])
 }
 
 function removeMappingCategory(mappingId: string, role: 'source' | 'target', categoryId: string) {
@@ -1220,10 +1430,41 @@ function onContinueClick() {
     return
   }
   if (step.value === 2) {
-    void expandQuery().then(() => stepper.value?.next()).catch(() => undefined)
+    void continueFromSemanticReview()
     return
   }
   void saveExpansionEntities().catch(() => undefined)
+}
+
+async function continueFromSemanticReview() {
+  if (invalidRelationMappingCategoryCount.value > 0 && !(await confirmUnsupportedRelationMappings())) {
+    return
+  }
+  await expandQuery().then(() => stepper.value?.next()).catch(() => undefined)
+}
+
+function confirmUnsupportedRelationMappings(): Promise<boolean> {
+  return new Promise((resolve) => {
+    $q.dialog({
+      title: t('queryExpansion.unsupportedMappingTitle'),
+      message: t('queryExpansion.unsupportedMappingMessage', {
+        count: invalidRelationMappingCategoryCount.value,
+      }),
+      cancel: {
+        label: t('cancel'),
+        flat: true,
+      },
+      ok: {
+        label: t('continue'),
+        color: 'warning',
+        flat: true,
+      },
+      persistent: true,
+    })
+      .onOk(() => resolve(true))
+      .onCancel(() => resolve(false))
+      .onDismiss(() => resolve(false))
+  })
 }
 </script>
 
@@ -1247,11 +1488,17 @@ function onContinueClick() {
 }
 
 .query-expansion-stepper .q-stepper__step-content {
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.semantic-scroll-box {
-  max-height: min(30rem, calc(92vh - 18rem));
+.semantic-catalog-scroll-box {
+  max-height: min(15rem, calc(92vh - 24rem));
+  overflow-y: auto;
+}
+
+.semantic-mapping-scroll-box {
+  max-height: min(22rem, calc(92vh - 18rem));
   overflow-y: auto;
 }
 
@@ -1261,14 +1508,87 @@ function onContinueClick() {
 }
 
 .mapping-drop-zone {
-  min-height: 18rem;
+  min-height: 14rem;
+}
+
+.relation-review-item,
+.category-review-item {
+  width: calc(100% - 0.5rem);
+  min-height: 4rem;
+  padding: 0;
+  border: 1px solid $grey-5;
+  border-left-width: 4px;
+  border-radius: 6px;
+  cursor: grab;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.relation-review-item > .q-item__section--main {
+  padding: 0.625rem 0.5rem 0.625rem 0.75rem;
+}
+
+.relation-review-item > .q-item__section--side {
+  padding-right: 0.75rem;
+}
+
+.category-review-item > .q-item__section--avatar {
+  padding-left: 0.75rem;
+}
+
+.category-review-item > .q-item__section--main {
+  padding: 0.625rem 0.5rem;
+}
+
+.category-review-item > .q-item__section--side {
+  padding-right: 0.75rem;
+}
+
+.relation-review-item:active,
+.category-review-item:active {
+  cursor: grabbing;
+}
+
+.relation-review-item--mapped {
+  border-color: $primary;
+  background: rgba($primary, 0.12);
+}
+
+.relation-review-item--inactive {
+  border-color: $grey-6;
+  background: $grey-2;
+}
+
+.category-review-item--mapped {
+  border-color: $primary;
+  background: rgba($primary, 0.12);
+}
+
+.category-review-item--selected {
+  border-color: $grey-6;
+  border-left-color: $primary;
+  background: rgba($primary, 0.05);
+}
+
+.category-review-item--inactive {
+  border-color: $grey-6;
+  background: $grey-2;
+}
+
+.category-review-status {
+  margin-top: 0.125rem;
+  font-weight: 500;
+}
+
+.body--dark .relation-review-item--inactive,
+.body--dark .category-review-item--inactive {
+  background: $grey-9;
 }
 
 .relation-role-drop-zone {
-  min-height: 5rem;
+  min-height: 4rem;
   border: 1px dashed $grey-5;
   border-radius: 4px;
-  padding: 0.5rem;
+  padding: 0.375rem;
 }
 
 .source-zone {

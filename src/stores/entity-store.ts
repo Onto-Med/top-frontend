@@ -373,6 +373,7 @@ export const useEntityStore = defineStore('entity', {
     async deleteEntity(entity: Entity, cascade?: boolean) {
       const index = this.entities.findIndex((e) => e.id === entity.id)
       if (index === -1) return
+      const cascadeIds = cascade ? this.collectSubtreeEntityIds(entity) : new Set<string>()
 
       if (entity.version) {
         const organisationId = this.organisationId
@@ -394,12 +395,17 @@ export const useEntityStore = defineStore('entity', {
             deleteOptions,
           )
           .then(() => {
-            if (organisationId === this.organisationId && repositoryId === this.repositoryId)
-              this.entities.splice(index, 1)
+            if (organisationId === this.organisationId && repositoryId === this.repositoryId) {
+              if (cascade) this.entities = this.entities.filter((e) => !cascadeIds.has(e.id || ''))
+              else this.entities.splice(index, 1)
+            }
           })
       } else {
-        this.entities.splice(index, 1)
+        if (cascade) this.entities = this.entities.filter((e) => !cascadeIds.has(e.id || ''))
+        else this.entities.splice(index, 1)
       }
+
+      if (cascade) return
 
       if (this.isCategory(entity)) {
         this.entities
@@ -418,6 +424,37 @@ export const useEntityStore = defineStore('entity', {
             if (entity.superConcepts) e.superConcepts?.push(...entity.superConcepts)
           })
       }
+    },
+
+    collectSubtreeEntityIds(entity: Entity): Set<string> {
+      const ids = new Set<string>()
+      const collect = (current: Entity) => {
+        if (!current.id || ids.has(current.id)) return
+        ids.add(current.id)
+        this.getDirectSubEntities(current).forEach(collect)
+      }
+      collect(entity)
+      return ids
+    },
+
+    getDirectSubEntities(entity: Entity): Entity[] {
+      if (this.isCategory(entity)) {
+        return this.entities.filter(
+          (e): e is Category | Phenotype =>
+            (this.isCategory(e) || this.isPhenotype(e)) && this.hasSuperCategory(e, entity),
+        )
+      }
+      if (this.isPhenotype(entity)) {
+        return this.entities.filter(
+          (e): e is Phenotype => this.isPhenotype(e) && e.superPhenotype?.id === entity.id,
+        )
+      }
+      if (this.isConcept(entity)) {
+        return this.entities.filter(
+          (e): e is Concept => this.isConcept(e) && this.hasSuperConcept(e, entity as SingleConcept),
+        )
+      }
+      return []
     },
 
     async deleteVersion(entity: Entity) {
