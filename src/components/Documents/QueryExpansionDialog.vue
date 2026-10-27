@@ -96,14 +96,11 @@
 <!--            </q-card-section>-->
 <!--          </q-card>-->
 
-          <div ref="semanticPanelsRef" class="semantic-review-panels">
-            <div
-              class="semantic-catalog-row row q-col-gutter-x-md"
-              :style="{ height: `${catalogPanelHeight}px` }"
-            >
-              <div class="col-12 col-md-6 semantic-catalog-scroll-box">
-                <q-list bordered separator dense>
-                <q-item-label header class="semantic-sticky-header catalog-sticky-header q-py-sm">
+          <div class="semantic-review-panels">
+            <div class="semantic-catalog-row row q-col-gutter-x-md">
+              <div class="col-12 col-md-6">
+                <q-list bordered separator dense class="semantic-catalog-scroll-box">
+                <q-item-label header class="q-py-sm">
                   {{ t('queryExpansion.relations') }}
                 </q-item-label>
                 <q-item v-if="loadingProfile">
@@ -142,9 +139,9 @@
                 </q-list>
               </div>
 
-            <div class="col-12 col-md-6 semantic-catalog-scroll-box">
-              <q-list bordered separator dense>
-                <q-item-label header class="semantic-sticky-header catalog-sticky-header q-py-sm">
+            <div class="col-12 col-md-6">
+              <q-list bordered separator dense class="semantic-catalog-scroll-box">
+                <q-item-label header class="q-py-sm">
                   {{ t('category', 2) }}
                 </q-item-label>
                 <q-item v-if="loadingProfile">
@@ -212,26 +209,16 @@
             </div>
             </div>
 
-            <div
-              class="semantic-panel-divider"
-              role="separator"
-              aria-orientation="horizontal"
-              :aria-label="t('queryExpansion.resizeSemanticPanels')"
-              @pointerdown="startSemanticPanelResize"
-            >
-              <q-icon name="drag_handle" size="sm" />
-            </div>
-
-            <div class="semantic-mapping-row">
+            <div class="semantic-mapping-row q-mt-md">
               <q-card
                 flat
                 bordered
-                class="mapping-drop-zone semantic-mapping-scroll-box"
+                class="mapping-drop-zone"
                 @dragover.prevent
                 @drop="dropRelationMapping"
               >
-                <q-card-section class="q-pa-sm">
-                  <div class="semantic-sticky-header mapping-sticky-header row items-center justify-between q-mb-xs">
+                <q-card-section class="mapping-carousel-section q-pa-sm">
+                  <div class="row items-center justify-between q-mb-xs">
                     <div class="text-subtitle2">{{ t('mapping', 2) }}</div>
                     <div class="text-caption text-grey-7">
                       {{ relationMappings.length }} {{ t('mapping', relationMappings.length) }}
@@ -242,14 +229,25 @@
                     {{ t('queryExpansion.noMappings') }}
                   </q-banner>
 
-                  <q-card
-                    v-for="mapping in relationMappings"
-                    :key="mapping.id"
-                    flat
-                    bordered
-                    class="q-mb-sm"
+                  <q-carousel
+                    v-if="relationMappings.length > 0"
+                    v-model="activeMappingId"
+                    animated
+                    arrows
+                    navigation
+                    swipeable
+                    control-color="primary"
+                    class="mapping-carousel"
+                    @wheel.stop.prevent="changeMappingWithWheel"
                   >
-                    <q-card-section class="q-pa-sm">
+                    <q-carousel-slide
+                      v-for="mapping in relationMappings"
+                      :key="mapping.id"
+                      :name="mapping.id"
+                      class="mapping-carousel-slide q-pa-sm"
+                    >
+                      <q-card flat bordered>
+                        <q-card-section class="q-pa-sm">
                       <div class="row items-start justify-between q-mb-xs">
                         <div>
                           <div class="text-subtitle2">{{ relationLabel(mapping.relationId) }}</div>
@@ -336,8 +334,10 @@
                           </div>
                         </div>
                       </div>
-                    </q-card-section>
-                  </q-card>
+                        </q-card-section>
+                      </q-card>
+                    </q-carousel-slide>
+                  </q-carousel>
                 </q-card-section>
               </q-card>
             </div>
@@ -510,7 +510,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
 import { QStepper, useDialogPluginComponent, useQuasar } from 'quasar'
 import {
   EntityType,
@@ -606,8 +606,6 @@ const entityStore = useEntityStore()
 const queryApi = inject(QueryApiKey)
 const queryExpansionApi = inject(QueryExpansionApiKey)
 const stepper = ref<QStepper>()
-const semanticPanelsRef = ref<HTMLElement>()
-const catalogPanelHeight = ref(240)
 const step = ref(1)
 const profiles = ref<QueryExpansionProfile[]>([])
 const selectedProfile = ref<QueryExpansionProfile>()
@@ -626,9 +624,11 @@ const expansionResponse = ref<QueryExpansionResponseWithDrafts>()
 const selectedDraftIds = ref<string[]>([])
 const selectedCategoryIds = ref<string[]>([])
 const relationMappings = ref<RelationMapping[]>([])
+const activeMappingId = ref('')
 const draggedRelationId = ref<string>()
 const draggedCategoryId = ref<string>()
 let mappingCounter = 0
+let mappingWheelUnlockTimer: ReturnType<typeof setTimeout> | undefined
 
 const conceptTitle = computed(() => getTitle(props.concept))
 const profileOptions = computed(() =>
@@ -787,54 +787,13 @@ onMounted(() => {
   void loadDataSources()
 })
 
-onBeforeUnmount(() => stopSemanticPanelResize())
-
-let semanticPanelResizeCleanup: (() => void) | undefined
-
-function startSemanticPanelResize(event: PointerEvent) {
-  const panels = semanticPanelsRef.value
-  if (!panels) return
-  event.preventDefault()
-  stopSemanticPanelResize()
-
-  const startY = event.clientY
-  const startHeight = catalogPanelHeight.value
-  const minimumCatalogHeight = 160
-  const minimumMappingHeight = 224
-  const dividerHeight = 20
-  const maximumCatalogHeight = Math.max(
-    minimumCatalogHeight,
-    panels.clientHeight - minimumMappingHeight - dividerHeight,
-  )
-  const previousCursor = document.body.style.cursor
-  const previousUserSelect = document.body.style.userSelect
-
-  const resize = (moveEvent: PointerEvent) => {
-    catalogPanelHeight.value = Math.min(
-      maximumCatalogHeight,
-      Math.max(minimumCatalogHeight, startHeight + moveEvent.clientY - startY),
-    )
-  }
-  const stop = () => stopSemanticPanelResize()
-
-  document.body.style.cursor = 'row-resize'
-  document.body.style.userSelect = 'none'
-  window.addEventListener('pointermove', resize)
-  window.addEventListener('pointerup', stop)
-  window.addEventListener('pointercancel', stop)
-  semanticPanelResizeCleanup = () => {
-    window.removeEventListener('pointermove', resize)
-    window.removeEventListener('pointerup', stop)
-    window.removeEventListener('pointercancel', stop)
-    document.body.style.cursor = previousCursor
-    document.body.style.userSelect = previousUserSelect
-  }
-}
-
-function stopSemanticPanelResize() {
-  semanticPanelResizeCleanup?.()
-  semanticPanelResizeCleanup = undefined
-}
+watch(
+  () => relationMappings.value.map(({ id }) => id),
+  (mappingIds) => {
+    if (!mappingIds.includes(activeMappingId.value)) activeMappingId.value = mappingIds[0] || ''
+  },
+  { immediate: true },
+)
 
 function getGeneratedSynonymConceptDraftIds(drafts: SingleConcept[]): Set<string> {
   const synonymCategoryDraftIds = new Set(
@@ -1356,6 +1315,7 @@ function addRelationMapping(relationId: string) {
   if (!relation) return
   const mapping = createRelationMapping(relation)
   relationMappings.value.push(mapping)
+  activeMappingId.value = mapping.id
   selectMappingCategories(mapping)
 }
 
@@ -1367,6 +1327,29 @@ function selectMappingCategories(mapping: RelationMapping) {
 
 function removeRelationMapping(mappingId: string) {
   relationMappings.value = relationMappings.value.filter(({ id }) => id !== mappingId)
+}
+
+function changeMappingWithWheel(event: WheelEvent) {
+  if (relationMappings.value.length < 2) return
+
+  if (mappingWheelUnlockTimer) {
+    clearTimeout(mappingWheelUnlockTimer)
+    mappingWheelUnlockTimer = setTimeout(() => {
+      mappingWheelUnlockTimer = undefined
+    }, 180)
+    return
+  }
+
+  const currentIndex = relationMappings.value.findIndex(({ id }) => id === activeMappingId.value)
+  const direction = event.deltaY > 0 ? 1 : -1
+  const nextIndex = Math.min(
+    relationMappings.value.length - 1,
+    Math.max(0, currentIndex + direction),
+  )
+  activeMappingId.value = relationMappings.value[nextIndex]?.id || activeMappingId.value
+  mappingWheelUnlockTimer = setTimeout(() => {
+    mappingWheelUnlockTimer = undefined
+  }, 180)
 }
 
 function startRelationDrag(relationId: string) {
@@ -1570,81 +1553,53 @@ function confirmUnsupportedRelationMappings(): Promise<boolean> {
   padding: 0.375rem 0.5rem !important;
 }
 
-.semantic-review-panels {
-  display: flex;
-  flex-direction: column;
-  height: min(38rem, calc(92vh - 19rem));
-  min-height: 24rem;
-}
-
-.semantic-catalog-row {
-  flex: 0 0 auto;
-  min-height: 10rem;
-  overflow: hidden;
-}
-
-.semantic-catalog-row > div {
-  height: 100%;
-  min-height: 0;
+.semantic-catalog-scroll-box {
+  height: 19rem;
   overflow-x: hidden;
-}
-
-.semantic-catalog-scroll-box,
-.semantic-mapping-scroll-box {
-  display: block;
-  height: 100%;
-  min-height: 0;
-  max-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto !important;
+  overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.semantic-panel-divider {
-  flex: 0 0 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $grey-7;
-  cursor: row-resize;
-  touch-action: none;
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
-}
-
-.semantic-panel-divider:hover {
-  color: $primary;
-  border-color: rgba($primary, 0.45);
-  background: rgba($primary, 0.05);
-}
-
 .semantic-mapping-row {
+  height: 13rem;
+}
+
+.mapping-drop-zone,
+.mapping-carousel-section {
+  height: 100%;
+}
+
+.mapping-carousel-section {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.mapping-carousel {
   flex: 1 1 auto;
-  min-height: 14rem;
-  overflow: hidden;
+  min-height: 0;
+  background: transparent;
 }
 
-.semantic-sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: white !important;
+.mapping-carousel-slide {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 2rem !important;
 }
 
-.catalog-sticky-header {
-  top: 1px;
-  box-shadow: 0 1px 0 $grey-4;
+.mapping-carousel .q-carousel__navigation--bottom {
+  bottom: 0.125rem;
 }
 
-.mapping-sticky-header {
-  top: 0;
-  margin: -0.5rem -0.5rem 0.25rem;
-  padding: 0.5rem;
-  border-bottom: 1px solid $grey-4;
+.mapping-carousel .q-carousel__navigation .q-btn {
+  min-width: 1rem;
+  min-height: 1rem;
+  margin: 0 0.0625rem;
+  padding: 0;
 }
 
-.body--dark .semantic-sticky-header {
-  background: $dark !important;
+.mapping-carousel .q-carousel__navigation .q-icon {
+  font-size: 0.5rem;
 }
 
 .preview-scroll-box {
@@ -1653,7 +1608,7 @@ function confirmUnsupportedRelationMappings(): Promise<boolean> {
 }
 
 .mapping-drop-zone {
-  min-height: 14rem;
+  min-height: 0;
 }
 
 .relation-review-item,
@@ -1745,28 +1700,16 @@ function confirmUnsupportedRelationMappings(): Promise<boolean> {
 }
 
 @media (max-width: 1023px) {
-  .semantic-review-panels {
-    height: auto;
-    min-height: 0;
-  }
-
-  .semantic-catalog-row {
-    height: auto !important;
-    min-height: 0;
-  }
-
   .semantic-catalog-row > div {
-    height: 15rem;
     margin-bottom: 0.75rem;
   }
 
-  .semantic-panel-divider {
-    display: none;
+  .semantic-catalog-scroll-box {
+    height: 18rem;
   }
 
   .semantic-mapping-row {
-    flex: none;
-    height: 22rem;
+    height: 16rem;
   }
 }
 </style>
